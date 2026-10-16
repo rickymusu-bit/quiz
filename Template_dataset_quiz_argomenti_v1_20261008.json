@@ -1,0 +1,192 @@
+{
+  "versione": 1,
+  "titolo": "Template della banca di domande di fisica",
+  "argomenti": [
+    {
+      "id": "misure_si",
+      "nome": "Misure e Sistema Internazionale",
+      "domande": [
+        {
+          "id": "misure_si_001",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Qual è l’unità di misura della lunghezza nel Sistema Internazionale?",
+          "alternative": [
+            "Metro",
+            "Secondo",
+            "Chilogrammo",
+            "Kelvin"
+          ],
+          "corretta": "A",
+          "spiegazione": "La lunghezza si misura in metri, simbolo m."
+        },
+        {
+          "id": "misure_si_002",
+          "difficolta": "facile",
+          "tipologia": "calcolo",
+          "testo": "A quanti metri corrispondono 2,5 km?",
+          "alternative": [
+            "250 m",
+            "2 500 m",
+            "25 m",
+            "25 000 m"
+          ],
+          "corretta": "B",
+          "spiegazione": "Un chilometro equivale a 1 000 metri."
+        },
+        {
+          "id": "misure_si_003",
+          "difficolta": "media",
+          "tipologia": "calcolo",
+          "testo": "A quanto corrisponde \\(1\\,\\mathrm{cm}^2\\) in metri quadrati?",
+          "alternative": [
+            "\\(10^{-2}\\,\\mathrm{m}^2\\)",
+            "\\(10^{-4}\\,\\mathrm{m}^2\\)",
+            "\\(10^{2}\\,\\mathrm{m}^2\\)",
+            "\\(10^{-1}\\,\\mathrm{m}^2\\)"
+          ],
+          "corretta": "B",
+          "spiegazione": "Poiché \\(1\\,\\mathrm{cm}=10^{-2}\\,\\mathrm{m}\\), elevando al quadrato si ottiene \\(10^{-4}\\,\\mathrm{m}^2\\)."
+        },
+        {
+          "id": "misure_si_004",
+          "difficolta": "media",
+          "tipologia": "calcolo",
+          "testo": "Qual è la scrittura in notazione scientifica di \\(0{,}00045\\)?",
+          "alternative": [
+            "\\(4{,}5\\times10^{-4}\\)",
+            "\\(4{,}5\\times10^{-3}\\)",
+            "\\(45\\times10^{4}\\)",
+            "\\(4{,}5\\times10^{4}\\)"
+          ],
+          "corretta": "A",
+          "spiegazione": "La mantissa è compresa tra 1 e 10. Si sposta la virgola di quattro posti, ottenendo \\(4{,}5\\times10^{-4}\\)."
+        }
+      ]
+    },
+    {
+      "id": "cinematica",
+      "nome": "Cinematica",
+      "domande": [
+        {
+          "id": "cinematica_001",
+          "difficolta": "facile",
+          "tipologia": "calcolo",
+          "testo": "Un corpo percorre 100 m in 20 s. Qual è la sua velocità media?",
+          "alternative": [
+            "5 m/s",
+            "20 m/s",
+            "80 m/s",
+            "2 000 m/s"
+          ],
+          "corretta": "A",
+          "spiegazione": "\\(v_m=\\frac{100\\,\\mathrm{m}}{20\\,\\mathrm{s}}=5\\,\\mathrm{m/s}\\)."
+        },
+        {
+          "id": "cinematica_002",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Nel moto rettilineo uniforme, quale grandezza rimane costante?",
+          "alternative": [
+            "Posizione",
+            "Tempo trascorso",
+            "Velocità",
+            "Spazio percorso"
+          ],
+          "corretta": "C",
+          "spiegazione": "La velocità rimane costante e l’accelerazione è nulla."
+        },
+        {
+          "id": "cinematica_003",
+          "difficolta": "media",
+          "tipologia": "calcolo",
+          "testo": "Un veicolo viaggia a 72 km/h. Qual è la velocità in m/s?",
+          "alternative": [
+            "10 m/s",
+            "20 m/s",
+            "72 m/s",
+            "259,2 m/s"
+          ],
+          "corretta": "B",
+          "spiegazione": "\\(v=\\frac{72}{3{,}6}\\,\\mathrm{m/s}=20\\,\\mathrm{m/s}\\)."
+        },
+        {
+          "id": "cinematica_004",
+          "difficolta": "media",
+          "tipologia": "calcolo",
+          "testo": "Un corpo parte da fermo e accelera a 2 m/s² per 3 s. Qual è la velocità finale?",
+          "alternative": [
+            "2 m/s",
+            "3 m/s",
+            "5 m/s",
+            "6 m/s"
+          ],
+          "corretta": "D",
+          "spiegazione": "\\(v=v_0+at=0+2\\cdot3=6\\,\\mathrm{m/s}\\)."
+        }
+      ]
+    },
+    {
+      "id": "energia",
+      "nome": "Lavoro ed energia",
+      "domande": [
+        {
+          "id": "energia_001",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Qual è l’unità di misura dell’energia nel Sistema Internazionale?",
+          "alternative": [
+            "Newton",
+            "Watt",
+            "Joule",
+            "Pascal"
+          ],
+          "corretta": "C",
+          "spiegazione": "L’energia si misura in joule, simbolo J."
+        },
+        {
+          "id": "energia_002",
+          "difficolta": "facile",
+          "tipologia": "ragionamento",
+          "testo": "A parità di massa, raddoppiando la velocità, come cambia l’energia cinetica?",
+          "alternative": [
+            "Raddoppia",
+            "Quadruplica",
+            "Si dimezza",
+            "Rimane costante"
+          ],
+          "corretta": "B",
+          "spiegazione": "\\(E_c=\\frac{1}{2}mv^2\\): il quadrato della velocità aumenta di un fattore 4."
+        },
+        {
+          "id": "energia_003",
+          "difficolta": "media",
+          "tipologia": "calcolo",
+          "testo": "Un corpo di massa 2 kg si muove a 3 m/s. Quanto vale l’energia cinetica?",
+          "alternative": [
+            "3 J",
+            "6 J",
+            "9 J",
+            "18 J"
+          ],
+          "corretta": "C",
+          "spiegazione": "\\(E_c=\\frac{1}{2}\\cdot2\\cdot3^2=9\\,\\mathrm{J}\\)."
+        },
+        {
+          "id": "energia_004",
+          "difficolta": "media",
+          "tipologia": "calcolo",
+          "testo": "Una forza costante di 10 N agisce nella stessa direzione e nello stesso verso di uno spostamento di 2 m. Qual è il lavoro?",
+          "alternative": [
+            "5 J",
+            "10 J",
+            "12 J",
+            "20 J"
+          ],
+          "corretta": "D",
+          "spiegazione": "\\(L=Fs=10\\cdot2=20\\,\\mathrm{J}\\)."
+        }
+      ]
+    }
+  ]
+}

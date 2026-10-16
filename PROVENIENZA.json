@@ -1,0 +1,27 @@
+{
+  "repository_origine": "https://github.com/rickymusu-bit/fisica",
+  "commit_origine": "172b8e5eb111a2b6a4717a9a1cd7c2b9eb1bb1c1",
+  "percorso_origine": "quiz/",
+  "file": [
+    {
+      "nome": "Chi_vuol_essere_rimandato_quiz_v3_20261008.html",
+      "sha256": "8bc73bcbdcf3941a618bb95154fc564123d3f6a32a0fba9b68a23e4b01c10ed9",
+      "byte": 6360835
+    },
+    {
+      "nome": "Chi_vuol_essere_rimandato_regole_v9_20261008.html",
+      "sha256": "a16479dd9b1d910e86ef00b7734632fd5532dbd24c8035216b0ed9b8089c3fea",
+      "byte": 2305334
+    },
+    {
+      "nome": "Prompt_generazione_dataset_quiz_v1_20261008.txt",
+      "sha256": "e4e28eaa900bcad4dcadd630131bacddb9eb1d38ea6f6707d2eaf378602481ce",
+      "byte": 9714
+    },
+    {
+      "nome": "Template_dataset_quiz_argomenti_v1_20261008.json",
+      "sha256": "22e2d83ca33b1d586500337478dee9a3cff044bd520e7b39e3b9b56427cc1eba",
+      "byte": 6126
+    }
+  ]
+}

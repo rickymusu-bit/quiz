@@ -1,0 +1,162 @@
+PROMPT PER GENERARE UNA BANCA DI DOMANDE PER «CHI VUOL ESSERE RIMANDATO»
+Versione 1 — 08/10/2026
+
+Compila i parametri qui sotto, poi invia l’intero prompt a ChatGPT.
+
+PARAMETRI DA COMPILARE
+
+CLASSE DESTINATARIA:
+[Scrivi classe, indirizzo scolastico e, se utile, livello di preparazione.]
+
+DISCIPLINA:
+[Per esempio: Fisica.]
+
+ARGOMENTI DA INCLUDERE:
+- [Nome del primo argomento e relativi sottoargomenti.]
+- [Nome del secondo argomento e relativi sottoargomenti.]
+- [Aggiungi altri argomenti se necessario.]
+
+ARGOMENTI SPECIFICI DA EVITARE:
+- [Contenuti non ancora svolti, formule, tecniche o sottoargomenti da escludere.]
+- [Aggiungi altri vincoli oppure scrivi «Nessuno».]
+
+NUMERO DI DOMANDE PER ARGOMENTO:
+100
+[Puoi aumentare questo numero. È il numero per ciascun argomento, non il totale.]
+
+NUMERO DI ALTERNATIVE PER DOMANDA:
+4
+[Il quiz HTML attuale richiede esattamente 4 alternative. Per altri usi puoi cambiare il numero, ma un dataset con un numero diverso non è compatibile con questa versione dell’app.]
+
+DIFFICOLTÀ:
+[Scrivi: facile, medio, difficile oppure misto.]
+
+DISTRIBUZIONE SE LA DIFFICOLTÀ È «MISTO»:
+30% facile, 40% medio, 30% difficile.
+[Puoi cambiare le percentuali, mantenendo il totale al 100%.]
+
+EQUILIBRIO DELLE TIPOLOGIE:
+Circa 30% conoscenza, 40% ragionamento, 30% calcolo.
+[Puoi modificare le proporzioni. Inserisci calcolo solo dove è pertinente alla disciplina e all’argomento.]
+
+ULTERIORI VINCOLI DIDATTICI:
+[Per esempio: calcolatrice consentita o vietata, formule già note, convenzioni sui simboli e arrotondamenti. Oppure scrivi «Nessuno».]
+
+
+COMPITO
+
+Crea una banca di domande a scelta multipla, organizzata per argomento, destinata alla classe indicata. La banca servirà a estrarre quiz diversi da 33 domande. Non creare soltanto una singola partita da 33 domande: produci il numero richiesto PER OGNI argomento.
+
+Rispetta rigorosamente i contenuti inclusi e quelli da evitare. Un argomento escluso non deve essere necessario per rispondere neppure come passaggio intermedio, conoscenza implicita o prerequisito non dichiarato.
+
+Se mancano classe, argomenti o difficoltà, chiedi di completare i parametri prima di generare la banca. Non scegliere questi dati al posto del docente.
+
+
+QUALITÀ E VARIETÀ DELLE DOMANDE
+
+1. Ogni domanda deve avere una e una sola alternativa corretta. Evita interpretazioni diverse, dati insufficienti e assunzioni nascoste. Specifica le condizioni fisiche o le convenzioni necessarie.
+
+2. Le domande devono essere comprensibili per la classe destinataria. Usa termini studiati, frasi chiare e una lunghezza adatta alla lettura sullo schermo. Per il quiz il tempo previsto è 30 secondi: limita i calcoli e i passaggi a quelli realisticamente eseguibili in questo tempo, tenendo conto della classe e dell’eventuale uso della calcolatrice.
+
+3. Alterna le seguenti tipologie:
+   - CONOSCENZA: definizioni, proprietà, unità, relazioni e riconoscimento di concetti.
+   - RAGIONAMENTO: previsioni, confronti, nessi causali, interpretazione di situazioni e individuazione di errori concettuali. Non limitarti a chiedere di ricordare una formula.
+   - CALCOLO: brevi problemi con dati e unità espliciti, soluzione numerica oppure simbolica, passaggi adeguati al tempo disponibile.
+
+4. Rendi le domande realmente varie. Non raggiungere il numero richiesto copiando lo stesso quesito e cambiando soltanto i numeri, i nomi o l’ordine delle parole. Distribuisci le domande tra i sottoargomenti ed evita doppioni anche tra argomenti diversi.
+
+5. Ogni domanda deve essere autonoma. Non fare riferimento alle altre domande, al loro ordine o a risposte date prima. Non usare immagini, tabelle o grafici esterni che non sono disponibili nel dataset. Descrivi nel testo gli elementi necessari.
+
+6. Per un argomento molto ristretto, non inventare contenuti né violare gli argomenti esclusi per raggiungere 100 domande. Se non puoi ottenere il numero richiesto con sufficiente varietà, segnala il limite e chiedi di ampliare l’ambito prima di consegnare il dataset.
+
+
+ALTERNATIVE E DISTRATTORI
+
+1. Usa esattamente il numero di alternative richiesto. Le alternative devono essere diverse e dello stesso tipo logico: grandezze confrontabili, unità compatibili, affermazioni strutturate in modo omogeneo.
+
+2. La risposta corretta NON deve essere riconoscibile perché è sistematicamente la più lunga, la più dettagliata, la più precisa o l’unica scritta bene. Mantieni lunghezza, struttura grammaticale e livello di dettaglio comparabili. Non allungare artificialmente i distrattori per pareggiare la lunghezza.
+
+3. Non ripetere nella sola risposta corretta una parola chiave del testo della domanda. Non dare indizi tramite concordanze grammaticali, stile diverso, precisione numerica o unità.
+
+4. I distrattori devono essere plausibili per quella classe. Basali su errori comuni: conversioni errate, confusione tra grandezze, segni, interpretazioni scorrette o uso improprio delle formule. Evita risposte palesemente assurde.
+
+5. Evita «tutte le precedenti», «nessuna delle precedenti» e alternative sovrapposte. Evita anche riferimenti come «A e C», perché l’applicazione mescola l’ordine delle alternative.
+
+6. Distribuisci la posizione della risposta corretta in modo approssimativamente equilibrato e senza sequenze prevedibili. Se sono richieste 4 alternative, usa le lettere A, B, C e D. La lettera nel campo «corretta» deve corrispondere all’ordine delle alternative nel file originale.
+
+
+DIFFICOLTÀ
+
+Valuta la difficoltà rispetto alla CLASSE DESTINATARIA, non in senso assoluto. La difficoltà non deve derivare da linguaggio oscuro, trabocchetti o contenuti esclusi.
+
+- FACILE: riconoscimento di un concetto fondamentale o applicazione diretta con un passaggio semplice.
+- MEDIO: scelta della relazione appropriata, breve ragionamento o calcolo con una conversione o due passaggi semplici.
+- DIFFICILE: confronto tra situazioni, collegamento di concetti o individuazione di un errore non immediato, sempre entro il programma indicato e con tempi adeguati.
+- MISTO: applica a ciascun argomento le percentuali indicate. Il campo della singola domanda deve comunque essere «facile», «media» oppure «difficile»: NON scrivere «misto» nel JSON. Il parametro «medio» corrisponde al valore JSON «media».
+
+Se la difficoltà scelta è unica, tutte le domande devono riportare quel livello. Se la difficoltà è mista, arrotonda le quantità intere mantenendo esattamente il totale di domande richiesto per ogni argomento.
+
+
+FORMULE E NOTAZIONE MATEMATICA
+
+1. Scrivi formule, frazioni, potenze, indici e radici in LaTeX compatibile con KaTeX.
+2. Racchiudi le formule inline tra \( e \); quelle su una riga separata tra \[ e \].
+3. Nel file JSON raddoppia ogni barra inversa. Esempio di stringa JSON valida:
+   "L’energia cinetica è \\(E_c=\\frac{1}{2}mv^2\\)."
+4. Usa \frac per le divisioni e \cdot oppure \times per le moltiplicazioni. Le unità nelle formule vanno in \mathrm{...}.
+5. Non inserire codice HTML, delimitatori Markdown o comandi LaTeX non supportati. Non usare \includegraphics, macro personalizzate o collegamenti esterni.
+6. Le formule devono apparire anche nelle alternative e nelle spiegazioni, quando servono.
+7. Distingui chiaramente simboli, unità e valori numerici. Se servono arrotondamenti, indicali nel testo e scegli alternative sufficientemente distinte.
+
+
+SPIEGAZIONI E VERIFICA
+
+Per ogni domanda fornisci una spiegazione breve ma utile. Spiega perché la risposta è corretta. Nei calcoli mostra la relazione, la sostituzione dei valori e il risultato con l’unità. Nei quesiti di ragionamento esplicita il nesso logico. Non scrivere soltanto «La risposta corretta è B».
+
+Prima della consegna:
+- risolvi ogni quesito indipendentemente dalle alternative;
+- ricontrolla formule, valori, conversioni, unità e lettera corretta;
+- verifica che nessun distrattore possa essere considerato corretto;
+- elimina domande ripetute e indizi basati sulla lunghezza delle risposte;
+- verifica il numero esatto di domande per ciascun argomento;
+- controlla che ID di argomenti e domande siano univoci;
+- verifica la correttezza del JSON e l’escaping del LaTeX.
+
+
+FORMATO DI CONSEGNA
+
+Consegna un unico file .json separato dall’applicazione, con questa struttura:
+
+{
+  "versione": 1,
+  "titolo": "Banca di domande — disciplina e classe",
+  "argomenti": [
+    {
+      "id": "id_argomento",
+      "nome": "Nome leggibile dell’argomento",
+      "domande": [
+        {
+          "id": "id_argomento_001",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Testo completo della domanda.",
+          "alternative": [
+            "Prima alternativa",
+            "Seconda alternativa",
+            "Terza alternativa",
+            "Quarta alternativa"
+          ],
+          "corretta": "C",
+          "spiegazione": "Spiegazione della soluzione."
+        }
+      ]
+    }
+  ]
+}
+
+I valori ammessi per «tipologia» sono «conoscenza», «ragionamento», «calcolo».
+I valori ammessi per «difficolta» sono «facile», «media», «difficile».
+Usa ID stabili, leggibili e senza spazi, per esempio «energia_001».
+Lo schema sopra è un esempio strutturale: non includere nel dataset le domande segnaposto e non usare i puntini di sospensione per sostituire contenuti mancanti.
+
+Se puoi creare allegati, consegna il file JSON completo. Altrimenti restituisci il JSON completo senza commenti, introduzioni o testo aggiuntivo. Non consegnare silenziosamente un dataset parziale. Se il contenuto è troppo grande per una sola risposta, proponi prima una produzione per argomento, mantenendo lo stesso schema e ID globalmente univoci.
