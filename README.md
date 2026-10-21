@@ -9,11 +9,11 @@ Materiali del quiz di Riccardo Musumarra, separati dal repository `rickymusu-bit
 
 ## Documenti di riferimento
 
-- [Regolamento ufficiale](docs/REGOLAMENTO_UFFICIALE.md) — fonte normativa del gioco, versione 2.0.0.
-- [Specifiche del programma](docs/SPECIFICHE_PROGRAMMA.md) — comportamento, formato dataset, criteri di accettazione e stato dell'implementazione, versione 2.0.0.
+- [Regolamento ufficiale](docs/REGOLAMENTO_UFFICIALE.md) — fonte normativa del gioco, versione 3.0.0.
+- [Specifiche del programma](docs/SPECIFICHE_PROGRAMMA.md) — comportamento, formato dataset, criteri di accettazione e stato dell'implementazione, versione 3.0.0.
 
 Prima di modificare il programma o la presentazione, leggere entrambi i documenti. Il regolamento prevale sulle specifiche e sugli HTML; le questioni aperte richiedono una decisione esplicita, senza trasformare automaticamente il codice esistente in una regola. Le modifiche alle regole devono aggiornare i riferimenti e le verifiche pertinenti. Le migliorie indicate come future non sono già implementate.
 
-I documenti hanno nomi stabili, versione interna e cronologia Git. Gli HTML attuali non sono ancora adeguati al regolamento 2.0.0: applicano ancora −1 per errore/scadenza, 30 secondi predefiniti e il precedente premio del 10 a soglia. Prima di usare le nuove regole con il programma e la presentazione occorre aggiornarli.
+I documenti hanno nomi stabili, versione interna e cronologia Git. Gli HTML attuali non sono ancora adeguati al regolamento 3.0.0: applicano ancora −1 per errore/scadenza, 30 secondi predefiniti e il precedente premio del 10 a soglia. Mancano inoltre salvataggio/ripresa e spareggio «Chi vuol essere eliminato»; il vecchio comando di fine modulo non applica la nuova sospensione. Prima di usare le nuove regole con il programma e la presentazione occorre aggiornarli.
 
 Scarica gli HTML e aprili nel browser. I materiali originari sono stati trasferiti integralmente: la loro provenienza e i relativi hash sono registrati in `PROVENIENZA.json`; la cronologia precedente rimane nel repository di origine. Nessuna pubblicazione GitHub Pages è stata attivata per il quiz.

@@ -1,20 +1,20 @@
 # Chi vuol essere rimandato — Regolamento ufficiale
 
-Versione: **2.0.0** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
+Versione: **3.0.0** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
 
 ## 1. Autorità e ambito
 
 Questo documento è la fonte normativa delle regole del gioco. Il programma e la presentazione HTML devono applicarlo e rappresentarlo fedelmente. Le [specifiche del programma](SPECIFICHE_PROGRAMMA.md) traducono queste regole in requisiti verificabili, senza modificarle.
 
-La prima edizione consolidava il regolamento HTML v9 presente nel repository. La versione 2.0.0 recepisce le modifiche richieste il 21/10/2026 a punteggi, tempo e premio finale; gli HTML v3/v9 sono ancora basati sulle regole precedenti e devono essere allineati prima di usarli con questo regolamento. Non certifica che il programma e la presentazione siano già conformi a ogni requisito delle specifiche. Le questioni non definite sono elencate in fondo: il comportamento esistente del codice non costituisce da solo una nuova regola.
+La versione 3.0.0 recepisce le decisioni del 21/10/2026: 33 domande ordinarie, sospensione alla campanella, spareggio a eliminazione, timer unico e premio fisso. Il programma HTML v3 e la presentazione v9 devono ancora essere adeguati. Le questioni non definite sono elencate in fondo: il comportamento esistente del codice non costituisce da solo una nuova regola.
 
 Gli identificativi `REG-xx` restano stabili nelle revisioni, per collegare regole, requisiti e verifiche.
 
 ## 2. Preparazione
 
-- **REG-01 — Gruppi.** La classe si divide in tre gruppi. Ogni gruppo nomina un portavoce, che comunica la risposta a nome del gruppo.
+- **REG-01 — Gruppi.** Il professore forma tre gruppi equilibrati. La responsabilità di bilanciarne la composizione è del professore. Ogni gruppo nomina un portavoce, che comunica la risposta a nome del gruppo.
 - **REG-02 — Partenza e rotazione.** Tutti partono da zero punti. Un sorteggio stabilisce il primo gruppo titolare della domanda; viene stabilita una rotazione dei tre gruppi, usata dopo un errore o un tempo scaduto.
-- **REG-03 — Formato ordinario.** La partita ordinaria comprende 33 domande, ciascuna con quattro alternative e una sola risposta corretta. Il tempo predefinito è di **45 secondi complessivi** per domanda a partire dallo svelamento: **15 secondi per leggerla e 30 secondi per rispondere**. La suddivisione non introduce automaticamente un blocco delle risposte nei primi 15 secondi: questo dettaglio resta da definire in DEC-09. Il programma attuale consente sessioni ridotte e un timer diverso: sono varianti organizzative che il docente deve comunicare prima dell'inizio, anche nella presentazione se usata per quella sessione.
+- **REG-03 — Formato e tempo.** La fase ordinaria comprende **33 domande**, ciascuna con quattro alternative e una sola risposta corretta. Il tempo predefinito per domanda è un **unico periodo di 45 secondi**, a partire dallo svelamento; si può rispondere fin dall'inizio. Il calcolo «15 secondi per leggere + 30 per rispondere» è una stima organizzativa del docente: non è una suddivisione del tempo di gioco, non blocca le risposte e non va presentato ai giocatori come due fasi. Eventuali domande di spareggio sono aggiuntive rispetto alle 33. Un timer diverso, se impostato dal docente, va comunicato prima della partita. La modalità regolamentare non termina anticipatamente perché finisce una lezione.
 - **REG-04 — Materiale consentito.** Sono consentiti solo un foglio bianco, una penna e una calcolatrice. Il foglio deve essere bianco all'inizio e può essere usato per i calcoli durante il gioco. Non si possono consultare appunti.
 
 ## 3. Domanda e turno
@@ -24,7 +24,7 @@ Gli identificativi `REG-xx` restano stabili nelle revisioni, per collegare regol
 - **REG-07 — Risposta corretta.** Una risposta corretta vale +1 punto. Il gruppo può tenere la domanda successiva oppure passarla, prima di conoscerne il testo, salvo REG-08.
 - **REG-08 — Tre corrette consecutive.** Dopo tre risposte corrette consecutive, il gruppo deve passare la domanda successiva a un altro gruppo a sua scelta, senza conoscerne il testo.
 - **REG-09 — Errore e tempo scaduto.** Una risposta sbagliata o il tempo scaduto senza risposta vale **0 punti**: il punteggio resta invariato. Si perdono punti **solo per una sanzione**. La domanda è conclusa e il turno della successiva passa al gruppo successivo della rotazione, tenendo conto di eventuali turni da saltare.
-- **REG-10 — Nessuna eliminazione.** Tutti restano in gioco anche a zero punti o con punteggio negativo. I punti persi per sanzioni possono essere recuperati con risposte corrette.
+- **REG-10 — Nessuna eliminazione nella fase ordinaria.** Nelle 33 domande ordinarie tutti restano in gioco anche a zero punti o con punteggio negativo. I punti persi per sanzioni possono essere recuperati con risposte corrette.
 
 ## 4. Comportamento e sanzioni
 
@@ -46,9 +46,11 @@ Gli identificativi `REG-xx` restano stabili nelle revisioni, per collegare regol
 
 ## 6. Conclusione e riconoscimento
 
-- **REG-20 — Fine della sessione.** La sessione termina alla fine delle domande oppure alla fine del modulo, dichiarata dal docente. Nessun punteggio raggiunto durante la partita la conclude anticipatamente.
-- **REG-21 — Vittoria e voto blu facoltativo.** Vince il gruppo che ha il punteggio più alto **alla fine della sessione**. I suoi membri ottengono la possibilità di far riportare **il punteggio finale del gruppo come voto blu** sul registro: è una possibilità, non un voto assegnato automaticamente. Per esempio, se il gruppo vincitore termina con 8 punti, il voto proposto è 8. Non è più previsto il premio automatico del 10 al raggiungimento di una soglia. Pareggi e punteggi fuori dalla scala dei voti restano da definire in DEC-07 e DEC-08.
-- **REG-22 — Registro.** Il programma deve indicare il gruppo con il punteggio finale più alto e il relativo punteggio. L'accettazione del voto e la sua registrazione restano gestite dal docente; nessuna scrittura automatica su ClasseViva. Se si verifica un caso ancora aperto, il programma deve segnalarlo senza inventare uno spareggio o una conversione del punteggio.
+- **REG-20 — Fine della fase ordinaria e campanella.** La fase ordinaria termina dopo le **33 domande**, non alla fine del modulo o della lezione. Se suona la campanella prima di aver concluso la partita, si sospende e si riprende la volta successiva **con le stesse squadre**, conservando punteggi e stato di avanzamento. La campanella non determina un vincitore né l'assegnazione del premio. La sospensione vale anche se è in corso lo spareggio.
+- **REG-21 — Vittoria e premio fisso.** Dopo le 33 domande vince il gruppo con più punti. Se più gruppi sono a pari merito al primo posto, si applica REG-23. Ai membri del gruppo vincitore viene assegnato **un 10 blu sul registro**, indipendentemente dal punteggio ottenuto: vincere con 7, 10 o 12 punti dà lo stesso premio. Non è necessario raggiungere una soglia e il voto non coincide con il punteggio.
+- **REG-22 — Valutazione e registro.** Il 10 blu fa media con le altre attività valutate al di fuori delle verifiche, come **compiti a casa e progetti**. L'insieme di queste valutazioni viene tramutato in **un voto verde alla fine dell'anno scolastico**. Il 10 del quiz è quindi uno dei contributi a quella valutazione, non si trasforma da solo in un 10 verde. Il programma segnala il vincitore e il premio; registrazione del 10, media e attribuzione del voto verde restano al professore. Non sono stabiliti qui pesi o arrotondamenti della media.
+- **REG-23 — «Chi vuol essere eliminato».** In caso di parità al primo posto, partecipano allo spareggio solo i gruppi a pari merito. Si aggiungono domande extra, a cui i gruppi rispondono **a turno**. Il gruppo che sbaglia viene eliminato dallo spareggio. Si continua fino a quando rimane **un solo gruppo**, che vince la partita e il premio. Questa fase si chiama **«Chi vuol essere eliminato»**. La logica della fase ordinaria che consente di tenere o passare la domanda non si applica: qui si risponde a turno. I dettagli ancora da stabilire sono indicati in DEC-10 e DEC-11.
+
 
 ## 7. Questioni aperte: non sono nuove regole
 
@@ -61,10 +63,14 @@ Questi punti richiedono una decisione esplicita del responsabile prima di cambia
 | DEC-03 | Formalizzare gli effetti del rifiuto: punti, titolare, serie, consumo della domanda o sostituzione | Nessun punto; stesso titolare salvo turni da saltare; consuma una delle domande estratte, senza sostituzione |
 | DEC-04 | Formalizzare il cumulo dei turni saltati e il salto quando l'occasione deriva da un passaggio volontario | Ogni sanzione pertinente aggiunge un salto; consuma i salti anche sui passaggi volontari, procedendo nella rotazione |
 | DEC-05 | Una sanzione con salto al gruppo che sta già rispondendo interrompe il turno corrente o riguarda il successivo? | Durante la risposta non interrompe; nella schermata prima dello svelamento applica subito il salto |
-| DEC-06 | Durante una sanzione disciplinare si sospende il timer? Alla fine del modulo una domanda in corso è annullata senza punti? | Il dialogo sanzioni non sospende il timer; la chiusura del modulo non attribuisce punti alla domanda ancora in corso |
-| DEC-07 | In caso di parità al primo posto, vincono tutti i gruppi a pari merito oppure si fa uno spareggio? | Il programma precedente non determina il vincitore per punteggio finale |
-| DEC-08 | Come trattare il punteggio vincente superiore a 10, nullo o negativo? La scelta di accettare il voto è individuale o di gruppo? | Il vecchio premio era un 10 fisso; non esiste una conversione per la nuova regola |
-| DEC-09 | I primi 15 secondi sono una fase con risposte bloccate oppure una ripartizione indicativa dei 45 secondi? Come suddividere un timer personalizzato? | Il timer attuale è unico e consente risposte fin dallo svelamento |
+| DEC-06 | Durante una sanzione disciplinare si sospende il timer? | Il dialogo sanzioni non sospende il timer |
+| DEC-07 | Risolta: parità al primo posto | Si applica REG-23: spareggio «Chi vuol essere eliminato»; da implementare |
+| DEC-08 | Risolta: premio e punteggio | REG-21/22: 10 blu fisso al gruppo vincitore, a prescindere dai punti; sostituisce il voto facoltativo pari al punteggio |
+| DEC-09 | Risolta: timer | REG-03: unico periodo di 45 secondi, risposta consentita dall'inizio |
+| DEC-10 | Quale gruppo inizia lo spareggio e in quale ordine si procede? | Da decidere; l'ordine influisce sulle possibilità di vittoria nello spareggio a eliminazione immediata |
+| DEC-11 | Nello spareggio il tempo scaduto elimina come una risposta sbagliata? Come si applicano sanzioni, salti del turno e rifiuti? | Da decidere prima di implementare quei casi; non estendere automaticamente l'eliminazione a eventi diversi dall'errore |
+| DEC-12 | Se la campanella suona durante una domanda già svelata, si riprende dal tempo residuo o si usa una domanda sostitutiva? | La sospensione è stabilita; il trattamento della domanda svelata resta da decidere, considerando il tempo aggiuntivo di riflessione tra lezioni |
+
 
 ## 8. Revisioni
 
@@ -76,3 +82,4 @@ I nomi dei documenti restano stabili per non rompere i collegamenti. La versione
 | --- | --- | --- |
 | 1.0.0 | 21/10/2026 | Consolidamento iniziale del regolamento HTML v9, gerarchia delle fonti e questioni aperte |
 | 2.0.0 | 21/10/2026 | Errore e scadenza senza penalità; 45 secondi predefiniti (15+30); vittoria per punteggio finale e possibilità del voto blu pari al punteggio; nuovi casi aperti |
+| 3.0.0 | 21/10/2026 | 33 domande e ripresa alla lezione successiva; squadre equilibrate a cura del docente; spareggio a eliminazione; timer unico; 10 blu fisso e contributo alla valutazione verde di fine anno |
