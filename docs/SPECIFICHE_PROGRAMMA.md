@@ -1,12 +1,12 @@
 # Skool — Specifiche del programma
 
-Versione: **14.1.0** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
+Versione: **14.1.1** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
 
 Regolamento di riferimento: [REGOLAMENTO_UFFICIALE.md, v14.0.1](REGOLAMENTO_UFFICIALE.md).
 
 ## 1. Scopo e gerarchia
 
-Il prodotto si chiama **Skool**. L’identità visiva ha come riferimento Doom ed è descritta nel documento separato [ASPETTO_GRAFICO.md](ASPETTO_GRAFICO.md), versione 1.0.0. La direzione estetica non è ancora implementata e i suoi dettagli saranno raccolti progressivamente.
+Il prodotto si chiama **Skool**. L’identità visiva ha come riferimento **Doom classico, con estetica pixel**, ed è descritta nel documento separato [ASPETTO_GRAFICO.md](ASPETTO_GRAFICO.md), versione 1.1.0. La direzione estetica non è ancora implementata e i suoi dettagli saranno raccolti progressivamente.
 
 Questo documento raccoglie le specifiche funzionali, i vincoli tecnici e i criteri di accettazione del quiz HTML. Il regolamento definisce le regole; questo documento definisce come applicarle. La presentazione HTML è una spiegazione per la classe. In caso di contrasto prevale il regolamento; per le questioni aperte non si inventano soluzioni normative.
 
@@ -179,7 +179,7 @@ Dopo l’intero intervento disciplinare, prima di rispondere, premiare o avanzar
 **SPEC-40 — Quote e punteggi razionali esatti (da implementare; REG-27).** La divisione in parti uguali può essere periodica: lordo 100 con due beneficiari dà 100/3 a ciascuno. Non arrotondare ciascun accredito a 33,33 perdendo 0,01, né assegnare il residuo a un gruppo rompendo l’uguaglianza. Conservare guadagni, quote e totali con numeratore/denominatore ridotti o altra rappresentazione razionale equivalente; somme, confronti finali e parità devono usare i valori esatti, non le stringhe visualizzate. Serializzare nel salvataggio numeratori/denominatori in modo da non perdere precisione e validare denominatori positivi. Eventuali importi approssimati a schermo devono essere riconoscibili come tali e permettere di consultare la quota esatta nell’esito. Eseguire tutti gli accrediti della stessa risposta insieme, prima di determinare vincitore o spareggio. La somma esatta delle quote deve essere uguale al lordo.
 
 
-**SPEC-41 — Nome e riferimento grafico (da implementare).** Usare **Skool** come nome visibile del gioco nella copertina, nel titolo del documento HTML/browser, nei menu, nei riepiloghi e nella presentazione delle regole. Per la veste grafica seguire [ASPETTO_GRAFICO.md](ASPETTO_GRAFICO.md), mantenendo separati requisiti approvati e dettagli ancora da definire. L’ispirazione a Doom non modifica logica di gioco, leggibilità, funzionamento offline o layout operativo richiesti dalle altre specifiche. Non rinominare automaticamente repository, file originari, schema dei dataset o salvataggi per il solo cambio del titolo. Conservare lo spareggio «Chi vuol essere eliminato».
+**SPEC-41 — Nome e riferimento grafico (da implementare).** Usare **Skool** come nome visibile del gioco nella copertina, nel titolo del documento HTML/browser, nei menu, nei riepiloghi e nella presentazione delle regole. Per la veste grafica seguire [ASPETTO_GRAFICO.md](ASPETTO_GRAFICO.md), mantenendo separati requisiti approvati e dettagli ancora da definire. L’ispirazione a Doom classico e l’estetica pixel non modificano logica di gioco, leggibilità, funzionamento offline o layout operativo richiesti dalle altre specifiche. Non rinominare automaticamente repository, file originari, schema dei dataset o salvataggi per il solo cambio del titolo. Conservare lo spareggio «Chi vuol essere eliminato».
 
 ## 7. Coerenza fra documenti, programma e presentazione
 
@@ -307,3 +307,4 @@ Si mantengono percorsi stabili, versione interna e cronologia Git. Aggiornare qu
 | 13.0.0 | 21/10/2026 | Decisioni premi/turni consolidate, moltiplicatore corretto da seconda risposta senza tetto, sanzioni prioritarie e pausa automatica, rifiuti sostituiti e cancellazioni effetti |
 | 14.0.0 | 21/10/2026 | Ruba punti simultanei e quote uguali per gruppi distinti; calcolo razionale esatto, gestione duplicati ed eliminazione selettiva dei beneficiari |
 | 14.1.0 | 21/10/2026 | Nome Skool e fonte separata delle specifiche grafiche con riferimento Doom; nuova verifica di coerenza dell’identità |
+| 14.1.1 | 21/10/2026 | Precisato il riferimento grafico Doom classico con estetica pixel; riferimento al documento grafico 1.1.0 |

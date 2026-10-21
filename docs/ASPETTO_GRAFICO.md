@@ -1,6 +1,6 @@
 # Skool — Specifiche dell’aspetto grafico
 
-Versione: **1.0.0** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
+Versione: **1.1.0** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
 
 ## 1. Scopo e stato
 
@@ -15,11 +15,11 @@ Il [regolamento](REGOLAMENTO_UFFICIALE.md) definisce il gioco; le [specifiche de
 | ID | Caratteristica | Indicazione |
 | --- | --- | --- |
 | VIS-01 | Nome del gioco | **Skool** |
-| VIS-02 | Riferimento visivo | Un aspetto grafico che somigli al videogioco **Doom** |
+| VIS-02 | Riferimento visivo | Un aspetto grafico ispirato a **Doom classico**, con **estetica pixel** |
 | VIS-03 | Ambito | Identità visiva del software del quiz; la presentazione HTML delle regole deve usare lo stesso nome e una veste coerente |
 | VIS-04 | Aggiornamenti successivi | Raccogliere in questo documento le caratteristiche grafiche che il responsabile elencherà |
 
-Il riferimento a Doom stabilisce una direzione estetica, non cambia il regolamento o le funzioni del quiz. La specifica edizione di Doom e gli elementi da riprendere non sono ancora indicati: stile pixel del classico, interfacce dei capitoli moderni, palette, caratteri, materiali, animazioni e suoni non sono ancora scelte approvate.
+Il riferimento approvato è **Doom classico**, con estetica pixel. Questa scelta stabilisce la direzione visiva di Skool; non cambia il regolamento o le funzioni del quiz. Palette, caratteri specifici, logo, materiali, disposizione, animazioni e suoni restano da definire con le prossime indicazioni del responsabile. L’estetica pixel deve rispettare la leggibilità di testi e formule prevista nelle specifiche.
 
 ## 3. Applicazione del nome
 
@@ -44,7 +44,7 @@ Questi vincoli provengono dalle specifiche funzionali; non sono ulteriori prefer
 
 | Area | Stato attuale |
 | --- | --- |
-| Edizione/stile di Doom di riferimento | Da precisare |
+| Edizione/stile di Doom di riferimento | **Approvato: Doom classico, estetica pixel** |
 | Logo e trattamento del nome Skool | Da definire |
 | Palette, contrasti e colori degli stati | Da definire |
 | Caratteri per titoli, testo, timer e punteggi | Da definire |
@@ -69,3 +69,4 @@ Percorso stabile, versione interna e cronologia Git.
 | Versione | Data | Modifica |
 | --- | --- | --- |
 | 1.0.0 | 21/10/2026 | Nome Skool, direzione estetica Doom e documento per raccogliere le successive indicazioni grafiche |
+| 1.1.0 | 21/10/2026 | Riferimento precisato: Doom classico con estetica pixel; altri dettagli visivi ancora da raccogliere |
