@@ -1,6 +1,6 @@
 # Skool — Specifiche dell’aspetto grafico
 
-Versione: **1.1.1** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
+Versione: **1.1.2** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
 
 ## 1. Scopo e stato
 
@@ -50,8 +50,8 @@ Questi vincoli provengono dalle specifiche funzionali; non sono ulteriori prefer
 | Caratteri per titoli, testo, timer e punteggi | Da definire |
 | Sfondo, pannelli, bordi, texture e materiali | Da definire |
 | Disposizione del tabellone e delle informazioni di gioco | Da definire rispettando SPEC-33 |
-| Aspetto dei pulsanti e dei quattro premi | Da definire: Salta turno, Ruba punti, Svela e passa e Aura |
-| Protezione Aura attiva | Rappresentazione grafica da definire; durata e consumo seguono DEC-20 del regolamento |
+| Aspetto dei pulsanti e dei cinque premi | Da definire: Salta turno, Ruba punti, Svela e passa, Aura e Karma |
+| Protezione Aura attiva | Rappresentazione grafica da definire; durata fino al prossimo turno; interazioni residue in DEC-20 |
 | Rappresentazione delle sanzioni e dell’eliminazione | Da definire |
 | Transizioni e animazioni | Da definire |
 | Eventuali suoni | Da definire; nessun suono è stato richiesto finora |
@@ -72,3 +72,4 @@ Percorso stabile, versione interna e cronologia Git.
 | 1.0.0 | 21/10/2026 | Nome Skool, direzione estetica Doom e documento per raccogliere le successive indicazioni grafiche |
 | 1.1.0 | 21/10/2026 | Riferimento precisato: Doom classico con estetica pixel; altri dettagli visivi ancora da raccogliere |
 | 1.1.1 | 21/10/2026 | Aggiunta Aura alle aree grafiche da definire; nessuna icona o animazione ancora approvata |
+| 1.1.2 | 21/10/2026 | Karma aggiunto al catalogo grafico e indicazione di Aura fino al prossimo turno; nessuna nuova icona approvata |
