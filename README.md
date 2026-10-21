@@ -1,29 +1,52 @@
 # Fool
 
-Materiali di **Fool**, il quiz di Riccardo Musumarra, separati dal repository `rickymusu-bit/fisica` su richiesta dell’autore.
+Quiz online di Riccardo Musumarra. **Interfaccia 1.1.0**, regolamento **18.0.1**.
 
-- `Chi_vuol_essere_rimandato_quiz_v3_20261008.html`: gioco a quiz.
-- `Chi_vuol_essere_rimandato_regole_v9_20261008.html`: presentazione delle regole per la classe.
-- `Template_dataset_quiz_argomenti_v1_20261008.json`: modello del dataset.
-- [Prompt_generazione_dataset_quiz_v2_20261021.txt](Prompt_generazione_dataset_quiz_v2_20261021.txt): istruzioni aggiornate per preparare i dataset; la v1 è conservata come precedente.
+Apri **https://rickymusu-bit.github.io/quiz/** e scegli **Avvia il quiz** o **Scopri le regole**. Non sono previsti download, installazioni o selettori di file.
 
-## Documenti di riferimento
+## Domande già sul sito
 
-- [Template di avvio per Codex](docs/PROMPT_CODEX_AVVIO_HTML.md) — prompt per realizzare da zero Fool.html e Fool_regole.html, archiviando i vecchi HTML, versione 1.1.1.
+Il gioco legge il catalogo `datasets.json` e carica automaticamente la banca selezionata dal sito. È disponibile Termologia, con 100 domande. Il docente configura tre gruppi distinti, tempo, punti base, probabilità bonus, difficoltà e quote per argomento; la somma delle quote deve essere 33. Configurazione e anteprima mostrano le soluzioni e si usano prima di proiettare alla classe.
 
-- [Regolamento ufficiale](docs/REGOLAMENTO_UFFICIALE.md) — fonte normativa del gioco, versione 18.0.1.
-- [Specifiche del programma](docs/SPECIFICHE_PROGRAMMA.md) — comportamento riferito al regolamento 18.0.1, stati e comandi, dataset, salvataggi e criteri di accettazione, versione 18.0.1.
+Il catalogo contiene `versione: 1` e l'elenco `banche`, ciascuna con `id`, `nome` e `url` relativa al sito. Per aggiungere una banca, pubblicare il relativo contenuto nello schema esistente e aggiungerla al catalogo. Le domande mantengono il contratto del dataset e i loro ID originali. Il catalogo e le banche devono provenire dallo stesso sito; errori di rete o validazione bloccano l'avvio e offrono **Riprova**.
 
-- [Specifiche grafiche](docs/ASPETTO_GRAFICO.md) — nome Fool, Doom classico con estetica pixel e raccolta progressiva delle caratteristiche visive, versione 1.2.1.
+All'esaurimento della riserva, **Cerca nuove domande** verifica gli aggiornamenti delle banche online. Inserisce soltanto nuovi ID compatibili con gli argomenti e la difficoltà della partita; non ripropone le domande già note, non sovrascrive quesiti modificati e non assegna una vittoria perché mancano domande.
 
-Prima di modificare il programma o la presentazione, leggere i documenti di riferimento pertinenti; per l’interfaccia consultare anche le specifiche grafiche. Il regolamento prevale sulle specifiche e sugli HTML; le questioni aperte richiedono una decisione esplicita, senza trasformare automaticamente il codice esistente in una regola. Le modifiche alle regole devono aggiornare i riferimenti e le verifiche pertinenti. Le migliorie indicate come future non sono già implementate.
+## Salvataggio nello stesso browser
 
-I documenti hanno nomi stabili, versione interna e cronologia Git. Gli HTML attuali usano ancora il vecchio nome e la vecchia grafica e non sono adeguati al regolamento 18.0.1: applicano ancora −1 per errore/scadenza, 30 secondi predefiniti e il precedente premio del 10 a soglia. Mancano inoltre sanzioni prioritarie con pausa automatica, contatore separato ed eliminazione alla terza, punti base configurabili per difficoltà (100/200/300 predefiniti), moltiplicatore di serie da seconda corretta, senza tetto e bonus Salta turno, Ruba punti, Svela e passa, Aura e Karma conservabili e accumulabili, con uso solo nel proprio turno (probabilità configurabile, tipi equiprobabili e un solo uso per turno, Ruba punti simultanei con quote uguali), rotazione fissa senza passaggi liberi, Pausa/Riprendi, adattamento verificato in altezza senza scorrimento, salvataggio/ripresa e spareggio «Battaglia finale» con dataset ordinario a quattro alternative, stesso tempo normale e nessuna nuova assegnazione di bonus; il vecchio comando di fine modulo non applica la nuova sospensione. Prima di usare le nuove regole con il programma e la presentazione occorre aggiornarli.
+La partita viene salvata automaticamente nel browser. **Salva nel browser** permette un salvataggio esplicito; **Riprendi partita** sulla copertina recupera l'ultima partita conservata da quel browser, mantenendo il timer fermo fino al comando del docente. Non sono presenti importazione o esportazione di file. Le partite non sono sincronizzate tra dispositivi e la cancellazione dei dati del sito elimina il salvataggio locale.
 
-Scarica gli HTML e aprili nel browser. I materiali erano stati trasferiti integralmente; i titoli nei metadati e nel prompt sono ora aggiornati a Fool. Gli hash di origine documentano la versione importata: la loro provenienza e i relativi hash sono registrati in `PROVENIENZA.json`; la cronologia precedente rimane nel repository di origine. Nessuna pubblicazione GitHub Pages è stata attivata per il quiz.
+Alla campanella una domanda già svelata deve essere conclusa; solo dopo l'esito si sospende. Sanzioni prioritarie, serie, inventari e bonus vincolati, rifiuti, rotazione e Battaglia finale restano quelli del regolamento 18.0.1.
 
-Aura si attiva facoltativamente nel proprio turno e protegge dai soli nuovi attacchi, incluso Svela e passa, fino all’inizio del prossimo turno; gli attacchi bloccati vengono consumati. Per ogni malus applicato si trasforma una sola copia Karma, vincolata al suo autore. Probabilità predefinita dei bonus 90%, configurabile; cinque tipi equiprobabili.
+La nuova richiesta del responsabile di offrire il quiz solo online sostituisce i precedenti requisiti di distribuzione offline e scambio di file. Il motore e il formato di salvataggio restano compatibili con 1.0.0: le partite già conservate nello stesso browser vengono riprese senza modificare le regole.
 
-Gli HTML, inclusi i loro nomi, restano invariati su richiesta del responsabile: saranno rifatti da capo. La rinomina attuale riguarda documenti, prompt e metadati del dataset.
+## Schermo e aspetto
 
-Il template per Codex prevede due nuovi HTML autonomi, programma e regole per la classe, e lo spostamento degli HTML storici in `archivio/`. Questo è il prossimo lavoro di implementazione: i file storici non sono stati ancora spostati da questa revisione del prompt.
+Dimensioni supportate e verificate: **1280×800, 1440×900, 1920×1080 pixel CSS**, a zoom 100%. Testo operativo minimo 18 px, domande 22,5 px, alternative 18,9 px; le etichette di servizio possono essere più piccole. I contenuti operativi non vengono tagliati o ridotti sotto queste dimensioni per farli entrare. Prima dell'inizio sono verificate tutte le domande estratte con soluzioni e spiegazioni; ogni successivo quesito è verificato prima dello svelamento. Contenuti e nomi arbitrariamente lunghi possono essere segnalati come non idonei: allargare la finestra o correggere i contenuti. Se il ridimensionamento rende inidonea una risposta, il timer viene messo in pausa.
+
+Veste provvisoria ispirata a Doom classico: pannelli scuri, bordi squadrati, griglia pixel, titoli monospaziati e accento ambra. Palette, font specifici e logo restano scelte sostituibili, non preferenze approvate. Nessun suono aggiunto. L'app non contiene risorse grafiche di Doom.
+
+## Fonti e verifiche
+
+- [Regolamento ufficiale](docs/REGOLAMENTO_UFFICIALE.md), autorità normativa.
+- [Specifiche del programma](docs/SPECIFICHE_PROGRAMMA.md).
+- [Aspetto grafico](docs/ASPETTO_GRAFICO.md).
+- [Istruzioni originali di implementazione](docs/PROMPT_CODEX_AVVIO_HTML.md), antecedenti alla richiesta di distribuzione solo online.
+- [Avanzamento, tracciabilità e verifiche realmente eseguite](docs/VERIFICHE_IMPLEMENTAZIONE.md).
+- [Prompt per generare dataset](Prompt_generazione_dataset_quiz_v2_20261021.txt).
+
+I due HTML storici sono conservati **identici**, con i nomi originali, in [archivio/](archivio/). Non sono il programma o le regole attuali. [PROVENIENZA.json](PROVENIENZA.json) conserva i percorsi e gli hash originari del trasferimento da `rickymusu-bit/fisica`: non sono stati riscritti per l'archiviazione.
+
+## Sorgenti e rigenerazione
+
+Il motore, separato dal DOM, è in `src/engine.js`; interfaccia, stile e regole proiettate sono in `src/`. Il renderer KaTeX 0.16.22 e i font incorporati provengono dal vecchio HTML; l'avviso MIT è conservato in `vendor/LICENSE-KaTeX.txt` e nelle pagine del sito.
+
+```sh
+python3 tools/build.py
+node tests/engine.test.js
+python3 tests/browser.py
+python3 tests/layout.py
+python3 tests/online.py
+```
+
+La rigenerazione usa soltanto la libreria standard Python. I test motore usano Node; i test browser richiedono Python Playwright e Chromium (`/usr/bin/chromium`). Il sito generato è statico e viene pubblicato sul ramo `gh-pages`. `src/home.html` genera la pagina iniziale; `src/app.js` gestisce il caricamento online e i salvataggi nel browser.

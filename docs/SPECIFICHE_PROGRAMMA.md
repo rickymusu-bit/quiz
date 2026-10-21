@@ -1,5 +1,8 @@
 # Fool — Specifiche del programma
 
+> **Aggiornamento della distribuzione — interfaccia 1.1.0, su richiesta del responsabile.** Fool viene offerto solo online su GitHub Pages, senza download né selezione di file. Per la distribuzione, questa indicazione sostituisce le precedenti parti locali/offline di SPEC-02, il caricamento manuale della banca di SPEC-05 e l'esportazione/importazione locale di SPEC-30. Le banche, con lo stesso schema SPEC-13 e gli stessi ID, vengono caricate dal catalogo del sito; il rifornimento SPEC-34 consulta le banche online e accetta soltanto quesiti nuovi compatibili. Il salvataggio e la ripresa avvengono nello stesso browser, senza sincronizzazione tra dispositivi. Regolamento 18.0.1, motore e formato dei salvataggi restano invariati. Le sezioni sottostanti conservano l'analisi della precedente consegna: per distribuzione e verifiche correnti consultare README e VERIFICHE_IMPLEMENTAZIONE.md.
+
+
 Versione: **18.0.1** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
 
 Regolamento di riferimento: [REGOLAMENTO_UFFICIALE.md, v18.0.1](REGOLAMENTO_UFFICIALE.md).
@@ -413,7 +416,7 @@ Le decisioni DEC-01–DEC-21 sono risolte o superate dal regolamento 18.0.1. Imp
 1. Adeguare il motore del gioco: punteggi base configurabili, serie da seconda corretta senza tetto, rotazione dal rispondente, rifiuti sostituiti e salti cumulabili senza consumo domanda.
 2. Implementare un bonus per turno, inventario, cinque bonus equiprobabili con p configurabile, Ruba punti simultanei con divisione in parti uguali per gruppi distinti e cancellazioni su eliminazione/ingresso spareggio.
 3. Implementare pannello sanzioni con pausa automatica e precedenza disciplinare, azzeramento serie, terza sanzione eliminatoria, vittoria anticipata e sconfitta di tutti.
-4. Integrare salvataggio/ripresa, layout verificato senza scorrimento e presentazione allineata alla stessa versione. Il default di p non è stato scelto: il programma può richiedere un valore prima dell’avvio.
+4. Integrare salvataggio/ripresa, layout verificato senza scorrimento e presentazione allineata alla stessa versione. Il default di p è 90%, configurabile da 0% a 100%, come stabilito dal regolamento 18.0.1.
 5. Eseguire gli scenari pertinenti alla logica e i controlli visuali; le tabelle di questa edizione sono specifiche di verifica, non risultati di test già eseguiti.
 
 ## 10. Versioni

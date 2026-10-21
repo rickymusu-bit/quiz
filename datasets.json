@@ -1,0 +1,10 @@
+{
+  "versione": 1,
+  "banche": [
+    {
+      "id": "termologia",
+      "nome": "Termologia · 100 domande",
+      "url": "Dataset_termologia_100_domande_v1_20261021.json"
+    }
+  ]
+}
