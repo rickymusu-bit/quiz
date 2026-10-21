@@ -413,7 +413,7 @@ Le decisioni DEC-01–DEC-21 sono risolte o superate dal regolamento 18.0.1. Imp
 1. Adeguare il motore del gioco: punteggi base configurabili, serie da seconda corretta senza tetto, rotazione dal rispondente, rifiuti sostituiti e salti cumulabili senza consumo domanda.
 2. Implementare un bonus per turno, inventario, cinque bonus equiprobabili con p configurabile, Ruba punti simultanei con divisione in parti uguali per gruppi distinti e cancellazioni su eliminazione/ingresso spareggio.
 3. Implementare pannello sanzioni con pausa automatica e precedenza disciplinare, azzeramento serie, terza sanzione eliminatoria, vittoria anticipata e sconfitta di tutti.
-4. Integrare salvataggio/ripresa, layout verificato senza scorrimento e presentazione allineata alla stessa versione. Il default di p non è stato scelto: il programma può richiedere un valore prima dell’avvio.
+4. Integrare salvataggio/ripresa, layout verificato senza scorrimento e presentazione allineata alla stessa versione. Il default di p è 90%, configurabile da 0% a 100%, come stabilito dal regolamento 18.0.1.
 5. Eseguire gli scenari pertinenti alla logica e i controlli visuali; le tabelle di questa edizione sono specifiche di verifica, non risultati di test già eseguiti.
 
 ## 10. Versioni

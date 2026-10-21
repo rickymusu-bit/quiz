@@ -1,29 +1,49 @@
 # Fool
 
-Materiali di **Fool**, il quiz di Riccardo Musumarra, separati dal repository `rickymusu-bit/fisica` su richiesta dell’autore.
+Quiz di Riccardo Musumarra. **App 1.0.0**, regolamento **18.0.1** del 21/10/2026.
 
-- `Chi_vuol_essere_rimandato_quiz_v3_20261008.html`: gioco a quiz.
-- `Chi_vuol_essere_rimandato_regole_v9_20261008.html`: presentazione delle regole per la classe.
-- `Template_dataset_quiz_argomenti_v1_20261008.json`: modello del dataset.
-- [Prompt_generazione_dataset_quiz_v2_20261021.txt](Prompt_generazione_dataset_quiz_v2_20261021.txt): istruzioni aggiornate per preparare i dataset; la v1 è conservata come precedente.
+- Scarica e apri [Fool.html](Fool.html) nel browser: è il programma autonomo del quiz.
+- Scarica e apri [Fool_regole.html](Fool_regole.html): 21 schermate delle regole per la classe, con indice, pulsanti e frecce della tastiera.
+- Per giocare, carica [Dataset_termologia_100_domande_v1_20261021.json](Dataset_termologia_100_domande_v1_20261021.json), oppure una banca compatibile con il [template](Template_dataset_quiz_argomenti_v1_20261008.json). Il template contiene esempi e non basta da solo per 33 domande.
 
-## Documenti di riferimento
+I due HTML funzionano indipendentemente, senza installazioni, server, account o CDN. Le formule e i relativi caratteri sono incorporati in Fool.html. Tenere entrambi i file nella stessa cartella permette di aprire il collegamento alle regole dalla copertina; il gioco non richiede l'altro HTML per funzionare. Non è stata attivata alcuna pubblicazione o configurazione di hosting.
 
-- [Template di avvio per Codex](docs/PROMPT_CODEX_AVVIO_HTML.md) — prompt per realizzare da zero Fool.html e Fool_regole.html, archiviando i vecchi HTML, versione 1.1.1.
+## Conduzione e ripresa
 
-- [Regolamento ufficiale](docs/REGOLAMENTO_UFFICIALE.md) — fonte normativa del gioco, versione 18.0.1.
-- [Specifiche del programma](docs/SPECIFICHE_PROGRAMMA.md) — comportamento riferito al regolamento 18.0.1, stati e comandi, dataset, salvataggi e criteri di accettazione, versione 18.0.1.
+Il docente usa un dispositivo e inserisce le risposte comunicate dai portavoce. Prima della proiezione, sceglie tre nomi distinti, tempo, punti base, probabilità bonus, difficoltà e quote per argomento. La somma delle quote deve essere 33. L'anteprima contiene soluzioni e spiegazioni: è riservata alla preparazione del docente, senza autenticazione separata.
 
-- [Specifiche grafiche](docs/ASPETTO_GRAFICO.md) — nome Fool, Doom classico con estetica pixel e raccolta progressiva delle caratteristiche visive, versione 1.2.1.
+Il primo gruppo è sorteggiato; la rotazione è mostrata sul tabellone. Il programma gestisce serie, bonus e bersagli vincolati, sanzioni, rifiuti, campanella, eliminazioni e Battaglia finale. Il pannello sanzioni consente di registrare tutto l'intervento su più gruppi prima di valutare il vincitore. Chiuderlo non riavvia il timer.
 
-Prima di modificare il programma o la presentazione, leggere i documenti di riferimento pertinenti; per l’interfaccia consultare anche le specifiche grafiche. Il regolamento prevale sulle specifiche e sugli HTML; le questioni aperte richiedono una decisione esplicita, senza trasformare automaticamente il codice esistente in una regola. Le modifiche alle regole devono aggiornare i riferimenti e le verifiche pertinenti. Le migliorie indicate come future non sono già implementate.
+Usare **Salva file** e conservare il JSON della partita per la lezione successiva. L'autosalvataggio locale è aggiuntivo: il browser può limitarlo o cancellarlo. **Importa partita** o **Riprendi autosalvataggio** ripristinano lo stato senza avviare il timer. Una scelta bonus non ancora confermata conserva copia e bersaglio, senza consumi anticipati. I file di partita contengono anche le soluzioni e sono destinati al docente. I salvataggi dei vecchi HTML non sono compatibili e non vengono reinterpretati.
 
-I documenti hanno nomi stabili, versione interna e cronologia Git. Gli HTML attuali usano ancora il vecchio nome e la vecchia grafica e non sono adeguati al regolamento 18.0.1: applicano ancora −1 per errore/scadenza, 30 secondi predefiniti e il precedente premio del 10 a soglia. Mancano inoltre sanzioni prioritarie con pausa automatica, contatore separato ed eliminazione alla terza, punti base configurabili per difficoltà (100/200/300 predefiniti), moltiplicatore di serie da seconda corretta, senza tetto e bonus Salta turno, Ruba punti, Svela e passa, Aura e Karma conservabili e accumulabili, con uso solo nel proprio turno (probabilità configurabile, tipi equiprobabili e un solo uso per turno, Ruba punti simultanei con quote uguali), rotazione fissa senza passaggi liberi, Pausa/Riprendi, adattamento verificato in altezza senza scorrimento, salvataggio/ripresa e spareggio «Battaglia finale» con dataset ordinario a quattro alternative, stesso tempo normale e nessuna nuova assegnazione di bonus; il vecchio comando di fine modulo non applica la nuova sospensione. Prima di usare le nuove regole con il programma e la presentazione occorre aggiornarli.
+Alla campanella una domanda svelata deve essere conclusa; solo dopo l'esito si sospende. **Salva file** durante una risposta è un salvataggio tecnico di emergenza e non sostituisce questa regola. All'esaurimento della riserva si possono caricare quesiti con ID nuovi, nel medesimo formato, per argomenti e difficoltà selezionati. Non occorre un file Vero/Falso.
 
-Scarica gli HTML e aprili nel browser. I materiali erano stati trasferiti integralmente; i titoli nei metadati e nel prompt sono ora aggiornati a Fool. Gli hash di origine documentano la versione importata: la loro provenienza e i relativi hash sono registrati in `PROVENIENZA.json`; la cronologia precedente rimane nel repository di origine. Nessuna pubblicazione GitHub Pages è stata attivata per il quiz.
+## Schermo e aspetto
 
-Aura si attiva facoltativamente nel proprio turno e protegge dai soli nuovi attacchi, incluso Svela e passa, fino all’inizio del prossimo turno; gli attacchi bloccati vengono consumati. Per ogni malus applicato si trasforma una sola copia Karma, vincolata al suo autore. Probabilità predefinita dei bonus 90%, configurabile; cinque tipi equiprobabili.
+Dimensioni supportate e verificate: **1280×800, 1440×900, 1920×1080 pixel CSS**, a zoom 100%. Testo operativo minimo 18 px, domande 22,5 px, alternative 18,9 px; le etichette di servizio possono essere più piccole. I contenuti operativi non vengono tagliati o ridotti sotto queste dimensioni per farli entrare. Prima dell'inizio sono verificate tutte le domande estratte con soluzioni e spiegazioni; ogni successivo quesito è verificato prima dello svelamento. Contenuti e nomi arbitrariamente lunghi possono essere segnalati come non idonei: allargare la finestra o correggere i contenuti. Se il ridimensionamento rende inidonea una risposta, il timer viene messo in pausa.
 
-Gli HTML, inclusi i loro nomi, restano invariati su richiesta del responsabile: saranno rifatti da capo. La rinomina attuale riguarda documenti, prompt e metadati del dataset.
+Veste provvisoria ispirata a Doom classico: pannelli scuri, bordi squadrati, griglia pixel, titoli monospaziati e accento ambra. Palette, font specifici e logo restano scelte sostituibili, non preferenze approvate. Nessun suono aggiunto. L'app non contiene risorse grafiche di Doom.
 
-Il template per Codex prevede due nuovi HTML autonomi, programma e regole per la classe, e lo spostamento degli HTML storici in `archivio/`. Questo è il prossimo lavoro di implementazione: i file storici non sono stati ancora spostati da questa revisione del prompt.
+## Fonti e verifiche
+
+- [Regolamento ufficiale](docs/REGOLAMENTO_UFFICIALE.md), autorità normativa.
+- [Specifiche del programma](docs/SPECIFICHE_PROGRAMMA.md).
+- [Aspetto grafico](docs/ASPETTO_GRAFICO.md).
+- [Istruzioni di implementazione](docs/PROMPT_CODEX_AVVIO_HTML.md).
+- [Avanzamento, tracciabilità e verifiche realmente eseguite](docs/VERIFICHE_IMPLEMENTAZIONE.md).
+- [Prompt per generare dataset](Prompt_generazione_dataset_quiz_v2_20261021.txt).
+
+I due HTML storici sono conservati **identici**, con i nomi originali, in [archivio/](archivio/). Non sono il programma o le regole attuali. [PROVENIENZA.json](PROVENIENZA.json) conserva i percorsi e gli hash originari del trasferimento da `rickymusu-bit/fisica`: non sono stati riscritti per l'archiviazione.
+
+## Sorgenti e rigenerazione
+
+Il motore, separato dal DOM, è in `src/engine.js`; interfaccia, stile e regole proiettate sono in `src/`. Il renderer KaTeX 0.16.22 e i font incorporati provengono dal vecchio HTML; l'avviso MIT è conservato in `vendor/LICENSE-KaTeX.txt` e nel distribuibile.
+
+```sh
+python3 tools/build.py
+node tests/engine.test.js
+python3 tests/browser.py
+python3 tests/layout.py
+```
+
+La rigenerazione usa soltanto la libreria standard Python. I test motore usano Node; i test browser richiedono Python Playwright e Chromium (`/usr/bin/chromium`). Gli strumenti di sviluppo non servono per aprire gli HTML.
