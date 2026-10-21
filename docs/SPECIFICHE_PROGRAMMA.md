@@ -10,6 +10,10 @@ Versione: **18.0.1** · Data: **21/10/2026** · Responsabile: **Riccardo Musumar
 
 Regolamento di riferimento: [REGOLAMENTO_UFFICIALE.md, v18.0.1](REGOLAMENTO_UFFICIALE.md).
 
+## Aggiornamento di navigazione del responsabile — 21/10/2026
+
+La richiesta corrente separa la preparazione rapida da parametri e anteprima: **Start** richiede solo nomi e icone dei tre gruppi e argomento della banca online, quindi avvia il quiz con domanda nascosta. Il terzo pulsante della home, **Impostazioni**, sotto **Regole**, contiene timer, bonus, basi, difficoltà, quote e anteprima docente. I profili per banca sono conservati in `localStorage` separatamente dalla partita e validati prima del salvataggio; non modificano le partite già avviate. Le icone sono metadati opzionali della configurazione, senza cambiare il formato 1 o le regole. Questa indicazione prevale sul precedente passaggio obbligatorio nell’anteprima (SPEC-03/09–11 e tabella transizioni).
+
 ## 1. Scopo, fonti e stato dell’adeguamento
 
 Queste sono le specifiche del comportamento da implementare per **Fool**, allineate al [regolamento ufficiale v18.0.1](REGOLAMENTO_UFFICIALE.md) e alle [specifiche grafiche v1.2.1](ASPETTO_GRAFICO.md). La direzione visiva approvata è **Doom classico, con estetica pixel**; palette, font, logo e dettagli non ancora approvati restano raccolti nel documento grafico, senza inventarli qui.

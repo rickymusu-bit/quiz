@@ -15,16 +15,16 @@ with sync_playwright() as p:
  for w,h in [(390,844),(1440,900)]:
   page=browser.new_page(viewport={'width':w,'height':h});errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
   page.goto(base);page.get_by_role('link',name='Start',exact=True).click()
-  expect(page.get_by_role('button',name='Prepara anteprima')).to_be_enabled()
+  expect(page.get_by_role('button',name='Inizia partita')).to_be_enabled()
   page.get_by_role('button',name='Torna alla schermata iniziale',exact=True).click()
   expect(page).to_have_url(base)
-  assert page.locator('nav.menu a').all_text_contents()==['Start','Regole']
+  assert page.locator('nav.menu a').all_text_contents()==['Start','Regole','Impostazioni']
   assert page.get_by_role('button',name='Nuova partita',exact=True).count()==0
   # A direct visit to Fool.html is the game setup, not an alternate cover.
-  page.goto(base+'Fool.html');expect(page.get_by_role('button',name='Prepara anteprima')).to_be_enabled()
+  page.goto(base+'Fool.html');expect(page.get_by_role('button',name='Inizia partita')).to_be_enabled()
   assert page.get_by_role('heading',name='Prepara Fool',exact=True).count()==1
   assert page.locator('.cover').count()==0
-  page.get_by_role('button',name='Prepara anteprima').click();page.get_by_role('button',name='Verifica schermo e inizia Fool').click()
+  page.get_by_role('button',name='Inizia partita').click()
   page.get_by_role('button',name='Svela e avvia il tempo').click();page.get_by_role('button',name='Salva nel browser',exact=True).filter(visible=True).click()
   saved=page.evaluate('JSON.parse(localStorage.getItem("fool-v1"))')
   page.reload();page.get_by_role('button',name='Riprendi partita',exact=True).click()
@@ -34,10 +34,10 @@ with sync_playwright() as p:
   page.route('**/datasets.json',lambda route:route.fulfill(status=503,body='Unavailable'))
   page.goto(base+'Fool.html');expect(page.get_by_role('heading',name='Domande non disponibili')).to_be_visible()
   page.get_by_role('button',name='Torna alla schermata iniziale',exact=True).click();expect(page).to_have_url(base)
-  assert page.locator('nav.menu a').all_text_contents()==['Start','Regole']
+  assert page.locator('nav.menu a').all_text_contents()==['Start','Regole','Impostazioni']
   page.goto(base+'Fool_regole.html');page.locator('#section').select_option('20')
   page.get_by_role('link',name='Torna alla schermata iniziale',exact=True).click();expect(page).to_have_url(base)
-  assert page.locator('nav.menu a').all_text_contents()==['Start','Regole']
+  assert page.locator('nav.menu a').all_text_contents()==['Start','Regole','Impostazioni']
   assert not errors,errors
   page.close()
  browser.close()

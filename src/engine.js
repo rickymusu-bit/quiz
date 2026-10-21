@@ -32,6 +32,7 @@ function parseDataset(text,katex){
 }
 function config(c){
  need(Array.isArray(c.names)&&c.names.length===3,'Servono tre gruppi');const names=c.names.map((x,i)=>typeof x==='string'&&x.trim()?x.trim():'Gruppo '+(i+1));need(new Set(names.map(n=>n.toLocaleLowerCase())).size===3,'I nomi dei gruppi devono essere distinti');
+ if(c.icons!==undefined)need(Array.isArray(c.icons)&&c.icons.length===3&&c.icons.every(x=>['skull','bolt','star','swords','shield','crown'].includes(x)),'Icone dei gruppi non valide');
  integer(c.seconds,1,600,'Tempo');need(typeof c.probability==='number'&&Number.isFinite(c.probability)&&c.probability>=0&&c.probability<=100,'Probabilità: inserire un numero fra 0 e 100');
  for(const d of ['facile','media','difficile'])integer(c.bases[d],1,Number.MAX_SAFE_INTEGER,'Punti '+d);
  need(['misto','facile','media','difficile'].includes(c.difficulty),'Filtro difficoltà non valido');need(c.quotas&&Object.keys(c.quotas).length,'Selezionare argomenti e quote');let sum=0;for(const v of Object.values(c.quotas))sum+=integer(v,0,33,'Quota');need(sum===33,'La somma delle quote deve essere 33');return {...clone(c),names};

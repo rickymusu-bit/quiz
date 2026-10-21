@@ -1,6 +1,6 @@
 # Fool — Specifiche dell’aspetto grafico
 
-Versione: **1.3.1** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
+Versione: **1.4.0** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
 
 ## 1. Scopo e fonti
 
@@ -16,7 +16,7 @@ Questo documento raccoglie le indicazioni grafiche approvate per **Fool**, per l
 | VIS-04 | Aggiornamenti | Raccogliere qui le indicazioni successive del responsabile |
 | VIS-05 | Logo ufficiale | Prima immagine allegata nella richiesta del 21/10/2026, `15033.jpg`, conservata come riferimento in `assets/fool-logo.jpg`; revisione corrente grigio/nero in `assets/fool-logo.png` |
 | VIS-06 | Sottotitolo della home | **Solo uno sciocco pensa di vincere** |
-| VIS-07 | Menu della home | Due riquadri cliccabili, uno sopra l'altro: **Start** sopra, **Regole** sotto |
+| VIS-07 | Menu della home | Tre riquadri cliccabili in colonna: **Start**, **Regole**, **Impostazioni** |
 | VIS-08 | Sfondo | Richiamo alla seconda immagine, `15034.jpg`: cielo rosso e pavimento scuro di pietra, con estetica Doom 1993 |
 | VIS-09 | Responsività | Il sito, il gioco e le regole si adattano a mobile e desktop, in entrambe le orientazioni, senza imporre la precedente finestra minima |
 
@@ -24,7 +24,7 @@ La revisione corrente porta le superfici blu a grigio antracite e nero, conserva
 
 ## 3. Home e navigazione
 
-La home presenta il logo, il sottotitolo esatto e i due soli pulsanti richiesti. **Start** apre direttamente la configurazione del gioco, senza una seconda copertina obbligatoria; se è presente una partita nello stesso browser, il docente può riprenderla dalla configurazione. **Regole** apre la presentazione navigabile. Il logo nell'intestazione delle pagine interne riporta alla home.
+La home presenta il logo, il sottotitolo esatto e tre pulsanti in colonna: **Start**, **Regole**, **Impostazioni**. **Start** apre la preparazione breve: tre nomi, tre icone selezionabili e argomento della banca online. **Inizia partita** entra nella domanda nascosta senza mostrare le soluzioni. Le icone monocromatiche sono visibili anche sul tabellone e conservate nel salvataggio; le vecchie partite ricevono icone predefinite. **Regole** apre la presentazione navigabile. **Impostazioni** (`Fool.html?settings=1`) raccoglie parametri, quote e anteprima docente; il salvataggio dei parametri è separato da quello della partita. Il logo nelle pagine interne riporta alla home.
 
 L'aspetto dei riquadri usa bordi metallici squadrati, caratteri pixel e testo rosso. Sono scelte di implementazione coerenti con il riferimento; non introducono regole o funzioni aggiuntive. Il carattere VT323 è ospitato sul sito con la relativa licenza SIL OFL. Non sono stati aggiunti suoni o animazioni del gioco.
 

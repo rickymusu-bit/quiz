@@ -1,5 +1,18 @@
 # Fool — implementazione e verifiche
 
+## Preparazione rapida e Impostazioni — interfaccia 1.3.0
+
+La home ha tre pulsanti: Start, Regole, Impostazioni. Start consente soltanto nomi e icone dei tre gruppi e argomento dal catalogo online; Inizia partita entra nella domanda nascosta senza anteprima. Timer, probabilità bonus, difficoltà, punti base e quote sono in Impostazioni, insieme all’anteprima docente facoltativa (estrazione di esempio). I parametri validati sono conservati per banca in `fool-settings-v1`, separati da `fool-v1`: aggiornare le impostazioni non cambia le partite già iniziate. Le sei icone monocromatiche compaiono nei gruppi e nel tabellone; il metadato opzionale è salvato nella configurazione e i vecchi salvataggi restano validi con icone predefinite. Formato, versione del motore e regolamento restano invariati.
+
+Verifiche eseguite:
+- `node tests/engine.test.js`: 28 prove superate, comprese validazione delle icone e compatibilità dei salvataggi precedenti.
+- `python3 tests/settings.py`: menu, preparazione priva di parametri/soluzioni, persistenza, rifiuto di valori non validi, anteprima e ritorno, applicazione dei parametri, isolamento dalle partite, icone/ripresa, vecchi salvataggi e storage bloccato; 240×320, 390×844 e 1440×900.
+- `python3 tests/responsive.py`: flusso completo su dieci dimensioni da 240×320 a 2560×1440, testo grande, nomi lunghi, formule, tastiera e touch. Adeguato il terzo pulsante anche agli schermi più stretti.
+- `python3 tests/online.py`, `python3 tests/navigation.py` e `python3 tests/browser.py`: caricamento online, errore/riprova, rifornimento, home unica, timer, sanzioni, risposta, salvataggio/ripresa e navigazione delle regole.
+- `python3 tests/layout.py`: tutte le 100 domande e 21 sezioni delle regole su dieci dimensioni, senza overflow laterale né errori JavaScript.
+
+Le descrizioni seguenti sono lo storico delle versioni precedenti.
+
 ## Revisione colore del logo — interfaccia 1.2.2
 
 Su richiesta del responsabile le superfici blu sono state portate a grigio antracite/nero, conservando lettering, metallo e accenti arancioni/dorati. La risorsa corrente è `assets/fool-logo.png`; il JPEG di riferimento resta conservato. Schermata iniziale, intestazioni del gioco e delle regole e icona usano la nuova risorsa. Verificati caricamento e proporzioni su desktop e mobile, con ispezione visiva del logo nel sito; nessuna modifica al motore o ai salvataggi.

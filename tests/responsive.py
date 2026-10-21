@@ -22,16 +22,15 @@ with sync_playwright() as p:
   expect(page.locator('.subtitle')).to_have_text('Solo uno sciocco pensa di vincere')
   expect(page.get_by_role('img',name='Fool',exact=True)).to_be_visible()
   assert page.evaluate('document.querySelector(".home-logo").naturalWidth')==2171
-  assert page.locator('nav.menu a').all_text_contents()==['Start','Regole']
-  boxes=[page.get_by_role('link',name=x,exact=True).bounding_box() for x in ['Start','Regole']]
+  assert page.locator('nav.menu a').all_text_contents()==['Start','Regole','Impostazioni']
+  boxes=[page.get_by_role('link',name=x,exact=True).bounding_box() for x in ['Start','Regole','Impostazioni']]
   assert boxes[0]['y']+boxes[0]['height']<=boxes[1]['y']
   assert boxes[0]['height']>=44 and boxes[1]['height']>=44
   fits(page,('home',w,h))
   page.get_by_role('link',name='Start',exact=True).click()
-  expect(page.get_by_role('button',name='Prepara anteprima')).to_be_enabled()
+  expect(page.get_by_role('button',name='Inizia partita')).to_be_enabled()
   fits(page,('configuration',w,h))
-  page.get_by_role('button',name='Prepara anteprima').click();fits(page,('preview',w,h))
-  page.get_by_role('button',name='Verifica schermo e inizia Fool').click()
+  page.get_by_role('button',name='Inizia partita').click()
   expect(page.get_by_role('button',name='Svela e avvia il tempo')).to_be_visible()
   assert page.locator('#fit-warning').is_hidden()
   page.get_by_role('button',name='Svela e avvia il tempo').click()
@@ -63,29 +62,29 @@ with sync_playwright() as p:
   fits(page,('rules-index',w,h))
  # Enlarged text and long names/fractional scores/long formulas must retain access to controls.
  page.set_viewport_size({'width':320,'height':568});page.goto(base+'Fool.html?start=1')
- expect(page.get_by_role('button',name='Prepara anteprima')).to_be_enabled()
+ expect(page.get_by_role('button',name='Inizia partita')).to_be_enabled()
  for i in range(3):page.locator('#name'+str(i)).fill('Squadra '+str(i)+' — nome lungo '+('x'*60))
- page.get_by_role('button',name='Prepara anteprima').click();page.get_by_role('button',name='Verifica schermo e inizia Fool').click()
+ page.get_by_role('button',name='Inizia partita').click()
  page.evaluate('()=>{game.s.groups[0].score=F.rational(100,3);game.s.current.body="Una domanda lunga. ".repeat(150)+String.raw`\\[\\frac{123456789012345678901234567890}{1234567890}\\]`;renderGame()}')
  page.get_by_role('button',name='Svela e avvia il tempo').click()
  page.evaluate('document.documentElement.style.fontSize="24px"')
  page.get_by_role('button',name='Pausa',exact=True).click()
  fits(page,'large-text-and-formula')
  assert page.locator('#fit-warning').is_hidden()
- # Keyboard navigation keeps exactly the two requested home actions reachable.
+ # Keyboard navigation keeps every homepage action reachable.
  page.goto(base);page.keyboard.press('Tab');assert page.evaluate('document.activeElement.textContent')=='Start'
  page.keyboard.press('Tab');assert page.evaluate('document.activeElement.textContent')=='Regole'
- page.keyboard.press('Enter');expect(page.locator('#section')).to_be_visible()
+ page.keyboard.press('Tab');assert page.evaluate('document.activeElement.textContent')=='Impostazioni'
+ page.keyboard.press('Enter');expect(page.get_by_role('button',name='Salva impostazioni')).to_be_visible()
  # Real touch emulation, including a narrow portrait viewport.
  for w,h in [(360,800),(800,360)]:
   ctx=browser.new_context(viewport={'width':w,'height':h},is_mobile=True,has_touch=True,device_scale_factor=2)
   mobile=ctx.new_page();mobile.goto(base);mobile.get_by_role('link',name='Start',exact=True).tap()
-  expect(mobile.get_by_role('button',name='Prepara anteprima')).to_be_enabled()
-  mobile.get_by_role('button',name='Prepara anteprima').tap()
-  mobile.get_by_role('button',name='Verifica schermo e inizia Fool').tap()
+  expect(mobile.get_by_role('button',name='Inizia partita')).to_be_enabled()
+  mobile.get_by_role('button',name='Inizia partita').tap()
   mobile.get_by_role('button',name='Svela e avvia il tempo').tap()
   mobile.get_by_role('button',name='Pausa',exact=True).tap();assert mobile.evaluate('game.s.paused')
   fits(mobile,('touch',w,h));ctx.close()
  assert not errors,errors
- print(json.dumps({'responsive_flows':sizes,'errors':errors,'home_menu':'Start / Regole','large_text':'passed'},ensure_ascii=False))
+ print(json.dumps({'responsive_flows':sizes,'errors':errors,'home_menu':'Start / Regole / Impostazioni','large_text':'passed'},ensure_ascii=False))
  browser.close()

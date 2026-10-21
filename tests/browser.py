@@ -14,10 +14,9 @@ with sync_playwright() as p:
     page.on('pageerror',lambda e:errors.append(str(e)))
     page.on('request',lambda r:requests.append(r.url) if r.url.startswith('http') and not r.url.startswith(base) else None)
     page.goto(base+'Fool.html')
-    page.wait_for_function('bank && document.getElementById("quotas")')
+    page.wait_for_function('bank && document.getElementById("icon2")')
     assert page.locator('input[type=file],a[download]').count()==0
-    page.get_by_role('button',name='Prepara anteprima').click()
-    page.get_by_role('button',name='Verifica schermo e inizia Fool').click();page.wait_for_timeout(150)
+    page.get_by_role('button',name='Inizia partita').click();page.wait_for_timeout(150)
     print('MESSAGE',page.locator('#message').inner_text());print('STATE',page.evaluate('({screen:game?.s.screen,ui,fitBlocked})'))
     page.screenshot(path=str(ROOT/'tests/game.png'),full_page=True)
     if page.get_by_role('button',name='Svela e avvia il tempo').count():

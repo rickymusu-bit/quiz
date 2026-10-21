@@ -113,6 +113,7 @@ main { max-width: 1200px; margin: auto; padding: clamp(.75rem, 3vw, 1.5rem); }
 .good { color: var(--good); }
 .bad { color: var(--bad); }
 #message {
+  pointer-events: none;
   position: fixed;
   bottom: max(1rem, env(safe-area-inset-bottom));
   left: 1rem;
@@ -226,3 +227,11 @@ dialog .columns { margin: 1rem 0; }
   .operation-body.hidden-question { padding-block: .5rem; }
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+/* Preparazione rapida e parametri separati. */
+.setup-teams label, .settings-grid label, #quotas label { display: grid; gap: .4rem; align-content: start; }
+.setup-teams input, .setup-teams select { width: 100%; }
+.settings-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+#quotas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem 1rem; }
+.team-icon { display: inline-flex; align-items: center; justify-content: center; width: 1.65em; height: 1.65em; margin-right: .45em; color: var(--accent); background: #111215; border: 1px solid #77716a; font-family: serif; vertical-align: middle; }
+@media (max-width: 650px) { .settings-grid, #quotas { grid-template-columns: 1fr; } }

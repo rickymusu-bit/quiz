@@ -1,12 +1,12 @@
 # Fool
 
-Quiz online di Riccardo Musumarra. **Interfaccia 1.2.2**, regolamento **18.0.1**.
+Quiz online di Riccardo Musumarra. **Interfaccia 1.3.0**, regolamento **18.0.1**.
 
-Apri **https://rickymusu-bit.github.io/quiz/** e scegli **Start** o **Regole**. Non sono previsti download, installazioni o selettori di file.
+Apri **https://rickymusu-bit.github.io/quiz/** e scegli **Start**, **Regole** o **Impostazioni**. Non sono previsti download, installazioni o selettori di file.
 
 ## Domande già sul sito
 
-Il gioco legge il catalogo `datasets.json` e carica automaticamente la banca selezionata dal sito. È disponibile Termologia, con 100 domande. Il docente configura tre gruppi distinti, tempo, punti base, probabilità bonus, difficoltà e quote per argomento; la somma delle quote deve essere 33. Configurazione e anteprima mostrano le soluzioni e si usano prima di proiettare alla classe.
+Il gioco legge il catalogo `datasets.json` e carica automaticamente la banca selezionata dal sito. È disponibile Termologia, con 100 domande. Con **Start** si scelgono soltanto nomi e icone dei tre gruppi e l’argomento dal catalogo, poi **Inizia partita** avvia il gioco con domanda nascosta. **Impostazioni**, sotto Regole nella home, raccoglie tempo, punti base, probabilità bonus, difficoltà e quote dei sottoargomenti: totale 33. **Salva impostazioni** conserva un profilo per ogni banca in `localStorage` (`fool-settings-v1`) per le nuove partite nello stesso browser. Da Impostazioni si può aprire l’anteprima docente con le soluzioni, da usare prima della proiezione.
 
 Il catalogo contiene `versione: 1` e l'elenco `banche`, ciascuna con `id`, `nome` e `url` relativa al sito. Per aggiungere una banca, pubblicare il relativo contenuto nello schema esistente e aggiungerla al catalogo. Le domande mantengono il contratto del dataset e i loro ID originali. Il catalogo e le banche devono provenire dallo stesso sito; errori di rete o validazione bloccano l'avvio e offrono **Riprova**.
 
@@ -14,7 +14,7 @@ All'esaurimento della riserva, **Cerca nuove domande** verifica gli aggiornament
 
 ## Salvataggio nello stesso browser
 
-La partita viene salvata automaticamente nel browser. **Salva nel browser** permette un salvataggio esplicito; **Riprendi partita** sulla copertina recupera l'ultima partita conservata da quel browser, mantenendo il timer fermo fino al comando del docente. Non sono presenti importazione o esportazione di file. Le partite non sono sincronizzate tra dispositivi e la cancellazione dei dati del sito elimina il salvataggio locale.
+La partita viene salvata automaticamente nel browser. **Salva nel browser** permette un salvataggio esplicito; **Riprendi partita** nella preparazione recupera l'ultima partita conservata da quel browser, mantenendo il timer fermo fino al comando del docente. Non sono presenti importazione o esportazione di file. Le partite non sono sincronizzate tra dispositivi e la cancellazione dei dati del sito elimina il salvataggio locale.
 
 Alla campanella una domanda già svelata deve essere conclusa; solo dopo l'esito si sospende. Sanzioni prioritarie, serie, inventari e bonus vincolati, rifiuti, rotazione e Battaglia finale restano quelli del regolamento 18.0.1.
 
@@ -24,7 +24,7 @@ La nuova richiesta del responsabile di offrire il quiz solo online sostituisce i
 
 La sola home è `https://rickymusu-bit.github.io/quiz/`: «Torna alla schermata iniziale» e il logo riportano a questo indirizzo. `Fool.html` apre direttamente la configurazione, senza una schermata iniziale alternativa.
 
-La home usa il logo ufficiale rivisto su richiesta del responsabile, con superfici grigio/nero al posto del blu, il sottotitolo **Solo uno sciocco pensa di vincere** e due soli pulsanti sovrapposti: **Start** e **Regole**. Lo sfondo riprende cielo rosso e pavimento di pietra del riferimento, nell'estetica di Doom del 1993. Immagini e caratteri sono serviti dal sito stesso; provenienza e licenze sono in [assets/README.md](assets/README.md).
+La home usa il logo ufficiale rivisto su richiesta del responsabile, con superfici grigio/nero al posto del blu, il sottotitolo **Solo uno sciocco pensa di vincere** e tre pulsanti sovrapposti: **Start**, **Regole**, **Impostazioni**. Lo sfondo riprende cielo rosso e pavimento di pietra del riferimento, nell'estetica di Doom del 1993. Immagini e caratteri sono serviti dal sito stesso; provenienza e licenze sono in [assets/README.md](assets/README.md).
 
 Home, configurazione, gioco, dialoghi e regole si adattano alla larghezza disponibile, senza una finestra minima obbligatoria. Su mobile le alternative diventano una colonna e i dettagli di inventari/effetti sono espandibili per ciascun gruppo. Se serve, la pagina scorre in verticale; le formule molto larghe possono scorrere nel proprio riquadro, senza tagliarle o rimpicciolirle. Restano disponibili focus visibile, tastiera e comandi touch. Un ridimensionamento normale non sospende il timer; solo un effettivo problema di larghezza non gestita attiva la protezione del layout.
 
@@ -52,6 +52,8 @@ python3 tests/browser.py
 python3 tests/layout.py
 python3 tests/online.py
 python3 tests/responsive.py
+python3 tests/settings.py
+python3 tests/navigation.py
 ```
 
 La rigenerazione usa soltanto la libreria standard Python. I test motore usano Node; i test browser richiedono Python Playwright e Chromium (`/usr/bin/chromium`). Il sito generato è statico e viene pubblicato sul ramo `gh-pages`. `src/home.html` genera la pagina iniziale; `src/app.js` gestisce il caricamento online e i salvataggi nel browser.

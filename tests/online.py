@@ -19,13 +19,12 @@ with sync_playwright() as p:
  assert 'Scarica' not in page.locator('body').inner_text()
  page.get_by_role('link',name='Start',exact=True).click()
  assert page.get_by_role('button',name='Riprendi partita').count()==0
- expect(page.get_by_role('button',name='Prepara anteprima')).to_be_enabled()
+ expect(page.get_by_role('button',name='Inizia partita')).to_be_enabled()
  assert page.locator('#bank-choice').input_value()=='termologia'
  assert page.evaluate('bank.bank.length')==100
  assert any('/Quiz/datasets.json' in x for x in requests)
  assert any('/Quiz/Dataset_termologia_' in x for x in requests)
- page.get_by_role('button',name='Prepara anteprima').click()
- page.get_by_role('button',name='Verifica schermo e inizia Fool').click()
+ page.get_by_role('button',name='Inizia partita').click()
  page.get_by_role('button',name='Svela e avvia il tempo').click()
  page.get_by_role('button',name='Salva nel browser',exact=True).filter(visible=True).click()
  assert not downloads
@@ -51,9 +50,9 @@ with sync_playwright() as p:
  page.route('**/datasets.json',lambda route:route.fulfill(status=503,body='Unavailable'))
  page.goto(base+'Fool.html')
  expect(page.get_by_role('heading',name='Domande non disponibili')).to_be_visible()
- assert page.get_by_role('button',name='Prepara anteprima').count()==0
+ assert page.get_by_role('button',name='Inizia partita').count()==0
  page.unroute('**/datasets.json');page.get_by_role('button',name='Riprova',exact=True).click()
- expect(page.get_by_role('button',name='Prepara anteprima')).to_be_enabled()
+ expect(page.get_by_role('button',name='Inizia partita')).to_be_enabled()
  assert not errors and not downloads,(errors,downloads)
  print('Online: catalogo/banca automatici, nessun file o download, salvataggio/ripresa, rifornimento e recupero da errore: OK')
  browser.close()

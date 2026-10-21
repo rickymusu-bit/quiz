@@ -11,7 +11,7 @@
 <style>
 @font-face{font-family:FoolTerminal;src:url('assets/vt323-regular.ttf') format('truetype');font-style:normal;font-weight:400;font-display:swap}
 :root{color-scheme:dark;background:#090809;color:#f4e9cc;font-family:system-ui,sans-serif}
-*{box-sizing:border-box}
+*{box-sizing:border-box;min-width:0}
 body{margin:0;min-width:0;min-height:100svh;background:#090809 url('assets/doom-background.png') center center/cover no-repeat}
 body::before{content:"";position:fixed;inset:0;pointer-events:none;background:linear-gradient(180deg,#0005,transparent 45%,#0007),radial-gradient(ellipse at center,#0000 35%,#0009 100%)}
 main{position:relative;min-height:100svh;display:flex;align-items:center;justify-content:center;padding:max(18px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));text-align:center}
@@ -20,11 +20,11 @@ h1{width:100%;margin:0;line-height:0}
 .home-logo{display:block;width:100%;height:auto;max-height:42svh;object-fit:contain;filter:url(#fool-logo-key)}
 .subtitle{margin:0;padding:0 6px;font:400 clamp(25px,3.1vw,43px)/1.08 FoolTerminal,ui-monospace,monospace;color:#f4e9cc;text-shadow:2px 2px #000,0 2px 8px #000;overflow-wrap:anywhere}
 .menu{display:grid;grid-template-columns:1fr;gap:12px;width:min(340px,88%);margin-top:clamp(3px,1.5vh,14px)}
-.menu a{display:flex;align-items:center;justify-content:center;min-height:clamp(54px,7vh,76px);padding:8px 24px;border:3px solid;border-color:#80766b #251e1c #171314 #625a53;background:linear-gradient(#333132,#1c1a1d);color:#ed4a32;text-decoration:none;font:400 clamp(34px,4vw,49px)/1 FoolTerminal,ui-monospace,monospace;text-shadow:2px 2px #260000,0 -1px #ffad6a;box-shadow:3px 4px 0 #000b,inset 0 0 0 2px #0e0d0d}
+.menu a{display:flex;align-items:center;justify-content:center;min-height:clamp(54px,7vh,76px);padding:8px clamp(6px,2vw,24px);border:3px solid;border-color:#80766b #251e1c #171314 #625a53;background:linear-gradient(#333132,#1c1a1d);color:#ed4a32;text-decoration:none;font:400 clamp(24px,8vw,49px)/1 FoolTerminal,ui-monospace,monospace;text-shadow:2px 2px #260000,0 -1px #ffad6a;box-shadow:3px 4px 0 #000b,inset 0 0 0 2px #0e0d0d}
 .menu a:hover{color:#ffb66f;border-top-color:#b98b63;background:linear-gradient(#49302e,#24191b)}
 .menu a:active{transform:translate(1px,2px);box-shadow:1px 2px #000b,inset 0 0 0 2px #0e0d0d}
 .menu a:focus-visible{outline:3px solid #ffe4ac;outline-offset:5px}
-@media(max-height:500px){.home-content{gap:8px}.home-logo{max-height:32svh}.subtitle{font-size:clamp(20px,4vh,29px)}.menu{gap:8px;margin-top:0;width:min(290px,78%)}.menu a{min-height:44px;font-size:32px;padding-block:4px}}
+@media(max-height:500px){.home-content{gap:8px}.home-logo{max-height:32svh}.subtitle{font-size:clamp(20px,4vh,29px)}.menu{gap:8px;margin-top:0;width:min(290px,78%)}.menu a{min-height:44px;font-size:clamp(24px,7vw,32px);padding-block:4px}}
 @media(prefers-reduced-motion:reduce){.menu a:active{transform:none}}
 </style>
 </head>
@@ -38,6 +38,7 @@ h1{width:100%;margin:0;line-height:0}
 <nav class="menu" aria-label="Menu principale">
 <a href="Fool.html?start=1">Start</a>
 <a href="Fool_regole.html">Regole</a>
+<a href="Fool.html?settings=1">Impostazioni</a>
 </nav>
 </div>
 </main>
