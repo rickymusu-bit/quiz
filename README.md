@@ -10,7 +10,12 @@ Indirizzo previsto: https://rickymusu-bit.github.io/quiz/
 - `Dataset_termologia_100_domande_v1_20261021.json`: banca scaricabile.
 - `.nojekyll`: pubblicazione statica dei file.
 
-GitHub Pages usa il ramo `gh-pages`, cartella `/`.
+Configurazione prevista: GitHub Pages dal ramo `gh-pages`, cartella `/`.
+
+L’attivazione tramite integrazione ha restituito HTTP 403. Per completarla,
+aprire https://github.com/rickymusu-bit/quiz/settings/pages e scegliere:
+Source → Deploy from a branch; Branch → gh-pages; Folder → / (root); Save.
+Attendere poi il completamento della pubblicazione prima di usare il link pubblico.
 Il codice sorgente e il resoconto delle verifiche sono nel ramo
 `codex/fool-offline-18-0-1` e nella pull request #1.
 
