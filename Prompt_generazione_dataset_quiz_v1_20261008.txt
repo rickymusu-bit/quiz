@@ -1,4 +1,4 @@
-PROMPT PER GENERARE UNA BANCA DI DOMANDE PER «CHI VUOL ESSERE RIMANDATO»
+PROMPT PER GENERARE UNA BANCA DI DOMANDE PER «Fool»
 Versione 1 — 08/10/2026
 
 Compila i parametri qui sotto, poi invia l’intero prompt a ChatGPT.
