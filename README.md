@@ -1,25 +1,11 @@
-# Fool — sito GitHub Pages
+# Fool — solo online
 
-Questo ramo contiene il sito pubblico di Fool, app 1.0.0 e regolamento 18.0.1.
+Sito: https://rickymusu-bit.github.io/quiz/
 
-Indirizzo previsto: https://rickymusu-bit.github.io/quiz/
+Interfaccia 1.1.0, regolamento 18.0.1. GitHub Pages pubblica il ramo `gh-pages`, cartella `/`.
 
-- `index.html`: pagina iniziale.
-- `Fool.html`: gioco autonomo.
-- `Fool_regole.html`: presentazione delle regole.
-- `Dataset_termologia_100_domande_v1_20261021.json`: banca scaricabile.
-- `.nojekyll`: pubblicazione statica dei file.
+Il sito offre il quiz e le regole direttamente nel browser. Non sono presenti pulsanti di download, selettori di file o importazione/esportazione delle partite. Le domande vengono caricate automaticamente dal catalogo `datasets.json` e dalle banche pubblicate sul sito. Il dataset rimane una risorsa interna del sito, senza collegamenti di download per l'utente.
 
-Configurazione prevista: GitHub Pages dal ramo `gh-pages`, cartella `/`.
+La partita si conserva automaticamente nello stesso browser. Non viene sincronizzata su altri dispositivi; cancellare i dati del sito elimina il salvataggio locale. Il motore e le regole sono invariati.
 
-L’attivazione tramite integrazione ha restituito HTTP 403. Per completarla,
-aprire https://github.com/rickymusu-bit/quiz/settings/pages e scegliere:
-Source → Deploy from a branch; Branch → gh-pages; Folder → / (root); Save.
-Attendere poi il completamento della pubblicazione prima di usare il link pubblico.
-Il codice sorgente e il resoconto delle verifiche sono nel ramo
-`codex/fool-offline-18-0-1` e nella pull request #1.
-
-Per aggiornare il gioco rigenerare i due HTML con `python3 tools/build.py`
-nel ramo sorgente e sostituire i corrispondenti file di questo ramo.
-Il caricamento dei dataset e i salvataggi avvengono nel browser del docente;
-il sito non invia partite o dati degli studenti a un server applicativo.
+I sorgenti e le istruzioni per rigenerare le pagine sono nel ramo `codex/fool-offline-18-0-1` e nella pull request #1. Il nome storico del ramo non descrive la distribuzione corrente, che è solo online.
