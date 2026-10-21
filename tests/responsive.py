@@ -21,7 +21,7 @@ with sync_playwright() as p:
   page.set_viewport_size({'width':w,'height':h});page.goto(base,wait_until='networkidle');page.evaluate('document.fonts.ready')
   expect(page.locator('.subtitle')).to_have_text('Solo uno sciocco pensa di vincere')
   expect(page.get_by_role('img',name='Fool',exact=True)).to_be_visible()
-  assert page.evaluate('document.querySelector(".home-logo").naturalWidth')==1280
+  assert page.evaluate('document.querySelector(".home-logo").naturalWidth')==2171
   assert page.locator('nav.menu a').all_text_contents()==['Start','Regole']
   boxes=[page.get_by_role('link',name=x,exact=True).bounding_box() for x in ['Start','Regole']]
   assert boxes[0]['y']+boxes[0]['height']<=boxes[1]['y']

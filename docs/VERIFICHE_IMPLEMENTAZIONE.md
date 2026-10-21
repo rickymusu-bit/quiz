@@ -1,5 +1,10 @@
 # Fool — implementazione e verifiche
 
+## Revisione colore del logo — interfaccia 1.2.2
+
+Su richiesta del responsabile le superfici blu sono state portate a grigio antracite/nero, conservando lettering, metallo e accenti arancioni/dorati. La risorsa corrente è `assets/fool-logo.png`; il JPEG di riferimento resta conservato. Schermata iniziale, intestazioni del gioco e delle regole e icona usano la nuova risorsa. Verificati caricamento e proporzioni su desktop e mobile, con ispezione visiva del logo nel sito; nessuna modifica al motore o ai salvataggi.
+
+
 ## Correzione navigazione — interfaccia 1.2.1
 
 Eliminata la schermata iniziale interna duplicata. «Torna alla schermata iniziale», anche dopo un errore di caricamento, naviga alla home ufficiale della cartella del sito. Aprire o ricaricare `Fool.html` mostra la configurazione e l'eventuale ripresa della partita salvata; non viene creata una schermata iniziale alternativa. Una nuova partita dal riepilogo torna alla configurazione. Anche le regole hanno un pulsante esplicito «Torna alla schermata iniziale», in tutte le sezioni. Il salvataggio resta invariato. `tests/navigation.py` verifica il percorso reale sotto prefisso di cartella su mobile e desktop.

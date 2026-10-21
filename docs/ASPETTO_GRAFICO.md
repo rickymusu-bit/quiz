@@ -1,6 +1,6 @@
 # Fool — Specifiche dell’aspetto grafico
 
-Versione: **1.3.0** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
+Versione: **1.3.1** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
 
 ## 1. Scopo e fonti
 
@@ -14,13 +14,13 @@ Questo documento raccoglie le indicazioni grafiche approvate per **Fool**, per l
 | VIS-02 | Riferimento visivo | **Doom del 1993**, con estetica pixel |
 | VIS-03 | Ambito | Identità coerente di home, quiz e presentazione delle regole |
 | VIS-04 | Aggiornamenti | Raccogliere qui le indicazioni successive del responsabile |
-| VIS-05 | Logo ufficiale | Prima immagine allegata nella richiesta del 21/10/2026, `15033.jpg`, conservata in `assets/fool-logo.jpg` |
+| VIS-05 | Logo ufficiale | Prima immagine allegata nella richiesta del 21/10/2026, `15033.jpg`, conservata come riferimento in `assets/fool-logo.jpg`; revisione corrente grigio/nero in `assets/fool-logo.png` |
 | VIS-06 | Sottotitolo della home | **Solo uno sciocco pensa di vincere** |
 | VIS-07 | Menu della home | Due riquadri cliccabili, uno sopra l'altro: **Start** sopra, **Regole** sotto |
 | VIS-08 | Sfondo | Richiamo alla seconda immagine, `15034.jpg`: cielo rosso e pavimento scuro di pietra, con estetica Doom 1993 |
 | VIS-09 | Responsività | Il sito, il gioco e le regole si adattano a mobile e desktop, in entrambe le orientazioni, senza imporre la precedente finestra minima |
 
-Il logo mantiene i byte originali del JPEG. L'inserimento nel sito usa un filtro SVG di visualizzazione che rende trasparente il fondo quasi nero, conservando i colori del marchio. Lo sfondo è una risorsa generata a partire dallo stile del riferimento, priva della scritta presente nel riferimento.
+La revisione corrente porta le superfici blu a grigio antracite e nero, conservando forma e accenti arancioni/dorati. Il riferimento JPEG originale è conservato separatamente. L'inserimento nel sito usa un filtro SVG di visualizzazione che rende trasparente il fondo quasi nero, conservando i colori del marchio. Lo sfondo è una risorsa generata a partire dallo stile del riferimento, priva della scritta presente nel riferimento.
 
 ## 3. Home e navigazione
 
@@ -61,3 +61,4 @@ Percorsi stabili e cronologia Git conservano le edizioni precedenti.
 | 1.2.0 | 21/10/2026 | Nome Fool, bonus e interazioni Aura/Karma |
 | 1.2.1 | 21/10/2026 | Spareggio rinominato «Battaglia finale» |
 | 1.3.0 | 21/10/2026 | Logo ufficiale, Doom 1993, sottotitolo, menu Start/Regole, sfondo dal riferimento e responsività mobile/desktop |
+| 1.3.1 | 21/10/2026 | Superfici blu del logo sostituite da grigio/nero su richiesta del responsabile |

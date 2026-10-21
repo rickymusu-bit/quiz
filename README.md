@@ -1,6 +1,6 @@
 # Fool
 
-Quiz online di Riccardo Musumarra. **Interfaccia 1.2.1**, regolamento **18.0.1**.
+Quiz online di Riccardo Musumarra. **Interfaccia 1.2.2**, regolamento **18.0.1**.
 
 Apri **https://rickymusu-bit.github.io/quiz/** e scegli **Start** o **Regole**. Non sono previsti download, installazioni o selettori di file.
 
@@ -24,7 +24,7 @@ La nuova richiesta del responsabile di offrire il quiz solo online sostituisce i
 
 La sola home è `https://rickymusu-bit.github.io/quiz/`: «Torna alla schermata iniziale» e il logo riportano a questo indirizzo. `Fool.html` apre direttamente la configurazione, senza una schermata iniziale alternativa.
 
-La home usa il logo ufficiale fornito dal responsabile, il sottotitolo **Solo uno sciocco pensa di vincere** e due soli pulsanti sovrapposti: **Start** e **Regole**. Lo sfondo riprende cielo rosso e pavimento di pietra del riferimento, nell'estetica di Doom del 1993. Immagini e caratteri sono serviti dal sito stesso; provenienza e licenze sono in [assets/README.md](assets/README.md).
+La home usa il logo ufficiale rivisto su richiesta del responsabile, con superfici grigio/nero al posto del blu, il sottotitolo **Solo uno sciocco pensa di vincere** e due soli pulsanti sovrapposti: **Start** e **Regole**. Lo sfondo riprende cielo rosso e pavimento di pietra del riferimento, nell'estetica di Doom del 1993. Immagini e caratteri sono serviti dal sito stesso; provenienza e licenze sono in [assets/README.md](assets/README.md).
 
 Home, configurazione, gioco, dialoghi e regole si adattano alla larghezza disponibile, senza una finestra minima obbligatoria. Su mobile le alternative diventano una colonna e i dettagli di inventari/effetti sono espandibili per ciascun gruppo. Se serve, la pagina scorre in verticale; le formule molto larghe possono scorrere nel proprio riquadro, senza tagliarle o rimpicciolirle. Restano disponibili focus visibile, tastiera e comandi touch. Un ridimensionamento normale non sospende il timer; solo un effettivo problema di larghezza non gestita attiva la protezione del layout.
 
