@@ -1,8 +1,8 @@
 # Chi vuol essere rimandato — Specifiche del programma
 
-Versione: **9.0.0** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
+Versione: **10.0.0** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
 
-Regolamento di riferimento: [REGOLAMENTO_UFFICIALE.md, v9.0.0](REGOLAMENTO_UFFICIALE.md).
+Regolamento di riferimento: [REGOLAMENTO_UFFICIALE.md, v10.0.0](REGOLAMENTO_UFFICIALE.md).
 
 ## 1. Scopo e gerarchia
 
@@ -10,7 +10,7 @@ Questo documento raccoglie le specifiche funzionali, i vincoli tecnici e i crite
 
 L'analisi iniziale è stata eseguita sul commit `4b7f285cfc4bec5507bed559ada3efa479b29e95`, leggendo il programma `Chi_vuol_essere_rimandato_quiz_v3_20261008.html`, il regolamento HTML v9, il template e il prompt dataset v1. È una verifica del sorgente, non una certificazione funzionale in browser.
 
-Stati dei requisiti: **presente** = riscontrato nel sorgente; **da implementare** = requisito per una futura modifica; **da decidere** = dipende da una questione DEC del regolamento. Le presenti modifiche sono documentali e non aggiornano gli HTML. **Il programma v3 e la presentazione v9 non sono conformi al regolamento 9.0.0**: vanno adeguati rotazione fissa con il solo passaggio da premio, errore/scadenza, timer, conclusione, sospensione/ripresa, spareggio, premio finale, pausa manuale e disposizione della schermata in altezza. La lettura del sorgente non equivale a una verifica in browser.
+Stati dei requisiti: **presente** = riscontrato nel sorgente; **da implementare** = requisito per una futura modifica; **da decidere** = dipende da una questione DEC del regolamento. Le presenti modifiche sono documentali e non aggiornano gli HTML. **Il programma v3 e la presentazione v9 non sono conformi al regolamento 10.0.0**: vanno adeguati rotazione fissa con il solo passaggio da premio, errore/scadenza, timer, conclusione, sospensione/ripresa, spareggio, premio finale, pausa manuale e disposizione della schermata in altezza. La lettura del sorgente non equivale a una verifica in browser.
 
 ## 2. Utenti e distribuzione
 
@@ -125,7 +125,11 @@ Prima della partita mostrare separatamente il numero di quesiti estratti per le 
 
 **SPEC-35 — Moltiplicatore di serie (da implementare; REG-07/08).** Per ciascun gruppo conservare una serie di corrette nei propri turni. A una corretta incrementare n, calcolare M = 1 + 0,10 × n e aggiungere soltanto il valore base della domanda moltiplicato per M. I turni degli avversari non cambiano n; errore e scadenza ordinari azzerano n. Le altre interruzioni seguono DEC-02. La prima corretta vale ×1,10 come esplicitato nel regolamento; non usare silenziosamente una formula con prima corretta ×1,00. Non applicare il moltiplicatore a sanzioni o al totale già accumulato. Finché la tabella per difficoltà non è deliberata il valore base resta 1. Usare aritmetica decimale esatta (con base intera, incremento 10% e divisione a metà, si possono conservare centesimi interi) ed evitare errori binari, arrotondamenti a punti interi e pareggi falsi. Il confronto finale deve usare i punteggi esatti. Mostrare serie, moltiplicatore e dettaglio del guadagno. Lo spareggio resta a eliminazione: non trasformarlo in una seconda gara a punti.
 
-**SPEC-36 — Estrazione e gestione premi (da implementare; REG-25–REG-28).** Catalogo: `salta_turno`, `ruba_punti`, `svela_e_passa`; nessun furto di domande. Dopo una risposta corretta effettuare una sola procedura casuale con probabilità e distribuzione dei tipi da deliberare (DEC-13); non assumere percentuali, equiprobabilità o numero di premi per corretta. Nessuna estrazione per errore/scadenza, per la sola quota Ruba punti o durante lo spareggio, anche in caso di risposta corretta. Completare i parametri aperti prima di abilitare il prodotto.
+**SPEC-36 — Estrazione e gestione premi (da implementare; REG-25–REG-28).** Catalogo: `salta_turno`, `ruba_punti`, `svela_e_passa`. Nella configurazione del programma esporre «Probabilità premio (%)» come numero finito da 0 a 100 compresi; rifiutare valori vuoti, non numerici o fuori intervallo, senza conversioni implicite a zero. Il valore effettivo va mostrato al docente e salvato con la partita. Il valore predefinito non è ancora stabilito: non inventarlo, richiedere un valore valido se manca. Configurare p prima dell’avvio e conservarlo alla ripresa senza reinizializzarlo.
+
+Per ogni corretta nella fase ordinaria effettuare una sola prova di assegnazione con probabilità p/100. Se non vince, nessun premio; se vince, scegliere uniformemente un solo tipo tra quelli del catalogo e accreditare una copia. I tre tipi attuali hanno probabilità condizionata 1/3 ciascuno; se il catalogo verrà ampliato, l’equiprobabilità diventa 1/N. Non offrire pesi diversi per tipo. La probabilità complessiva per ciascun tipo attuale è p/300 se p è espresso come percentuale: per esempio p=30% dà 10% Salta turno, 10% Ruba punti, 10% Svela e passa e 70% nessun premio. Questo è un esempio, non il valore predefinito.
+
+Con p=0% non assegnare mai premi; con p=100% assegnarne uno a ogni corretta ordinaria. Nessuna estrazione per errore/scadenza, sola quota ricevuta da Ruba punti o corretta nello spareggio. I premi non dipendono da difficoltà, serie o tipo di quesito, salvo future modifiche esplicite. Salvare probabilità, catalogo utilizzato e risultati delle estrazioni per non ripetere o alterare una vincita alla ripresa.
 
 Registrare una volta l’estrazione, senza ripeterla per doppi clic, ridisegni, pausa o ripresa. Accreditare il premio nell’inventario del gruppo: si può conservare e accumulare, comprese copie uguali. Non richiedere subito uso o bersaglio e non bloccare l’avanzamento perché un premio vinto resta inutilizzato. Non imporre un limite alle copie non deliberato.
 
@@ -200,7 +204,7 @@ Questa è una lista di scenari da usare per le implementazioni successive; non d
 | ACC-37 | Somma di guadagni decimali e confronto finale | Nessun arrotondamento a interi o errore di rappresentazione; premio finale resta 10 blu fisso (SPEC-19/24/35) |
 | ACC-38 | Esito corretto, doppio clic, ridisegno e ripresa da salvataggio | Una sola estrazione premio e un solo accredito di punti, senza rigenerare l’esito casuale (SPEC-36) |
 | ACC-39 | Uso di Salta turno su un avversario e doppio clic | Un premio consumato, un effetto destinato al prossimo turno del bersaglio; nessun furto di turno o punti. Cumulo e domanda secondo decisioni DEC-04/15 (SPEC-36) |
-| ACC-40 | Test con probabilità controllata, dopo DEC-13 | Con 0% nessuna vincita, con 100% vincita a ogni corretta; errore/scadenza non estraggono. Sono estremi di test, non probabilità di gioco deliberate (SPEC-36) |
+| ACC-40 | Probabilità 0% e 100%, poi risposta errata o spareggio | 0%: nessun premio; 100%: esattamente un premio a ogni corretta ordinaria. Nessuna vincita per errore/scadenza o nello spareggio (SPEC-36) |
 | ACC-41 | Premio appena vinto, poi uso nel proprio turno o tentativo fuori turno | Premio conservato nell’inventario senza uso/bersaglio obbligatori; uso fuori turno respinto; bersaglio scelto solo all’attivazione consentita (SPEC-36) |
 | ACC-42 | A attiva Ruba punti su B, C gioca prima di B, poi B guadagna lordo 1,30 | C non consuma l’effetto; B e A ricevono 0,65 ciascuno. Serie di B avanza, serie di A invariata (SPEC-36) |
 | ACC-43 | B sbaglia o scade il tempo alla domanda bersaglio | Nessuna quota, serie di B azzerata ed effetto consumato senza rinvio alla futura corretta (SPEC-36) |
@@ -213,10 +217,13 @@ Questa è una lista di scenari da usare per le implementazioni successive; non d
 | ACC-50 | Salva durante la scelta Svela e passa e riprendi | Domanda e scelta ripristinate senza doppio consumo; conclusione della domanda già svelata alla campanella resta valida (SPEC-30/37) |
 | ACC-51 | Corretta in spareggio con probabilità premi forzata al 100% nel test | Nessuna estrazione o accredito di nuovi premi; inventario invariato per il solo esito corretto (SPEC-31/36) |
 | ACC-52 | Domande ordinarie ed extra dalla stessa banca | Quattro alternative in entrambe le fasi, risposta corretta preservata dopo il mescolamento e nessun quesito già svelato ripetuto (SPEC-31/34) |
+| ACC-53 | Probabilità vuota, non numerica, infinita o fuori 0–100 | Configurazione rifiutata con messaggio chiaro; nessun valore inventato o coercizione silenziosa (SPEC-36) |
+| ACC-54 | Estrazione con generatore casuale controllato | Verifica separata della probabilità di vincita e della scelta uniforme tra i tre tipi; ogni ramo assegna una sola copia. Nessun test statistico instabile usato come unica verifica (SPEC-36) |
+| ACC-55 | Salva e riprendi con probabilità personalizzata | Stesso parametro e stessi esiti già sorteggiati, senza ripetizioni o ritorno a un valore predefinito (SPEC-30/36) |
 
 ## 9. Passi successivi proposti
 
-1. Risolvere gli effetti della serie in DEC-02, i casi DEC-03–DEC-05, l’automatismo residuo in DEC-06, i casi residui DEC-11 e i parametri premi DEC-13–DEC-17. Conservazione e accumulo sono approvati, con uso solo nel proprio turno; l’obbligo di uso immediato è superato. Il passaggio libero resta escluso; Svela e passa è l’eccezione con premio. Definire separatamente la tabella dei punti base per difficoltà, senza inventarne i valori. DEC-07–DEC-10 e DEC-12 sono risolte; la scadenza eliminatoria in DEC-11 è definita.
+1. Risolvere gli effetti della serie in DEC-02, i casi DEC-03–DEC-05, l’automatismo residuo in DEC-06, i casi residui DEC-11 e i casi dei premi DEC-14–DEC-17. DEC-13 è risolta: probabilità configurabile e tipi equiprobabili. Conservazione e accumulo sono approvati, con uso solo nel proprio turno; l’obbligo di uso immediato è superato. Il passaggio libero resta escluso; Svela e passa è l’eccezione con premio. Definire separatamente la tabella dei punti base per difficoltà, senza inventarne i valori. DEC-07–DEC-10 e DEC-12 sono risolte; la scadenza eliminatoria in DEC-11 è definita.
 2. Adeguare programma e presentazione: 33 domande con rotazione fissa dopo ogni esito, senza passaggi liberi né limite delle tre corrette, con eccezione Svela e passa, errore/scadenza ordinari a 0, timer unico 45 secondi, sospensione/ripresa dopo aver concluso la domanda svelata, spareggio con banca ordinaria condivisa, quattro alternative, stesso tempo normale, nessun nuovo premio, ordine casuale e scadenza eliminatoria, 10 blu fisso, Pausa/Riprendi e layout in altezza senza scorrimento. Introdurre versione e riferimenti REG.
 3. Introdurre configurazione condivisa e schema del dataset con una migrazione esplicita, conservando gli HTML autonomi; aggiungere uno schema versionato del salvataggio.
 4. Automatizzare gli scenari fondamentali, inclusi chiusura/ripresa e spareggio. Valutare separatamente l'annullamento dell'ultima operazione del docente.
@@ -236,3 +243,4 @@ Si mantengono percorsi stabili, versione interna e cronologia Git. Aggiornare qu
 | 7.0.0 | 21/10/2026 | Serie e moltiplicatore decimale, inventario ed estrazione premi, Salta turno, esclusione furti; parametri casuali e d’uso ancora da definire |
 | 8.0.0 | 21/10/2026 | Premi con bersaglio immediato; Ruba punti con ripartizione esatta del prossimo guadagno, esiti, salvataggio e nessun inventario spendibile |
 | 9.0.0 | 21/10/2026 | Inventario accumulabile e uso solo nel proprio turno; Svela e passa; spareggio con banca e timer ordinari e senza nuove assegnazioni di premi |
+| 10.0.0 | 21/10/2026 | Parametro probabilità 0–100%, estrazione uniforme del tipo, singolo premio per corretta e controlli su configurazione/salvataggio |
