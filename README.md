@@ -10,7 +10,7 @@ Materiali di **Skool**, il quiz di Riccardo Musumarra precedentemente chiamato �
 ## Documenti di riferimento
 
 - [Regolamento ufficiale](docs/REGOLAMENTO_UFFICIALE.md) — fonte normativa del gioco, versione 14.0.1.
-- [Specifiche del programma](docs/SPECIFICHE_PROGRAMMA.md) — comportamento, formato dataset, criteri di accettazione e stato dell'implementazione, versione 14.1.1.
+- [Specifiche del programma](docs/SPECIFICHE_PROGRAMMA.md) — comportamento conforme al regolamento 14.0.1, stati e comandi, dataset, salvataggi e criteri di accettazione, versione 15.0.0.
 
 - [Specifiche grafiche](docs/ASPETTO_GRAFICO.md) — nome Skool, Doom classico con estetica pixel e raccolta progressiva delle caratteristiche visive, versione 1.1.0.
 

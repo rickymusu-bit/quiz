@@ -1,24 +1,25 @@
 # Skool — Specifiche del programma
 
-Versione: **14.1.1** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
+Versione: **15.0.0** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
 
 Regolamento di riferimento: [REGOLAMENTO_UFFICIALE.md, v14.0.1](REGOLAMENTO_UFFICIALE.md).
 
-## 1. Scopo e gerarchia
+## 1. Scopo, fonti e stato dell’adeguamento
 
-Il prodotto si chiama **Skool**. L’identità visiva ha come riferimento **Doom classico, con estetica pixel**, ed è descritta nel documento separato [ASPETTO_GRAFICO.md](ASPETTO_GRAFICO.md), versione 1.1.0. La direzione estetica non è ancora implementata e i suoi dettagli saranno raccolti progressivamente.
+Queste sono le specifiche del comportamento da implementare per **Skool**, allineate al [regolamento ufficiale v14.0.1](REGOLAMENTO_UFFICIALE.md) e alle [specifiche grafiche v1.1.0](ASPETTO_GRAFICO.md). La direzione visiva approvata è **Doom classico, con estetica pixel**; palette, font, logo e dettagli non ancora approvati restano raccolti nel documento grafico, senza inventarli qui.
 
-Questo documento raccoglie le specifiche funzionali, i vincoli tecnici e i criteri di accettazione del quiz HTML. Il regolamento definisce le regole; questo documento definisce come applicarle. La presentazione HTML è una spiegazione per la classe. In caso di contrasto prevale il regolamento; per le questioni aperte non si inventano soluzioni normative.
+Il regolamento stabilisce le regole, questo documento le traduce in stati, calcoli, comandi, salvataggi e verifiche, il documento grafico stabilisce la veste visiva. La presentazione HTML deve spiegare le medesime regole e dichiararne la versione.
 
-L'analisi iniziale è stata eseguita sul commit `4b7f285cfc4bec5507bed559ada3efa479b29e95`, leggendo il programma `Chi_vuol_essere_rimandato_quiz_v3_20261008.html`, il regolamento HTML v9, il template e il prompt dataset v1. È una verifica del sorgente, non una certificazione funzionale in browser.
+**Questa revisione aggiorna i documenti, non il codice del gioco o la presentazione.** Le indicazioni «presente» si riferiscono soltanto all’analisi storica del programma HTML v3 al commit `4b7f285cfc4bec5507bed559ada3efa479b29e95`; non attestano la conformità alle nuove regole o test in browser. I requisiti «da adeguare» o «da implementare» descrivono il risultato richiesto. Gli identificativi SPEC e ACC restano stabili.
 
-Stati dei requisiti: **presente** = riscontrato nel sorgente; **da implementare** = requisito per una futura modifica; **da decidere** = dipende da una questione DEC del regolamento. Le presenti modifiche sono documentali e non aggiornano gli HTML. **Il programma v3 e la presentazione v9 non sono conformi al regolamento 14.0.1**: vanno adeguati rotazione fissa con il solo passaggio da premio, errore/scadenza, timer, conclusione, sospensione/ripresa, spareggio, premio finale, pausa manuale e disposizione della schermata in altezza. La lettura del sorgente non equivale a una verifica in browser.
+Le decisioni DEC del regolamento sono risolte o superate: non usarne le vecchie formulazioni come nuove richieste di approvazione. L’unico parametro di configurazione senza valore predefinito indicato è la probabilità dei premi: il docente deve poterla impostare prima della partita. Dettagli visivi ancora da raccogliere non bloccano la definizione della logica.
+
 
 ## 2. Utenti e distribuzione
 
 - **SPEC-01 — Conduzione (presente).** Un docente conduce il gioco su un dispositivo, eventualmente proiettato. Non è un'applicazione multiplayer con accessi separati. Il docente registra nell'interfaccia la risposta comunicata dal portavoce.
 - **SPEC-02 — Uso locale (presente).** Il gioco è un HTML autonomo apribile nel browser senza installazione. Dataset JSON esterno selezionato dall'utente; formule, font e risorse già inclusi devono funzionare anche offline. Non richiede account, server o accesso al registro.
-- **SPEC-03 — Interfaccia (presente).** Copertina con logo e avvio, configurazione, anteprima docente, domanda nascosta, risposta a tempo, esito e riepilogo. Testi leggibili in proiezione, layout adattabile, focus visibile, comandi utilizzabili da tastiera e schermo intero con messaggio alternativo se non disponibile. Correttezza ed errore sono indicati anche dal testo, oltre al colore.
+- **SPEC-03 — Interfaccia da adeguare.** Schermate coerenti con Skool e Doom classico secondo SPEC-41, leggibili in proiezione e adattate allo schermo secondo SPEC-33. Comprendere copertina, configurazione, anteprima docente, domanda nascosta, scelta Svela e passa, risposta a tempo, pausa, premi/bersagli, sanzioni, esito, sospensione/ripresa, spareggio e riepilogo. Focus visibile e uso da tastiera; stati espressi anche con testo, non soltanto colore. L’esistenza di alcune schermate nel vecchio HTML non equivale alla realizzazione di questo requisito.
 
 ## 3. Configurazione e anteprima
 
@@ -27,7 +28,7 @@ Stati dei requisiti: **presente** = riscontrato nel sorgente; **da implementare*
 | SPEC-04 | Tre nomi di gruppo distinti senza distinzione fra maiuscole e minuscole; nomi vuoti sostituiti da nomi predefiniti | Presente |
 | SPEC-05 | Caricamento e validazione del JSON prima dell'estrazione; un nuovo caricamento invalida quello precedente | Presente |
 | SPEC-06 | 33 domande ordinarie valide, salvo vittoria anticipata dell’unico gruppo rimasto o sconfitta di tutti. Rifiuto accettato, turno saltato e quesito annullato per eliminazione del rispondente non consumano una domanda valida; prevedere sostituti nella banca | Da adeguare |
-| SPEC-07 | Timer unico per domanda, predefinito 45 secondi e personalizzabile a interi 1–600; risposta consentita subito, nessuna fase 15+30. Lo spareggio eredita esattamente il tempo impostato per il gioco normale, senza un valore separato a 30 secondi | Da adeguare |
+| SPEC-07 | Timer unico per domanda, predefinito 45 secondi e personalizzabile a interi 1–600; risposta consentita subito dopo l’avvio, nessuna fase 15+30. Avvio allo svelamento ordinario o dopo la scelta Svela e passa; spareggio eredita lo stesso tempo normale | Da adeguare |
 | SPEC-08 | Selezione degli argomenti e quote intere non negative; somma uguale al totale e quota non superiore alla disponibilità; ribilanciamento delle quote | Presente |
 | SPEC-09 | Estrazione casuale senza ripetizioni di ID nella partita, nel rispetto delle quote; mescolamento di domande e alternative conservando la risposta corretta | Presente |
 | SPEC-10 | Anteprima docente con domande, alternative, soluzione e spiegazione; sostituzione singola con domanda inutilizzata dello stesso argomento e difficoltà; messaggio se non disponibile | Presente |
@@ -59,35 +60,49 @@ Non si confondono le 100 domande per argomento della banca con le 33 estratte pe
 
 **SPEC-16 — Schema condiviso (miglioramento proposto, non implementato).** Introdurre un JSON Schema versionato riutilizzato da validatore, generazione delle banche e controlli automatici. Decidere esplicitamente la compatibilità prima di rendere obbligatori campi che il parser attuale considera facoltativi.
 
-## 5. Stati e transizioni
+## 5. Stati, turni e ordine delle operazioni
 
-| Stato logico | Operazione | Risultato e vincoli |
+La fase di gioco (`ordinaria`, `spareggio`, `conclusa`) è distinta dalla schermata e dall’eventuale pausa. Non cambiare fase o turno per il solo fatto che si apre un dialogo o si ridisegna l’interfaccia.
+
+| Stato | Comando o evento | Comportamento richiesto |
 | --- | --- | --- |
-| Copertina | Avvia | Configurazione |
-| Configurazione | Prepara con dati validi | Estrazione e anteprima docente |
-| Anteprima | Cambia domanda / torna indietro | Sostituzione controllata / configurazione |
-| Anteprima | Inizia partita | Azzera punteggi, sanzioni, eliminazioni e salti; sorteggia il primo gruppo e conserva l’ordine fisso dei turni; mostra la domanda nascosta |
-| Domanda nascosta | Gruppo assegnato | Nessun passaggio libero; può attivare Svela e passa se possiede una copia e si trova nel proprio turno |
-| Domanda nascosta | Svela ordinariamente | Mostra domanda e alternative e avvia il timer; per Svela e passa la scelta precede l’avvio del tempo |
-| Risposta a tempo | Seleziona alternativa prima della scadenza | Un solo esito; valore base × moltiplicatore se corretta, 0 se errata; blocco delle alternative (da adeguare) |
-| Risposta ordinaria a tempo | Scadenza | Un solo esito a 0 punti, anche se la scheda era in background (da adeguare) |
-| Risposta ordinaria o spareggio | Pausa | Memorizza il residuo effettivo, ferma timer, disabilita risposte; mostra stato in pausa |
-| Pausa manuale | Riprendi | Riprende il tempo residuo e riabilita le risposte, senza azzerare il timer |
-| Risposta a tempo | Chiedi rifiuto | Pausa del timer e decisione docente |
-| Valutazione rifiuto | Annulla / nega | Riprende il tempo residuo senza ripartire da zero |
-| Valutazione rifiuto | Accetta | Sostituisce allo stesso rispondente, stesso indice valido, serie invariata, nuovo tempo intero allo svelamento; quota premio del turno invariata |
-| Esito | Prossima | Avanza una domanda valida e prosegue dal successore del rispondente effettivo, anche dopo Svela e passa; salti ed eliminazioni applicati senza consumare la domanda successiva |
-| Domanda ancora nascosta o esito già registrato | Sospendi alla campanella | Salvataggio e sospensione prima dello svelamento successivo; nessun premio anticipato |
-| Domanda già svelata, anche in pausa o in revisione rifiuto | Richiedi sospensione alla campanella | Segna sospensione in attesa: non archivia la domanda come sospesa fra lezioni; conclude risposta/scadenza o decisione rifiuto e registra esito prima di sospendere |
-| Partita sospesa fra lezioni | Riprendi | Stesse squadre, punteggi e stato di gioco; riparte prima della prossima domanda nascosta; nessuna nuova estrazione o nuovo sorteggio |
-| Domanda ordinaria 33 valida conclusa | Concludi fase ordinaria | Confronta gruppi attivi: massimo unico vince; pareggio avvia spareggio, cancellando tutti gli inventari e gli effetti prima della prima domanda extra |
-| Spareggio, domanda extra | Risposta corretta | Gruppo ancora in gioco; turno al successivo partecipante attivo |
-| Spareggio, domanda extra | Risposta sbagliata o tempo scaduto | Elimina il gruppo; se rimane un solo gruppo, dichiara il vincitore; altrimenti prosegui a turno |
-| Riepilogo | Nuova partita | Configurazione; i dati della partita successiva vengono azzerati all'avvio |
+| Copertina | Avvia / Riprendi | Configurazione nuova partita oppure caricamento validato di una partita salvata |
+| Configurazione | Prepara | Valida banca, tre gruppi distinti, quote, tempo, basi e probabilità; estrae 33 quesiti e prepara anteprima |
+| Anteprima docente | Sostituisci / torna indietro | Sostituzione compatibile oppure configurazione; nessun dato mostrato alla classe |
+| Anteprima docente | Inizia | Azzera punti, serie, sanzioni, inventari, effetti, salti ed eliminazioni; sorteggia primo gruppo, conserva rotazione e impostazioni |
+| Assegnazione turno | Individua gruppo disponibile | Esclude eliminati e consuma un salto per ogni occasione saltata; nessuna domanda svelata o consumata. Poi azzera la quota premio per il nuovo turno effettivo |
+| Domanda nascosta | Svela | Mostra domanda e quattro alternative, avvia il tempo intero, abilita la risposta |
+| Domanda nascosta | Attiva Svela e passa | Consuma una copia e l’unica quota premio del turno; svela domanda e alternative con timer fermo e risposte bloccate |
+| Scelta Svela e passa | Rispondi / conferma destinatario | Stessa domanda e alternative; imposta il rispondente effettivo e avvia solo ora il tempo intero |
+| Domanda ordinaria, prima o dopo svelamento | Usa Salta turno / Ruba punti | Solo gruppo avente diritto nel proprio turno, copia presente e quota libera; conferma bersaglio attivo, consuma una copia e crea l’effetto. Nessuna azione retroattiva |
+| Risposta ordinaria a tempo | Alternativa corretta | Esito unico: incrementa serie, calcola base × moltiplicatore, divide eventuali quote uguali, accredita e risolve effetti; poi una prova premio ordinaria |
+| Risposta ordinaria a tempo | Errore / scadenza | Zero punti, serie azzerata, nessun premio; consuma gli effetti Ruba punti della risposta; non aggiunge sanzioni |
+| Risposta in spareggio | Corretta / errore o scadenza | Corretta: resta in gara e ruota. Errore/scadenza: elimina; niente punti né premi |
+| Risposta a tempo | Pausa | Conserva residuo effettivo e blocca risposte; nessuna avanzata del tempo durante la pausa |
+| Pausa | Riprendi | Riparte dal residuo nello stesso stato e con un solo timer, senza rinnovare il tempo |
+| Qualunque schermata operativa | Apri pannello sanzioni | Pausa automatica se il timer corre; blocca risposte, premi e avanzamento finché il pannello è attivo |
+| Pannello sanzioni | Conferma sanzione | Prima le sanzioni: +1 contatore, serie a zero, punti invariati; a 3 elimina, cancella premi/effetti coinvolti e valuta condizioni finali |
+| Pannello sanzioni | Chiudi senza sanzionare | Nessuna modifica a serie o contatori; non annulla la pausa preesistente e non riavvia automaticamente il tempo |
+| Domanda svelata senza risposta, anche nella scelta Svela e passa | Richiedi rifiuto | Stato docente di valutazione, con timer sospeso se già partito; conserva lo stato di provenienza |
+| Valutazione rifiuto | Respinto / annullato | Ritorna allo stato di provenienza: se il timer non era mai partito resta fermo; se correva, usa il residuo |
+| Valutazione rifiuto | Accettato | Esclude quel quesito e lo sostituisce allo stesso rispondente, stesso indice valido, serie invariata e quota premio del turno invariata; tempo intero al nuovo svelamento |
+| Esito ordinario registrato | Prossima | Passa al quesito successivo e al successore del rispondente effettivo, anche dopo passaggio; non reincrementa il contatore valido già aggiornato nell’esito. Salti/eliminazioni non consumano il quesito successivo |
+| Prima dello svelamento successivo | Campanella / sospendi | Salva e sospende; la fine della lezione non assegna un vincitore |
+| Domanda già svelata | Campanella | Imposta sospensione dopo la domanda, da concludere nella lezione; la priorità disciplinare e la fine anticipata prevalgono |
+| Partita sospesa | Riprendi | Stesse squadre e stato salvato, timer fermo finché il docente non prosegue; nessun nuovo sorteggio, consumo o estrazione |
+| Intervento disciplinare completo | Conta gruppi attivi | Zero: tutti sconfitti; uno: vince subito anche prima delle 33; altrimenti continua |
+| Domanda ordinaria valida n. 33 conclusa | Concludi fase ordinaria | Confronta punteggi razionali esatti dei soli attivi; massimo unico vince, parità al primo posto avvia spareggio |
+| Ingresso nello spareggio | Prepara extra | Cancella tutti gli inventari ed effetti, sorteggia una volta l’ordine dei soli partecipanti e usa riserva della banca ordinaria con lo stesso tempo |
+| Riepilogo definitivo | Nuova partita | Configurazione e nuovo stato iniziale; nessun trascinamento di punti, sanzioni, premi o salti |
 
-**SPEC-17 — Integrità delle transizioni (presente, da verificare con scenari).** Nessuna risposta doppia, punteggio doppio o avanzamento doppio. La gestione dell’esito ordinario e dell’eliminazione nello spareggio deve essere distinta. Un clic alla scadenza o dopo la scadenza equivale a tempo scaduto; il riferimento è la scadenza temporale effettiva, non il numero arrotondato mostrato dal timer.
+**SPEC-17 — Integrità degli eventi e priorità da implementare.** Un evento logico deve poter essere applicato una sola volta: invio risposta, scadenza, estrazione, premio, sanzione, sostituzione e avanzamento hanno identificativi o una protezione equivalente. Un ridisegno della schermata non modifica lo stato di gioco. Elaborare prima un intervento disciplinare ancora aperto; poi rivalutare se risposte, timer o azioni in attesa sono ancora leciti. L’apertura del pannello blocca nuovi invii; una terza sanzione annulla la risposta ancora pendente, non crea anche un timeout. Una risposta già definitivamente registrata non viene ricalcolata retroattivamente.
 
-**SPEC-18 — Domande nascoste (presente).** Nessun testo o alternativa visibile nella schermata di scelta; nessun cambio di ordine delle alternative durante la stessa domanda. Dopo l'esito mostra risposta corretta e spiegazione, se presente.
+Per una risposta ordinaria valida e non annullata dalla priorità disciplinare: (1) verifica fase, stato, rispondente attivo e scadenza effettiva; (2) registra un unico esito; (3) aggiorna solo la serie del rispondente; (4) calcola il lordo e le quote esatte; (5) accredita simultaneamente e risolve tutti gli effetti relativi alla risposta; (6) esegue l’unica prova premio prevista se corretta; (7) incrementa una sola volta il contatore delle domande valide; (8) valuta fine partita o attende Prossima. Alla domanda 33 il confronto finale avviene solo dopo tutti gli accrediti.
+
+La durata si basa sulla scadenza temporale effettiva, non sui secondi interi mostrati. Senza intervento disciplinare prioritario, un clic alla scadenza o dopo equivale a tempo scaduto. Contatori distinti: numero di domande valide ordinarie, extra dello spareggio, quesiti svelati, rifiutati o annullati. Non usare l’indice del file estratto come unico conteggio di partita.
+
+**SPEC-18 — Visibilità delle domande da adeguare.** Prima dello svelamento testo e alternative non sono visibili. La scelta Svela e passa è un’eccezione esplicita: domanda e alternative visibili, timer fermo e pulsanti di risposta bloccati fino alla scelta. Solo dopo un esito registrato si mostra la soluzione corretta e la spiegazione. Non rimescolare le alternative durante la stessa domanda, un passaggio, una pausa o una ripresa.
+
 
 ## 6. Punteggi, sanzioni e conclusione
 
@@ -103,9 +118,27 @@ Non si confondono le 100 domande per argomento della banca con le 33 estratte pe
 
 Il registro eventi attuale conserva al massimo otto messaggi in memoria e ne mostra quattro. Il programma attuale non ripristina una partita dopo il caricamento della pagina: **salvataggio e ripresa sono ora requisiti necessari, ancora da implementare** (SPEC-30). L'annullamento dell'ultima operazione resta una possibile miglioria separata.
 
-**SPEC-30 — Sospensione e ripresa (da implementare; REG-20).** Sostituire la conclusione «fine modulo» con una sospensione. Conservare versione del regolamento e formato del salvataggio, identificativo della partita, composizione delle squadre (nomi e membri ove registrati), ordine di rotazione, titolare iniziale del turno, rispondente effettivo e riferimento per il prossimo gruppo, flag premio già usato nel turno, punteggi decimali, contatori disciplinari per gruppo, stato e causa di eliminazione, serie individuali, inventario conservabile con quantità per tipo e gruppo, attivazione o selezione bersaglio da completare, premi attivati e consumati, effetti pendenti con beneficiario e bersaglio, salti temporanei dovuti ai soli premi, tabella dei punti base effettivi, indice e stato della domanda, contatori di risposte/rifiuti, tempo residuo e impostazioni. Conservare anche le estrazioni di premio già effettuate e gli esiti associati a ciascuna risposta, per impedire nuove estrazioni alla ripresa. Salvare anche domande estratte, ordine delle alternative e risposte corrette, la banca ordinaria condivisa e l’eventuale riserva residua, ID dei quesiti già svelati in entrambe le fasi e, nello spareggio, partecipanti, eliminati, ordine dei turni e tempo effettivo ereditato dalla fase ordinaria. In caso di rifornimento validare gli ID contro l’intera banca condivisa e i quesiti già svelati; nessun caricamento separato Vero/Falso. Nessuna assegnazione del premio alla campanella. Non richiedere nominativi degli studenti per il solo funzionamento: il docente può garantire la stessa composizione usando i nomi delle squadre.
+**SPEC-30 — Sospensione e ripresa (da implementare; REG-20).** Sostituire la conclusione «fine modulo» con una sospensione. Conservare versione del regolamento e formato del salvataggio, identificativo della partita, composizione delle squadre (nomi e membri ove registrati), ordine di rotazione, titolare iniziale del turno, rispondente effettivo e riferimento per il prossimo gruppo, flag premio già usato nel turno, punteggi razionali esatti di SPEC-40, contatori disciplinari per gruppo, stato e causa di eliminazione, serie individuali, inventario conservabile con quantità per tipo e gruppo, attivazione o selezione bersaglio da completare, premi attivati e consumati, effetti pendenti con beneficiario e bersaglio, salti temporanei dovuti ai soli premi, tabella dei punti base effettivi, indice e stato della domanda, contatori di risposte/rifiuti, tempo residuo e impostazioni. Conservare anche le estrazioni di premio già effettuate e gli esiti associati a ciascuna risposta, per impedire nuove estrazioni alla ripresa. Salvare anche domande estratte, ordine delle alternative e risposte corrette, la banca ordinaria condivisa e l’eventuale riserva residua, ID dei quesiti già svelati in entrambe le fasi e, nello spareggio, partecipanti, eliminati, ordine dei turni e tempo effettivo ereditato dalla fase ordinaria. In caso di rifornimento validare gli ID contro l’intera banca condivisa e i quesiti già svelati; nessun caricamento separato Vero/Falso. Nessuna assegnazione del premio alla campanella. Non richiedere nominativi degli studenti per il solo funzionamento: il docente può garantire la stessa composizione usando i nomi delle squadre.
 
 Il salvataggio deve sopravvivere alla chiusura del browser e consentire esportazione/importazione di un file locale versionato; l'autosalvataggio locale è complementare, non l'unico mezzo di ripresa. Validare integralmente un salvataggio prima di sostituire la partita attiva; un file non valido o incompatibile deve lasciare intatta la partita. Riprendere con timer fermo fino al comando del docente, senza applicare come tempo trascorso l'intervallo fra le lezioni. Per la sospensione dovuta alla campanella, una domanda già svelata va conclusa nella lezione in corso (REG-20): usare un flag «sospendi dopo questa domanda», impedire lo svelamento successivo e salvare dopo aver registrato l’esito. Se quell’esito o un’eliminazione disciplinare determina il vincitore o la sconfitta di tutti, mostrare il riepilogo definitivo; la priorità disciplinare prevale sul completamento della domanda. Se la domanda 33 produce un pareggio, salvare lo spareggio ancora da iniziare senza svelare una domanda extra. Un eventuale salvataggio tecnico di emergenza non deve essere presentato come il normale rinvio di una domanda già svelata alla campanella. Il file di partita contiene soluzioni ed è destinato al docente.
+
+Il salvataggio deve distinguere i seguenti dati, senza ricavarli dalle sole etichette dell’interfaccia:
+
+| Dato logico | Vincolo |
+| --- | --- |
+| Versioni e impostazioni | Formato salvataggio, regolamento 14.0.1, tabella basi, tempo e p effettivi; nessuna sostituzione con default alla ripresa |
+| Fase e schermata | Fase ordinaria/spareggio/conclusa distinta da domanda nascosta, scelta, risposta, esito, pausa e dialogo |
+| Turno | Identificativo del turno, titolare iniziale, rispondente effettivo e riferimento per la rotazione successiva |
+| Quota premio | Un flag comune al turno; passa e rifiuto non lo rinnovano |
+| Domanda | ID, testo, ordine delle alternative, risposta corretta, stato già svelata e indice della domanda valida |
+| Conteggi | Valide ordinarie, extra, rifiuti e annullamenti distinti; la stessa domanda non produce due incrementi |
+| Timer | Durata e residuo; stato non ancora avviato/in corso/in pausa; motivi di pausa e schermata di ritorno |
+| Gruppi | Punteggio razionale, serie, sanzioni, stato attivo/eliminato e causa; squadra/composizione invariata |
+| Premi ed effetti | Quantità inventario, beneficiari/bersagli per ogni effetto, contatori salti, attivazioni in corso e copie già consumate |
+| Riserva ed eventi | Banca condivisa, ID svelati non riutilizzabili, estrazioni premio e accrediti già applicati |
+| Conclusione/sospensione | Richiesta di sospensione dopo domanda, eventuale vincitore o sconfitta di tutti; nessuna riapertura implicita di una partita conclusa |
+
+Validare coerenza dei dati oltre al JSON: gruppo rispondente esistente, inventari e salti non negativi, serie non negativa, nessun premio utilizzabile nello spareggio, quota coerente con l’attivazione e punteggi razionali con denominatore positivo. Un salvataggio di una vecchia versione non va reinterpretato automaticamente come compatibile con le nuove regole: migrazione esplicita oppure messaggio di incompatibilità, senza sovrascrivere la partita attiva.
 
 **SPEC-31 — «Chi vuol essere eliminato» (da implementare; REG-23).** Dopo le 33 domande valide, in caso di parità al massimo tra gruppi attivi, cancellare tutti gli inventari dei premi e tutti gli effetti pendenti (Salta turno e Ruba punti inclusi), per ogni gruppo. Solo dopo questo reset entrare nello spareggio e salvarne lo stato: la ripresa non deve recuperare premi eliminati. Sorteggiare una volta l’ordine dei partecipanti; usare quesiti non svelati della banca ordinaria a quattro alternative e lo stesso tempo impostato per la partita. Una corretta mantiene in gara e ruota; errore/scadenza eliminano. Non assegnare o consentire uso di premi. Le sanzioni continuano, azzerano la serie e alla terza eliminano con priorità. Il rifiuto accettato sostituisce allo stesso gruppo, senza cambiare la serie. Dopo l’intervento completo, un superstite vince il 10 blu; nessun superstite significa sconfitta di tutti. Nessun punto o moltiplicatore aggiuntivo nello spareggio.
 
@@ -146,6 +179,22 @@ Svela e passa richiede domanda ancora nascosta; Salta turno e Ruba punti sono ut
 **Ruba punti.** Consentire più effetti attivi sul medesimo bersaglio, mantenendo per ciascuno beneficiario e bersaglio. Le nuove attivazioni restano soggette a possesso, proprio turno e massimo un premio attivato per turno. Alla risposta corretta raccogliere i beneficiari attivi **distinti**, aggiungere il bersaglio e calcolare una sola volta il lordo con la nuova serie del rispondente. Con k beneficiari assegnare a ognuno dei k + 1 gruppi lordo/(k + 1), in una transazione unica. Nessun dimezzamento in cascata o premio del 50% separato per ogni effetto. Più copie dello stesso beneficiario non aumentano il numero delle quote: l’interfaccia deve segnalare l’eventuale attivazione ridondante prima del consumo, senza inventare una quota aggiuntiva. Solo il rispondente modifica la serie ed è eleggibile per l’estrazione; gli accrediti passivi non sono risposte corrette. Con A e C beneficiari su B e lordo 240: 80 ciascuno. Con unico beneficiario e lordo 120: 60 ciascuno. Su errore/scadenza nessuna quota; consumare insieme tutti gli effetti di quella risposta. Turni altrui, salti e rifiuti accettati non consumano gli effetti.
 
 Eliminazione: cancellare inventario dell’eliminato e tutti gli effetti in cui è beneficiario o bersaglio, senza trasferirli. Se viene eliminato un beneficiario Ruba punti, conservare gli effetti degli altri beneficiari sullo stesso bersaglio; determinare le quote dagli effetti ancora validi al momento della risposta. Se è eliminato il bersaglio, cancellare tutti gli effetti su di lui. Nessun ricalcolo retroattivo di quote già accreditate. Ingresso nello spareggio: cancellare tutti gli inventari ed effetti, senza nuove assegnazioni o attivazioni. Fine partita: gli oggetti senza occasioni utili non creano nuove domande né alterano il risultato. Salvare inventari, quota di turno, selezioni in corso, effetti, estrazioni e quote già accreditate; non riapplicare nulla alla ripresa.
+
+La disponibilità dei comandi deve seguire lo stato del motore, non il solo aspetto del pulsante:
+
+| Comando | Condizioni di abilitazione |
+| --- | --- |
+| Risposta A/B/C/D | Timer di risposta avviato, non in pausa, nessun pannello sanzioni, rispondente attivo; scelta Svela e passa già confermata |
+| Svela e passa | Fase ordinaria, proprio turno, domanda nascosta, copia posseduta, quota premio ancora libera |
+| Salta turno / Ruba punti | Fase ordinaria, proprio turno, copia e quota disponibili, nessuna pausa/intervento, bersaglio avversario attivo, nessun esito modificato retroattivamente |
+| Tieni / Passa a… | Solo scelta prodotta da Svela e passa attivato; non sono passaggi liberi |
+| Pausa / Riprendi | Risposta in corso o pausa effettiva, rispettivamente; Riprendi non deve avviare il timer di una scelta mai conclusa |
+| Rifiuta | Domanda svelata e nessuna risposta/esito già registrato; la tempestività e il motivo sono valutati dal docente |
+| Prossima | Esito già applicato una sola volta, nessun intervento prioritario aperto e partita non conclusa |
+| Pannello sanzioni | Sempre raggiungibile mentre la partita è in corso; sospende il timer, non conferma automaticamente una sanzione |
+| Salva / sospendi | Conserva lo stato completo; la sospensione fra lezioni attende la domanda svelata, salvo priorità disciplinare o fine partita |
+
+L’indisponibilità di un comando deve valere anche per tastiera e richieste ripetute. Un comando rifiutato non modifica punti, quota, inventario, timer o domanda.
 
 **SPEC-37 — Svela e passa e rotazione dal destinatario (da implementare; REG-28).** Attivabile solo nel proprio turno prima dello svelamento e se nessun premio è già stato usato nel turno. Alla conferma consumare una copia e marcare la quota, poi mostrare stessa domanda e quattro alternative **con timer non avviato e risposte bloccate**. Mostrare le scelte «Rispondi» e «Passa a…», con soli destinatari attivi. Nessuna scadenza viene scalata durante la scelta.
 
@@ -191,9 +240,46 @@ Dopo l’intero intervento disciplinare, prima di rispondere, premiare o avanzar
 
 **SPEC-29 — Controlli prima di distribuire (da implementare).** Affiancare controlli automatici per punteggi, transizioni, dataset e valori condivisi a una verifica visiva della presentazione. Un controllo dei soli numeri non prova che un testo spieghi correttamente tutte le regole.
 
+## 7.1. Copertura delle regole nelle specifiche
+
+| Regola | Comportamento da implementare | Riferimenti |
+| --- | --- | --- |
+| REG-01 | Tre squadre equilibrate a cura del docente e portavoce | SPEC-01, SPEC-04 |
+| REG-02 | Rotazione e disponibilità dei gruppi | SPEC-20, SPEC-36, SPEC-37 |
+| REG-03 | 33 valide, quattro alternative e tempo effettivo comune alle fasi | SPEC-06, SPEC-07, SPEC-13, SPEC-31 |
+| REG-04 | Materiale consentito comunicato nella presentazione | SPEC-27 |
+| REG-05 | Nessun passaggio libero; eccezione con premio | SPEC-18, SPEC-20, SPEC-37 |
+| REG-06 | Svelamento, timer e risposta del portavoce | SPEC-01, SPEC-07, SPEC-17, SPEC-37 |
+| REG-07 | Punti base configurabili e attribuzione al rispondente | SPEC-19, SPEC-35, SPEC-38 |
+| REG-08 | Serie, reset e crescita dalla seconda corretta senza tetto | SPEC-35 |
+| REG-09 | Errore/scadenza ordinari senza punti o sanzione | SPEC-17, SPEC-19, SPEC-35 |
+| REG-10 | Priorità, eliminazione, vittoria anticipata e sconfitta di tutti | SPEC-22, SPEC-24, SPEC-39 |
+| REG-11 | Disturbo registrato come sanzione | SPEC-22, SPEC-39 |
+| REG-12 | Suggerimento attribuito al gruppo responsabile | SPEC-22, SPEC-39 |
+| REG-13 | Protesta sanzionabile senza confonderla con chiarimento | SPEC-22, SPEC-39 |
+| REG-14 | Applicazione docente, niente sottrazione punti | SPEC-22, SPEC-39 |
+| REG-15 | Salto da premio distinto da eliminazione | SPEC-20, SPEC-36, SPEC-39 |
+| REG-16 | Decisioni del docente e richiesta rispettosa di chiarimento | SPEC-01, SPEC-27 |
+| REG-17 | Solo i due motivi ammessi per il rifiuto | SPEC-23 |
+| REG-18 | Rifiuto tempestivo prima della risposta | SPEC-23, SPEC-27 |
+| REG-19 | Sostituzione allo stesso gruppo e serie invariata | SPEC-23, SPEC-34, SPEC-35 |
+| REG-20 | Campanella, conclusione domanda e ripresa | SPEC-24, SPEC-30, SPEC-39 |
+| REG-21 | Vincitore ammissibile e 10 blu fisso | SPEC-24, SPEC-25, SPEC-40 |
+| REG-22 | Comunicazione della valutazione, registrazione manuale | SPEC-25, SPEC-27 |
+| REG-23 | Spareggio con banca comune, niente premi, eliminazione | SPEC-31, SPEC-34, SPEC-39 |
+| REG-24 | Pausa manuale e automatica per sanzioni | SPEC-32 |
+| REG-25 | Parametro p, equiprobabilità, inventario e un uso per turno | SPEC-30, SPEC-36 |
+| REG-26 | Salta turno cumulabile senza consumo domanda | SPEC-20, SPEC-36 |
+| REG-27 | Ruba punti simultanei e quote uguali per gruppi distinti | SPEC-36, SPEC-40 |
+| REG-28 | Scelta a timer fermo e rotazione dal destinatario | SPEC-18, SPEC-20, SPEC-37 |
+
+## 7.2. Riferimento grafico e leggibilità
+
+Nome e riferimento visivo sono definiti in SPEC-41 e ASPETTO_GRAFICO.md v1.1.0. Il layout operativo di SPEC-33 deve includere anche inventario, stato di quota premio, destinatario della domanda, contatori sanzioni e beneficiari Ruba punti, quando pertinenti. Il pixel style non autorizza font illeggibili o formule rasterizzate indistinguibili. Le decisioni grafiche ancora aperte restano nel documento grafico.
+
 ## 8. Criteri di accettazione
 
-Questa è una lista di scenari da usare per le implementazioni successive; non dichiara test già eseguiti. Gli scenari legati a DEC si completano dopo la decisione pertinente.
+Questa è una lista di scenari da usare per l’implementazione; non dichiara test già eseguiti. Gli scenari applicano le decisioni consolidate del regolamento, non le varianti superate presenti nella cronologia.
 
 | ID | Scenario | Risultato atteso |
 | --- | --- | --- |
@@ -275,6 +361,10 @@ Questa è una lista di scenari da usare per le implementazioni successive; non d
 | ACC-76 | Più copie dello stesso beneficiario sullo stesso bersaglio | Una sola quota per gruppo distinto; nessuna moltiplicazione del guadagno tramite copie duplicate (SPEC-36/40) |
 | ACC-77 | Rifiuto/salto o errore del bersaglio con due effetti attivi | Rifiuto/salto conserva entrambi; errore/scadenza li consuma entrambi senza quote. Ripresa non duplica effetti o accrediti (SPEC-36) |
 | ACC-78 | Aggiornamento dell’identità visiva | Nome Skool coerente nelle schermate e nella presentazione; direzione grafica verificata contro ASPETTO_GRAFICO.md senza alterare regole, file storici o compatibilità dei dati (SPEC-41) |
+| ACC-79 | Domanda rifiutata durante scelta Svela e passa, poi rifiuto respinto | Ritorno alla scelta con timer mai avviato, senza risposta abilitata o nuovo consumo premio (SPEC-17/18/23/37) |
+| ACC-80 | Esito ordinario, ripetuti Prossima e ripresa dal salvataggio | Contatore valido incrementato solo all’esito, mai due volte dall’avanzamento; prossimo gruppo e quota corretti (SPEC-17/30) |
+| ACC-81 | Ripresa con punteggi frazionari, più beneficiari, premio usato e pausa attiva | Valori razionali, effetti, quota e residuo identici, senza credito, estrazione o timer automatico aggiuntivo (SPEC-30/36/40) |
+| ACC-82 | Confronto di regolamento, specifiche, grafica e presentazione | Tutte le 28 regole coperte, versioni fonti dichiarate, nome Skool e Doom classico; niente regole superate reintrodotte dal vecchio HTML (SPEC-26/27/41) |
 
 ## 9. Passi successivi
 
@@ -308,3 +398,4 @@ Si mantengono percorsi stabili, versione interna e cronologia Git. Aggiornare qu
 | 14.0.0 | 21/10/2026 | Ruba punti simultanei e quote uguali per gruppi distinti; calcolo razionale esatto, gestione duplicati ed eliminazione selettiva dei beneficiari |
 | 14.1.0 | 21/10/2026 | Nome Skool e fonte separata delle specifiche grafiche con riferimento Doom; nuova verifica di coerenza dell’identità |
 | 14.1.1 | 21/10/2026 | Precisato il riferimento grafico Doom classico con estetica pixel; riferimento al documento grafico 1.1.0 |
+| 15.0.0 | 21/10/2026 | Consolidamento delle specifiche rispetto al regolamento 14.0.1 e grafica 1.1.0: stati, comandi, priorità, conteggi validi, salvataggi razionali e copertura di tutte le regole |
