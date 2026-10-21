@@ -1,8 +1,8 @@
 # Chi vuol essere rimandato — Specifiche del programma
 
-Versione: **4.0.0** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
+Versione: **5.0.0** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
 
-Regolamento di riferimento: [REGOLAMENTO_UFFICIALE.md, v4.0.0](REGOLAMENTO_UFFICIALE.md).
+Regolamento di riferimento: [REGOLAMENTO_UFFICIALE.md, v5.0.0](REGOLAMENTO_UFFICIALE.md).
 
 ## 1. Scopo e gerarchia
 
@@ -10,7 +10,7 @@ Questo documento raccoglie le specifiche funzionali, i vincoli tecnici e i crite
 
 L'analisi iniziale è stata eseguita sul commit `4b7f285cfc4bec5507bed559ada3efa479b29e95`, leggendo il programma `Chi_vuol_essere_rimandato_quiz_v3_20261008.html`, il regolamento HTML v9, il template e il prompt dataset v1. È una verifica del sorgente, non una certificazione funzionale in browser.
 
-Stati dei requisiti: **presente** = riscontrato nel sorgente; **da implementare** = requisito per una futura modifica; **da decidere** = dipende da una questione DEC del regolamento. Le presenti modifiche sono documentali e non aggiornano gli HTML. **Il programma v3 e la presentazione v9 non sono conformi al regolamento 4.0.0**: vanno adeguati errore/scadenza, timer, conclusione, sospensione/ripresa, spareggio, premio finale, pausa manuale e disposizione della schermata in altezza. La lettura del sorgente non equivale a una verifica in browser.
+Stati dei requisiti: **presente** = riscontrato nel sorgente; **da implementare** = requisito per una futura modifica; **da decidere** = dipende da una questione DEC del regolamento. Le presenti modifiche sono documentali e non aggiornano gli HTML. **Il programma v3 e la presentazione v9 non sono conformi al regolamento 5.0.0**: vanno adeguati errore/scadenza, timer, conclusione, sospensione/ripresa, spareggio, premio finale, pausa manuale e disposizione della schermata in altezza. La lettura del sorgente non equivale a una verifica in browser.
 
 ## 2. Utenti e distribuzione
 
@@ -25,7 +25,7 @@ Stati dei requisiti: **presente** = riscontrato nel sorgente; **da implementare*
 | SPEC-04 | Tre nomi di gruppo distinti senza distinzione fra maiuscole e minuscole; nomi vuoti sostituiti da nomi predefiniti | Presente |
 | SPEC-05 | Caricamento e validazione del JSON prima dell'estrazione; un nuovo caricamento invalida quello precedente | Presente |
 | SPEC-06 | Partita regolamentare di esattamente 33 domande ordinarie; se la banca non basta, bloccare la preparazione e indicare la carenza. Eventuali prove ridotte devono essere chiaramente distinte dalla partita regolamentare. Le domande extra dello spareggio non rientrano nelle 33 | Da adeguare: oggi consente 1–33 domande |
-| SPEC-07 | Timer unico, predefinito 45 secondi; risposta consentita immediatamente. Nessun conteggio separato, blocco iniziale o messaggio ai giocatori «15+30». Mantenere la personalizzazione intera 1–600 secondi e comunicare il valore effettivo prima della partita | Da adeguare: oggi predefinito 30; timer unico già presente |
+| SPEC-07 | Timer della fase ordinaria unico, predefinito 45 secondi; risposta consentita immediatamente. Nessun conteggio separato, blocco iniziale o messaggio ai giocatori «15+30». Mantenere la personalizzazione ordinaria intera 1–600 secondi e comunicare il valore effettivo prima della partita; non trasferire questo valore allo spareggio, che usa 30 secondi | Da adeguare: oggi predefinito 30; timer unico già presente |
 | SPEC-08 | Selezione degli argomenti e quote intere non negative; somma uguale al totale e quota non superiore alla disponibilità; ribilanciamento delle quote | Presente |
 | SPEC-09 | Estrazione casuale senza ripetizioni di ID nella partita, nel rispetto delle quote; mescolamento di domande e alternative conservando la risposta corretta | Presente |
 | SPEC-10 | Anteprima docente con domande, alternative, soluzione e spiegazione; sostituzione singola con domanda inutilizzata dello stesso argomento e difficoltà; messaggio se non disponibile | Presente |
@@ -36,7 +36,7 @@ Non si confondono le 100 domande per argomento della banca con le 33 estratte pe
 
 ## 4. Contratto del dataset
 
-**SPEC-13 — Formato compatibile (presente).** JSON UTF-8, con eventuale BOM rimosso dal lettore; `versione` numerico uguale a `1`; array `argomenti` non vuoto. Dimensione massima accettata dall'app: 20 × 1024 × 1024 byte. Un dataset non valido non deve avviare la partita.
+**SPEC-13 — Formato compatibile del dataset ordinario (presente).** JSON UTF-8, con eventuale BOM rimosso dal lettore; `versione` numerico uguale a `1`; array `argomenti` non vuoto. Dimensione massima accettata dall'app: 20 × 1024 × 1024 byte. Un dataset non valido non deve avviare la partita.
 
 | Livello | Campo | Contratto |
 | --- | --- | --- |
@@ -101,23 +101,58 @@ Non si confondono le 100 domande per argomento della banca con le 33 estratte pe
 
 Il registro eventi attuale conserva al massimo otto messaggi in memoria e ne mostra quattro. Il programma attuale non ripristina una partita dopo il caricamento della pagina: **salvataggio e ripresa sono ora requisiti necessari, ancora da implementare** (SPEC-30). L'annullamento dell'ultima operazione resta una possibile miglioria separata.
 
-**SPEC-30 — Sospensione e ripresa (da implementare; REG-20).** Sostituire la conclusione «fine modulo» con una sospensione. Conservare versione del regolamento e formato del salvataggio, identificativo della partita, composizione delle squadre (nomi e membri ove registrati), ordine di rotazione, titolare, punteggi, serie, salti, indice e stato della domanda, contatori di risposte/rifiuti, tempo residuo e impostazioni. Salvare anche domande estratte, ordine delle alternative e risposte corrette, banca o riserva necessaria, ID già utilizzati e, nello spareggio, partecipanti, eliminati e ordine dei turni. Nessuna assegnazione del premio alla campanella. Non richiedere nominativi degli studenti per il solo funzionamento: il docente può garantire la stessa composizione usando i nomi delle squadre.
+**SPEC-30 — Sospensione e ripresa (da implementare; REG-20).** Sostituire la conclusione «fine modulo» con una sospensione. Conservare versione del regolamento e formato del salvataggio, identificativo della partita, composizione delle squadre (nomi e membri ove registrati), ordine di rotazione, titolare, punteggi, serie, salti, indice e stato della domanda, contatori di risposte/rifiuti, tempo residuo e impostazioni. Salvare anche domande estratte, ordine delle alternative e risposte corrette, le due banche distinte (ordinaria e Vero/Falso) o le riserve necessarie, ID già utilizzati distinti per banca e, nello spareggio, partecipanti, eliminati, ordine dei turni e timer di 30 secondi. Usare identificativi con ambito di banca, così un ID uguale in due file diversi non causa collisioni o esclusioni improprie. Nessuna assegnazione del premio alla campanella. Non richiedere nominativi degli studenti per il solo funzionamento: il docente può garantire la stessa composizione usando i nomi delle squadre.
 
 Il salvataggio deve sopravvivere alla chiusura del browser e consentire esportazione/importazione di un file locale versionato; l'autosalvataggio locale è complementare, non l'unico mezzo di ripresa. Validare integralmente un salvataggio prima di sostituire la partita attiva; un file non valido o incompatibile deve lasciare intatta la partita. Riprendere con timer fermo fino al comando del docente, senza applicare come tempo trascorso l'intervallo fra le lezioni. Per la sospensione dovuta alla campanella, una domanda già svelata va conclusa nella lezione in corso (REG-20): usare un flag «sospendi dopo questa domanda», impedire lo svelamento successivo e salvare dopo aver registrato l’esito. Se quell’esito determina il vincitore, mostrare il riepilogo definitivo. Se la domanda 33 produce un pareggio, salvare lo spareggio ancora da iniziare senza svelare una domanda extra. Un eventuale salvataggio tecnico di emergenza non deve essere presentato come il normale rinvio di una domanda già svelata alla campanella. Il file di partita contiene soluzioni ed è destinato al docente.
 
-**SPEC-31 — «Chi vuol essere eliminato» (da implementare; REG-23).** Attivare una fase distinta alla parità al primo posto dopo le 33 domande. Ammettere soltanto i gruppi con il punteggio massimo; usare domande extra e mostrare turno e gruppi ancora in gioco. Ogni risposta corretta fa avanzare al successivo gruppo attivo; ogni risposta sbagliata o scadenza del tempo elimina il gruppo. Quando ne resta uno, termina lo spareggio e assegna a quel gruppo il premio fisso. Conservare separati punteggi ordinari ed eliminazioni; niente passaggio volontario o mantenimento della domanda dopo una risposta corretta. All’ingresso nello spareggio sorteggiare una permutazione dei soli gruppi ammessi, mostrarla al docente e usarla come rotazione, saltando gli eliminati. Conservare il sorteggio nel salvataggio e non ripeterlo a ogni giro o alla ripresa. Le sole casistiche disciplinari e di rifiuto ancora aperte seguono DEC-11.
+**SPEC-31 — «Chi vuol essere eliminato» (da implementare; REG-23).** Attivare una fase distinta alla parità al primo posto dopo le 33 domande. Ammettere soltanto i gruppi con il punteggio massimo; usare esclusivamente il dataset separato Vero/Falso descritto in SPEC-34 e mostrare turno e gruppi ancora in gioco. Allo svelamento mostrare l’affermazione con i due pulsanti «Vero» e «Falso», sempre nello stesso ordine, e avviare un unico timer di 30 secondi. Non ereditare il timer ordinario né mescolare le etichette Vero/Falso. La correttezza si confronta con il valore booleano del dataset. Ogni risposta corretta fa avanzare al successivo gruppo attivo; ogni risposta sbagliata o scadenza del tempo elimina il gruppo. Quando ne resta uno, termina lo spareggio e assegna a quel gruppo il premio fisso. Conservare separati punteggi ordinari ed eliminazioni; niente passaggio volontario o mantenimento della domanda dopo una risposta corretta. All’ingresso nello spareggio sorteggiare una permutazione dei soli gruppi ammessi, mostrarla al docente e usarla come rotazione, saltando gli eliminati. Conservare il sorteggio nel salvataggio e non ripeterlo a ogni giro o alla ripresa. Le sole casistiche disciplinari e di rifiuto ancora aperte seguono DEC-11.
 
-Usare domande extra non già svelate e compatibili con gli argomenti selezionati. Poiché il numero di extra non è limitabile a priori (tutti possono continuare a rispondere bene), prevedere un rifornimento validato della riserva senza azzerare lo spareggio. Se le domande finiscono, sospendere e chiedere al docente altre domande: non ripetere silenziosamente quesiti e non dichiarare un vincitore per esaurimento della banca.
+Usare domande extra Vero/Falso non già svelate, tratte soltanto dalla banca di spareggio e compatibili con gli argomenti selezionati. Non ricavare automaticamente domande Vero/Falso dalle quattro alternative del dataset ordinario. Poiché il numero di extra non è limitabile a priori (tutti possono continuare a rispondere bene), prevedere un rifornimento validato della riserva senza azzerare lo spareggio. Se le domande finiscono, sospendere e chiedere al docente altre domande: non ripetere silenziosamente quesiti e non dichiarare un vincitore per esaurimento della banca.
 
 
 **SPEC-32 — Pulsante Pausa/Riprendi (da implementare; REG-24).** Comando del docente sempre raggiungibile durante una domanda ordinaria o extra. Alla pressione, verificare prima la scadenza effettiva: se il tempo è già scaduto, applicare l’esito della fase e non consentire di recuperare tempo tramite la pausa. Altrimenti memorizzare il residuo con precisione, fermare i tick e passare allo stato di pausa. Mostrare «In pausa» e il pulsante «Riprendi», disabilitare le alternative e l’avanzamento; nessun esito o variazione di punteggio per il solo trascorrere del tempo in pausa. Alla ripresa ricostruire la scadenza dal residuo, mantenendo domanda, ordine alternative, titolare e fase. Ripetuti clic non devono creare più timer. Lo stato resta fermo anche se si cambia scheda o si apre/chiude un dialogo; chiudere un dialogo non deve annullare una pausa manuale. I comandi sanzione restano utilizzabili durante la pausa. Non introdurre una pausa automatica all’apertura del dialogo sanzioni senza una decisione separata (DEC-06).
 
-**SPEC-33 — Schermata di gioco interamente nel viewport (da implementare).** Nelle schermate operative di domanda nascosta, risposta, pausa ed esito, tutte le informazioni della schermata corrente e i comandi devono essere visibili contemporaneamente senza scorrimento verticale o orizzontale, né della pagina né di pannelli interni. Includere turno, contatore/fase, domanda e quattro alternative quando svelate, timer, Pausa/Riprendi, tabellone, rifiuto e comandi pertinenti; nell’esito includere soluzione, spiegazione disponibile e avanzamento. Non mostrare una soluzione durante la risposta per soddisfare il requisito di completezza. Ricalcolare il layout al ridimensionamento, al cambio orientamento e all’ingresso/uscita dallo schermo intero, usando l’altezza effettivamente disponibile nel browser.
+**SPEC-33 — Schermata di gioco interamente nel viewport (da implementare).** Nelle schermate operative di domanda nascosta, risposta, pausa ed esito, tutte le informazioni della schermata corrente e i comandi devono essere visibili contemporaneamente senza scorrimento verticale o orizzontale, né della pagina né di pannelli interni. Includere turno, contatore/fase, domanda e quattro alternative ordinarie oppure affermazione e due pulsanti Vero/Falso nello spareggio, quando svelate, timer, Pausa/Riprendi, tabellone, rifiuto e comandi pertinenti; nell’esito includere soluzione, spiegazione disponibile e avanzamento. Non mostrare una soluzione durante la risposta per soddisfare il requisito di completezza. Ricalcolare il layout al ridimensionamento, al cambio orientamento e all’ingresso/uscita dallo schermo intero, usando l’altezza effettivamente disponibile nel browser.
 
 Adattare disposizione di tabellone e contenuto, spaziature e dimensione dei testi al contenuto reale, comprese le formule dopo il rendering. Non soddisfare il requisito tramite `overflow:hidden`, troncamento, contenuti fuori schermo o testo ridotto fino a diventare illeggibile. Anche i dialoghi pausa/rifiuto/sanzione devono rendere raggiungibili tutti i relativi comandi. Copertina, configurazione e anteprima della banca possono scorrere: il requisito riguarda la schermata operativa del quiz.
 
 La specifica di assenza di scorrimento richiede dimensioni minime di schermo e limiti di lunghezza del contenuto: con testi arbitrariamente lunghi e schermi arbitrariamente piccoli non si possono garantire contemporaneamente testo completo, leggibilità e assenza di scorrimento. In implementazione definire e dichiarare una matrice di dimensioni supportate e una soglia minima di leggibilità, da verificare con il docente. Prima della partita verificare tutte le domande estratte e le spiegazioni, e verificare le nuove domande extra prima di svelarle. Se una schermata non entra con testo leggibile, segnalarlo prima dello svelamento (o mettere in pausa in caso di ridimensionamento durante la risposta) e richiedere una correzione di contenuto o dimensioni disponibili, senza avviare un timer con informazioni nascoste. Non presentare un adattamento grafico come verificato finché non sono stati eseguiti i controlli visuali.
 
+
+**SPEC-34 — Dataset separato Vero/Falso (da implementare; REG-23).** Prevedere due caricamenti distinti e chiaramente etichettati: «Domande ordinarie» e «Spareggio Vero/Falso». Validare separatamente le due banche; il dataset ordinario continua a usare il contratto SPEC-13 con quattro alternative. La banca dello spareggio non cambia quel contratto e non deve essere caricata nel vecchio parser ordinario.
+
+Contratto iniziale della banca di spareggio: JSON UTF-8, eventuale BOM ammesso, massimo 20 × 1024 × 1024 byte, `versione` numerico 1, `tipo` esattamente `spareggio_vero_falso`, `titolo` stringa non vuota e `argomenti` array non vuoto. Ogni argomento ha `id` e `nome` non vuoti e una lista `domande` non vuota. Ogni domanda ha `id` univoco nella banca, `difficolta` tra `facile`, `media`, `difficile`, `testo` e `spiegazione` non vuoti e `corretta` di tipo **booleano JSON**: `true` significa Vero, `false` significa Falso. Non ammettere lettere A/B, stringhe "true"/"false" o valori numerici al posto del booleano. Le due etichette di risposta sono generate dal programma: non richiedere un array di alternative nel nuovo formato. Validare testo e formule come in SPEC-14.
+
+Esempio strutturale valido, che illustra il formato e non costituisce una banca pronta per la classe:
+
+```json
+{
+  "versione": 1,
+  "tipo": "spareggio_vero_falso",
+  "titolo": "Spareggio — Vero/Falso",
+  "argomenti": [
+    {
+      "id": "temperatura",
+      "nome": "Temperatura",
+      "domande": [
+        {
+          "id": "vf_temperatura_001",
+          "difficolta": "facile",
+          "testo": "Il kelvin è l’unità SI della temperatura termodinamica.",
+          "corretta": true,
+          "spiegazione": "Nel Sistema Internazionale la temperatura termodinamica si misura in kelvin."
+        }
+      ]
+    }
+  ]
+}
+```
+
+Ogni affermazione deve essere autonoma, inequivocabilmente vera o falsa, breve e compatibile con i 30 secondi. Evitare doppie negazioni, frasi con più proposizioni valutabili diversamente e indizi stilistici. Bilanciare approssimativamente vero e falso nella banca senza rendere prevedibile la sequenza estratta; questo vincolo editoriale non forza l’alternanza delle risposte durante lo spareggio. Nelle affermazioni false la spiegazione deve contenere la correzione.
+
+Prima dell’avvio della partita regolamentare verificare che sia stata caricata anche una banca Vero/Falso valida e non vuota con quesiti pertinenti agli argomenti scelti: non attendere il pareggio per scoprire che manca la riserva. Segnalare la carenza e bloccare l’avvio regolamentare fino al caricamento. Mostrare disponibilità e argomenti della banca di spareggio al docente e consentirne l’anteprima separata prima della proiezione. Non svelare i quesiti di riserva alla classe. Per associare le due banche usare gli ID argomento condivisi; eventuali ID diversi richiedono un abbinamento esplicito del docente, senza deduzioni basate soltanto sul nome.
+
+Estrarre in modo casuale senza ripetere i quesiti Vero/Falso già usati nella partita. In caso di rifornimento, accettare soltanto un dataset con lo stesso tipo e contratto, verificare gli ID e non reintrodurre domande già svelate; conservare gli stati di spareggio come prescritto in SPEC-31. Salvare e ripristinare entrambe le banche come richiesto in SPEC-30. Il timer di 30 secondi appartiene alla fase di gioco, non a un campo modificabile del dataset.
 
 ## 7. Coerenza fra documenti, programma e presentazione
 
@@ -125,7 +160,7 @@ La specifica di assenza di scorrimento richiede dimensioni minime di schermo e l
 
 **SPEC-27 — Tracciabilità della presentazione (da implementare).** Ogni sezione HTML deve essere collegata agli ID REG pertinenti e mostrare la versione del regolamento. Le semplificazioni del linguaggio per la classe devono conservare condizioni, conseguenze ed eccezioni. L'attuale v9 non dichiara la versione di questo documento né descrive tutte le convenzioni operative.
 
-**SPEC-28 — Dati comuni (miglioramento proposto, non implementato).** In una futura implementazione spostare parametri condivisi — gruppi, domande ordinarie, timer unico ordinario, punteggi, premio fisso e limite serie — in una configurazione strutturata validata. Il programma e la presentazione devono incorporare gli stessi valori e la stessa versione durante la generazione degli HTML, così da mantenere l'uso offline. Non aggiungere un caricamento di rete obbligatorio. Il regolamento resta la fonte semantica: un JSON di numeri non sostituisce le condizioni espresse nel testo.
+**SPEC-28 — Dati comuni (miglioramento proposto, non implementato).** In una futura implementazione spostare parametri condivisi — gruppi, domande ordinarie, timer unico ordinario e timer dello spareggio separati, formato delle domande per fase, punteggi, premio fisso e limite serie — in una configurazione strutturata validata. Il programma e la presentazione devono incorporare gli stessi valori e la stessa versione durante la generazione degli HTML, così da mantenere l'uso offline. Non aggiungere un caricamento di rete obbligatorio. Il regolamento resta la fonte semantica: un JSON di numeri non sostituisce le condizioni espresse nel testo.
 
 **SPEC-29 — Controlli prima di distribuire (da implementare).** Affiancare controlli automatici per punteggi, transizioni, dataset e valori condivisi a una verifica visiva della presentazione. Un controllo dei soli numeri non prova che un testo spieghi correttamente tutte le regole.
 
@@ -166,10 +201,14 @@ Questa è una lista di scenari da usare per le implementazioni successive; non d
 | ACC-29 | Domande e spiegazioni più lunghe della banca, formule multilinea, ridimensionamento e schermo intero | Nelle dimensioni supportate tutti i dati e comandi della schermata corrente sono completi e leggibili senza scroll o tagli; configurazione non idonea segnalata prima di iniziare o timer messo in pausa se cambia durante la risposta (SPEC-33) |
 | ACC-30 | Campanella prima dello svelamento oppure dopo domanda 33 in pareggio | Salva senza svelare altro; alla ripresa mostra la prossima domanda nascosta oppure l’ingresso nello spareggio (SPEC-30) |
 
+| ACC-31 | Caricamento separato delle banche | Il dataset ordinario richiede quattro alternative; lo spareggio richiede tipo Vero/Falso e corretta booleana. File errato o risposta "false" come stringa sono rifiutati senza sostituire la banca valida (SPEC-13/34) |
+| ACC-32 | Passaggio da fase ordinaria con timer personalizzato allo spareggio | Due soli pulsanti Vero/Falso in ordine fisso; nuovo timer di 30 secondi; pausa/ripresa conserva il residuo senza ripartire da 45 (SPEC-07/31/32) |
+| ACC-33 | Mancanza banca Vero/Falso, rifornimento e ripresa da salvataggio | Avvio regolamentare bloccato se manca la banca pertinente; rifornimento validato senza ripetizioni; ripresa conserva entrambe le banche, eliminazioni, ordine e timer della fase (SPEC-30/34) |
+
 ## 9. Passi successivi proposti
 
 1. Risolvere i casi ancora aperti DEC-01–DEC-05, l’automatismo residuo in DEC-06 e le casistiche residue in DEC-11. DEC-07–DEC-10 e DEC-12 sono risolte; la scadenza eliminatoria in DEC-11 è definita.
-2. Adeguare programma e presentazione: 33 domande, errore/scadenza ordinari a 0, timer unico 45 secondi, sospensione/ripresa dopo aver concluso la domanda svelata, spareggio con ordine casuale e scadenza eliminatoria, 10 blu fisso, Pausa/Riprendi e layout in altezza senza scorrimento. Introdurre versione e riferimenti REG.
+2. Adeguare programma e presentazione: 33 domande, errore/scadenza ordinari a 0, timer unico 45 secondi, sospensione/ripresa dopo aver concluso la domanda svelata, spareggio con banca separata Vero/Falso, 30 secondi, ordine casuale e scadenza eliminatoria, 10 blu fisso, Pausa/Riprendi e layout in altezza senza scorrimento. Introdurre versione e riferimenti REG.
 3. Introdurre configurazione condivisa e schema del dataset con una migrazione esplicita, conservando gli HTML autonomi; aggiungere uno schema versionato del salvataggio.
 4. Automatizzare gli scenari fondamentali, inclusi chiusura/ripresa e spareggio. Valutare separatamente l'annullamento dell'ultima operazione del docente.
 
@@ -183,3 +222,4 @@ Si mantengono percorsi stabili, versione interna e cronologia Git. Aggiornare qu
 | 2.0.0 | 21/10/2026 | Allineamento dei requisiti e degli scenari al regolamento 2.0.0; vecchi HTML esplicitamente da adeguare |
 | 3.0.0 | 21/10/2026 | Requisiti per 33 domande, sospensione persistente e ripresa, spareggio a eliminazione, timer unico e premio fisso; nuovi scenari di verifica |
 | 4.0.0 | 21/10/2026 | Pausa/Riprendi e schermata operativa in altezza; sorteggio dello spareggio e scadenza eliminatoria; sospensione alla campanella dopo la domanda svelata |
+| 5.0.0 | 21/10/2026 | Contratto e caricamento della banca Vero/Falso separata; timer spareggio 30 secondi; salvataggio delle due banche e verifiche per fase |
