@@ -36,7 +36,7 @@ with sync_playwright() as p:
     assert page.locator('.bonus-group').count()==5
     page.get_by_role('button',name='Chiudi',exact=True).click()
     # Invalid imported save must leave the game unchanged.
-    assert page.evaluate('()=>{const current=game;try{importGame(JSON.stringify({...game.snapshot(),rules:"bad"}))}catch(e){}return game===current}')
+    assert page.evaluate('()=>{const current=game;try{restoreGame(JSON.stringify({...game.snapshot(),rules:"bad"}))}catch(e){}return game===current}')
     # Pause/answers work with network unavailable after initial load.
     page.context.set_offline(True)
     page.evaluate('()=>{game.s.panel=null;if(game.s.paused)game.resume();game.answer(game.s.current.correct);renderGame()}')

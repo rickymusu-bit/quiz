@@ -1,22 +1,24 @@
 # Fool
 
-Quiz di Riccardo Musumarra. **App 1.0.0**, regolamento **18.0.1** del 21/10/2026.
+Quiz online di Riccardo Musumarra. **Interfaccia 1.1.0**, regolamento **18.0.1**.
 
-- Scarica e apri [Fool.html](Fool.html) nel browser: è il programma autonomo del quiz.
-- Scarica e apri [Fool_regole.html](Fool_regole.html): 21 schermate delle regole per la classe, con indice, pulsanti e frecce della tastiera.
-- Per giocare, carica [Dataset_termologia_100_domande_v1_20261021.json](Dataset_termologia_100_domande_v1_20261021.json), oppure una banca compatibile con il [template](Template_dataset_quiz_argomenti_v1_20261008.json). Il template contiene esempi e non basta da solo per 33 domande.
+Apri **https://rickymusu-bit.github.io/quiz/** e scegli **Avvia il quiz** o **Scopri le regole**. Non sono previsti download, installazioni o selettori di file.
 
-I due HTML funzionano indipendentemente, senza installazioni, server, account o CDN. Le formule e i relativi caratteri sono incorporati in Fool.html. Tenere entrambi i file nella stessa cartella permette di aprire il collegamento alle regole dalla copertina; il gioco non richiede l'altro HTML per funzionare. Non è stata attivata alcuna pubblicazione o configurazione di hosting.
+## Domande già sul sito
 
-## Conduzione e ripresa
+Il gioco legge il catalogo `datasets.json` e carica automaticamente la banca selezionata dal sito. È disponibile Termologia, con 100 domande. Il docente configura tre gruppi distinti, tempo, punti base, probabilità bonus, difficoltà e quote per argomento; la somma delle quote deve essere 33. Configurazione e anteprima mostrano le soluzioni e si usano prima di proiettare alla classe.
 
-Il docente usa un dispositivo e inserisce le risposte comunicate dai portavoce. Prima della proiezione, sceglie tre nomi distinti, tempo, punti base, probabilità bonus, difficoltà e quote per argomento. La somma delle quote deve essere 33. L'anteprima contiene soluzioni e spiegazioni: è riservata alla preparazione del docente, senza autenticazione separata.
+Il catalogo contiene `versione: 1` e l'elenco `banche`, ciascuna con `id`, `nome` e `url` relativa al sito. Per aggiungere una banca, pubblicare il relativo contenuto nello schema esistente e aggiungerla al catalogo. Le domande mantengono il contratto del dataset e i loro ID originali. Il catalogo e le banche devono provenire dallo stesso sito; errori di rete o validazione bloccano l'avvio e offrono **Riprova**.
 
-Il primo gruppo è sorteggiato; la rotazione è mostrata sul tabellone. Il programma gestisce serie, bonus e bersagli vincolati, sanzioni, rifiuti, campanella, eliminazioni e Battaglia finale. Il pannello sanzioni consente di registrare tutto l'intervento su più gruppi prima di valutare il vincitore. Chiuderlo non riavvia il timer.
+All'esaurimento della riserva, **Cerca nuove domande** verifica gli aggiornamenti delle banche online. Inserisce soltanto nuovi ID compatibili con gli argomenti e la difficoltà della partita; non ripropone le domande già note, non sovrascrive quesiti modificati e non assegna una vittoria perché mancano domande.
 
-Usare **Salva file** e conservare il JSON della partita per la lezione successiva. L'autosalvataggio locale è aggiuntivo: il browser può limitarlo o cancellarlo. **Importa partita** o **Riprendi autosalvataggio** ripristinano lo stato senza avviare il timer. Una scelta bonus non ancora confermata conserva copia e bersaglio, senza consumi anticipati. I file di partita contengono anche le soluzioni e sono destinati al docente. I salvataggi dei vecchi HTML non sono compatibili e non vengono reinterpretati.
+## Salvataggio nello stesso browser
 
-Alla campanella una domanda svelata deve essere conclusa; solo dopo l'esito si sospende. **Salva file** durante una risposta è un salvataggio tecnico di emergenza e non sostituisce questa regola. All'esaurimento della riserva si possono caricare quesiti con ID nuovi, nel medesimo formato, per argomenti e difficoltà selezionati. Non occorre un file Vero/Falso.
+La partita viene salvata automaticamente nel browser. **Salva nel browser** permette un salvataggio esplicito; **Riprendi partita** sulla copertina recupera l'ultima partita conservata da quel browser, mantenendo il timer fermo fino al comando del docente. Non sono presenti importazione o esportazione di file. Le partite non sono sincronizzate tra dispositivi e la cancellazione dei dati del sito elimina il salvataggio locale.
+
+Alla campanella una domanda già svelata deve essere conclusa; solo dopo l'esito si sospende. Sanzioni prioritarie, serie, inventari e bonus vincolati, rifiuti, rotazione e Battaglia finale restano quelli del regolamento 18.0.1.
+
+La nuova richiesta del responsabile di offrire il quiz solo online sostituisce i precedenti requisiti di distribuzione offline e scambio di file. Il motore e il formato di salvataggio restano compatibili con 1.0.0: le partite già conservate nello stesso browser vengono riprese senza modificare le regole.
 
 ## Schermo e aspetto
 
@@ -29,7 +31,7 @@ Veste provvisoria ispirata a Doom classico: pannelli scuri, bordi squadrati, gri
 - [Regolamento ufficiale](docs/REGOLAMENTO_UFFICIALE.md), autorità normativa.
 - [Specifiche del programma](docs/SPECIFICHE_PROGRAMMA.md).
 - [Aspetto grafico](docs/ASPETTO_GRAFICO.md).
-- [Istruzioni di implementazione](docs/PROMPT_CODEX_AVVIO_HTML.md).
+- [Istruzioni originali di implementazione](docs/PROMPT_CODEX_AVVIO_HTML.md), antecedenti alla richiesta di distribuzione solo online.
 - [Avanzamento, tracciabilità e verifiche realmente eseguite](docs/VERIFICHE_IMPLEMENTAZIONE.md).
 - [Prompt per generare dataset](Prompt_generazione_dataset_quiz_v2_20261021.txt).
 
@@ -37,13 +39,14 @@ I due HTML storici sono conservati **identici**, con i nomi originali, in [archi
 
 ## Sorgenti e rigenerazione
 
-Il motore, separato dal DOM, è in `src/engine.js`; interfaccia, stile e regole proiettate sono in `src/`. Il renderer KaTeX 0.16.22 e i font incorporati provengono dal vecchio HTML; l'avviso MIT è conservato in `vendor/LICENSE-KaTeX.txt` e nel distribuibile.
+Il motore, separato dal DOM, è in `src/engine.js`; interfaccia, stile e regole proiettate sono in `src/`. Il renderer KaTeX 0.16.22 e i font incorporati provengono dal vecchio HTML; l'avviso MIT è conservato in `vendor/LICENSE-KaTeX.txt` e nelle pagine del sito.
 
 ```sh
 python3 tools/build.py
 node tests/engine.test.js
 python3 tests/browser.py
 python3 tests/layout.py
+python3 tests/online.py
 ```
 
-La rigenerazione usa soltanto la libreria standard Python. I test motore usano Node; i test browser richiedono Python Playwright e Chromium (`/usr/bin/chromium`). Gli strumenti di sviluppo non servono per aprire gli HTML.
+La rigenerazione usa soltanto la libreria standard Python. I test motore usano Node; i test browser richiedono Python Playwright e Chromium (`/usr/bin/chromium`). Il sito generato è statico e viene pubblicato sul ramo `gh-pages`. `src/home.html` genera la pagina iniziale; `src/app.js` gestisce il caricamento online e i salvataggi nel browser.

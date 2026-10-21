@@ -1,5 +1,12 @@
 # Fool — implementazione e verifiche
 
+## Aggiornamento: distribuzione solo online, interfaccia 1.1.0
+
+Su nuova richiesta del responsabile, la versione corrente non propone download, caricamenti o esportazioni di file. La pagina iniziale apre gioco e regole; il gioco carica `datasets.json` e la banca selezionata dal sito. La partita si salva e riprende nello stesso browser, senza modifiche al motore o alle regole. La precedente consegna 1.0.0 è documentata nelle sezioni storiche successive; i requisiti di distribuzione offline sono superati dalla nuova richiesta.
+
+Verifiche correnti: i 27 test motore restano superati. `tests/online.py` verifica il caricamento del catalogo e delle 100 domande sotto un prefisso di percorso come GitHub Pages, assenza di input file e link download, nessun evento download, salvataggio/ripresa con domanda identica e timer fermo, esaurimento senza ripetizioni o vittorie, rifornimento da un aggiornamento online e recupero dopo errore HTTP 503. I test browser e layout sono aggiornati al nuovo flusso. Le formule e i criteri di adattamento restano quelli già verificati.
+
+
 App **1.0.0**, regolamento **18.0.1**, grafica **1.2.1**. Data: 21/10/2026.
 
 ## Piano e avanzamento

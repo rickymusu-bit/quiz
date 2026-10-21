@@ -14,7 +14,8 @@ with sync_playwright() as p:
     page.on('pageerror',lambda e:errors.append(str(e)))
     page.on('request',lambda r:requests.append(r.url) if r.url.startswith('http') and not r.url.startswith(base) else None)
     page.goto(base+'Fool.html');page.get_by_role('button',name='Nuova partita',exact=True).click()
-    page.locator('input[type=file]').set_input_files(ROOT/'Dataset_termologia_100_domande_v1_20261021.json')
+    page.wait_for_function('bank && document.getElementById("quotas")')
+    assert page.locator('input[type=file],a[download]').count()==0
     page.get_by_role('button',name='Prepara anteprima').click()
     page.get_by_role('button',name='Verifica schermo e inizia Fool').click();page.wait_for_timeout(150)
     print('MESSAGE',page.locator('#message').inner_text());print('STATE',page.evaluate('({screen:game?.s.screen,ui,fitBlocked})'))
@@ -30,6 +31,7 @@ with sync_playwright() as p:
         page.locator('.answer').nth(page.evaluate('game.s.current.correct')).click();page.wait_for_timeout(100)
         page.screenshot(path=str(ROOT/'tests/result.png'),full_page=True)
         print('RESULT',page.evaluate('({screen:game.s.screen,valid:game.s.valid,fitBlocked})'))
+    page.reload();page.get_by_role('button',name='Riprendi partita',exact=True).click();assert page.evaluate('game.s.valid')==1;assert not page.evaluate('game.running');assert page.locator('input[type=file],a[download]').count()==0
     page.goto(base+'Fool_regole.html');
     overflows=[]
     for i in range(21):
