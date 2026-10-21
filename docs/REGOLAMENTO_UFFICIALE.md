@@ -1,8 +1,10 @@
-# Chi vuol essere rimandato — Regolamento ufficiale
+# Skool — Regolamento ufficiale
 
-Versione: **14.0.0** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
+Versione: **14.0.1** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
 
 ## 1. Autorità e ambito
+
+**Skool** è il nuovo nome del gioco precedentemente chiamato «Chi vuol essere rimandato». Il cambio di nome non modifica le regole. L’aspetto visivo è raccolto in [ASPETTO_GRAFICO.md](ASPETTO_GRAFICO.md).
 
 Questo documento è la fonte normativa delle regole del gioco. Il programma e la presentazione HTML devono applicarlo e rappresentarlo fedelmente. Le [specifiche del programma](SPECIFICHE_PROGRAMMA.md) traducono queste regole in requisiti verificabili, senza modificarle.
 
@@ -112,3 +114,4 @@ I nomi dei documenti restano stabili per non rompere i collegamenti. La versione
 | 12.0.0 | 21/10/2026 | Contatore disciplinare separato: nessuna sottrazione di punti o salto disciplinare; eliminazione alla terza sanzione, esclusione dalla vittoria e persistenza fra lezioni/fasi |
 | 13.0.0 | 21/10/2026 | Consolidamento decisioni sui premi e sui rifiuti, priorità sanzioni e pausa automatica, vittoria anticipata/sconfitta di tutti; moltiplicatore da seconda corretta e senza tetto |
 | 14.0.0 | 21/10/2026 | Ruba punti simultanei sullo stesso bersaglio; divisione uguale tra gruppi coinvolti, una quota per gruppo, calcolo esatto e cancellazione selettiva degli effetti |
+| 14.0.1 | 21/10/2026 | Nome del prodotto aggiornato a Skool e collegamento alle specifiche grafiche; regole invariate |

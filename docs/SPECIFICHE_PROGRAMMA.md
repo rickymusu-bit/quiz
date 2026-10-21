@@ -1,16 +1,18 @@
-# Chi vuol essere rimandato — Specifiche del programma
+# Skool — Specifiche del programma
 
-Versione: **14.0.0** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
+Versione: **14.1.0** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
 
-Regolamento di riferimento: [REGOLAMENTO_UFFICIALE.md, v14.0.0](REGOLAMENTO_UFFICIALE.md).
+Regolamento di riferimento: [REGOLAMENTO_UFFICIALE.md, v14.0.1](REGOLAMENTO_UFFICIALE.md).
 
 ## 1. Scopo e gerarchia
+
+Il prodotto si chiama **Skool**. L’identità visiva ha come riferimento Doom ed è descritta nel documento separato [ASPETTO_GRAFICO.md](ASPETTO_GRAFICO.md), versione 1.0.0. La direzione estetica non è ancora implementata e i suoi dettagli saranno raccolti progressivamente.
 
 Questo documento raccoglie le specifiche funzionali, i vincoli tecnici e i criteri di accettazione del quiz HTML. Il regolamento definisce le regole; questo documento definisce come applicarle. La presentazione HTML è una spiegazione per la classe. In caso di contrasto prevale il regolamento; per le questioni aperte non si inventano soluzioni normative.
 
 L'analisi iniziale è stata eseguita sul commit `4b7f285cfc4bec5507bed559ada3efa479b29e95`, leggendo il programma `Chi_vuol_essere_rimandato_quiz_v3_20261008.html`, il regolamento HTML v9, il template e il prompt dataset v1. È una verifica del sorgente, non una certificazione funzionale in browser.
 
-Stati dei requisiti: **presente** = riscontrato nel sorgente; **da implementare** = requisito per una futura modifica; **da decidere** = dipende da una questione DEC del regolamento. Le presenti modifiche sono documentali e non aggiornano gli HTML. **Il programma v3 e la presentazione v9 non sono conformi al regolamento 14.0.0**: vanno adeguati rotazione fissa con il solo passaggio da premio, errore/scadenza, timer, conclusione, sospensione/ripresa, spareggio, premio finale, pausa manuale e disposizione della schermata in altezza. La lettura del sorgente non equivale a una verifica in browser.
+Stati dei requisiti: **presente** = riscontrato nel sorgente; **da implementare** = requisito per una futura modifica; **da decidere** = dipende da una questione DEC del regolamento. Le presenti modifiche sono documentali e non aggiornano gli HTML. **Il programma v3 e la presentazione v9 non sono conformi al regolamento 14.0.1**: vanno adeguati rotazione fissa con il solo passaggio da premio, errore/scadenza, timer, conclusione, sospensione/ripresa, spareggio, premio finale, pausa manuale e disposizione della schermata in altezza. La lettura del sorgente non equivale a una verifica in browser.
 
 ## 2. Utenti e distribuzione
 
@@ -176,6 +178,9 @@ Dopo l’intero intervento disciplinare, prima di rispondere, premiare o avanzar
 
 **SPEC-40 — Quote e punteggi razionali esatti (da implementare; REG-27).** La divisione in parti uguali può essere periodica: lordo 100 con due beneficiari dà 100/3 a ciascuno. Non arrotondare ciascun accredito a 33,33 perdendo 0,01, né assegnare il residuo a un gruppo rompendo l’uguaglianza. Conservare guadagni, quote e totali con numeratore/denominatore ridotti o altra rappresentazione razionale equivalente; somme, confronti finali e parità devono usare i valori esatti, non le stringhe visualizzate. Serializzare nel salvataggio numeratori/denominatori in modo da non perdere precisione e validare denominatori positivi. Eventuali importi approssimati a schermo devono essere riconoscibili come tali e permettere di consultare la quota esatta nell’esito. Eseguire tutti gli accrediti della stessa risposta insieme, prima di determinare vincitore o spareggio. La somma esatta delle quote deve essere uguale al lordo.
 
+
+**SPEC-41 — Nome e riferimento grafico (da implementare).** Usare **Skool** come nome visibile del gioco nella copertina, nel titolo del documento HTML/browser, nei menu, nei riepiloghi e nella presentazione delle regole. Per la veste grafica seguire [ASPETTO_GRAFICO.md](ASPETTO_GRAFICO.md), mantenendo separati requisiti approvati e dettagli ancora da definire. L’ispirazione a Doom non modifica logica di gioco, leggibilità, funzionamento offline o layout operativo richiesti dalle altre specifiche. Non rinominare automaticamente repository, file originari, schema dei dataset o salvataggi per il solo cambio del titolo. Conservare lo spareggio «Chi vuol essere eliminato».
+
 ## 7. Coerenza fra documenti, programma e presentazione
 
 **SPEC-26 — Gerarchia e manutenzione (procedura da applicare da questa edizione).** Prima di modificare le regole leggere il regolamento; prima di modificare il gioco leggere anche queste specifiche. Le scelte DEC vanno risolte dal responsabile, non dal codice. Ogni modifica deve indicare gli ID interessati e aggiornare versione, data e cronologia.
@@ -269,10 +274,11 @@ Questa è una lista di scenari da usare per le implementazioni successive; non d
 | ACC-75 | Due beneficiari distinti sullo stesso bersaglio, lordo 100 | Tre quote esatte da 100/3; somma esatta 100 e nessun centesimo assegnato arbitrariamente. Classifica e salvataggio usano valori razionali (SPEC-40) |
 | ACC-76 | Più copie dello stesso beneficiario sullo stesso bersaglio | Una sola quota per gruppo distinto; nessuna moltiplicazione del guadagno tramite copie duplicate (SPEC-36/40) |
 | ACC-77 | Rifiuto/salto o errore del bersaglio con due effetti attivi | Rifiuto/salto conserva entrambi; errore/scadenza li consuma entrambi senza quote. Ripresa non duplica effetti o accrediti (SPEC-36) |
+| ACC-78 | Aggiornamento dell’identità visiva | Nome Skool coerente nelle schermate e nella presentazione; direzione grafica verificata contro ASPETTO_GRAFICO.md senza alterare regole, file storici o compatibilità dei dati (SPEC-41) |
 
 ## 9. Passi successivi
 
-Le decisioni DEC-01–DEC-19 sono risolte o superate dal regolamento 14.0.0; non continuare a usare le precedenti righe «da decidere» come blocchi per implementare quanto approvato. I dettagli tecnici reversibili vanno scelti in coerenza con i requisiti e verificati.
+Le decisioni DEC-01–DEC-19 sono risolte o superate dal regolamento 14.0.1; non continuare a usare le precedenti righe «da decidere» come blocchi per implementare quanto approvato. I dettagli tecnici reversibili vanno scelti in coerenza con i requisiti e verificati.
 
 1. Adeguare il motore del gioco: punteggi base configurabili, serie da seconda corretta senza tetto, rotazione dal rispondente, rifiuti sostituiti e salti cumulabili senza consumo domanda.
 2. Implementare un premio per turno, inventario, tre premi equiprobabili con p configurabile, Ruba punti simultanei con divisione in parti uguali per gruppi distinti e cancellazioni su eliminazione/ingresso spareggio.
@@ -300,3 +306,4 @@ Si mantengono percorsi stabili, versione interna e cronologia Git. Aggiornare qu
 | 12.0.0 | 21/10/2026 | Sanzioni separate dai punti, eliminazione disciplinare a 3, persistenza e ammissibilità alla vittoria; nuovi scenari e casi limite |
 | 13.0.0 | 21/10/2026 | Decisioni premi/turni consolidate, moltiplicatore corretto da seconda risposta senza tetto, sanzioni prioritarie e pausa automatica, rifiuti sostituiti e cancellazioni effetti |
 | 14.0.0 | 21/10/2026 | Ruba punti simultanei e quote uguali per gruppi distinti; calcolo razionale esatto, gestione duplicati ed eliminazione selettiva dei beneficiari |
+| 14.1.0 | 21/10/2026 | Nome Skool e fonte separata delle specifiche grafiche con riferimento Doom; nuova verifica di coerenza dell’identità |
