@@ -1,0 +1,1466 @@
+{
+  "versione": 1,
+  "titolo": "Chi vuol essere rimandato — Termologia (100 domande)",
+  "argomenti": [
+    {
+      "id": "sistemi_termodinamici",
+      "nome": "Sistemi termodinamici",
+      "domande": [
+        {
+          "id": "sistemi_termodinamici_001",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Una tazza aperta di caffè che evapora è un sistema…",
+          "alternative": [
+            "chiuso",
+            "isolato",
+            "aperto",
+            "adiabatico"
+          ],
+          "corretta": "C",
+          "spiegazione": "Scambia materia, attraverso l’evaporazione, ed energia con l’ambiente."
+        },
+        {
+          "id": "sistemi_termodinamici_002",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Un sistema termodinamico chiuso può scambiare con l’ambiente…",
+          "alternative": [
+            "energia ma non materia",
+            "materia ma non energia",
+            "né energia né materia",
+            "solo acqua e aria"
+          ],
+          "corretta": "A",
+          "spiegazione": "Il confine di un sistema chiuso impedisce gli scambi di materia, ma non necessariamente quelli energetici."
+        },
+        {
+          "id": "sistemi_termodinamici_003",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Che cosa distingue un sistema idealmente isolato?",
+          "alternative": [
+            "Scambia materia ma non energia",
+            "Scambia soltanto energia",
+            "Scambia soltanto materia",
+            "Non scambia né materia né energia"
+          ],
+          "corretta": "D",
+          "spiegazione": "Un sistema isolato non trasferisce né materia né energia attraverso il proprio confine."
+        },
+        {
+          "id": "sistemi_termodinamici_004",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Un thermos reale chiuso mantiene caldo il tè a lungo. Come va considerato?",
+          "alternative": [
+            "Un sistema perfettamente isolato",
+            "Un'approssimazione di sistema isolato",
+            "Un sistema sempre aperto",
+            "Un sistema che crea energia"
+          ],
+          "corretta": "B",
+          "spiegazione": "Il thermos limita gli scambi, ma in tempi lunghi il tè cambia comunque temperatura."
+        },
+        {
+          "id": "sistemi_termodinamici_005",
+          "difficolta": "media",
+          "tipologia": "conoscenza",
+          "testo": "In termodinamica, che cos'è l'ambiente?",
+          "alternative": [
+            "Soltanto l'aria intorno al sistema",
+            "Soltanto le pareti del recipiente",
+            "Tutto ciò che resta fuori dal sistema scelto",
+            "La superficie che separa due corpi"
+          ],
+          "corretta": "C",
+          "spiegazione": "La definizione dipende dal confine scelto: ciò che non è nel sistema appartiene all’ambiente."
+        },
+        {
+          "id": "sistemi_termodinamici_006",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Una bottiglia sigillata lascia passare calore attraverso le pareti. Qual è il tipo di sistema?",
+          "alternative": [
+            "Chiuso",
+            "Aperto",
+            "Isolato ideale",
+            "Sempre in equilibrio"
+          ],
+          "corretta": "A",
+          "spiegazione": "Il tappo impedisce lo scambio di materia, mentre l’energia può attraversare le pareti."
+        },
+        {
+          "id": "sistemi_termodinamici_007",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Si studia un corridore come sistema: respira e suda. Quali scambi avvengono?",
+          "alternative": [
+            "Solo energia",
+            "Solo materia",
+            "Nessuno dei due",
+            "Materia ed energia"
+          ],
+          "corretta": "D",
+          "spiegazione": "Aria e sudore attraversano il confine, e avvengono anche trasferimenti energetici."
+        },
+        {
+          "id": "sistemi_termodinamici_008",
+          "difficolta": "difficile",
+          "tipologia": "ragionamento",
+          "testo": "Una scatola chiusa non perde aria ma può essere riscaldata dall'esterno. Quale affermazione è valida?",
+          "alternative": [
+            "Una scatola chiusa è sempre isolata",
+            "La chiusura non implica isolamento energetico",
+            "L'energia attraversa il confine solo con la materia",
+            "Un sistema chiuso deve avere temperatura costante"
+          ],
+          "corretta": "B",
+          "spiegazione": "L’assenza di scambio di materia non impedisce il trasferimento di energia."
+        },
+        {
+          "id": "sistemi_termodinamici_009",
+          "difficolta": "difficile",
+          "tipologia": "ragionamento",
+          "testo": "In una tazza aperta il livello dell'acqua cala senza versamenti. Quale osservazione dimostra lo scambio di materia?",
+          "alternative": [
+            "La tazza cede energia al tavolo",
+            "La parete della tazza si riscalda",
+            "L'acqua evapora e lascia il sistema",
+            "L'aria esterna cambia temperatura"
+          ],
+          "corretta": "C",
+          "spiegazione": "L’evaporazione fa attraversare il confine alle molecole d’acqua."
+        },
+        {
+          "id": "sistemi_termodinamici_010",
+          "difficolta": "difficile",
+          "tipologia": "ragionamento",
+          "testo": "Perché si può definire l'Universo idealmente isolato, considerandolo tutto ciò che esiste?",
+          "alternative": [
+            "Non esiste un ambiente esterno al totale",
+            "Perché ogni sua parte ha temperatura uniforme",
+            "Perché non avvengono trasformazioni energetiche",
+            "Perché non contiene sistemi aperti"
+          ],
+          "corretta": "A",
+          "spiegazione": "Se il sistema comprende tutto ciò che esiste, non resta un esterno con cui scambiare materia o energia."
+        }
+      ]
+    },
+    {
+      "id": "temperatura_equilibrio",
+      "nome": "Temperatura ed equilibrio termico",
+      "domande": [
+        {
+          "id": "temperatura_equilibrio_001",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Qual è l'unità di misura SI della temperatura termodinamica?",
+          "alternative": [
+            "grado Celsius",
+            "grado Fahrenheit",
+            "joule",
+            "kelvin"
+          ],
+          "corretta": "D",
+          "spiegazione": "Nel Sistema Internazionale la temperatura termodinamica si misura in kelvin, simbolo K."
+        },
+        {
+          "id": "temperatura_equilibrio_002",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Due corpi sono in equilibrio termico quando…",
+          "alternative": [
+            "hanno la stessa massa",
+            "hanno la stessa temperatura",
+            "sono fatti dello stesso materiale",
+            "hanno la stessa energia interna"
+          ],
+          "corretta": "B",
+          "spiegazione": "L’equilibrio termico richiede uguale temperatura, non necessariamente massa o energia interna uguali."
+        },
+        {
+          "id": "temperatura_equilibrio_003",
+          "difficolta": "facile",
+          "tipologia": "ragionamento",
+          "testo": "Perché si attende qualche istante prima di leggere un termometro a contatto?",
+          "alternative": [
+            "Per aumentare la massa del termometro",
+            "Per impedire ogni scambio energetico",
+            "Per lasciarlo avvicinare alla temperatura misurata",
+            "Per cambiare la scala dello strumento"
+          ],
+          "corretta": "C",
+          "spiegazione": "La parte sensibile deve avvicinarsi all’equilibrio termico con la zona misurata."
+        },
+        {
+          "id": "temperatura_equilibrio_004",
+          "difficolta": "media",
+          "tipologia": "conoscenza",
+          "testo": "Se A è in equilibrio termico con C e B con C, quale principio collega A e B?",
+          "alternative": [
+            "Principio zero della termodinamica",
+            "Legge della dilatazione lineare",
+            "Legge di Stefan–Boltzmann",
+            "Legge fondamentale della calorimetria"
+          ],
+          "corretta": "A",
+          "spiegazione": "Il principio zero afferma la transitività dell’equilibrio termico."
+        },
+        {
+          "id": "temperatura_equilibrio_005",
+          "difficolta": "media",
+          "tipologia": "calcolo",
+          "testo": "A quanti kelvin corrispondono 20 °C?",
+          "alternative": [
+            "253,15 K",
+            "273,15 K",
+            "313,15 K",
+            "293,15 K"
+          ],
+          "corretta": "D",
+          "spiegazione": "La conversione è \\(T=20+273{,}15=293{,}15\\,\\mathrm{K}\\)."
+        },
+        {
+          "id": "temperatura_equilibrio_006",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Una bevanda a 10 °C viene lasciata in una stanza stabile a 22 °C. Senza altri apporti, tende a…",
+          "alternative": [
+            "raggiungere 10 °C",
+            "raggiungere 22 °C",
+            "raggiungere 0 °C",
+            "superare 100 °C"
+          ],
+          "corretta": "B",
+          "spiegazione": "L’energia passa dall’ambiente più caldo alla bevanda fino all’equilibrio."
+        },
+        {
+          "id": "temperatura_equilibrio_007",
+          "difficolta": "media",
+          "tipologia": "calcolo",
+          "testo": "Di quanti kelvin aumenta la temperatura passando da 15 °C a 25 °C?",
+          "alternative": [
+            "283,15 K",
+            "273,15 K",
+            "10 K",
+            "40 K"
+          ],
+          "corretta": "C",
+          "spiegazione": "Le differenze in °C e in K hanno lo stesso valore numerico: \\(\\Delta T=25-15=10\\,\\mathrm{K}\\)."
+        },
+        {
+          "id": "temperatura_equilibrio_008",
+          "difficolta": "difficile",
+          "tipologia": "calcolo",
+          "testo": "A quanti gradi Celsius corrispondono 104 °F?",
+          "alternative": [
+            "40 °C",
+            "32 °C",
+            "72 °C",
+            "56 °C"
+          ],
+          "corretta": "A",
+          "spiegazione": "La conversione è \\(T_C=\\frac{5}{9}(104-32)=40\\,°\\mathrm{C}\\)."
+        },
+        {
+          "id": "temperatura_equilibrio_009",
+          "difficolta": "difficile",
+          "tipologia": "ragionamento",
+          "testo": "Due oggetti di materiali diversi segnano entrambi 18 °C. Cosa si può affermare?",
+          "alternative": [
+            "Possiedono la stessa energia interna",
+            "Contengono lo stesso numero di particelle",
+            "Hanno la stessa capacità termica",
+            "Sono alla stessa temperatura"
+          ],
+          "corretta": "D",
+          "spiegazione": "La temperatura comune non determina da sola massa, capacità termica o energia interna."
+        },
+        {
+          "id": "temperatura_equilibrio_010",
+          "difficolta": "difficile",
+          "tipologia": "ragionamento",
+          "testo": "Un termometro inizialmente più caldo del liquido viene immerso nel liquido. All'inizio…",
+          "alternative": [
+            "il liquido cede energia al termometro",
+            "il termometro cede energia al liquido",
+            "nessuno scambia energia perché sono a contatto",
+            "la temperatura del liquido deve diminuire"
+          ],
+          "corretta": "B",
+          "spiegazione": "L’energia si trasferisce spontaneamente dal corpo più caldo verso quello più freddo."
+        }
+      ]
+    },
+    {
+      "id": "energia_interna_calore",
+      "nome": "Energia interna, calore e calore specifico",
+      "domande": [
+        {
+          "id": "energia_interna_calore_001",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Che cosa descrive l'energia interna U di un corpo?",
+          "alternative": [
+            "Solo l'energia dovuta alla sua altezza",
+            "Solo l'energia del moto del corpo intero",
+            "Le energie microscopiche delle sue particelle",
+            "La quantità di calore che contiene"
+          ],
+          "corretta": "C",
+          "spiegazione": "L’energia interna comprende contributi cinetici e potenziali microscopici."
+        },
+        {
+          "id": "energia_interna_calore_002",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "In fisica il calore Q è…",
+          "alternative": [
+            "energia trasferita per differenza di temperatura",
+            "energia immagazzinata in ogni corpo",
+            "la temperatura di un materiale",
+            "l'energia del moto macroscopico"
+          ],
+          "corretta": "A",
+          "spiegazione": "Il calore indica un trasferimento di energia causato da una differenza di temperatura."
+        },
+        {
+          "id": "energia_interna_calore_003",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Qual è l'unità del calore specifico c?",
+          "alternative": [
+            "J/K",
+            "J·kg/K",
+            "kg/(J·K)",
+            "J/(kg·K)"
+          ],
+          "corretta": "D",
+          "spiegazione": "Il calore specifico misura energia per chilogrammo e per kelvin di variazione."
+        },
+        {
+          "id": "energia_interna_calore_004",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "A parità di materiale e di aumento di temperatura, una massa doppia richiede…",
+          "alternative": [
+            "calore dimezzato",
+            "calore doppio",
+            "lo stesso calore",
+            "calore quadruplo"
+          ],
+          "corretta": "B",
+          "spiegazione": "Nella legge \\(Q=m\\cdot c\\cdot \\Delta T\\), il calore è proporzionale alla massa."
+        },
+        {
+          "id": "energia_interna_calore_005",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Per masse uguali e stesso calore assorbito, l'acqua si scalda meno della sabbia perché…",
+          "alternative": [
+            "ha sempre una massa maggiore",
+            "possiede una temperatura iniziale maggiore",
+            "ha un calore specifico maggiore",
+            "non assorbe energia"
+          ],
+          "corretta": "C",
+          "spiegazione": "A parità di Q e massa, \\(\\Delta T=\\frac{Q}{mc}\\) diminuisce quando il calore specifico aumenta."
+        },
+        {
+          "id": "energia_interna_calore_006",
+          "difficolta": "media",
+          "tipologia": "calcolo",
+          "testo": "1 kg d'acqua con c = 4180 J/(kg·K) si riscalda di 2 K. Quanto calore assorbe?",
+          "alternative": [
+            "8360 J",
+            "4180 J",
+            "2090 J",
+            "16 720 J"
+          ],
+          "corretta": "A",
+          "spiegazione": "\\(Q=1\\cdot4180\\cdot2=8360\\,\\mathrm{J}\\)."
+        },
+        {
+          "id": "energia_interna_calore_007",
+          "difficolta": "media",
+          "tipologia": "calcolo",
+          "testo": "Un corpo di massa 2 kg e c = 500 J/(kg·K) riceve 2000 J. Di quanti kelvin si scalda?",
+          "alternative": [
+            "1 K",
+            "4 K",
+            "8 K",
+            "2 K"
+          ],
+          "corretta": "D",
+          "spiegazione": "\\(\\Delta T=\\frac{2000}{2\\cdot500}=2\\,\\mathrm{K}\\)."
+        },
+        {
+          "id": "energia_interna_calore_008",
+          "difficolta": "difficile",
+          "tipologia": "ragionamento",
+          "testo": "Due quantità diverse della stessa acqua sono alla stessa temperatura. Quale ha, in genere, maggiore energia interna totale?",
+          "alternative": [
+            "Quella di massa minore",
+            "Quella di massa maggiore",
+            "Hanno necessariamente la stessa energia interna",
+            "Quella nel contenitore più stretto"
+          ],
+          "corretta": "B",
+          "spiegazione": "A parità di stato e temperatura, più acqua contiene più particelle e quindi più energia interna totale."
+        },
+        {
+          "id": "energia_interna_calore_009",
+          "difficolta": "difficile",
+          "tipologia": "calcolo",
+          "testo": "Un corpo di 3 kg ha c = 400 J/(kg·K). Qual è la sua capacità termica C?",
+          "alternative": [
+            "400 J/K",
+            "750 J/K",
+            "1200 J/K",
+            "120 J/K"
+          ],
+          "corretta": "C",
+          "spiegazione": "\\(C=m\\cdot c=3\\cdot400=1200\\,\\mathrm{J/K}\\)."
+        },
+        {
+          "id": "energia_interna_calore_010",
+          "difficolta": "difficile",
+          "tipologia": "ragionamento",
+          "testo": "Un corpo si raffredda senza cambiare stato e senza lavoro esterno. Il Q che riceve è…",
+          "alternative": [
+            "negativo",
+            "positivo",
+            "sempre nullo",
+            "maggiore della sua energia interna"
+          ],
+          "corretta": "A",
+          "spiegazione": "Con \\(Q=mc\\Delta T\\), il raffreddamento comporta \\(\\Delta T<0\\) e quindi Q negativo."
+        }
+      ]
+    },
+    {
+      "id": "bilancio_termico",
+      "nome": "Bilancio termico",
+      "domande": [
+        {
+          "id": "bilancio_termico_001",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "In un bilancio termico, che segno si assegna al calore assorbito?",
+          "alternative": [
+            "negativo",
+            "sempre zero",
+            "sempre variabile senza criterio",
+            "positivo"
+          ],
+          "corretta": "D",
+          "spiegazione": "Per convenzione il calore entrante in un corpo è positivo, quello ceduto è negativo."
+        },
+        {
+          "id": "bilancio_termico_002",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Due corpi scambiano calore fra loro in un sistema isolato. Quanto vale la somma dei Q scambiati?",
+          "alternative": [
+            "il doppio di Q assorbito",
+            "zero",
+            "sempre 1 joule",
+            "la somma delle loro temperature"
+          ],
+          "corretta": "B",
+          "spiegazione": "Nel sistema isolato l’energia ceduta da un corpo è esattamente quella assorbita dall’altro."
+        },
+        {
+          "id": "bilancio_termico_003",
+          "difficolta": "facile",
+          "tipologia": "ragionamento",
+          "testo": "Mescoli uguali masse dello stesso liquido a 20 °C e 40 °C, senza dispersioni. La temperatura finale è…",
+          "alternative": [
+            "20 °C",
+            "40 °C",
+            "30 °C",
+            "60 °C"
+          ],
+          "corretta": "C",
+          "spiegazione": "Con masse e calori specifici uguali, la temperatura finale è la media: \\((20+40)/2=30\\,°\\mathrm{C}\\)."
+        },
+        {
+          "id": "bilancio_termico_004",
+          "difficolta": "media",
+          "tipologia": "calcolo",
+          "testo": "Mescoli 100 g d'acqua a 80 °C e 100 g a 20 °C, senza perdite. T finale?",
+          "alternative": [
+            "50 °C",
+            "60 °C",
+            "40 °C",
+            "100 °C"
+          ],
+          "corretta": "A",
+          "spiegazione": "Per masse uguali e stessa sostanza \\(T_{eq}=\\frac{80+20}{2}=50\\,°\\mathrm{C}\\)."
+        },
+        {
+          "id": "bilancio_termico_005",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "In un miscuglio isolato, 100 g di liquido caldo e 300 g dello stesso liquido freddo: chi pesa di più nella media delle temperature?",
+          "alternative": [
+            "Il liquido caldo",
+            "Hanno sempre lo stesso peso",
+            "Nessuno dei due perché le masse si annullano",
+            "Il liquido freddo"
+          ],
+          "corretta": "D",
+          "spiegazione": "La temperatura di equilibrio è una media pesata dalle masse se il calore specifico è lo stesso."
+        },
+        {
+          "id": "bilancio_termico_006",
+          "difficolta": "media",
+          "tipologia": "calcolo",
+          "testo": "Mescoli 300 g d'acqua a 80 °C con 100 g a 20 °C, senza perdite. T finale?",
+          "alternative": [
+            "50 °C",
+            "65 °C",
+            "70 °C",
+            "60 °C"
+          ],
+          "corretta": "B",
+          "spiegazione": "\\(T_{eq}=\\frac{300\\cdot80+100\\cdot20}{400}=65\\,°\\mathrm{C}\\)."
+        },
+        {
+          "id": "bilancio_termico_007",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "In un sistema isolato il corpo caldo perde 800 J. Quanto assorbe quello freddo, se ci sono solo questi due corpi?",
+          "alternative": [
+            "400 J",
+            "1600 J",
+            "800 J",
+            "0 J"
+          ],
+          "corretta": "C",
+          "spiegazione": "La somma dei calori è nulla: \\(-800+800=0\\,\\mathrm{J}\\)."
+        },
+        {
+          "id": "bilancio_termico_008",
+          "difficolta": "difficile",
+          "tipologia": "ragionamento",
+          "testo": "Una tazza fredda assorbe parte del calore del caffè. Ignorarla nel bilancio comporta…",
+          "alternative": [
+            "un modello meno accurato",
+            "una conservazione dell'energia più rigorosa",
+            "una temperatura finale necessariamente esatta",
+            "l'annullamento del calore specifico del caffè"
+          ],
+          "corretta": "A",
+          "spiegazione": "Anche la tazza scambia energia e può influire sulla temperatura di equilibrio."
+        },
+        {
+          "id": "bilancio_termico_009",
+          "difficolta": "difficile",
+          "tipologia": "calcolo",
+          "testo": "200 g d'acqua a 70 °C e 100 g a 10 °C vengono mescolati senza perdite. T finale?",
+          "alternative": [
+            "40 °C",
+            "30 °C",
+            "60 °C",
+            "50 °C"
+          ],
+          "corretta": "D",
+          "spiegazione": "\\(T_{eq}=\\frac{200\\cdot70+100\\cdot10}{300}=50\\,°\\mathrm{C}\\)."
+        },
+        {
+          "id": "bilancio_termico_010",
+          "difficolta": "difficile",
+          "tipologia": "ragionamento",
+          "testo": "Mescoli due quantità della stessa sostanza a 15 °C e 65 °C, senza perdite né cambi di stato. La temperatura finale…",
+          "alternative": [
+            "è sempre 40 °C",
+            "è compresa fra 15 °C e 65 °C",
+            "supera sempre 65 °C",
+            "è sempre inferiore a 15 °C"
+          ],
+          "corretta": "B",
+          "spiegazione": "La media pesata con masse positive resta fra le due temperature iniziali."
+        }
+      ]
+    },
+    {
+      "id": "dilatazione_termica",
+      "nome": "Dilatazione termica",
+      "domande": [
+        {
+          "id": "dilatazione_termica_001",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Nei solidi comuni la dilatazione termica dipende soprattutto…",
+          "alternative": [
+            "dall'ingrandimento dei singoli atomi",
+            "dalla creazione di nuove particelle",
+            "dall'aumento delle distanze medie tra particelle",
+            "dall'aumento della massa"
+          ],
+          "corretta": "C",
+          "spiegazione": "Nel modello microscopico variano le distanze medie tra particelle, non le dimensioni degli atomi."
+        },
+        {
+          "id": "dilatazione_termica_002",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Nella legge di dilatazione lineare, il coefficiente α si misura in…",
+          "alternative": [
+            "K⁻¹",
+            "K",
+            "m/K",
+            "J/K"
+          ],
+          "corretta": "A",
+          "spiegazione": "Dato che \\(\\Delta L=\\alpha L_0\\Delta T\\), α ha unità inversa alla variazione termica."
+        },
+        {
+          "id": "dilatazione_termica_003",
+          "difficolta": "facile",
+          "tipologia": "ragionamento",
+          "testo": "A che cosa servono i giunti di dilatazione di un ponte?",
+          "alternative": [
+            "A impedire tutti gli scambi di calore",
+            "Ad aumentare la massa dell'impalcato",
+            "A mantenere costante la temperatura",
+            "A consentire variazioni di lunghezza"
+          ],
+          "corretta": "D",
+          "spiegazione": "I giunti permettono alle strutture di espandersi e contrarsi evitando sforzi eccessivi."
+        },
+        {
+          "id": "dilatazione_termica_004",
+          "difficolta": "media",
+          "tipologia": "conoscenza",
+          "testo": "La relazione \\(\\Delta V=\\beta V_0\\Delta T\\) descrive…",
+          "alternative": [
+            "la conduzione termica",
+            "la dilatazione volumica",
+            "il bilancio termico",
+            "il calore latente"
+          ],
+          "corretta": "B",
+          "spiegazione": "La grandezza β collega la variazione di volume alla variazione di temperatura."
+        },
+        {
+          "id": "dilatazione_termica_005",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Un'asta con coefficiente α positivo si raffredda. La sua variazione di lunghezza ΔL è…",
+          "alternative": [
+            "positiva",
+            "necessariamente nulla",
+            "negativa",
+            "sempre uguale alla massa"
+          ],
+          "corretta": "C",
+          "spiegazione": "Con \\(\\Delta L=\\alpha L_0\\Delta T\\), una diminuzione di T dà ΔL negativa."
+        },
+        {
+          "id": "dilatazione_termica_006",
+          "difficolta": "media",
+          "tipologia": "calcolo",
+          "testo": "Asta di 2 m, α = 1×10⁻⁵ K⁻¹, aumento di 50 K. Quanto si allunga?",
+          "alternative": [
+            "1 mm",
+            "2 mm",
+            "0,1 mm",
+            "10 mm"
+          ],
+          "corretta": "A",
+          "spiegazione": "\\(\\Delta L=10^{-5}\\cdot2\\cdot50=0{,}001\\,\\mathrm{m}=1\\,\\mathrm{mm}\\)."
+        },
+        {
+          "id": "dilatazione_termica_007",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Scaldi con acqua calda il coperchio metallico di un barattolo: spesso si svita più facilmente perché…",
+          "alternative": [
+            "il metallo perde massa",
+            "il vetro diventa sempre liquido",
+            "il tappo smette di condurre calore",
+            "il coperchio tende a dilatarsi"
+          ],
+          "corretta": "D",
+          "spiegazione": "La dilatazione del coperchio metallico può allentare l’incastro."
+        },
+        {
+          "id": "dilatazione_termica_008",
+          "difficolta": "difficile",
+          "tipologia": "calcolo",
+          "testo": "Asta di 1 m, α = 2×10⁻⁵ K⁻¹, ΔT = 100 K. Qual è ΔL?",
+          "alternative": [
+            "0,2 mm",
+            "2 mm",
+            "20 mm",
+            "1 mm"
+          ],
+          "corretta": "B",
+          "spiegazione": "\\(\\Delta L=2\\cdot10^{-5}\\cdot1\\cdot100=0{,}002\\,\\mathrm{m}=2\\,\\mathrm{mm}\\)."
+        },
+        {
+          "id": "dilatazione_termica_009",
+          "difficolta": "difficile",
+          "tipologia": "ragionamento",
+          "testo": "Tra 4 °C e 0 °C, raffreddando acqua liquida pura verso il congelamento il volume tende a…",
+          "alternative": [
+            "diminuire regolarmente",
+            "restare rigorosamente costante",
+            "aumentare",
+            "diventare nullo"
+          ],
+          "corretta": "C",
+          "spiegazione": "L’acqua ha densità massima intorno a 4 °C: raffreddandola ulteriormente, il volume aumenta."
+        },
+        {
+          "id": "dilatazione_termica_010",
+          "difficolta": "difficile",
+          "tipologia": "ragionamento",
+          "testo": "Una lamina bimetallica viene scaldata: un metallo si allunga più dell'altro. Verso quale lato tende a curvarsi?",
+          "alternative": [
+            "Verso il metallo che si dilata meno",
+            "Verso il metallo che si dilata di più",
+            "Sempre verso l'alto rispetto al suolo",
+            "Non può curvarsi se i due metalli sono uniti"
+          ],
+          "corretta": "A",
+          "spiegazione": "Il lato che si allunga maggiormente occupa la parte esterna della curvatura."
+        }
+      ]
+    },
+    {
+      "id": "stati_materia",
+      "nome": "Stati della materia",
+      "domande": [
+        {
+          "id": "stati_materia_001",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Quale stato della materia conserva generalmente forma e volume propri?",
+          "alternative": [
+            "Liquido",
+            "Gas",
+            "Vapore acqueo",
+            "Solido"
+          ],
+          "corretta": "D",
+          "spiegazione": "Le particelle di un solido restano vicine e oscillano intorno alle proprie posizioni."
+        },
+        {
+          "id": "stati_materia_002",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Un liquido versato in un recipiente…",
+          "alternative": [
+            "mantiene la forma e cambia volume",
+            "mantiene circa il volume ma cambia forma",
+            "riempie sempre ogni spazio libero",
+            "non può scorrere"
+          ],
+          "corretta": "B",
+          "spiegazione": "Le particelle del liquido restano vicine ma possono scorrere le une sulle altre."
+        },
+        {
+          "id": "stati_materia_003",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "In un recipiente chiuso, un gas tende a…",
+          "alternative": [
+            "conservare una forma propria",
+            "raggrupparsi sempre sul fondo",
+            "occupare tutto il volume disponibile",
+            "mantenere un bordo libero come un liquido"
+          ],
+          "corretta": "C",
+          "spiegazione": "Le particelle gassose possono muoversi in tutto lo spazio del contenitore."
+        },
+        {
+          "id": "stati_materia_004",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Le particelle in un cubetto di ghiaccio fermo sul tavolo…",
+          "alternative": [
+            "continuano a oscillare",
+            "sono tutte immobili",
+            "si muovono solo quando il ghiaccio fonde",
+            "si separano tutte come in un gas"
+          ],
+          "corretta": "A",
+          "spiegazione": "Un solido apparentemente fermo presenta comunque movimento microscopico."
+        },
+        {
+          "id": "stati_materia_005",
+          "difficolta": "media",
+          "tipologia": "conoscenza",
+          "testo": "Quale materiale è un esempio di solido amorfo?",
+          "alternative": [
+            "Cristallo di sale",
+            "Cristallo di bismuto",
+            "Singolo cristallo di quarzo",
+            "Vetro comune"
+          ],
+          "corretta": "D",
+          "spiegazione": "Nel vetro manca l’ordine periodico a grande distanza tipico dei solidi cristallini."
+        },
+        {
+          "id": "stati_materia_006",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Un olio può scorrere più lentamente dell'acqua pur avendo densità inferiore perché…",
+          "alternative": [
+            "viscosità e densità sono identiche",
+            "viscosità e densità sono proprietà diverse",
+            "una densità minore impedisce lo scorrimento",
+            "la viscosità misura la massa totale"
+          ],
+          "corretta": "B",
+          "spiegazione": "La viscosità riguarda la resistenza allo scorrimento, la densità la massa per volume."
+        },
+        {
+          "id": "stati_materia_007",
+          "difficolta": "media",
+          "tipologia": "conoscenza",
+          "testo": "Un solido formato da molti piccoli cristalli con orientazioni differenti si chiama…",
+          "alternative": [
+            "amorfo",
+            "gassoso",
+            "policristallino",
+            "liquido"
+          ],
+          "corretta": "C",
+          "spiegazione": "I materiali policristallini sono composti da più regioni cristalline, dette grani."
+        },
+        {
+          "id": "stati_materia_008",
+          "difficolta": "difficile",
+          "tipologia": "ragionamento",
+          "testo": "Perché un gas è generalmente più comprimibile di un liquido?",
+          "alternative": [
+            "Le particelle del gas sono molto più distanti",
+            "Le particelle del gas sono più grandi",
+            "Il gas contiene necessariamente meno massa",
+            "Nel liquido non esistono spazi fra particelle"
+          ],
+          "corretta": "A",
+          "spiegazione": "Nel gas le particelle sono mediamente lontane, lasciando molto spazio riducibile."
+        },
+        {
+          "id": "stati_materia_009",
+          "difficolta": "difficile",
+          "tipologia": "ragionamento",
+          "testo": "Due recipienti hanno la stessa quantità di acqua liquida e forme diverse. Che cosa resta quasi uguale?",
+          "alternative": [
+            "La forma dell'acqua",
+            "L'altezza del livello",
+            "La superficie libera",
+            "Il volume dell'acqua"
+          ],
+          "corretta": "D",
+          "spiegazione": "Un liquido mantiene approssimativamente il proprio volume ma adatta la forma al contenitore."
+        },
+        {
+          "id": "stati_materia_010",
+          "difficolta": "difficile",
+          "tipologia": "ragionamento",
+          "testo": "Un cristallo e un pezzo di vetro conservano entrambi la forma. La differenza essenziale è…",
+          "alternative": [
+            "la presenza di particelle solo nel cristallo",
+            "l'ordine a grande distanza delle particelle",
+            "l'assenza di vibrazioni nel vetro",
+            "la quantità di calore contenuta"
+          ],
+          "corretta": "B",
+          "spiegazione": "Il cristallo mostra periodicità strutturale, mentre nel vetro l’ordine a grande distanza manca."
+        }
+      ]
+    },
+    {
+      "id": "passaggi_stato",
+      "nome": "Passaggi di stato",
+      "domande": [
+        {
+          "id": "passaggi_stato_001",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Come si chiama il passaggio da solido a liquido?",
+          "alternative": [
+            "Solidificazione",
+            "Condensazione",
+            "Fusione",
+            "Sublimazione"
+          ],
+          "corretta": "C",
+          "spiegazione": "La fusione trasforma un solido in liquido senza cambiarne l’identità chimica."
+        },
+        {
+          "id": "passaggi_stato_002",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Come si chiama il passaggio da liquido a solido?",
+          "alternative": [
+            "Solidificazione",
+            "Fusione",
+            "Vaporizzazione",
+            "Brinamento"
+          ],
+          "corretta": "A",
+          "spiegazione": "La solidificazione forma un solido a partire dal liquido, cedendo energia."
+        },
+        {
+          "id": "passaggi_stato_003",
+          "difficolta": "facile",
+          "tipologia": "ragionamento",
+          "testo": "Una pozzanghera diminuisce in una giornata fresca senza bollire. Il processo è…",
+          "alternative": [
+            "ebollizione",
+            "fusione",
+            "brinamento",
+            "evaporazione"
+          ],
+          "corretta": "D",
+          "spiegazione": "L’evaporazione avviene alla superficie del liquido anche sotto il punto di ebollizione."
+        },
+        {
+          "id": "passaggi_stato_004",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Durante l'ebollizione dell'acqua a pressione atmosferica ordinaria, le bolle di vapore si formano…",
+          "alternative": [
+            "solo sulla superficie esterna",
+            "anche all'interno del liquido",
+            "esclusivamente nel recipiente vuoto",
+            "solo dopo la solidificazione"
+          ],
+          "corretta": "B",
+          "spiegazione": "L’ebollizione interessa anche l’interno del liquido, a differenza dell’evaporazione superficiale."
+        },
+        {
+          "id": "passaggi_stato_005",
+          "difficolta": "media",
+          "tipologia": "conoscenza",
+          "testo": "Il vapore acqueo diventa direttamente ghiaccio sulla foglia. È…",
+          "alternative": [
+            "sublimazione",
+            "fusione",
+            "brinamento",
+            "evaporazione"
+          ],
+          "corretta": "C",
+          "spiegazione": "Il brinamento è il passaggio diretto da gas a solido."
+        },
+        {
+          "id": "passaggi_stato_006",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Perché il ghiaccio puro in fusione a pressione ordinaria può restare a 0 °C mentre riceve calore?",
+          "alternative": [
+            "L'energia serve al cambiamento di stato",
+            "Il ghiaccio smette di assorbire energia",
+            "La massa deve aumentare",
+            "La temperatura non dipende mai dall'energia"
+          ],
+          "corretta": "A",
+          "spiegazione": "L’energia assorbita modifica l’organizzazione microscopica anziché aumentare T durante la fusione."
+        },
+        {
+          "id": "passaggi_stato_007",
+          "difficolta": "media",
+          "tipologia": "calcolo",
+          "testo": "Quanto calore serve per fondere 0,5 kg di ghiaccio già a 0 °C? Usa Lf = 334 kJ/kg.",
+          "alternative": [
+            "334 kJ",
+            "668 kJ",
+            "83,5 kJ",
+            "167 kJ"
+          ],
+          "corretta": "D",
+          "spiegazione": "\\(Q=mL_f=0{,}5\\cdot334=167\\,\\mathrm{kJ}\\)."
+        },
+        {
+          "id": "passaggi_stato_008",
+          "difficolta": "difficile",
+          "tipologia": "conoscenza",
+          "testo": "Il ghiaccio secco passa direttamente da solido a gas. Il fenomeno si chiama…",
+          "alternative": [
+            "condensazione",
+            "sublimazione",
+            "brinamento",
+            "solidificazione"
+          ],
+          "corretta": "B",
+          "spiegazione": "La sublimazione evita il passaggio intermedio per lo stato liquido."
+        },
+        {
+          "id": "passaggi_stato_009",
+          "difficolta": "difficile",
+          "tipologia": "calcolo",
+          "testo": "Per fondere 2 kg di ghiaccio già a 0 °C, con Lf = 334 kJ/kg, quanto serve?",
+          "alternative": [
+            "167 kJ",
+            "336 kJ",
+            "668 kJ",
+            "1002 kJ"
+          ],
+          "corretta": "C",
+          "spiegazione": "\\(Q=mL_f=2\\cdot334=668\\,\\mathrm{kJ}\\)."
+        },
+        {
+          "id": "passaggi_stato_010",
+          "difficolta": "difficile",
+          "tipologia": "ragionamento",
+          "testo": "Il vapore invisibile tocca un vetro freddo e forma goccioline visibili. Che cosa sono le gocce?",
+          "alternative": [
+            "Acqua liquida condensata",
+            "Vapore gassoso reso visibile",
+            "Ghiaccio sublimato",
+            "Aria trasformata in acqua"
+          ],
+          "corretta": "A",
+          "spiegazione": "Le gocce sono acqua liquida: il vapore acqueo gassoso, prima della condensazione, è invisibile."
+        }
+      ]
+    },
+    {
+      "id": "conduzione",
+      "nome": "Conduzione",
+      "domande": [
+        {
+          "id": "conduzione_001",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Nella conduzione termica, l'energia si trasferisce soprattutto…",
+          "alternative": [
+            "solo grazie al movimento dell'aria",
+            "soltanto attraverso il vuoto",
+            "solo tramite onde radio",
+            "senza trasporto macroscopico di materia"
+          ],
+          "corretta": "D",
+          "spiegazione": "Nella conduzione l’energia passa tra regioni vicine del materiale senza spostamento complessivo del materiale."
+        },
+        {
+          "id": "conduzione_002",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Quale materiale conduce generalmente meglio il calore?",
+          "alternative": [
+            "Legno asciutto",
+            "Rame",
+            "Aria ferma",
+            "Neve compatta"
+          ],
+          "corretta": "B",
+          "spiegazione": "Il rame ha conducibilità termica molto maggiore di legno, aria e neve."
+        },
+        {
+          "id": "conduzione_003",
+          "difficolta": "facile",
+          "tipologia": "ragionamento",
+          "testo": "Perché il manico in legno di un wok limita il riscaldamento della mano?",
+          "alternative": [
+            "Assorbe calore senza limite",
+            "Ha sempre temperatura nulla",
+            "Conduce meno calore del metallo",
+            "Trasforma il calore in freddo"
+          ],
+          "corretta": "C",
+          "spiegazione": "La bassa conducibilità termica del legno rallenta il passaggio di energia."
+        },
+        {
+          "id": "conduzione_004",
+          "difficolta": "media",
+          "tipologia": "conoscenza",
+          "testo": "La conducibilità termica λ si misura in…",
+          "alternative": [
+            "W/(m·K)",
+            "W·m·K",
+            "J/K",
+            "K/W"
+          ],
+          "corretta": "A",
+          "spiegazione": "Nella legge di Fourier la conducibilità collega potenza termica, area, spessore e differenza di temperatura."
+        },
+        {
+          "id": "conduzione_005",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Due lastre dello stesso materiale e spessore hanno aree A e 2A. A parità di ΔT, la potenza condotta dalla seconda è…",
+          "alternative": [
+            "metà",
+            "uguale",
+            "quadrupla",
+            "doppia"
+          ],
+          "corretta": "D",
+          "spiegazione": "Dalla legge \\(P=\\frac{\\lambda A\\Delta T}{s}\\) segue la proporzionalità diretta con l’area."
+        },
+        {
+          "id": "conduzione_006",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "A parità di materiale, area e ΔT, raddoppiare lo spessore di una parete fa diventare la potenza condotta…",
+          "alternative": [
+            "il doppio",
+            "la metà",
+            "quattro volte maggiore",
+            "invariata"
+          ],
+          "corretta": "B",
+          "spiegazione": "La potenza condotta è inversamente proporzionale allo spessore."
+        },
+        {
+          "id": "conduzione_007",
+          "difficolta": "media",
+          "tipologia": "calcolo",
+          "testo": "Parete con λ = 1 W/(m·K), A = 2 m², ΔT = 20 K e s = 0,5 m. Quanto vale P?",
+          "alternative": [
+            "20 W",
+            "40 W",
+            "80 W",
+            "160 W"
+          ],
+          "corretta": "C",
+          "spiegazione": "\\(P=\\frac{1\\cdot2\\cdot20}{0{,}5}=80\\,\\mathrm{W}\\)."
+        },
+        {
+          "id": "conduzione_008",
+          "difficolta": "difficile",
+          "tipologia": "ragionamento",
+          "testo": "Metallo e legno sono da ore nella stessa stanza a 20 °C. Perché il metallo appare più freddo al tatto?",
+          "alternative": [
+            "Sottrae energia alla pelle più rapidamente",
+            "Possiede necessariamente una T minore",
+            "Contiene meno energia interna in ogni caso",
+            "Assorbe il freddo dalla stanza"
+          ],
+          "corretta": "A",
+          "spiegazione": "La sensazione dipende dalla rapidità del trasferimento di energia, non da una T necessariamente diversa."
+        },
+        {
+          "id": "conduzione_009",
+          "difficolta": "difficile",
+          "tipologia": "calcolo",
+          "testo": "Una parete disperde una potenza termica costante di 100 W per 20 s. Quanta energia passa?",
+          "alternative": [
+            "5 J",
+            "120 J",
+            "5000 J",
+            "2000 J"
+          ],
+          "corretta": "D",
+          "spiegazione": "\\(Q=P\\Delta t=100\\cdot20=2000\\,\\mathrm{J}\\)."
+        },
+        {
+          "id": "conduzione_010",
+          "difficolta": "difficile",
+          "tipologia": "ragionamento",
+          "testo": "In una vetrocamera il gas è racchiuso in uno spazio sottile soprattutto per…",
+          "alternative": [
+            "favorire grandi correnti convettive",
+            "ridurre gli scambi termici limitando anche i moti del gas",
+            "trasformare l'aria in un metallo conduttore",
+            "annullare ogni forma di irraggiamento"
+          ],
+          "corretta": "B",
+          "spiegazione": "L’intercapedine poco conduttiva e opportunamente dimensionata riduce il trasferimento complessivo."
+        }
+      ]
+    },
+    {
+      "id": "convezione",
+      "nome": "Convezione",
+      "domande": [
+        {
+          "id": "convezione_001",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "La convezione è un trasferimento termico associato…",
+          "alternative": [
+            "solo al contatto tra solidi",
+            "solo alle onde nel vuoto",
+            "al movimento di un fluido",
+            "alla completa assenza di materia"
+          ],
+          "corretta": "C",
+          "spiegazione": "Nella convezione liquidi o gas trasportano energia con il loro movimento."
+        },
+        {
+          "id": "convezione_002",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Un ventilatore mette in moto l'aria vicino a una superficie. Questo moto provoca…",
+          "alternative": [
+            "convezione forzata",
+            "convezione naturale pura",
+            "solo conduzione nel vuoto",
+            "assenza di scambi energetici"
+          ],
+          "corretta": "A",
+          "spiegazione": "La convezione è forzata quando il fluido si muove grazie a un dispositivo."
+        },
+        {
+          "id": "convezione_003",
+          "difficolta": "facile",
+          "tipologia": "ragionamento",
+          "testo": "L'aria riscaldata dal termosifone tende a salire perché…",
+          "alternative": [
+            "diventa sempre più pesante",
+            "si trasforma in un solido",
+            "perde tutta l'energia interna",
+            "diventa meno densa dell'aria circostante"
+          ],
+          "corretta": "D",
+          "spiegazione": "Scaldandosi, l’aria tende a espandersi e può ricevere una spinta verso l’alto."
+        },
+        {
+          "id": "convezione_004",
+          "difficolta": "media",
+          "tipologia": "conoscenza",
+          "testo": "Una corrente ascendente dovuta a differenze di densità e gravità è un esempio di…",
+          "alternative": [
+            "conduzione elettrica",
+            "convezione naturale",
+            "irraggiamento infrarosso",
+            "evaporazione forzata"
+          ],
+          "corretta": "B",
+          "spiegazione": "Nella convezione naturale il movimento nasce dalla spinta di galleggiamento tra regioni di fluido."
+        },
+        {
+          "id": "convezione_005",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Una ventola raffredda un processore più caldo dell'aria soprattutto perché…",
+          "alternative": [
+            "raffredda automaticamente l'aria sotto zero",
+            "elimina ogni scambio per irraggiamento",
+            "rinnova l'aria vicina alla superficie",
+            "abbassa la temperatura del processore senza energia"
+          ],
+          "corretta": "C",
+          "spiegazione": "La ventilazione sostituisce l’aria riscaldata con altra aria, rendendo lo scambio più efficace."
+        },
+        {
+          "id": "convezione_006",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Un rapace può salire tenendo le ali aperte perché sfrutta…",
+          "alternative": [
+            "correnti ascendenti d'aria calda",
+            "il calore trasmesso nel vuoto",
+            "la conduzione attraverso le ali",
+            "la condensazione nel suo corpo"
+          ],
+          "corretta": "A",
+          "spiegazione": "Le termiche sono zone di aria ascendente generate dal riscaldamento del suolo."
+        },
+        {
+          "id": "convezione_007",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "In un circuito di raffreddamento una pompa fa circolare il liquido. Si tratta di…",
+          "alternative": [
+            "convezione naturale soltanto",
+            "irraggiamento nel vuoto",
+            "assenza di trasporto di energia",
+            "convezione forzata"
+          ],
+          "corretta": "D",
+          "spiegazione": "La pompa produce il movimento del fluido che trasporta energia."
+        },
+        {
+          "id": "convezione_008",
+          "difficolta": "difficile",
+          "tipologia": "ragionamento",
+          "testo": "Una ventola soffia aria più calda della superficie di un oggetto. Quale effetto è possibile?",
+          "alternative": [
+            "L'oggetto deve necessariamente raffreddarsi",
+            "L'oggetto si riscalda più rapidamente",
+            "L'energia smette di trasferirsi",
+            "La ventola rende l'aria sempre più fredda"
+          ],
+          "corretta": "B",
+          "spiegazione": "Il verso del trasferimento dipende dalla differenza di temperatura: l’aria più calda può scaldare l’oggetto."
+        },
+        {
+          "id": "convezione_009",
+          "difficolta": "difficile",
+          "tipologia": "ragionamento",
+          "testo": "Perché la convezione ordinaria non può trasportare calore nel vuoto perfetto?",
+          "alternative": [
+            "Manca la luce visibile",
+            "La gravità diventa necessariamente nulla",
+            "Manca un fluido che possa muoversi",
+            "Ogni corpo smette di emettere energia"
+          ],
+          "corretta": "C",
+          "spiegazione": "La convezione richiede lo spostamento di materia fluida; nel vuoto questa materia manca."
+        },
+        {
+          "id": "convezione_010",
+          "difficolta": "difficile",
+          "tipologia": "ragionamento",
+          "testo": "In una stanza, l'aria calda sale vicino al radiatore e scende altrove. Quale descrizione è più corretta?",
+          "alternative": [
+            "Si instaura una circolazione dovuta a differenze di densità",
+            "Tutte le molecole si muovono solo verso l'alto",
+            "La stanza viene scaldata solo per irraggiamento",
+            "La massa d'aria totale aumenta continuamente"
+          ],
+          "corretta": "A",
+          "spiegazione": "Il moto convettivo può formare correnti ascendenti e discendenti collegate."
+        }
+      ]
+    },
+    {
+      "id": "irraggiamento",
+      "nome": "Irraggiamento",
+      "domande": [
+        {
+          "id": "irraggiamento_001",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Come arriva dal Sole alla Terra gran parte dell'energia solare?",
+          "alternative": [
+            "Per conduzione attraverso il vuoto",
+            "Con vento proveniente dal Sole",
+            "Tramite una corrente d'acqua",
+            "Tramite radiazione elettromagnetica"
+          ],
+          "corretta": "D",
+          "spiegazione": "La radiazione elettromagnetica può propagarsi nel vuoto tra Sole e Terra."
+        },
+        {
+          "id": "irraggiamento_002",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Quale radiazione è appena oltre il rosso della luce visibile?",
+          "alternative": [
+            "Ultravioletta",
+            "Infrarossa",
+            "Raggi gamma",
+            "Raggi X"
+          ],
+          "corretta": "B",
+          "spiegazione": "L’infrarosso ha lunghezza d’onda maggiore della luce rossa visibile."
+        },
+        {
+          "id": "irraggiamento_003",
+          "difficolta": "facile",
+          "tipologia": "ragionamento",
+          "testo": "Un oggetto a temperatura ambiente, anche se non brilla al buio…",
+          "alternative": [
+            "non emette alcuna radiazione",
+            "emette solo luce rossa visibile",
+            "emette radiazione termica",
+            "emette solo se è di metallo"
+          ],
+          "corretta": "C",
+          "spiegazione": "Ogni corpo con temperatura superiore a 0 K emette radiazione termica."
+        },
+        {
+          "id": "irraggiamento_004",
+          "difficolta": "media",
+          "tipologia": "conoscenza",
+          "testo": "L'emissività ε di una superficie è un numero…",
+          "alternative": [
+            "tra 0 e 1",
+            "sempre maggiore di 100",
+            "con unità di misura kelvin",
+            "sempre negativo"
+          ],
+          "corretta": "A",
+          "spiegazione": "L’emissività descrive l’efficacia dell’emissione rispetto al corpo nero e varia da zero a uno."
+        },
+        {
+          "id": "irraggiamento_005",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "La radiazione che colpisce una superficie può essere…",
+          "alternative": [
+            "soltanto assorbita",
+            "soltanto riflessa",
+            "sempre trasformata in elettricità",
+            "assorbita, riflessa o trasmessa"
+          ],
+          "corretta": "D",
+          "spiegazione": "Le parti assorbita, riflessa e trasmessa ripartiscono la radiazione incidente."
+        },
+        {
+          "id": "irraggiamento_006",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "A parità di temperatura assoluta ed emissività, se l'area radiante raddoppia, la potenza emessa…",
+          "alternative": [
+            "si dimezza",
+            "raddoppia",
+            "diventa quattro volte maggiore",
+            "rimane uguale"
+          ],
+          "corretta": "B",
+          "spiegazione": "Nella legge \\(P=\\varepsilon\\sigma A T^4\\), P è proporzionale all’area A."
+        },
+        {
+          "id": "irraggiamento_007",
+          "difficolta": "media",
+          "tipologia": "calcolo",
+          "testo": "Nella legge di Stefan–Boltzmann, a parità di area ed emissività, passando da 300 K a 600 K, P diventa…",
+          "alternative": [
+            "2 volte maggiore",
+            "4 volte maggiore",
+            "16 volte maggiore",
+            "8 volte maggiore"
+          ],
+          "corretta": "C",
+          "spiegazione": "La dipendenza dalla temperatura assoluta è alla quarta potenza: \\((600/300)^4=16\\)."
+        },
+        {
+          "id": "irraggiamento_008",
+          "difficolta": "difficile",
+          "tipologia": "ragionamento",
+          "testo": "Una superficie metallica lucida appare scura in una termografia. Cosa bisogna considerare?",
+          "alternative": [
+            "Emissività e riflessione dell'ambiente",
+            "Solo il colore visibile del metallo",
+            "Che la sua temperatura sia necessariamente nulla",
+            "Che non possa riflettere infrarossi"
+          ],
+          "corretta": "A",
+          "spiegazione": "La termografia dipende anche dall’emissività e dalla radiazione riflessa, non solo dalla temperatura reale."
+        },
+        {
+          "id": "irraggiamento_009",
+          "difficolta": "difficile",
+          "tipologia": "calcolo",
+          "testo": "Se per una superficie \\(P=\\varepsilon\\sigma A T^4\\), quale fattore moltiplica P quando T triplica in kelvin?",
+          "alternative": [
+            "9",
+            "27",
+            "3",
+            "81"
+          ],
+          "corretta": "D",
+          "spiegazione": "La potenza varia con \\(T^4\\), quindi \\(3^4=81\\)."
+        },
+        {
+          "id": "irraggiamento_010",
+          "difficolta": "difficile",
+          "tipologia": "ragionamento",
+          "testo": "Un corpo emette 150 W e assorbe 200 W per radiazione. Qual è il bilancio netto per il corpo?",
+          "alternative": [
+            "Perde 50 W netti",
+            "Assorbe 50 W netti",
+            "Perde 350 W netti",
+            "Non scambia potenza netta"
+          ],
+          "corretta": "B",
+          "spiegazione": "L’energia radiativa entrante supera quella uscente di \\(200-150=50\\,\\mathrm{W}\\)."
+        }
+      ]
+    }
+  ]
+}
