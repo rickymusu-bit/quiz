@@ -225,16 +225,16 @@
         {
           "id": "temperatura_equilibrio_006",
           "difficolta": "media",
-          "tipologia": "ragionamento",
-          "testo": "Una bevanda a 10 °C viene lasciata in una stanza stabile a 22 °C. Senza altri apporti, tende a…",
+          "tipologia": "calcolo",
+          "testo": "Una temperatura di 25 °C corrisponde a quanti gradi Fahrenheit?",
           "alternative": [
-            "raggiungere 10 °C",
-            "raggiungere 22 °C",
-            "raggiungere 0 °C",
-            "superare 100 °C"
+            "45 °F",
+            "77 °F",
+            "57 °F",
+            "86 °F"
           ],
           "corretta": "B",
-          "spiegazione": "L’energia passa dall’ambiente più caldo alla bevanda fino all’equilibrio."
+          "spiegazione": "\\(T_F=\\frac95\\cdot25+32=77\\,°\\mathrm{F}\\)."
         },
         {
           "id": "temperatura_equilibrio_007",
@@ -267,16 +267,16 @@
         {
           "id": "temperatura_equilibrio_009",
           "difficolta": "difficile",
-          "tipologia": "ragionamento",
-          "testo": "Due oggetti di materiali diversi segnano entrambi 18 °C. Cosa si può affermare?",
+          "tipologia": "calcolo",
+          "testo": "A quanti gradi Celsius corrispondono 68 °F?",
           "alternative": [
-            "Possiedono la stessa energia interna",
-            "Contengono lo stesso numero di particelle",
-            "Hanno la stessa capacità termica",
-            "Sono alla stessa temperatura"
+            "18 °C",
+            "32 °C",
+            "36 °C",
+            "20 °C"
           ],
           "corretta": "D",
-          "spiegazione": "La temperatura comune non determina da sola massa, capacità termica o energia interna."
+          "spiegazione": "\\(T_C=\\frac59(68-32)=20\\,°\\mathrm{C}\\)."
         },
         {
           "id": "temperatura_equilibrio_010",
@@ -399,16 +399,16 @@
         {
           "id": "energia_interna_calore_008",
           "difficolta": "difficile",
-          "tipologia": "ragionamento",
-          "testo": "Due quantità diverse della stessa acqua sono alla stessa temperatura. Quale ha, in genere, maggiore energia interna totale?",
+          "tipologia": "calcolo",
+          "testo": "2 kg di olio con c = 2000 J/(kg·K) aumentano di 3 K. Quanto calore ricevono?",
           "alternative": [
-            "Quella di massa minore",
-            "Quella di massa maggiore",
-            "Hanno necessariamente la stessa energia interna",
-            "Quella nel contenitore più stretto"
+            "6 kJ",
+            "12 kJ",
+            "3 kJ",
+            "24 kJ"
           ],
           "corretta": "B",
-          "spiegazione": "A parità di stato e temperatura, più acqua contiene più particelle e quindi più energia interna totale."
+          "spiegazione": "\\(Q=2\\cdot2000\\cdot3=12000\\,\\mathrm{J}=12\\,\\mathrm{kJ}\\)."
         },
         {
           "id": "energia_interna_calore_009",
@@ -503,16 +503,16 @@
         {
           "id": "bilancio_termico_005",
           "difficolta": "media",
-          "tipologia": "ragionamento",
-          "testo": "In un miscuglio isolato, 100 g di liquido caldo e 300 g dello stesso liquido freddo: chi pesa di più nella media delle temperature?",
+          "tipologia": "calcolo",
+          "testo": "Mescoli 100 g di acqua a 90 °C e 300 g a 30 °C, senza perdite. T finale?",
           "alternative": [
-            "Il liquido caldo",
-            "Hanno sempre lo stesso peso",
-            "Nessuno dei due perché le masse si annullano",
-            "Il liquido freddo"
+            "40 °C",
+            "60 °C",
+            "50 °C",
+            "45 °C"
           ],
           "corretta": "D",
-          "spiegazione": "La temperatura di equilibrio è una media pesata dalle masse se il calore specifico è lo stesso."
+          "spiegazione": "\\(T_{eq}=\\frac{100\\cdot90+300\\cdot30}{400}=45\\,°\\mathrm{C}\\)."
         },
         {
           "id": "bilancio_termico_006",
@@ -545,16 +545,16 @@
         {
           "id": "bilancio_termico_008",
           "difficolta": "difficile",
-          "tipologia": "ragionamento",
-          "testo": "Una tazza fredda assorbe parte del calore del caffè. Ignorarla nel bilancio comporta…",
+          "tipologia": "calcolo",
+          "testo": "In un sistema isolato il caffè cede 900 J e il latte assorbe 600 J. Quanta energia assorbe la tazza?",
           "alternative": [
-            "un modello meno accurato",
-            "una conservazione dell'energia più rigorosa",
-            "una temperatura finale necessariamente esatta",
-            "l'annullamento del calore specifico del caffè"
+            "300 J",
+            "150 J",
+            "600 J",
+            "1500 J"
           ],
           "corretta": "A",
-          "spiegazione": "Anche la tazza scambia energia e può influire sulla temperatura di equilibrio."
+          "spiegazione": "\\(Q_{tazza}=900-600=300\\,\\mathrm{J}\\)."
         },
         {
           "id": "bilancio_termico_009",
@@ -635,16 +635,16 @@
         {
           "id": "dilatazione_termica_004",
           "difficolta": "media",
-          "tipologia": "conoscenza",
-          "testo": "La relazione \\(\\Delta V=\\beta V_0\\Delta T\\) descrive…",
+          "tipologia": "calcolo",
+          "testo": "Un liquido occupa 2 L e ha β = 0,001 K⁻¹. Per ΔT = 10 K, di quanto aumenta il volume?",
           "alternative": [
-            "la conduzione termica",
-            "la dilatazione volumica",
-            "il bilancio termico",
-            "il calore latente"
+            "0,002 L",
+            "0,02 L",
+            "0,2 L",
+            "0,01 L"
           ],
           "corretta": "B",
-          "spiegazione": "La grandezza β collega la variazione di volume alla variazione di temperatura."
+          "spiegazione": "\\(\\Delta V=\\beta V_0\\Delta T=0{,}001\\cdot2\\cdot10=0{,}02\\,\\mathrm{L}\\)."
         },
         {
           "id": "dilatazione_termica_005",
@@ -677,16 +677,16 @@
         {
           "id": "dilatazione_termica_007",
           "difficolta": "media",
-          "tipologia": "ragionamento",
-          "testo": "Scaldi con acqua calda il coperchio metallico di un barattolo: spesso si svita più facilmente perché…",
+          "tipologia": "calcolo",
+          "testo": "Un'asta di 1 m ha α = 1×10⁻⁵ K⁻¹ e si scalda di 100 K. Quanto è lunga alla fine?",
           "alternative": [
-            "il metallo perde massa",
-            "il vetro diventa sempre liquido",
-            "il tappo smette di condurre calore",
-            "il coperchio tende a dilatarsi"
+            "1,0001 m",
+            "1,01 m",
+            "1,1 m",
+            "1,001 m"
           ],
           "corretta": "D",
-          "spiegazione": "La dilatazione del coperchio metallico può allentare l’incastro."
+          "spiegazione": "\\(\\Delta L=10^{-5}\\cdot1\\cdot100=0{,}001\\,\\mathrm{m}\\), quindi \\(L_f=1{,}001\\,\\mathrm{m}\\)."
         },
         {
           "id": "dilatazione_termica_008",
@@ -927,16 +927,16 @@
         {
           "id": "passaggi_stato_004",
           "difficolta": "media",
-          "tipologia": "ragionamento",
-          "testo": "Durante l'ebollizione dell'acqua a pressione atmosferica ordinaria, le bolle di vapore si formano…",
+          "tipologia": "calcolo",
+          "testo": "Per vaporizzare 0,1 kg d'acqua già a 100 °C, con L = 2260 kJ/kg, quanto serve?",
           "alternative": [
-            "solo sulla superficie esterna",
-            "anche all'interno del liquido",
-            "esclusivamente nel recipiente vuoto",
-            "solo dopo la solidificazione"
+            "22,6 kJ",
+            "226 kJ",
+            "2260 kJ",
+            "113 kJ"
           ],
           "corretta": "B",
-          "spiegazione": "L’ebollizione interessa anche l’interno del liquido, a differenza dell’evaporazione superficiale."
+          "spiegazione": "\\(Q=mL=0{,}1\\cdot2260=226\\,\\mathrm{kJ}\\)."
         },
         {
           "id": "passaggi_stato_005",
@@ -1011,16 +1011,16 @@
         {
           "id": "passaggi_stato_010",
           "difficolta": "difficile",
-          "tipologia": "ragionamento",
-          "testo": "Il vapore invisibile tocca un vetro freddo e forma goccioline visibili. Che cosa sono le gocce?",
+          "tipologia": "calcolo",
+          "testo": "Fondi 1 kg di ghiaccio a 0 °C (Lf = 334 kJ/kg) e scaldi l'acqua a 10 °C (c = 4,2 kJ/(kg·K)). Calore totale?",
           "alternative": [
-            "Acqua liquida condensata",
-            "Vapore gassoso reso visibile",
-            "Ghiaccio sublimato",
-            "Aria trasformata in acqua"
+            "376 kJ",
+            "334 kJ",
+            "42 kJ",
+            "418 kJ"
           ],
           "corretta": "A",
-          "spiegazione": "Le gocce sono acqua liquida: il vapore acqueo gassoso, prima della condensazione, è invisibile."
+          "spiegazione": "\\(Q=1\\cdot334+1\\cdot4{,}2\\cdot10=376\\,\\mathrm{kJ}\\)."
         }
       ]
     },
@@ -1087,30 +1087,30 @@
         {
           "id": "conduzione_005",
           "difficolta": "media",
-          "tipologia": "ragionamento",
-          "testo": "Due lastre dello stesso materiale e spessore hanno aree A e 2A. A parità di ΔT, la potenza condotta dalla seconda è…",
+          "tipologia": "calcolo",
+          "testo": "Parete: λ = 2 W/(m·K), A = 1 m², ΔT = 10 K, spessore = 0,5 m. Quanto vale P?",
           "alternative": [
-            "metà",
-            "uguale",
-            "quadrupla",
-            "doppia"
+            "10 W",
+            "20 W",
+            "80 W",
+            "40 W"
           ],
           "corretta": "D",
-          "spiegazione": "Dalla legge \\(P=\\frac{\\lambda A\\Delta T}{s}\\) segue la proporzionalità diretta con l’area."
+          "spiegazione": "\\(P=\\frac{2\\cdot1\\cdot10}{0{,}5}=40\\,\\mathrm{W}\\)."
         },
         {
           "id": "conduzione_006",
           "difficolta": "media",
-          "tipologia": "ragionamento",
-          "testo": "A parità di materiale, area e ΔT, raddoppiare lo spessore di una parete fa diventare la potenza condotta…",
+          "tipologia": "calcolo",
+          "testo": "Una parete disperde 120 W. Se raddoppia solo lo spessore, quale diventa la potenza dispersa?",
           "alternative": [
-            "il doppio",
-            "la metà",
-            "quattro volte maggiore",
-            "invariata"
+            "30 W",
+            "60 W",
+            "120 W",
+            "240 W"
           ],
           "corretta": "B",
-          "spiegazione": "La potenza condotta è inversamente proporzionale allo spessore."
+          "spiegazione": "\\(P\\propto\\frac1s\\), quindi raddoppiando s si ottiene \\(120/2=60\\,\\mathrm{W}\\)."
         },
         {
           "id": "conduzione_007",
@@ -1393,16 +1393,16 @@
         {
           "id": "irraggiamento_006",
           "difficolta": "media",
-          "tipologia": "ragionamento",
-          "testo": "A parità di temperatura assoluta ed emissività, se l'area radiante raddoppia, la potenza emessa…",
+          "tipologia": "calcolo",
+          "testo": "Una superficie emette 200 W. Se raddoppia solo l'area, quanta potenza emette?",
           "alternative": [
-            "si dimezza",
-            "raddoppia",
-            "diventa quattro volte maggiore",
-            "rimane uguale"
+            "100 W",
+            "400 W",
+            "200 W",
+            "800 W"
           ],
           "corretta": "B",
-          "spiegazione": "Nella legge \\(P=\\varepsilon\\sigma A T^4\\), P è proporzionale all’area A."
+          "spiegazione": "A temperatura assoluta ed emissività costanti, \\(P\\propto A\\), quindi \\(2\\cdot200=400\\,\\mathrm{W}\\)."
         },
         {
           "id": "irraggiamento_007",
@@ -1449,7 +1449,7 @@
         {
           "id": "irraggiamento_010",
           "difficolta": "difficile",
-          "tipologia": "ragionamento",
+          "tipologia": "calcolo",
           "testo": "Un corpo emette 150 W e assorbe 200 W per radiazione. Qual è il bilancio netto per il corpo?",
           "alternative": [
             "Perde 50 W netti",
