@@ -186,7 +186,7 @@
           "tipologia": "ragionamento",
           "testo": "Perché si attende qualche istante prima di leggere un termometro a contatto?",
           "alternative": [
-            "Per lasciarlo avvicinare alla temperatura misurata",
+            "Per raggiungere l'equilibrio termico",
             "Per aumentare la massa del termometro",
             "Per impedire ogni scambio energetico",
             "Per cambiare la scala dello strumento"
@@ -234,7 +234,7 @@
             "86 °F"
           ],
           "corretta": "A",
-          "spiegazione": "\\(T_F=\\frac95\\cdot25+32=77\\,°\\mathrm{F}\\)."
+          "spiegazione": "\\(T_F=\\frac{9}{5}\\cdot25+32=77\\,°\\mathrm{F}\\)."
         },
         {
           "id": "temperatura_equilibrio_007",
@@ -276,7 +276,7 @@
             "36 °C"
           ],
           "corretta": "A",
-          "spiegazione": "\\(T_C=\\frac59(68-32)=20\\,°\\mathrm{C}\\)."
+          "spiegazione": "\\(T_C=\\frac{5}{9}(68-32)=20\\,°\\mathrm{C}\\)."
         },
         {
           "id": "temperatura_equilibrio_010",
@@ -321,7 +321,7 @@
             "energia immagazzinata in ogni corpo",
             "la temperatura di un materiale",
             "l'energia del moto macroscopico",
-            "energia trasferita per differenza di temperatura"
+            "energia scambiata a causa di una differenza di T"
           ],
           "corretta": "D",
           "spiegazione": "Il calore indica un trasferimento di energia causato da una differenza di temperatura."
@@ -599,7 +599,7 @@
             "dall'ingrandimento dei singoli atomi",
             "dalla creazione di nuove particelle",
             "dall'aumento della massa",
-            "dall'aumento delle distanze medie tra particelle"
+            "dalle distanze medie tra le particelle"
           ],
           "corretta": "D",
           "spiegazione": "Nel modello microscopico variano le distanze medie tra particelle, non le dimensioni degli atomi."
@@ -1162,7 +1162,7 @@
           "alternative": [
             "favorire grandi correnti convettive",
             "trasformare l'aria in un metallo conduttore",
-            "ridurre gli scambi termici limitando anche i moti del gas",
+            "ridurre la circolazione del gas",
             "annullare ogni forma di irraggiamento"
           ],
           "corretta": "C",
@@ -1308,7 +1308,7 @@
           "alternative": [
             "Tutte le molecole si muovono solo verso l'alto",
             "La stanza viene scaldata solo per irraggiamento",
-            "Si instaura una circolazione dovuta a differenze di densità",
+            "Si forma un ricircolo legato alla densità",
             "La massa d'aria totale aumenta continuamente"
           ],
           "corretta": "C",
