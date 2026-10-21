@@ -1,6 +1,6 @@
 # Fool — Specifiche dell’aspetto grafico
 
-Versione: **1.2.1** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
+Versione: **1.3.0** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
 
 ## 1. Scopo e stato
 
@@ -17,9 +17,10 @@ Il [regolamento](REGOLAMENTO_UFFICIALE.md) definisce il gioco; le [specifiche de
 | VIS-01 | Nome del gioco | **Fool** |
 | VIS-02 | Riferimento visivo | Un aspetto grafico ispirato a **Doom classico**, con **estetica pixel** |
 | VIS-03 | Ambito | Identità visiva del software del quiz; la presentazione HTML delle regole deve usare lo stesso nome e una veste coerente |
+| VIS-05 | Logo ufficiale | Wordmark **FOOL** approvato il 21/10/2026: quattro lettere metalliche squadrate, blu nella parte superiore, riflessi arancione/oro nella parte inferiore e bordo tridimensionale; immagine generata in questa conversazione. Da importare come `assets/fool-logo.webp` (o PNG originale, preferibile per qualità) prima di inserirla negli HTML. Non sostituire con un logo generico o con quello di Doom. | 
 | VIS-04 | Aggiornamenti successivi | Raccogliere in questo documento le caratteristiche grafiche che il responsabile elencherà |
 
-Il riferimento approvato è **Doom classico**, con estetica pixel. Questa scelta stabilisce la direzione visiva di Fool; non cambia il regolamento o le funzioni del quiz. Palette, caratteri specifici, logo, materiali, disposizione, animazioni e suoni restano da definire con le prossime indicazioni del responsabile. L’estetica pixel deve rispettare la leggibilità di testi e formule prevista nelle specifiche.
+Il riferimento approvato è **Doom classico**, con estetica pixel. Questa scelta stabilisce la direzione visiva di Fool; non cambia il regolamento o le funzioni del quiz. Palette generale, caratteri specifici, disposizione, animazioni e suoni restano da definire con le prossime indicazioni del responsabile. L’estetica pixel deve rispettare la leggibilità di testi e formule prevista nelle specifiche.
 
 ## 3. Applicazione del nome
 
@@ -45,7 +46,7 @@ Questi vincoli provengono dalle specifiche funzionali; non sono ulteriori prefer
 | Area | Stato attuale |
 | --- | --- |
 | Edizione/stile di Doom di riferimento | **Approvato: Doom classico, estetica pixel** |
-| Logo e trattamento del nome Fool | Da definire |
+| Logo e trattamento del nome Fool | **Approvato:** immagine FOOL metallica blu e oro generata il 21/10/2026; file grafico ancora da caricare nel repository |
 | Palette, contrasti e colori degli stati | Da definire |
 | Caratteri per titoli, testo, timer e punteggi | Da definire |
 | Sfondo, pannelli, bordi, texture e materiali | Da definire |
@@ -64,7 +65,13 @@ Le verifiche visive devono coprire le schermate e le dimensioni supportate, incl
 
 Le caratteristiche VIS approvate devono essere collegate alle schermate pertinenti e aggiornate quando cambia una scelta. Le aree «da definire» restano aperte per le prossime indicazioni; questa prima edizione non costituisce una proposta grafica già realizzata.
 
-## 7. Revisioni
+## 7. Logo ufficiale e istruzioni per Codex
+
+L’immagine **FOOL** creata e approvata in chat il 21/10/2026 è il **logo ufficiale** da utilizzare nella schermata iniziale del programma e nella copertina delle regole. Deve essere conservata in `assets/fool-logo.png` usando il file generato originale; se si desidera ottimizzare il peso, produrre inoltre una versione WebP senza rimuovere l’originale. Preservare proporzioni, leggibilità e colori originali. La grafica ha sfondo nero integrato: evitare riquadri chiari incompatibili. Per gli HTML autonomi offline incorporare l’immagine come data URI o equivalente nel file finale; non usare URL GitHub richiesti a runtime.
+
+**Stato asset:** approvato ma non ancora caricato: la connessione GitHub disponibile non ha trasferito il file immagine binario. Non dichiarare che il percorso è presente finché il file non è stato effettivamente aggiunto.
+
+## 8. Revisioni
 
 Percorso stabile, versione interna e cronologia Git.
 
@@ -77,3 +84,4 @@ Percorso stabile, versione interna e cronologia Git.
 | 1.1.3 | 21/10/2026 | Informazioni grafiche necessarie per la copia trasformata da Karma e il bersaglio obbligato; aspetto ancora da definire |
 | 1.2.0 | 21/10/2026 | Nome Fool e denominazione bonus; HTML esclusi dalla modifica; interazioni Aura/Karma definite |
 | 1.2.1 | 21/10/2026 | Spareggio rinominato «Battaglia finale»; meccaniche invariate |
+| 1.3.0 | 21/10/2026 | Logo FOOL metallico blu/oro approvato come identità visiva ufficiale; registrato il caricamento dell’asset ancora pendente |
