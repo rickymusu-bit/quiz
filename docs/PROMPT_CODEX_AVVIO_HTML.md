@@ -1,6 +1,6 @@
 # Fool — Template per avviare l’implementazione con Codex
 
-Versione: **1.1.1** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
+Versione: **1.2.0** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
 
 Incollare in Codex il blocco seguente, lavorando nel repository `rickymusu-bit/quiz`. I percorsi sono relativi alla radice del repository. Questo template avvia la realizzazione del programma; non è il programma già implementato.
 
@@ -121,10 +121,15 @@ Questi promemoria non sostituiscono le condizioni complete dei documenti:
   automatica con il registro elettronico.
 
 INTERFACCIA
-- Nome Fool, riferimento Doom classico, estetica pixel. Le scelte ancora
-  aperte di palette/font/logo non sono preferenze approvate: usa una veste
-  provvisoria sobria, coerente, leggibile e facilmente sostituibile; indica
-  quali scelte hai fatto. Non inventare nuovi requisiti di gioco o suoni.
+- Nome Fool, riferimento Doom classico ed estetica pixel. Il logo ufficiale
+  è il wordmark FOOL metallico blu e oro approvato il 21/10/2026, descritto
+  in docs/ASPETTO_GRAFICO.md. Usa assets/fool-logo.png dopo aver verificato
+  che il file originale sia stato caricato; non inventare un altro logo e
+  non fingere che il file esista. Mostralo nella schermata iniziale e nella
+  copertina delle regole, preservandone proporzioni e leggibilità. Incorpora
+  l’asset nei due HTML offline. In assenza del file segnala il blocco e usa
+  temporaneamente il titolo FOOL in testo, senza sostituire la scelta.
+  Palette e font ulteriori sono ancora aperti; non inventare suoni.
 - Copri tutte le schermate previste: avvio, configurazione, anteprima docente,
   turno/domanda nascosta, scelta passaggio, risposta, esito, bonus/bersagli,
   pausa/sanzioni, salvataggio/ripresa, spareggio e riepilogo finale.
@@ -172,3 +177,4 @@ VERIFICHE E RESOCONTO
 | 1.0.0 | 21/10/2026 | Prompt iniziale per il nuovo HTML autonomo, con fonti autorevoli, incrementi, requisiti offline e verifiche |
 | 1.1.0 | 21/10/2026 | Due consegne: programma e regole per la classe; vecchi HTML da archiviare con aggiornamento dei riferimenti |
 | 1.1.1 | 21/10/2026 | Spareggio rinominato «Battaglia finale»; meccaniche invariate |
+| 1.2.0 | 21/10/2026 | Inserito logo FOOL ufficiale, con asset esterno in attesa del caricamento e istruzioni offline |
