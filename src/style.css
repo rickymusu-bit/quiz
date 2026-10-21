@@ -216,6 +216,7 @@ dialog .columns { margin: 1rem 0; }
   .slides-nav #previous { grid-column: 1; grid-row: 2; }
   .slides-nav #index-button { grid-column: 2; grid-row: 2; }
   .slides-nav #next { grid-column: 3; grid-row: 2; }
+  .slides-nav #home-button { grid-column: 1 / -1; grid-row: 4; }
   .slides-nav #counter { grid-column: 1 / -1; grid-row: 3; text-align: center; }
   .slides-nav button { padding-inline: .4rem; font-size: .85rem; }
   .index-grid { grid-template-columns: 1fr; }

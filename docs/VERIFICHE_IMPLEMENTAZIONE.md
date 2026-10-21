@@ -1,5 +1,10 @@
 # Fool — implementazione e verifiche
 
+## Correzione navigazione — interfaccia 1.2.1
+
+Eliminata la schermata iniziale interna duplicata. «Torna alla schermata iniziale», anche dopo un errore di caricamento, naviga alla home ufficiale della cartella del sito. Aprire o ricaricare `Fool.html` mostra la configurazione e l'eventuale ripresa della partita salvata; non viene creata una schermata iniziale alternativa. Una nuova partita dal riepilogo torna alla configurazione. Anche le regole hanno un pulsante esplicito «Torna alla schermata iniziale», in tutte le sezioni. Il salvataggio resta invariato. `tests/navigation.py` verifica il percorso reale sotto prefisso di cartella su mobile e desktop.
+
+
 ## Aggiornamento: logo ufficiale, Doom 1993 e responsività, interfaccia 1.2.0
 
 La home presenta il logo JPEG originale del responsabile, il sottotitolo esatto «Solo uno sciocco pensa di vincere» e due azioni sovrapposte, Start e Regole. Start entra direttamente nella configurazione. Sfondo pixel con cielo rosso/pietra generato dal riferimento, senza la scritta originaria; carattere VT323 ospitato sul sito con licenza OFL. Logo e stessa identità anche nelle pagine interne.

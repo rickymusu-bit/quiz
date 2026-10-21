@@ -1,6 +1,6 @@
 # Fool
 
-Quiz online di Riccardo Musumarra. **Interfaccia 1.2.0**, regolamento **18.0.1**.
+Quiz online di Riccardo Musumarra. **Interfaccia 1.2.1**, regolamento **18.0.1**.
 
 Apri **https://rickymusu-bit.github.io/quiz/** e scegli **Start** o **Regole**. Non sono previsti download, installazioni o selettori di file.
 
@@ -21,6 +21,8 @@ Alla campanella una domanda già svelata deve essere conclusa; solo dopo l'esito
 La nuova richiesta del responsabile di offrire il quiz solo online sostituisce i precedenti requisiti di distribuzione offline e scambio di file. Il motore e il formato di salvataggio restano compatibili con 1.0.0: le partite già conservate nello stesso browser vengono riprese senza modificare le regole.
 
 ## Logo e interfaccia responsive
+
+La sola home è `https://rickymusu-bit.github.io/quiz/`: «Torna alla schermata iniziale» e il logo riportano a questo indirizzo. `Fool.html` apre direttamente la configurazione, senza una schermata iniziale alternativa.
 
 La home usa il logo ufficiale fornito dal responsabile, il sottotitolo **Solo uno sciocco pensa di vincere** e due soli pulsanti sovrapposti: **Start** e **Regole**. Lo sfondo riprende cielo rosso e pavimento di pietra del riferimento, nell'estetica di Doom del 1993. Immagini e caratteri sono serviti dal sito stesso; provenienza e licenze sono in [assets/README.md](assets/README.md).
 

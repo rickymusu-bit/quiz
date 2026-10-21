@@ -49,7 +49,7 @@ with sync_playwright() as p:
  # A failed catalog request has a useful retry path; no stale or partial bank starts.
  page.unroute('**/Dataset_termologia_100_domande_v1_20261021.json')
  page.route('**/datasets.json',lambda route:route.fulfill(status=503,body='Unavailable'))
- page.goto(base+'Fool.html');page.get_by_role('button',name='Nuova partita',exact=True).click()
+ page.goto(base+'Fool.html')
  expect(page.get_by_role('heading',name='Domande non disponibili')).to_be_visible()
  assert page.get_by_role('button',name='Prepara anteprima').count()==0
  page.unroute('**/datasets.json');page.get_by_role('button',name='Riprova',exact=True).click()

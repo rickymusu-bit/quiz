@@ -13,7 +13,7 @@ with sync_playwright() as p:
     errors=[];requests=[]
     page.on('pageerror',lambda e:errors.append(str(e)))
     page.on('request',lambda r:requests.append(r.url) if r.url.startswith('http') and not r.url.startswith(base) else None)
-    page.goto(base+'Fool.html');page.get_by_role('button',name='Nuova partita',exact=True).click()
+    page.goto(base+'Fool.html')
     page.wait_for_function('bank && document.getElementById("quotas")')
     assert page.locator('input[type=file],a[download]').count()==0
     page.get_by_role('button',name='Prepara anteprima').click()

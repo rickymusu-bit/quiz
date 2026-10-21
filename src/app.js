@@ -1,6 +1,6 @@
 'use strict';
 const F=Fool,$=id=>document.getElementById(id),main=$('main');
-let bank=null,prepared=null,game=null,previewIndex=0,ui='cover',fitting=false,fitBlocked=false,messageTimer,inventoryCanResume=false,catalog=null,selectedBankId=null,configurationLoad=0;
+let bank=null,prepared=null,game=null,previewIndex=0,ui='config',fitting=false,fitBlocked=false,messageTimer,inventoryCanResume=false,catalog=null,selectedBankId=null,configurationLoad=0;
 const node=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n};
 function btn(text,fn,cls='',disabled=false){const b=node('button',text,cls);b.type='button';b.disabled=disabled;b.onclick=()=>act(fn);return b}
 function act(fn){try{const result=fn();if(result&&typeof result.catch==='function')result.catch(e=>message(e.message))}catch(e){message(e.message)}}
@@ -26,15 +26,14 @@ function persist(){if(!game)return;try{localStorage.setItem('fool-v1',JSON.strin
 function changed(){persist();renderGame()}
 function command(fn){return()=>{fn();changed()}}
 function localSave(){try{return localStorage.getItem('fool-v1')}catch(e){return null}}
-function officialLogo(){const h=node('h1'),img=node('img',undefined,'cover-logo');img.src='assets/fool-logo.jpg';img.alt='Fool';img.width=1280;img.height=427;h.append(img);return h}
 function offerResume(parent){if(localSave())parent.append(btn('Riprendi partita',()=>restoreGame(localSave())))}
-function cover(){ui='cover';main.className='';main.replaceChildren();const section=node('section',undefined,'cover stack');section.append(node('div','Un quiz, tre gruppi, una battaglia.','eyebrow'),officialLogo(),node('p','Solo uno sciocco pensa di vincere','subtitle'));const row=node('div',undefined,'row');row.append(btn('Nuova partita',configure,'primary'));if(localSave())row.append(btn('Riprendi partita',()=>restoreGame(localSave())));section.append(row,node('p','Gioca direttamente sul sito: le domande sono già disponibili. La partita si salva automaticamente e si riprende dallo stesso browser.','help'),node('p','Il tabellone si adatta allo schermo. Su mobile puoi espandere i dettagli dei gruppi e scorrere la pagina.','muted'));const a=node('a','Leggi le regole della classe','button');a.href='Fool_regole.html';section.append(a);main.append(section)}
+function goHome(){persist();configurationLoad++;location.assign(new URL('./',location.href).href)}
 async function configure(){
  const request=++configurationLoad;ui='config';game=null;main.className='';main.replaceChildren();offerResume(heading('Prepara Fool','Caricamento delle domande dal sito…'));
  try{const available=await loadCatalog();if(request!==configurationLoad||ui!=='config')return;catalog=available;const entry=catalog.find(x=>x.id===selectedBankId)||catalog[0];selectedBankId=entry.id;
  if(!bank||bank.source!==entry.id){const loaded=await loadBank(entry);if(request!==configurationLoad||ui!=='config')return;bank=loaded;}
  renderConfiguration();
- }catch(e){if(request!==configurationLoad||ui!=='config')return;main.replaceChildren();const p=heading('Domande non disponibili',e.message);p.append(btn('Riprova',configure,'primary'),btn('Torna alla copertina',cover));}
+ }catch(e){if(request!==configurationLoad||ui!=='config')return;main.replaceChildren();const p=heading('Domande non disponibili',e.message);p.append(btn('Riprova',configure,'primary'),btn('Torna alla schermata iniziale',goHome));}
 }
 function renderConfiguration(){main.replaceChildren();const p=heading('Prepara Fool','Configurazione e anteprima contengono soluzioni: usarle prima di proiettare alla classe.');offerResume(p);
  const choice=select('Banca domande','bank-choice',catalog.map(x=>[x.id,x.nome]),selectedBankId);choice.querySelector('select').onchange=()=>act(async()=>{selectedBankId=$('bank-choice').value;bank=null;prepared=null;await configure()});p.append(choice,node('p',bank.bank.length+' domande pronte: non occorre caricare file.','muted'));
@@ -42,7 +41,7 @@ function renderConfiguration(){main.replaceChildren();const p=heading('Prepara F
  const settings=node('section',undefined,'panel');settings.append(node('h3','Tempo e bonus'),input('Secondi per domanda','seconds',prepared?.config.seconds??45,'number'),input('Probabilità bonus (%)','probability',prepared?.config.probability??90,'number'),select('Difficoltà','difficulty',[['misto','Misto'],['facile','Facile'],['media','Media'],['difficile','Difficile']],prepared?.config.difficulty??'misto'));grid.append(settings);
  const bases=node('section',undefined,'panel');bases.append(node('h3','Punti base'));for(const [d,v]of Object.entries({facile:100,media:200,difficile:300}))bases.append(input(d,'base-'+d,prepared?.config.bases[d]??v,'number'));grid.append(bases);p.append(grid);
  const topics=node('section',undefined,'panel');topics.id='topics';p.append(topics);if(bank){topics.append(node('h3',bank.title),node('p','Seleziona le quote: totale 33. La riserva serve per sostituzioni e Battaglia finale.','muted'));const list=node('div');list.id='quotas';topics.append(list);$('difficulty').onchange=()=>rebalance(true);rebalance(true);topics.append(btn('Ribilancia quote',()=>rebalance(true)));}else topics.append(node('p','Le domande vengono caricate dal sito.'));
- const row=node('div',undefined,'row');row.append(btn('Prepara anteprima',()=>{const c=readConfig();prepared=F.prepare(bank.bank,c);previewIndex=0;preview()},'primary',!bank),btn('Torna alla copertina',cover));p.append(row)}
+ const row=node('div',undefined,'row');row.append(btn('Prepara anteprima',()=>{const c=readConfig();prepared=F.prepare(bank.bank,c);previewIndex=0;preview()},'primary',!bank),btn('Torna alla schermata iniziale',goHome));p.append(row)}
 function rebalance(reset){const list=$('quotas');if(!bank||!list)return;const filter=$('difficulty').value;const topics=[...new Map(bank.bank.map(q=>[q.topic,q.topicName]))];const counts=topics.map(([t])=>bank.bank.filter(q=>q.topic===t&&(filter==='misto'||q.difficulty===filter)).length);let quotas=topics.map(()=>0),remaining=33;while(remaining&&quotas.some((n,i)=>n<counts[i]))for(let i=0;i<quotas.length&&remaining;i++)if(quotas[i]<counts[i]){quotas[i]++;remaining--}list.replaceChildren();topics.forEach(([t,name],i)=>{const l=input(name+' ('+counts[i]+' disponibili)','quota-'+i,quotas[i],'number');l.querySelector('input').dataset.topic=t;list.append(l)});}
 function number(id){const x=$(id).value.trim();if(x==='')throw Error('Compilare '+id);const n=Number(x);if(!Number.isFinite(n))throw Error('Valore numerico non valido: '+id);return n}
 function readConfig(){return {names:[0,1,2].map(i=>$('name'+i).value),seconds:number('seconds'),probability:number('probability'),difficulty:$('difficulty').value,bases:Object.fromEntries(['facile','media','difficile'].map(d=>[d,number('base-'+d)])),quotas:Object.fromEntries([...$('quotas').querySelectorAll('input')].map(i=>[i.dataset.topic,number(i.id)]))}}
@@ -67,7 +66,7 @@ function scoreboard(){
 }
 function gameBody(){const s=game.s,revision=s.revision,b=node('section',undefined,'operation-body'+(s.screen==='hidden'?' hidden-question':''));
  if(s.suspended){b.append(node('h2','Partita sospesa'),node('p','Riprenderete con le stesse squadre e lo stesso stato. Il timer resta fermo.'),btn('Riprendi la sessione',command(()=>game.continueSession()),'primary'));return b}
- if(s.phase==='conclusa'){b.append(node('h2',s.winner===null?'Tutti eliminati':s.groups[s.winner].name+' vince Fool!'),node('p',s.winner===null?'Nessun premio finale.':'Un 10 blu sul registro per ogni membro del gruppo vincitore.','question'),node('p','Il 10 blu fa media con compiti a casa e progetti. Queste valutazioni contribuiscono al voto verde di fine anno. La registrazione resta al docente.','help'),btn('Nuova partita',cover));return b}
+ if(s.phase==='conclusa'){b.append(node('h2',s.winner===null?'Tutti eliminati':s.groups[s.winner].name+' vince Fool!'),node('p',s.winner===null?'Nessun premio finale.':'Un 10 blu sul registro per ogni membro del gruppo vincitore.','question'),node('p','Il 10 blu fa media con compiti a casa e progetti. Queste valutazioni contribuiscono al voto verde di fine anno. La registrazione resta al docente.','help'),btn('Nuova partita',configure));return b}
  if(s.screen==='supply'){b.append(node('h2','Riserva esaurita'),node('p','La partita resta salvata. Controlla se sono state aggiunte nuove domande sul sito: punti e turni restano invariati.'),btn('Cerca nuove domande',refreshSupply,'primary'));return b}
  if(s.screen==='hidden'){b.append(node('div',s.phase==='spareggio'?'Battaglia finale':'Domanda '+(s.valid+1)+' di 33','eyebrow'),node('h2','Tocca a '+s.groups[s.respondent].name),node('p','Domanda nascosta · '+s.current.topicName+' · '+s.current.difficulty),node('p',s.usedBonus?'Bonus del turno già usato':'Puoi usare un solo bonus in questo turno.','muted'),btn('Svela e avvia il tempo',command(()=>{assertFits(s.current);game.reveal(revision)}),'primary'));return b}
  if(s.current){b.append(text('div',s.current.body,'question'));const answers=node('div',undefined,'answers');s.current.options.forEach((a,i)=>{const ab=btn('',command(()=>game.answer(i,revision)),'answer'+(s.result&&i===s.current.correct?' correct':''),s.screen!=='answer'||s.paused||!!s.panel||fitBlocked);ab.append(node('span','ABCD'[i],'letter'),text('span',a));answers.append(ab)});b.append(answers)}
@@ -129,4 +128,5 @@ window.addEventListener('resize',()=>{if(ui==='game')requestAnimationFrame(check
 window.addEventListener('beforeunload',persist);
 setInterval(()=>{if(!game||ui!=='game')return;const old=game.s.screen;game.tick();if(old!==game.s.screen){changed();return}if($('timer'))$('timer').textContent=timerText()},100);
 setInterval(persist,3000);
-if(new URL(location.href).searchParams.get('start')==='1'){history.replaceState(null,'',location.pathname);act(configure)}else cover();
+if(new URL(location.href).searchParams.get('start')==='1')history.replaceState(null,'',location.pathname);
+act(configure);
