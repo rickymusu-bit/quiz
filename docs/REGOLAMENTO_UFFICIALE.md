@@ -1,12 +1,12 @@
 # Chi vuol essere rimandato — Regolamento ufficiale
 
-Versione: **3.0.0** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
+Versione: **4.0.0** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
 
 ## 1. Autorità e ambito
 
 Questo documento è la fonte normativa delle regole del gioco. Il programma e la presentazione HTML devono applicarlo e rappresentarlo fedelmente. Le [specifiche del programma](SPECIFICHE_PROGRAMMA.md) traducono queste regole in requisiti verificabili, senza modificarle.
 
-La versione 3.0.0 recepisce le decisioni del 21/10/2026: 33 domande ordinarie, sospensione alla campanella, spareggio a eliminazione, timer unico e premio fisso. Il programma HTML v3 e la presentazione v9 devono ancora essere adeguati. Le questioni non definite sono elencate in fondo: il comportamento esistente del codice non costituisce da solo una nuova regola.
+La versione 4.0.0 recepisce anche la pausa del timer per richiami, il sorteggio dell’ordine dello spareggio, l’eliminazione per tempo scaduto nello spareggio e la conclusione della domanda già svelata dopo la campanella. Il programma HTML v3 e la presentazione v9 devono ancora essere adeguati. Le questioni non definite sono elencate in fondo: il comportamento esistente del codice non costituisce da solo una nuova regola.
 
 Gli identificativi `REG-xx` restano stabili nelle revisioni, per collegare regole, requisiti e verifiche.
 
@@ -46,11 +46,12 @@ Gli identificativi `REG-xx` restano stabili nelle revisioni, per collegare regol
 
 ## 6. Conclusione e riconoscimento
 
-- **REG-20 — Fine della fase ordinaria e campanella.** La fase ordinaria termina dopo le **33 domande**, non alla fine del modulo o della lezione. Se suona la campanella prima di aver concluso la partita, si sospende e si riprende la volta successiva **con le stesse squadre**, conservando punteggi e stato di avanzamento. La campanella non determina un vincitore né l'assegnazione del premio. La sospensione vale anche se è in corso lo spareggio.
+- **REG-20 — Fine della fase ordinaria e campanella.** La fase ordinaria termina dopo le **33 domande**, non alla fine del modulo o della lezione. Se suona la campanella prima di aver concluso la partita, si sospende e si riprende la volta successiva **con le stesse squadre**, conservando punteggi e stato di avanzamento. **Se una domanda è già stata svelata, si deve rispondere a quella domanda anche dopo la campanella**, entro il tempo disponibile: prima si conclude la domanda con risposta o scadenza e se ne registra l’esito, poi si sospende prima di svelare la successiva. La campanella non ferma né rinnova il timer della domanda in corso. Se quell’esito conclude la partita, si registra il vincitore invece di sospendere una partita già terminata. La campanella non determina un vincitore né l'assegnazione del premio. La sospensione vale anche se è in corso lo spareggio.
 - **REG-21 — Vittoria e premio fisso.** Dopo le 33 domande vince il gruppo con più punti. Se più gruppi sono a pari merito al primo posto, si applica REG-23. Ai membri del gruppo vincitore viene assegnato **un 10 blu sul registro**, indipendentemente dal punteggio ottenuto: vincere con 7, 10 o 12 punti dà lo stesso premio. Non è necessario raggiungere una soglia e il voto non coincide con il punteggio.
 - **REG-22 — Valutazione e registro.** Il 10 blu fa media con le altre attività valutate al di fuori delle verifiche, come **compiti a casa e progetti**. L'insieme di queste valutazioni viene tramutato in **un voto verde alla fine dell'anno scolastico**. Il 10 del quiz è quindi uno dei contributi a quella valutazione, non si trasforma da solo in un 10 verde. Il programma segnala il vincitore e il premio; registrazione del 10, media e attribuzione del voto verde restano al professore. Non sono stabiliti qui pesi o arrotondamenti della media.
-- **REG-23 — «Chi vuol essere eliminato».** In caso di parità al primo posto, partecipano allo spareggio solo i gruppi a pari merito. Si aggiungono domande extra, a cui i gruppi rispondono **a turno**. Il gruppo che sbaglia viene eliminato dallo spareggio. Si continua fino a quando rimane **un solo gruppo**, che vince la partita e il premio. Questa fase si chiama **«Chi vuol essere eliminato»**. La logica della fase ordinaria che consente di tenere o passare la domanda non si applica: qui si risponde a turno. I dettagli ancora da stabilire sono indicati in DEC-10 e DEC-11.
+- **REG-23 — «Chi vuol essere eliminato».** In caso di parità al primo posto, partecipano allo spareggio solo i gruppi a pari merito. Si aggiungono domande extra, a cui i gruppi rispondono **a turno**. L’ordine iniziale dei turni viene **sorteggiato fra i soli gruppi ammessi allo spareggio** e rimane la rotazione di riferimento, saltando i gruppi eliminati. Il gruppo che **sbaglia o lascia scadere il tempo senza rispondere viene eliminato** dallo spareggio. Si continua fino a quando rimane **un solo gruppo**, che vince la partita e il premio. Questa fase si chiama **«Chi vuol essere eliminato»**. La logica della fase ordinaria che consente di tenere o passare la domanda non si applica: qui si risponde a turno. Il tempo scaduto elimina soltanto nello spareggio: nella fase ordinaria resta valido REG-09. I casi disciplinari e i rifiuti nello spareggio ancora da stabilire sono indicati in DEC-11.
 
+- **REG-24 — Pausa per richiami.** Il professore può mettere in pausa il timer per fare richiami o gestire un’interruzione. Durante la pausa il tempo residuo resta fermo e non si acquisiscono risposte. Il professore riprende la domanda con il tempo residuo, senza far ripartire i 45 secondi da zero. La pausa non modifica punteggi, titolare o turno e si può usare anche nello spareggio. È distinta dalla sospensione della partita fra lezioni.
 
 ## 7. Questioni aperte: non sono nuove regole
 
@@ -63,13 +64,13 @@ Questi punti richiedono una decisione esplicita del responsabile prima di cambia
 | DEC-03 | Formalizzare gli effetti del rifiuto: punti, titolare, serie, consumo della domanda o sostituzione | Nessun punto; stesso titolare salvo turni da saltare; consuma una delle domande estratte, senza sostituzione |
 | DEC-04 | Formalizzare il cumulo dei turni saltati e il salto quando l'occasione deriva da un passaggio volontario | Ogni sanzione pertinente aggiunge un salto; consuma i salti anche sui passaggi volontari, procedendo nella rotazione |
 | DEC-05 | Una sanzione con salto al gruppo che sta già rispondendo interrompe il turno corrente o riguarda il successivo? | Durante la risposta non interrompe; nella schermata prima dello svelamento applica subito il salto |
-| DEC-06 | Durante una sanzione disciplinare si sospende il timer? | Il dialogo sanzioni non sospende il timer |
+| DEC-06 | Risolta per la pausa manuale durante i richiami; resta da decidere se aprire il dialogo sanzioni debba sospendere automaticamente | REG-24: il docente dispone di Pausa/Riprendi; non è prescritto l’avvio automatico della pausa quando apre una sanzione |
 | DEC-07 | Risolta: parità al primo posto | Si applica REG-23: spareggio «Chi vuol essere eliminato»; da implementare |
 | DEC-08 | Risolta: premio e punteggio | REG-21/22: 10 blu fisso al gruppo vincitore, a prescindere dai punti; sostituisce il voto facoltativo pari al punteggio |
 | DEC-09 | Risolta: timer | REG-03: unico periodo di 45 secondi, risposta consentita dall'inizio |
-| DEC-10 | Quale gruppo inizia lo spareggio e in quale ordine si procede? | Da decidere; l'ordine influisce sulle possibilità di vittoria nello spareggio a eliminazione immediata |
-| DEC-11 | Nello spareggio il tempo scaduto elimina come una risposta sbagliata? Come si applicano sanzioni, salti del turno e rifiuti? | Da decidere prima di implementare quei casi; non estendere automaticamente l'eliminazione a eventi diversi dall'errore |
-| DEC-12 | Se la campanella suona durante una domanda già svelata, si riprende dal tempo residuo o si usa una domanda sostitutiva? | La sospensione è stabilita; il trattamento della domanda svelata resta da decidere, considerando il tempo aggiuntivo di riflessione tra lezioni |
+| DEC-10 | Risolta: ordine iniziale dello spareggio | Sorteggio tra le squadre ammesse; rotazione conservata saltando gli eliminati (REG-23) |
+| DEC-11 | Risolta l’eliminazione per scadenza nello spareggio; restano da precisare sanzioni, salti del turno e rifiuti nello spareggio | REG-23: errore o tempo scaduto eliminano; le altre casistiche non devono introdurre eliminazioni implicite |
+| DEC-12 | Risolta: domanda già svelata alla campanella | Si conclude prima di sospendere; nessun rinvio della risposta alla lezione successiva, nessuna sostituzione dovuta alla sola campanella (REG-20) |
 
 
 ## 8. Revisioni
@@ -83,3 +84,4 @@ I nomi dei documenti restano stabili per non rompere i collegamenti. La versione
 | 1.0.0 | 21/10/2026 | Consolidamento iniziale del regolamento HTML v9, gerarchia delle fonti e questioni aperte |
 | 2.0.0 | 21/10/2026 | Errore e scadenza senza penalità; 45 secondi predefiniti (15+30); vittoria per punteggio finale e possibilità del voto blu pari al punteggio; nuovi casi aperti |
 | 3.0.0 | 21/10/2026 | 33 domande e ripresa alla lezione successiva; squadre equilibrate a cura del docente; spareggio a eliminazione; timer unico; 10 blu fisso e contributo alla valutazione verde di fine anno |
+| 4.0.0 | 21/10/2026 | Pausa manuale per richiami; ordine casuale dello spareggio; scadenza eliminatoria nello spareggio; domanda svelata conclusa anche dopo la campanella |

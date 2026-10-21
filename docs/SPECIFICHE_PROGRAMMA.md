@@ -1,8 +1,8 @@
 # Chi vuol essere rimandato — Specifiche del programma
 
-Versione: **3.0.0** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
+Versione: **4.0.0** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
 
-Regolamento di riferimento: [REGOLAMENTO_UFFICIALE.md, v3.0.0](REGOLAMENTO_UFFICIALE.md).
+Regolamento di riferimento: [REGOLAMENTO_UFFICIALE.md, v4.0.0](REGOLAMENTO_UFFICIALE.md).
 
 ## 1. Scopo e gerarchia
 
@@ -10,7 +10,7 @@ Questo documento raccoglie le specifiche funzionali, i vincoli tecnici e i crite
 
 L'analisi iniziale è stata eseguita sul commit `4b7f285cfc4bec5507bed559ada3efa479b29e95`, leggendo il programma `Chi_vuol_essere_rimandato_quiz_v3_20261008.html`, il regolamento HTML v9, il template e il prompt dataset v1. È una verifica del sorgente, non una certificazione funzionale in browser.
 
-Stati dei requisiti: **presente** = riscontrato nel sorgente; **da implementare** = requisito per una futura modifica; **da decidere** = dipende da una questione DEC del regolamento. Le presenti modifiche sono documentali e non aggiornano gli HTML. **Il programma v3 e la presentazione v9 non sono conformi al regolamento 3.0.0**: vanno adeguati errore/scadenza, timer, conclusione, sospensione/ripresa, spareggio e premio finale. La lettura del sorgente non equivale a una verifica in browser.
+Stati dei requisiti: **presente** = riscontrato nel sorgente; **da implementare** = requisito per una futura modifica; **da decidere** = dipende da una questione DEC del regolamento. Le presenti modifiche sono documentali e non aggiornano gli HTML. **Il programma v3 e la presentazione v9 non sono conformi al regolamento 4.0.0**: vanno adeguati errore/scadenza, timer, conclusione, sospensione/ripresa, spareggio, premio finale, pausa manuale e disposizione della schermata in altezza. La lettura del sorgente non equivale a una verifica in browser.
 
 ## 2. Utenti e distribuzione
 
@@ -68,16 +68,19 @@ Non si confondono le 100 domande per argomento della banca con le 33 estratte pe
 | Domanda nascosta | Passa | Testo ancora nascosto; cambia titolare, applica eventuali salti |
 | Domanda nascosta | Svela | Mostra domanda e alternative; avvia timer, salvo passaggio obbligatorio |
 | Risposta a tempo | Seleziona alternativa prima della scadenza | Un solo esito; +1 se corretta, 0 se errata; blocco delle alternative (da adeguare) |
-| Risposta a tempo | Scadenza | Un solo esito a 0 punti, anche se la scheda era in background (da adeguare) |
+| Risposta ordinaria a tempo | Scadenza | Un solo esito a 0 punti, anche se la scheda era in background (da adeguare) |
+| Risposta ordinaria o spareggio | Pausa | Memorizza il residuo effettivo, ferma timer, disabilita risposte; mostra stato in pausa |
+| Pausa manuale | Riprendi | Riprende il tempo residuo e riabilita le risposte, senza azzerare il timer |
 | Risposta a tempo | Chiedi rifiuto | Pausa del timer e decisione docente |
 | Valutazione rifiuto | Annulla / nega | Riprende il tempo residuo senza ripartire da zero |
 | Valutazione rifiuto | Accetta | Scarta la domanda; passa alla successiva secondo DEC-03 |
 | Esito | Prossima | Avanza una volta; conserva titolare dopo corretta o ruota dopo errore/scadenza |
-| Fase ordinaria o spareggio | Sospendi alla campanella | Arresto del timer, salvataggio della partita e stato sospeso; nessun vincitore o premio |
-| Partita sospesa | Riprendi | Stesse squadre, punteggi e stato di gioco; nessuna nuova estrazione o nuovo sorteggio; domanda già svelata secondo DEC-12 |
+| Domanda ancora nascosta o esito già registrato | Sospendi alla campanella | Salvataggio e sospensione prima dello svelamento successivo; nessun premio anticipato |
+| Domanda già svelata, anche in pausa o in revisione rifiuto | Richiedi sospensione alla campanella | Segna sospensione in attesa: non archivia la domanda come sospesa fra lezioni; conclude risposta/scadenza o decisione rifiuto e registra esito prima di sospendere |
+| Partita sospesa fra lezioni | Riprendi | Stesse squadre, punteggi e stato di gioco; riparte prima della prossima domanda nascosta; nessuna nuova estrazione o nuovo sorteggio |
 | Domanda ordinaria 33 conclusa (rifiuti secondo DEC-03) | Concludi fase ordinaria | Massimo unico: vincitore e riepilogo; massimo condiviso: spareggio fra i soli gruppi a pari merito |
 | Spareggio, domanda extra | Risposta corretta | Gruppo ancora in gioco; turno al successivo partecipante attivo |
-| Spareggio, domanda extra | Risposta sbagliata | Elimina il gruppo; se rimane un solo gruppo, dichiara il vincitore; altrimenti prosegui a turno |
+| Spareggio, domanda extra | Risposta sbagliata o tempo scaduto | Elimina il gruppo; se rimane un solo gruppo, dichiara il vincitore; altrimenti prosegui a turno |
 | Riepilogo | Nuova partita | Configurazione; i dati della partita successiva vengono azzerati all'avvio |
 
 **SPEC-17 — Integrità delle transizioni (presente, da verificare con scenari).** Nessuna risposta doppia, punteggio doppio o avanzamento doppio. La gestione dell’esito ordinario e dell’eliminazione nello spareggio deve essere distinta. Un clic alla scadenza o dopo la scadenza equivale a tempo scaduto; il riferimento è la scadenza temporale effettiva, non il numero arrotondato mostrato dal timer.
@@ -100,11 +103,20 @@ Il registro eventi attuale conserva al massimo otto messaggi in memoria e ne mos
 
 **SPEC-30 — Sospensione e ripresa (da implementare; REG-20).** Sostituire la conclusione «fine modulo» con una sospensione. Conservare versione del regolamento e formato del salvataggio, identificativo della partita, composizione delle squadre (nomi e membri ove registrati), ordine di rotazione, titolare, punteggi, serie, salti, indice e stato della domanda, contatori di risposte/rifiuti, tempo residuo e impostazioni. Salvare anche domande estratte, ordine delle alternative e risposte corrette, banca o riserva necessaria, ID già utilizzati e, nello spareggio, partecipanti, eliminati e ordine dei turni. Nessuna assegnazione del premio alla campanella. Non richiedere nominativi degli studenti per il solo funzionamento: il docente può garantire la stessa composizione usando i nomi delle squadre.
 
-Il salvataggio deve sopravvivere alla chiusura del browser e consentire esportazione/importazione di un file locale versionato; l'autosalvataggio locale è complementare, non l'unico mezzo di ripresa. Validare integralmente un salvataggio prima di sostituire la partita attiva; un file non valido o incompatibile deve lasciare intatta la partita. Riprendere con timer fermo fino al comando del docente, senza applicare come tempo trascorso l'intervallo fra le lezioni. La domanda già svelata segue DEC-12. Il file di partita contiene soluzioni ed è destinato al docente.
+Il salvataggio deve sopravvivere alla chiusura del browser e consentire esportazione/importazione di un file locale versionato; l'autosalvataggio locale è complementare, non l'unico mezzo di ripresa. Validare integralmente un salvataggio prima di sostituire la partita attiva; un file non valido o incompatibile deve lasciare intatta la partita. Riprendere con timer fermo fino al comando del docente, senza applicare come tempo trascorso l'intervallo fra le lezioni. Per la sospensione dovuta alla campanella, una domanda già svelata va conclusa nella lezione in corso (REG-20): usare un flag «sospendi dopo questa domanda», impedire lo svelamento successivo e salvare dopo aver registrato l’esito. Se quell’esito determina il vincitore, mostrare il riepilogo definitivo. Se la domanda 33 produce un pareggio, salvare lo spareggio ancora da iniziare senza svelare una domanda extra. Un eventuale salvataggio tecnico di emergenza non deve essere presentato come il normale rinvio di una domanda già svelata alla campanella. Il file di partita contiene soluzioni ed è destinato al docente.
 
-**SPEC-31 — «Chi vuol essere eliminato» (da implementare; REG-23).** Attivare una fase distinta alla parità al primo posto dopo le 33 domande. Ammettere soltanto i gruppi con il punteggio massimo; usare domande extra e mostrare turno e gruppi ancora in gioco. Ogni risposta corretta fa avanzare al successivo gruppo attivo; ogni risposta sbagliata elimina il gruppo. Quando ne resta uno, termina lo spareggio e assegna a quel gruppo il premio fisso. Conservare separati punteggi ordinari ed eliminazioni; niente passaggio volontario o mantenimento della domanda dopo una risposta corretta. Ordine iniziale e casi particolari seguono DEC-10/11, senza decisioni implicite nel codice.
+**SPEC-31 — «Chi vuol essere eliminato» (da implementare; REG-23).** Attivare una fase distinta alla parità al primo posto dopo le 33 domande. Ammettere soltanto i gruppi con il punteggio massimo; usare domande extra e mostrare turno e gruppi ancora in gioco. Ogni risposta corretta fa avanzare al successivo gruppo attivo; ogni risposta sbagliata o scadenza del tempo elimina il gruppo. Quando ne resta uno, termina lo spareggio e assegna a quel gruppo il premio fisso. Conservare separati punteggi ordinari ed eliminazioni; niente passaggio volontario o mantenimento della domanda dopo una risposta corretta. All’ingresso nello spareggio sorteggiare una permutazione dei soli gruppi ammessi, mostrarla al docente e usarla come rotazione, saltando gli eliminati. Conservare il sorteggio nel salvataggio e non ripeterlo a ogni giro o alla ripresa. Le sole casistiche disciplinari e di rifiuto ancora aperte seguono DEC-11.
 
 Usare domande extra non già svelate e compatibili con gli argomenti selezionati. Poiché il numero di extra non è limitabile a priori (tutti possono continuare a rispondere bene), prevedere un rifornimento validato della riserva senza azzerare lo spareggio. Se le domande finiscono, sospendere e chiedere al docente altre domande: non ripetere silenziosamente quesiti e non dichiarare un vincitore per esaurimento della banca.
+
+
+**SPEC-32 — Pulsante Pausa/Riprendi (da implementare; REG-24).** Comando del docente sempre raggiungibile durante una domanda ordinaria o extra. Alla pressione, verificare prima la scadenza effettiva: se il tempo è già scaduto, applicare l’esito della fase e non consentire di recuperare tempo tramite la pausa. Altrimenti memorizzare il residuo con precisione, fermare i tick e passare allo stato di pausa. Mostrare «In pausa» e il pulsante «Riprendi», disabilitare le alternative e l’avanzamento; nessun esito o variazione di punteggio per il solo trascorrere del tempo in pausa. Alla ripresa ricostruire la scadenza dal residuo, mantenendo domanda, ordine alternative, titolare e fase. Ripetuti clic non devono creare più timer. Lo stato resta fermo anche se si cambia scheda o si apre/chiude un dialogo; chiudere un dialogo non deve annullare una pausa manuale. I comandi sanzione restano utilizzabili durante la pausa. Non introdurre una pausa automatica all’apertura del dialogo sanzioni senza una decisione separata (DEC-06).
+
+**SPEC-33 — Schermata di gioco interamente nel viewport (da implementare).** Nelle schermate operative di domanda nascosta, risposta, pausa ed esito, tutte le informazioni della schermata corrente e i comandi devono essere visibili contemporaneamente senza scorrimento verticale o orizzontale, né della pagina né di pannelli interni. Includere turno, contatore/fase, domanda e quattro alternative quando svelate, timer, Pausa/Riprendi, tabellone, rifiuto e comandi pertinenti; nell’esito includere soluzione, spiegazione disponibile e avanzamento. Non mostrare una soluzione durante la risposta per soddisfare il requisito di completezza. Ricalcolare il layout al ridimensionamento, al cambio orientamento e all’ingresso/uscita dallo schermo intero, usando l’altezza effettivamente disponibile nel browser.
+
+Adattare disposizione di tabellone e contenuto, spaziature e dimensione dei testi al contenuto reale, comprese le formule dopo il rendering. Non soddisfare il requisito tramite `overflow:hidden`, troncamento, contenuti fuori schermo o testo ridotto fino a diventare illeggibile. Anche i dialoghi pausa/rifiuto/sanzione devono rendere raggiungibili tutti i relativi comandi. Copertina, configurazione e anteprima della banca possono scorrere: il requisito riguarda la schermata operativa del quiz.
+
+La specifica di assenza di scorrimento richiede dimensioni minime di schermo e limiti di lunghezza del contenuto: con testi arbitrariamente lunghi e schermi arbitrariamente piccoli non si possono garantire contemporaneamente testo completo, leggibilità e assenza di scorrimento. In implementazione definire e dichiarare una matrice di dimensioni supportate e una soglia minima di leggibilità, da verificare con il docente. Prima della partita verificare tutte le domande estratte e le spiegazioni, e verificare le nuove domande extra prima di svelarle. Se una schermata non entra con testo leggibile, segnalarlo prima dello svelamento (o mettere in pausa in caso di ridimensionamento durante la risposta) e richiedere una correzione di contenuto o dimensioni disponibili, senza avviare un timer con informazioni nascoste. Non presentare un adattamento grafico come verificato finché non sono stati eseguiti i controlli visuali.
 
 
 ## 7. Coerenza fra documenti, programma e presentazione
@@ -133,7 +145,7 @@ Questa è una lista di scenari da usare per le implementazioni successive; non d
 | ACC-08 | Richiesta tempestiva di rifiuto annullata | Timer ripreso dal residuo; nessuna variazione di punti; decisione del docente rispettata (SPEC-23) |
 | ACC-09 | Disturbo, suggerimento o protesta sanzionabile | Penalità al gruppo selezionato, indipendente dall'esito altrui; salto secondo DEC-04/05 (SPEC-22) |
 | ACC-10 | Dopo 33 domande A=8, B=7, C=6; in una seconda partita B vince con 12 | Prima partita: vince A e il premio è 10 blu. Seconda: vince B e il premio è ancora 10 blu; nessuna conversione dei punti (SPEC-24/25) |
-| ACC-11 | Campanella prima della domanda 33, anche durante una risposta o nello spareggio | Sospensione e salvataggio; nessun vincitore o premio. Domanda già svelata secondo DEC-12 (SPEC-30) |
+| ACC-11 | Campanella durante una domanda ordinaria o extra già svelata | La domanda prosegue con il tempo residuo; esito registrato prima di sospendere. Nessuna domanda successiva svelata; se l’esito determina il vincitore, riepilogo definitivo (SPEC-30) |
 | ACC-12 | Doppio clic, clic alla scadenza, ritorno da scheda in background | Un solo esito e un solo aggiornamento dei punti (SPEC-17) |
 | ACC-13 | HTML aperti localmente senza rete; schermo piccolo e tastiera | Risorse/formule disponibili, comandi leggibili e raggiungibili (SPEC-02, SPEC-03) |
 | ACC-14 | Confronto di ogni sezione della presentazione con gli ID REG | Nessuna contraddizione e versione dichiarata quando SPEC-27 sarà implementato |
@@ -146,11 +158,18 @@ Questa è una lista di scenari da usare per le implementazioni successive; non d
 | ACC-21 | Esaurimento domande extra con due gruppi ancora attivi | Sospensione per rifornire la riserva; conserva stato e non assegna il premio (SPEC-31) |
 | ACC-22 | Sospendi e riprendi durante lo spareggio | Conserva partecipanti, eliminazioni, riserva e turno corrente (SPEC-30/31) |
 | ACC-23 | Carica banca con meno di 33 domande | Modalità regolamentare bloccata con indicazione della carenza (SPEC-06) |
+| ACC-24 | Spareggio: tempo scaduto senza risposta | Il gruppo è eliminato una sola volta; ruota al successivo attivo oppure conclude con l’unico superstite (SPEC-31) |
+| ACC-25 | Avvio e successiva ripresa dello spareggio | Ordine sorteggiato solo tra i gruppi ammessi; salvataggio/ripresa conservano lo stesso ordine, senza nuovo sorteggio (SPEC-31) |
+| ACC-26 | Pausa durante domanda ordinaria ed extra; attendi, cambia scheda, poi riprendi | Residuo invariato in pausa, alternative bloccate, nessun esito; riprende dal residuo con un solo timer (SPEC-32) |
+| ACC-27 | Pausa alla scadenza; doppi clic su pausa/riprendi | Nessun tempo recuperato dopo la scadenza; un solo esito e nessun intervallo duplicato (SPEC-32) |
+| ACC-28 | Apri e chiudi una sanzione mentre è attiva la pausa manuale | Il timer resta fermo fino a Riprendi; la sanzione è registrata correttamente (SPEC-32) |
+| ACC-29 | Domande e spiegazioni più lunghe della banca, formule multilinea, ridimensionamento e schermo intero | Nelle dimensioni supportate tutti i dati e comandi della schermata corrente sono completi e leggibili senza scroll o tagli; configurazione non idonea segnalata prima di iniziare o timer messo in pausa se cambia durante la risposta (SPEC-33) |
+| ACC-30 | Campanella prima dello svelamento oppure dopo domanda 33 in pareggio | Salva senza svelare altro; alla ripresa mostra la prossima domanda nascosta oppure l’ingresso nello spareggio (SPEC-30) |
 
 ## 9. Passi successivi proposti
 
-1. Risolvere i casi ancora aperti DEC-01–DEC-06 e DEC-10–DEC-12 prima di implementarne il comportamento. DEC-07–DEC-09 sono risolte dal regolamento 3.0.0.
-2. Adeguare programma e presentazione: 33 domande, errore/scadenza ordinari a 0, timer unico 45 secondi, sospensione/ripresa, spareggio e 10 blu fisso. Introdurre versione e riferimenti REG.
+1. Risolvere i casi ancora aperti DEC-01–DEC-05, l’automatismo residuo in DEC-06 e le casistiche residue in DEC-11. DEC-07–DEC-10 e DEC-12 sono risolte; la scadenza eliminatoria in DEC-11 è definita.
+2. Adeguare programma e presentazione: 33 domande, errore/scadenza ordinari a 0, timer unico 45 secondi, sospensione/ripresa dopo aver concluso la domanda svelata, spareggio con ordine casuale e scadenza eliminatoria, 10 blu fisso, Pausa/Riprendi e layout in altezza senza scorrimento. Introdurre versione e riferimenti REG.
 3. Introdurre configurazione condivisa e schema del dataset con una migrazione esplicita, conservando gli HTML autonomi; aggiungere uno schema versionato del salvataggio.
 4. Automatizzare gli scenari fondamentali, inclusi chiusura/ripresa e spareggio. Valutare separatamente l'annullamento dell'ultima operazione del docente.
 
@@ -163,3 +182,4 @@ Si mantengono percorsi stabili, versione interna e cronologia Git. Aggiornare qu
 | 1.0.0 | 21/10/2026 | Inventario iniziale, requisiti tracciabili, lacune e criteri di accettazione |
 | 2.0.0 | 21/10/2026 | Allineamento dei requisiti e degli scenari al regolamento 2.0.0; vecchi HTML esplicitamente da adeguare |
 | 3.0.0 | 21/10/2026 | Requisiti per 33 domande, sospensione persistente e ripresa, spareggio a eliminazione, timer unico e premio fisso; nuovi scenari di verifica |
+| 4.0.0 | 21/10/2026 | Pausa/Riprendi e schermata operativa in altezza; sorteggio dello spareggio e scadenza eliminatoria; sospensione alla campanella dopo la domanda svelata |
