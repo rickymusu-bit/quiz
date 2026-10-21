@@ -1,18 +1,18 @@
 # Skool — Specifiche del programma
 
-Versione: **15.0.0** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
+Versione: **15.1.0** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
 
-Regolamento di riferimento: [REGOLAMENTO_UFFICIALE.md, v14.0.1](REGOLAMENTO_UFFICIALE.md).
+Regolamento di riferimento: [REGOLAMENTO_UFFICIALE.md, v15.0.0](REGOLAMENTO_UFFICIALE.md).
 
 ## 1. Scopo, fonti e stato dell’adeguamento
 
-Queste sono le specifiche del comportamento da implementare per **Skool**, allineate al [regolamento ufficiale v14.0.1](REGOLAMENTO_UFFICIALE.md) e alle [specifiche grafiche v1.1.0](ASPETTO_GRAFICO.md). La direzione visiva approvata è **Doom classico, con estetica pixel**; palette, font, logo e dettagli non ancora approvati restano raccolti nel documento grafico, senza inventarli qui.
+Queste sono le specifiche del comportamento da implementare per **Skool**, allineate al [regolamento ufficiale v15.0.0](REGOLAMENTO_UFFICIALE.md) e alle [specifiche grafiche v1.1.1](ASPETTO_GRAFICO.md). La direzione visiva approvata è **Doom classico, con estetica pixel**; palette, font, logo e dettagli non ancora approvati restano raccolti nel documento grafico, senza inventarli qui.
 
 Il regolamento stabilisce le regole, questo documento le traduce in stati, calcoli, comandi, salvataggi e verifiche, il documento grafico stabilisce la veste visiva. La presentazione HTML deve spiegare le medesime regole e dichiararne la versione.
 
 **Questa revisione aggiorna i documenti, non il codice del gioco o la presentazione.** Le indicazioni «presente» si riferiscono soltanto all’analisi storica del programma HTML v3 al commit `4b7f285cfc4bec5507bed559ada3efa479b29e95`; non attestano la conformità alle nuove regole o test in browser. I requisiti «da adeguare» o «da implementare» descrivono il risultato richiesto. Gli identificativi SPEC e ACC restano stabili.
 
-Le decisioni DEC del regolamento sono risolte o superate: non usarne le vecchie formulazioni come nuove richieste di approvazione. L’unico parametro di configurazione senza valore predefinito indicato è la probabilità dei premi: il docente deve poterla impostare prima della partita. Dettagli visivi ancora da raccogliere non bloccano la definizione della logica.
+Le decisioni DEC-01–DEC-19 sono risolte o superate. La nuova DEC-20 riguarda la durata e le interazioni di Aura e deve essere completata prima di implementarne gli effetti. L’unico parametro di configurazione senza valore predefinito indicato è la probabilità dei premi: il docente deve poterla impostare prima della partita. Dettagli visivi ancora da raccogliere non bloccano la definizione della logica.
 
 
 ## 2. Utenti e distribuzione
@@ -110,7 +110,7 @@ La durata si basa sulla scadenza temporale effettiva, non sui secondi interi mos
 | --- | --- | --- | --- |
 | SPEC-19 | Corretta = base × moltiplicatore, con eventuale Ruba punti; errore/scadenza ordinari 0. Nessuna sottrazione disciplinare. Punteggi e contatore sanzioni separati; eliminazione alla terza sanzione anche nella fase ordinaria. Rotazione tra gruppi attivi | REG-02, REG-07–REG-10 | Da adeguare |
 | SPEC-20 | Rotazione fra gruppi attivi; un solo premio per turno. Dopo Svela e passa il successore si calcola dal destinatario rispondente. Salta turno cumulato salta occasioni senza consumare la domanda; niente mantenimento del turno per corretta o blocco dopo tre corrette | REG-02, REG-05, REG-08, REG-26–REG-28 | Da implementare |
-| SPEC-21 | Tabellone con titolare del turno e rispondente se diverso, rotazione, punteggi, serie/moltiplicatori, inventario per gruppo con quantità dei tre premi, effetti pendenti, contatore sanzioni 0–3, stato eliminato con causa e salti da premio. Inventario visibile e comandi d’uso attivi solo nel proprio turno | REG-02, REG-08, REG-25–REG-28 | Da adeguare |
+| SPEC-21 | Tabellone con titolare del turno e rispondente se diverso, rotazione, punteggi, serie/moltiplicatori, inventario per gruppo con quantità dei quattro premi, effetti pendenti, contatore sanzioni 0–3, stato eliminato con causa e salti da premio. Inventario visibile e comandi d’uso attivi solo nel proprio turno | REG-02, REG-08, REG-25–REG-28 | Da adeguare |
 | SPEC-22 | Sanzione: pausa automatica del timer all’apertura pannello, incremento contatore e azzeramento serie, punti invariati. Alla terza eliminazione prioritaria, anche durante risposta, e cancellazione premi/effetti coinvolti. Verificare dopo l’intervento vittoria anticipata o tutti eliminati | REG-10–REG-16, REG-24 | Da implementare |
 | SPEC-23 | Rifiuto tempestivo con soli due motivi ammessi; decide il docente. Accettato: sostituto allo stesso gruppo, serie invariata e stesso indice valido. Respinto: riprende residuo; nessun nuovo premio o punto per il rifiuto | REG-17–REG-19 | Da adeguare |
 | SPEC-24 | Dopo ogni eliminazione/intervento disciplinare completato: zero gruppi attivi = tutti sconfitti e nessun 10; uno = vittoria anticipata con 10 blu. Altrimenti dopo 33 domande valide confrontare punti dei soli attivi e applicare eventuale spareggio | REG-10, REG-20, REG-21, REG-23 | Da implementare |
@@ -118,7 +118,7 @@ La durata si basa sulla scadenza temporale effettiva, non sui secondi interi mos
 
 Il registro eventi attuale conserva al massimo otto messaggi in memoria e ne mostra quattro. Il programma attuale non ripristina una partita dopo il caricamento della pagina: **salvataggio e ripresa sono ora requisiti necessari, ancora da implementare** (SPEC-30). L'annullamento dell'ultima operazione resta una possibile miglioria separata.
 
-**SPEC-30 — Sospensione e ripresa (da implementare; REG-20).** Sostituire la conclusione «fine modulo» con una sospensione. Conservare versione del regolamento e formato del salvataggio, identificativo della partita, composizione delle squadre (nomi e membri ove registrati), ordine di rotazione, titolare iniziale del turno, rispondente effettivo e riferimento per il prossimo gruppo, flag premio già usato nel turno, punteggi razionali esatti di SPEC-40, contatori disciplinari per gruppo, stato e causa di eliminazione, serie individuali, inventario conservabile con quantità per tipo e gruppo, attivazione o selezione bersaglio da completare, premi attivati e consumati, effetti pendenti con beneficiario e bersaglio, salti temporanei dovuti ai soli premi, tabella dei punti base effettivi, indice e stato della domanda, contatori di risposte/rifiuti, tempo residuo e impostazioni. Conservare anche le estrazioni di premio già effettuate e gli esiti associati a ciascuna risposta, per impedire nuove estrazioni alla ripresa. Salvare anche domande estratte, ordine delle alternative e risposte corrette, la banca ordinaria condivisa e l’eventuale riserva residua, ID dei quesiti già svelati in entrambe le fasi e, nello spareggio, partecipanti, eliminati, ordine dei turni e tempo effettivo ereditato dalla fase ordinaria. In caso di rifornimento validare gli ID contro l’intera banca condivisa e i quesiti già svelati; nessun caricamento separato Vero/Falso. Nessuna assegnazione del premio alla campanella. Non richiedere nominativi degli studenti per il solo funzionamento: il docente può garantire la stessa composizione usando i nomi delle squadre.
+**SPEC-30 — Sospensione e ripresa (da implementare; REG-20).** Sostituire la conclusione «fine modulo» con una sospensione. Conservare versione del regolamento e formato del salvataggio, identificativo della partita, composizione delle squadre (nomi e membri ove registrati), ordine di rotazione, titolare iniziale del turno, rispondente effettivo e riferimento per il prossimo gruppo, flag premio già usato nel turno, punteggi razionali esatti di SPEC-40, contatori disciplinari per gruppo, stato e causa di eliminazione, serie individuali, inventario conservabile con quantità per tipo e gruppo, attivazione o selezione bersaglio da completare, premi attivati e consumati, effetti pendenti con beneficiario e bersaglio, eventuale protezione Aura attivata con i parametri deliberati, salti temporanei dovuti ai soli premi, tabella dei punti base effettivi, indice e stato della domanda, contatori di risposte/rifiuti, tempo residuo e impostazioni. Conservare anche le estrazioni di premio già effettuate e gli esiti associati a ciascuna risposta, per impedire nuove estrazioni alla ripresa. Salvare anche domande estratte, ordine delle alternative e risposte corrette, la banca ordinaria condivisa e l’eventuale riserva residua, ID dei quesiti già svelati in entrambe le fasi e, nello spareggio, partecipanti, eliminati, ordine dei turni e tempo effettivo ereditato dalla fase ordinaria. In caso di rifornimento validare gli ID contro l’intera banca condivisa e i quesiti già svelati; nessun caricamento separato Vero/Falso. Nessuna assegnazione del premio alla campanella. Non richiedere nominativi degli studenti per il solo funzionamento: il docente può garantire la stessa composizione usando i nomi delle squadre.
 
 Il salvataggio deve sopravvivere alla chiusura del browser e consentire esportazione/importazione di un file locale versionato; l'autosalvataggio locale è complementare, non l'unico mezzo di ripresa. Validare integralmente un salvataggio prima di sostituire la partita attiva; un file non valido o incompatibile deve lasciare intatta la partita. Riprendere con timer fermo fino al comando del docente, senza applicare come tempo trascorso l'intervallo fra le lezioni. Per la sospensione dovuta alla campanella, una domanda già svelata va conclusa nella lezione in corso (REG-20): usare un flag «sospendi dopo questa domanda», impedire lo svelamento successivo e salvare dopo aver registrato l’esito. Se quell’esito o un’eliminazione disciplinare determina il vincitore o la sconfitta di tutti, mostrare il riepilogo definitivo; la priorità disciplinare prevale sul completamento della domanda. Se la domanda 33 produce un pareggio, salvare lo spareggio ancora da iniziare senza svelare una domanda extra. Un eventuale salvataggio tecnico di emergenza non deve essere presentato come il normale rinvio di una domanda già svelata alla campanella. Il file di partita contiene soluzioni ed è destinato al docente.
 
@@ -126,7 +126,7 @@ Il salvataggio deve distinguere i seguenti dati, senza ricavarli dalle sole etic
 
 | Dato logico | Vincolo |
 | --- | --- |
-| Versioni e impostazioni | Formato salvataggio, regolamento 14.0.1, tabella basi, tempo e p effettivi; nessuna sostituzione con default alla ripresa |
+| Versioni e impostazioni | Formato salvataggio, regolamento 15.0.0, tabella basi, tempo e p effettivi; nessuna sostituzione con default alla ripresa |
 | Fase e schermata | Fase ordinaria/spareggio/conclusa distinta da domanda nascosta, scelta, risposta, esito, pausa e dialogo |
 | Turno | Identificativo del turno, titolare iniziale, rispondente effettivo e riferimento per la rotazione successiva |
 | Quota premio | Un flag comune al turno; passa e rifiuto non lo rinnovano |
@@ -168,7 +168,7 @@ Errore/scadenza ordinari e ogni sanzione confermata azzerano n. Rifiuto accettat
 
 I predefiniti base restano 100/200/300. Tre facili consecutive valgono 100 + 110 + 120 = 330. Una media alla terza corretta vale 240, non 260. Con più Ruba punti la divisione può produrre frazioni periodiche: conservare punteggi razionali esatti, non limitarsi a centesimi interi. Con configurazioni ampie controllare la rappresentabilità, senza imporre un limite di serie. Il confronto finale usa valori esatti. Nello spareggio non si attribuiscono nuovi punti e i premi sono cancellati.
 
-**SPEC-36 — Premi, quota per turno ed effetti (da implementare; REG-25–REG-28).** Catalogo: `salta_turno`, `ruba_punti`, `svela_e_passa`. Parametro p configurabile prima della partita come percentuale finita 0–100; validazione esplicita e nessun valore predefinito inventato se manca. Una prova di vincita dopo ciascuna corretta ordinaria, poi scelta uniforme di un solo tipo: 1/3 condizionato alla vincita, p/3 complessivo per tipo se p è espresso come probabilità. A p=0 nessun premio; p=100% un premio per corretta ordinaria. Nessuna estrazione per errore/scadenza, sanzione, sola quota Ruba punti o corrette nello spareggio. Registrare una sola volta prova ed esito, evitando nuove estrazioni con doppi clic, ridisegni o ripresa.
+**SPEC-36 — Premi, quota per turno ed effetti (da implementare; REG-25–REG-28).** Catalogo: `salta_turno`, `ruba_punti`, `svela_e_passa`, `aura`. Parametro p configurabile prima della partita come percentuale finita 0–100; validazione esplicita e nessun valore predefinito inventato se manca. Una prova di vincita dopo ciascuna corretta ordinaria, poi scelta uniforme di un solo tipo: 1/4 condizionato alla vincita, p/4 complessivo per tipo se p è espresso come probabilità. A p=0 nessun premio; p=100% un premio per corretta ordinaria. Nessuna estrazione per errore/scadenza, sanzione, sola quota Ruba punti o corrette nello spareggio. Registrare una sola volta prova ed esito, evitando nuove estrazioni con doppi clic, ridisegni o ripresa.
 
 Accreditare il premio all’inventario conservabile e accumulabile del rispondente; nessun uso/bersaglio obbligatorio alla vincita e nessun limite inventato all’inventario. Consentire **al massimo una copia attivata per turno** complessivamente, qualunque sia il tipo. Conservare `premioUsatoNelTurno` anche se un rifiuto sostituisce il quesito, interviene una pausa o la domanda viene passata. Il passaggio non rinnova la quota: il destinatario non può contro-passare o attivare un secondo premio sulla stessa domanda. Resettare la quota solo all’avvio del turno successivo.
 
@@ -230,6 +230,14 @@ Dopo l’intero intervento disciplinare, prima di rispondere, premiare o avanzar
 
 **SPEC-41 — Nome e riferimento grafico (da implementare).** Usare **Skool** come nome visibile del gioco nella copertina, nel titolo del documento HTML/browser, nei menu, nei riepiloghi e nella presentazione delle regole. Per la veste grafica seguire [ASPETTO_GRAFICO.md](ASPETTO_GRAFICO.md), mantenendo separati requisiti approvati e dettagli ancora da definire. L’ispirazione a Doom classico e l’estetica pixel non modificano logica di gioco, leggibilità, funzionamento offline o layout operativo richiesti dalle altre specifiche. Non rinominare automaticamente repository, file originari, schema dei dataset o salvataggi per il solo cambio del titolo. Conservare lo spareggio «Chi vuol essere eliminato».
 
+**SPEC-42 — Aura, requisiti approvati e dettagli aperti (da implementare; REG-29).** Aggiungere `aura` al catalogo, all’inventario e alle informazioni dei premi. La prova di vincita resta governata da p; condizionatamente alla vincita ogni tipo del catalogo attuale ha probabilità 1/4. Non mantenere tre premi nell’estrazione né assegnare un peso diverso ad Aura.
+
+Aura non è attiva per il solo fatto di essere posseduta: segue conservazione, accumulo, uso solo nel proprio turno e limite comune di un premio per turno. Una volta attivata deve proteggere il gruppo dagli effetti negativi dei premi avversari; non modifica punti, probabilità di premio o regole disciplinari. Le sanzioni restano prioritarie, azzerano la serie e alla terza eliminano anche un gruppo protetto.
+
+Completare **DEC-20** prima di abilitare la protezione nel motore: quante aggressioni assorbe o quanto dura, quando si consuma, se si applica agli effetti già pendenti, come interagisce con più copie e con un passaggio Svela e passa, e se una copia offensiva bloccata viene comunque consumata. Non introdurre uno di questi comportamenti come default implicito. Non presentare la logica Aura come implementata finché queste condizioni non sono definite.
+
+Una volta deliberate, salvare stato e condizioni residue della protezione separatamente dalle copie conservate; mostrare una protezione attiva e il suo consumo/termine. Eliminazione del gruppo e ingresso nello spareggio cancellano Aura insieme agli altri premi/effetti. La grafica dell’icona e della protezione resta da definire nel documento grafico. La presenza di DEC-20 non riapre le decisioni già concluse sugli altri tre premi.
+
 ## 7. Coerenza fra documenti, programma e presentazione
 
 **SPEC-26 — Gerarchia e manutenzione (procedura da applicare da questa edizione).** Prima di modificare le regole leggere il regolamento; prima di modificare il gioco leggere anche queste specifiche. Le scelte DEC vanno risolte dal responsabile, non dal codice. Ogni modifica deve indicare gli ID interessati e aggiornare versione, data e cronologia.
@@ -272,10 +280,11 @@ Dopo l’intero intervento disciplinare, prima di rispondere, premiare o avanzar
 | REG-26 | Salta turno cumulabile senza consumo domanda | SPEC-20, SPEC-36 |
 | REG-27 | Ruba punti simultanei e quote uguali per gruppi distinti | SPEC-36, SPEC-40 |
 | REG-28 | Scelta a timer fermo e rotazione dal destinatario | SPEC-18, SPEC-20, SPEC-37 |
+| REG-29 | Aura: protezione dagli effetti negativi dei premi, dettagli in DEC-20 | SPEC-36, SPEC-42 |
 
 ## 7.2. Riferimento grafico e leggibilità
 
-Nome e riferimento visivo sono definiti in SPEC-41 e ASPETTO_GRAFICO.md v1.1.0. Il layout operativo di SPEC-33 deve includere anche inventario, stato di quota premio, destinatario della domanda, contatori sanzioni e beneficiari Ruba punti, quando pertinenti. Il pixel style non autorizza font illeggibili o formule rasterizzate indistinguibili. Le decisioni grafiche ancora aperte restano nel documento grafico.
+Nome e riferimento visivo sono definiti in SPEC-41 e ASPETTO_GRAFICO.md v1.1.1. Il layout operativo di SPEC-33 deve includere anche inventario, stato di quota premio, destinatario della domanda, contatori sanzioni e beneficiari Ruba punti, quando pertinenti. Il pixel style non autorizza font illeggibili o formule rasterizzate indistinguibili. Le decisioni grafiche ancora aperte restano nel documento grafico.
 
 ## 8. Criteri di accettazione
 
@@ -336,7 +345,7 @@ Questa è una lista di scenari da usare per l’implementazione; non dichiara te
 | ACC-51 | Ingresso nello spareggio con premi e probabilità di test al 100% | Inventari ed effetti svuotati all’ingresso, nessun uso e nessuna nuova estrazione per corrette (SPEC-31/36) |
 | ACC-52 | Domande ordinarie ed extra dalla stessa banca | Quattro alternative in entrambe le fasi, risposta corretta preservata dopo il mescolamento e nessun quesito già svelato ripetuto (SPEC-31/34) |
 | ACC-53 | Probabilità vuota, non numerica, infinita o fuori 0–100 | Configurazione rifiutata con messaggio chiaro; nessun valore inventato o coercizione silenziosa (SPEC-36) |
-| ACC-54 | Estrazione con generatore casuale controllato | Verifica separata della probabilità di vincita e della scelta uniforme tra i tre tipi; ogni ramo assegna una sola copia. Nessun test statistico instabile usato come unica verifica (SPEC-36) |
+| ACC-54 | Estrazione con generatore casuale controllato | Verifica separata della probabilità di vincita e della scelta uniforme tra i quattro tipi; ogni ramo assegna una sola copia. Nessun test statistico instabile usato come unica verifica (SPEC-36) |
 | ACC-55 | Salva e riprendi con probabilità personalizzata | Stesso parametro e stessi esiti già sorteggiati, senza ripetizioni o ritorno a un valore predefinito (SPEC-30/36) |
 | ACC-56 | Prima corretta con valori predefiniti e serie iniziale zero | Facile 100, media 200, difficile 300: moltiplicatore ×1,00. Seconda corretta ×1,10 (SPEC-35/38) |
 | ACC-57 | Tabella personalizzata 150/250/400 e salvataggio/ripresa | Guadagni calcolati sui valori personalizzati; tabella persistente senza ritorno ai predefiniti (SPEC-30/38) |
@@ -364,14 +373,17 @@ Questa è una lista di scenari da usare per l’implementazione; non dichiara te
 | ACC-79 | Domanda rifiutata durante scelta Svela e passa, poi rifiuto respinto | Ritorno alla scelta con timer mai avviato, senza risposta abilitata o nuovo consumo premio (SPEC-17/18/23/37) |
 | ACC-80 | Esito ordinario, ripetuti Prossima e ripresa dal salvataggio | Contatore valido incrementato solo all’esito, mai due volte dall’avanzamento; prossimo gruppo e quota corretti (SPEC-17/30) |
 | ACC-81 | Ripresa con punteggi frazionari, più beneficiari, premio usato e pausa attiva | Valori razionali, effetti, quota e residuo identici, senza credito, estrazione o timer automatico aggiuntivo (SPEC-30/36/40) |
-| ACC-82 | Confronto di regolamento, specifiche, grafica e presentazione | Tutte le 28 regole coperte, versioni fonti dichiarate, nome Skool e Doom classico; niente regole superate reintrodotte dal vecchio HTML (SPEC-26/27/41) |
+| ACC-82 | Confronto di regolamento, specifiche, grafica e presentazione | Tutte le 29 regole coperte, con Aura marcata da completare, versioni fonti dichiarate, nome Skool e Doom classico; niente regole superate reintrodotte dal vecchio HTML (SPEC-26/27/41) |
+| ACC-83 | Estrazione premi dopo definizione completa di Aura | Quattro rami equiprobabili condizionati alla vincita; probabilità complessiva p/4 per ciascuno (SPEC-36/42) |
+| ACC-84 | Sanzione a gruppo con Aura attiva | Protezione non blocca la sanzione: contatore incrementato, serie azzerata e terza sanzione eliminatoria (SPEC-39/42) |
+| ACC-85 | Inventario Aura, attivazione e ingresso spareggio | Possesso distinto dalla protezione; uso solo nel proprio turno con quota comune; protezione e copie cancellate allo spareggio. Durata/consumo da completare secondo DEC-20 (SPEC-42) |
 
 ## 9. Passi successivi
 
-Le decisioni DEC-01–DEC-19 sono risolte o superate dal regolamento 14.0.1; non continuare a usare le precedenti righe «da decidere» come blocchi per implementare quanto approvato. I dettagli tecnici reversibili vanno scelti in coerenza con i requisiti e verificati.
+Le decisioni DEC-01–DEC-19 sono risolte o superate dal regolamento 15.0.0; DEC-20 è aperta per la nuova Aura. Prima di abilitare il catalogo completo, definirne la protezione secondo SPEC-42; non estrarre silenziosamente un premio privo di comportamento definito. I dettagli tecnici reversibili vanno scelti in coerenza con i requisiti e verificati.
 
 1. Adeguare il motore del gioco: punteggi base configurabili, serie da seconda corretta senza tetto, rotazione dal rispondente, rifiuti sostituiti e salti cumulabili senza consumo domanda.
-2. Implementare un premio per turno, inventario, tre premi equiprobabili con p configurabile, Ruba punti simultanei con divisione in parti uguali per gruppi distinti e cancellazioni su eliminazione/ingresso spareggio.
+2. Implementare un premio per turno, inventario, quattro premi equiprobabili con p configurabile, Ruba punti simultanei con divisione in parti uguali per gruppi distinti e cancellazioni su eliminazione/ingresso spareggio.
 3. Implementare pannello sanzioni con pausa automatica e precedenza disciplinare, azzeramento serie, terza sanzione eliminatoria, vittoria anticipata e sconfitta di tutti.
 4. Integrare salvataggio/ripresa, layout verificato senza scorrimento e presentazione allineata alla stessa versione. Il default di p non è stato scelto: il programma può richiedere un valore prima dell’avvio.
 5. Eseguire gli scenari pertinenti alla logica e i controlli visuali; le tabelle di questa edizione sono specifiche di verifica, non risultati di test già eseguiti.
@@ -399,3 +411,4 @@ Si mantengono percorsi stabili, versione interna e cronologia Git. Aggiornare qu
 | 14.1.0 | 21/10/2026 | Nome Skool e fonte separata delle specifiche grafiche con riferimento Doom; nuova verifica di coerenza dell’identità |
 | 14.1.1 | 21/10/2026 | Precisato il riferimento grafico Doom classico con estetica pixel; riferimento al documento grafico 1.1.0 |
 | 15.0.0 | 21/10/2026 | Consolidamento delle specifiche rispetto al regolamento 14.0.1 e grafica 1.1.0: stati, comandi, priorità, conteggi validi, salvataggi razionali e copertura di tutte le regole |
+| 15.1.0 | 21/10/2026 | Catalogo di quattro premi equiprobabili e requisiti di Aura; tutela disciplinare invariata, durata e interazioni ancora aperte in DEC-20 |
