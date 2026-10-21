@@ -1,12 +1,12 @@
 # Chi vuol essere rimandato — Regolamento ufficiale
 
-Versione: **7.0.0** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
+Versione: **8.0.0** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
 
 ## 1. Autorità e ambito
 
 Questo documento è la fonte normativa delle regole del gioco. Il programma e la presentazione HTML devono applicarlo e rappresentarlo fedelmente. Le [specifiche del programma](SPECIFICHE_PROGRAMMA.md) traducono queste regole in requisiti verificabili, senza modificarle.
 
-La versione 7.0.0 elimina le proposte di furto, introduce il moltiplicatore per le risposte corrette consecutive e definisce il sistema dei premi casuali, con il primo premio «Salta turno». Probabilità di assegnazione e dettagli di utilizzo restano da stabilire. Il programma HTML v3 e la presentazione v9 devono ancora essere adeguati.
+La versione 8.0.0 aggiunge Ruba punti e stabilisce l’uso immediato di Salta turno e Ruba punti, con dichiarazione obbligatoria del bersaglio. Probabilità di assegnazione e cumuli restano da definire. Il programma HTML v3 e la presentazione v9 devono ancora essere adeguati.
 
 Gli identificativi `REG-xx` restano stabili nelle revisioni, per collegare regole, requisiti e verifiche.
 
@@ -22,7 +22,7 @@ Gli identificativi `REG-xx` restano stabili nelle revisioni, per collegare regol
 - **REG-05 — Turno assegnato, senza passaggio.** Quando è il turno di un gruppo, quel gruppo deve rispondere alla domanda assegnata. Non può passarla a un altro gruppo né scegliere un destinatario alternativo. Testo e alternative vengono mostrati allo svelamento; il rifiuto per i motivi ammessi in REG-17 resta distinto dal passaggio volontario.
 - **REG-06 — Risposta.** Nella fase ordinaria, al comando di svelamento del docente vengono mostrate la domanda e le quattro alternative e parte il timer. Nello spareggio si mostrano invece l’affermazione e le due risposte Vero/Falso, con il timer di REG-23. Il portavoce comunica la risposta scelta.
 - **REG-07 — Punti per risposta corretta.** Una risposta corretta assegna il valore base della domanda moltiplicato per il bonus di serie di REG-08. Il valore base resta 1 punto finché non viene approvata una tabella di punteggi per difficoltà. Dopo l’esito il turno passa comunque al gruppo successivo della rotazione.
-- **REG-08 — Moltiplicatore di serie.** Ogni gruppo ha una propria serie di risposte corrette consecutive, contate nei propri turni: i turni degli avversari non interrompono la serie. Ogni corretta della serie aggiunge **10 punti percentuali** al moltiplicatore dei punti guadagnati con quella domanda. Interpretazione esplicita adottata: con n corrette nella serie, inclusa quella appena data, **M = 1 + 0,10 × n**. Quindi prima corretta ×1,10; seconda ×1,20; terza ×1,30, e così via. Il bonus è lineare, non composto: la terza corretta non vale ×1,10³. Si moltiplicano solo i punti della nuova risposta, non il punteggio totale già accumulato. Il punteggio può quindi avere decimali. Una risposta errata o il tempo scaduto interrompono la serie. L’effetto di sanzioni, rifiuti e turni saltati sulla serie resta da precisare in DEC-02. Non ci sono furti di domande o punti, né obblighi di passaggio dopo tre corrette.
+- **REG-08 — Moltiplicatore di serie.** Ogni gruppo ha una propria serie di risposte corrette consecutive, contate nei propri turni: i turni degli avversari non interrompono la serie. Ogni corretta della serie aggiunge **10 punti percentuali** al moltiplicatore dei punti guadagnati con quella domanda. Interpretazione esplicita adottata: con n corrette nella serie, inclusa quella appena data, **M = 1 + 0,10 × n**. Quindi prima corretta ×1,10; seconda ×1,20; terza ×1,30, e così via. Il bonus è lineare, non composto: la terza corretta non vale ×1,10³. Si moltiplicano solo i punti della nuova risposta, non il punteggio totale già accumulato. Il punteggio può quindi avere decimali. Una risposta errata o il tempo scaduto interrompono la serie. L’effetto di sanzioni, rifiuti e turni saltati sulla serie resta da precisare in DEC-02. Non ci sono furti di domande né obblighi di passaggio dopo tre corrette. La condivisione del guadagno prevista da Ruba punti segue REG-27, dopo il calcolo del moltiplicatore.
 - **REG-09 — Errore e tempo scaduto.** Una risposta sbagliata o il tempo scaduto senza risposta vale **0 punti**: il punteggio resta invariato. Si perdono punti **solo per una sanzione**. La domanda è conclusa e il turno della successiva passa al gruppo successivo della rotazione, tenendo conto di eventuali turni da saltare.
 - **REG-10 — Nessuna eliminazione nella fase ordinaria.** Nelle 33 domande ordinarie tutti restano in gioco anche a zero punti o con punteggio negativo. I punti persi per sanzioni possono essere recuperati con risposte corrette.
 
@@ -53,8 +53,10 @@ Gli identificativi `REG-xx` restano stabili nelle revisioni, per collegare regol
 
 - **REG-24 — Pausa per richiami.** Il professore può mettere in pausa il timer per fare richiami o gestire un’interruzione. Durante la pausa il tempo residuo resta fermo e non si acquisiscono risposte. Il professore riprende la domanda con il tempo residuo, senza far ripartire da zero il tempo della fase: 45 secondi predefiniti nella fase ordinaria, 30 secondi nello spareggio. La pausa non modifica punteggi, titolare o turno e si può usare anche nello spareggio. È distinta dalla sospensione della partita fra lezioni.
 
-- **REG-25 — Premi casuali.** Dopo una risposta corretta il gruppo ha una probabilità di ricevere un premio che gli offre un vantaggio o svantaggia gli avversari. L’assegnazione casuale è distinta dal moltiplicatore di serie, che si applica ai punti secondo REG-08. Una risposta errata o il tempo scaduto non danno accesso all’estrazione. La probabilità non è ancora fissata: non scegliere automaticamente una percentuale. Frequenza, conservazione, attivazione e applicabilità allo spareggio sono da definire in DEC-13/14.
-- **REG-26 — Premio «Salta turno».** Il gruppo che usa questo premio sceglie un gruppo avversario: il bersaglio **salterà il proprio prossimo turno**. Il premio si consuma quando viene usato; non permette di rubare una domanda, rubare punti o sostituirsi al bersaglio nel turno saltato. La rotazione resta fissa. Momento di utilizzo, accumulo degli effetti e gestione della domanda associata al turno saltato sono da definire prima dell’implementazione (DEC-14/15).
+- **REG-25 — Premi casuali e utilizzo immediato.** Dopo una risposta corretta il gruppo ha una probabilità di ricevere un premio, distinta dal moltiplicatore di serie. Errore e tempo scaduto non danno accesso all’estrazione. I premi disponibili sono Salta turno e Ruba punti: **appena ne vince uno, il gruppo deve usarlo e dichiarare subito un gruppo avversario come bersaglio**, prima di proseguire. Non si conservano questi premi per usarli più avanti: si conserva soltanto l’effetto già assegnato al bersaglio. Probabilità, distribuzione dei tipi e applicabilità allo spareggio restano da definire (DEC-13/14).
+- **REG-26 — Premio «Salta turno».** Il gruppo che vince questo premio dichiara immediatamente un avversario: il bersaglio **salterà il proprio prossimo turno**. Il premio si consuma alla dichiarazione; l’effetto resta pendente fino al salto. Il gruppo utilizzatore non prende il posto del bersaglio e la rotazione resta fissa. Cumuli e gestione della domanda associata restano in DEC-15.
+
+- **REG-27 — Premio «Ruba punti».** Il gruppo che vince il premio dichiara immediatamente un avversario. L’effetto riguarda **la prossima domanda del bersaglio**, non una domanda di un altro gruppo che gioca prima. Se il bersaglio risponde correttamente, il guadagno di quella risposta si divide **a metà** tra bersaglio e gruppo utilizzatore. Si calcola prima il guadagno con il moltiplicatore del bersaglio, poi si assegna il 50% a ciascuno: per esempio 1,30 punti diventano 0,65 a testa. Non si toccano i punti già accumulati. La quota ricevuta non incrementa la serie del beneficiario e non genera per lui un’estrazione premio. Se il bersaglio sbaglia o lascia scadere il tempo, non ci sono punti da dividere e l’effetto termina comunque; non attende una futura corretta. Rifiuti, turni saltati e più effetti sullo stesso bersaglio restano da precisare in DEC-16.
 
 ## 7. Questioni aperte: non sono nuove regole
 
@@ -74,11 +76,12 @@ Questi punti richiedono una decisione esplicita del responsabile prima di cambia
 | DEC-10 | Risolta: ordine iniziale dello spareggio | Sorteggio tra le squadre ammesse; rotazione conservata saltando gli eliminati (REG-23) |
 | DEC-11 | Risolta l’eliminazione per scadenza nello spareggio; restano da precisare sanzioni, salti del turno e rifiuti nello spareggio | REG-23: errore o tempo scaduto eliminano; le altre casistiche non devono introdurre eliminazioni implicite |
 | DEC-12 | Risolta: domanda già svelata alla campanella | Si conclude prima di sospendere; nessun rinvio della risposta alla lezione successiva, nessuna sostituzione dovuta alla sola campanella (REG-20) |
-| DEC-13 | Qual è la probabilità di premio dopo una corretta? Sarà costante? | Da stabilire; nessuna percentuale implicita, nessuna estrazione su risposta errata/scaduta |
-| DEC-14 | Quando si può usare un premio, quanti se ne possono conservare e vincere per risposta, possono essere usati nello spareggio? | Da stabilire; per ora è definito solo il tipo «Salta turno» |
+| DEC-13 | Qual è la probabilità di premio e come si distribuiscono i due tipi? | Da stabilire; nessuna percentuale o equiprobabilità implicita |
+| DEC-14 | Risolti momento d’uso e conservazione; restano numero di premi per risposta e applicabilità allo spareggio | Uso e bersaglio immediati, nessun premio conservabile; si salvano gli effetti già attivati (REG-25) |
 | DEC-15 | Più premi Salta turno sullo stesso bersaglio si cumulano? La domanda del turno saltato si scarta o resta per il successivo gruppo? | Da stabilire insieme alle sanzioni che fanno saltare il turno; nessun trasferimento del turno a chi usa il premio |
+| DEC-16 | Come si gestiscono più Ruba punti sullo stesso bersaglio, rifiuti, turni saltati o premi senza future occasioni utili a fine partita? | Da definire; nessun dimezzamento in cascata o trasferimento implicito di effetti nello spareggio |
 
-Il punteggio base differenziato per difficoltà resta da definire e approvare. Le proposte di furto sono eliminate: non costituiscono premi disponibili.
+Il punteggio base per difficoltà resta da definire. Il furto di domande è escluso; Ruba punti è ammesso soltanto nella forma REG-27.
 
 ## 8. Revisioni
 
@@ -95,3 +98,4 @@ I nomi dei documenti restano stabili per non rompere i collegamenti. La versione
 | 5.0.0 | 21/10/2026 | Spareggio con dataset separato di sole domande Vero/Falso e timer unico di 30 secondi; distinti formato e tempo delle due fasi |
 | 6.0.0 | 21/10/2026 | Rotazione fissa anche dopo risposta corretta; aboliti passaggi volontari e obbligo dopo tre corrette; punteggi per difficoltà e bonus restano proposte |
 | 7.0.0 | 21/10/2026 | Eliminati furti; moltiplicatore lineare +10% per corretta della serie; premi casuali e primo premio Salta turno, con parametri ancora aperti |
+| 8.0.0 | 21/10/2026 | Ruba punti con metà del prossimo guadagno del bersaglio; Salta turno e Ruba punti immediati con bersaglio dichiarato, senza conservazione |
