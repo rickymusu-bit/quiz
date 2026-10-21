@@ -1,5 +1,16 @@
 # Fool — implementazione e verifiche
 
+## Aggiornamento: logo ufficiale, Doom 1993 e responsività, interfaccia 1.2.0
+
+La home presenta il logo JPEG originale del responsabile, il sottotitolo esatto «Solo uno sciocco pensa di vincere» e due azioni sovrapposte, Start e Regole. Start entra direttamente nella configurazione. Sfondo pixel con cielo rosso/pietra generato dal riferimento, senza la scritta originaria; carattere VT323 ospitato sul sito con licenza OFL. Logo e stessa identità anche nelle pagine interne.
+
+Il precedente blocco sotto 1280×800 è eliminato su richiesta del responsabile. Home, configurazione, quiz, esito, dialoghi e regole si ridispongono; contenuti lunghi scorrono verticalmente, formule troppo larghe nel proprio riquadro. Su mobile i dettagli dei gruppi sono espandibili. Non è nascosto contenuto per ottenere il fit. Le sezioni successive descrivono le verifiche storiche delle precedenti versioni e non reintroducono il vecchio vincolo.
+
+Verifiche eseguite: 27 test del motore superati, senza modifiche alla logica di gioco. `tests/layout.py` verifica tutte le 100 domande e le 21 sezioni a 240×320, 280×653, 320×568, 390×844, 768×1024, 844×390, 1024×768, 1280×800, 1440×900 e 1920×1080, senza overflow orizzontale della pagina. Testi lunghi e resize a 800×600 restano utilizzabili, senza pausa automatica ingiustificata.
+
+`tests/responsive.py` esercita menu, configurazione, anteprima, domanda, pausa, sanzione, dettagli, inventario, esito, sospensione/ripresa e indice delle regole a dieci dimensioni da 240×320 a 2560×1440. Comprende nomi lunghi, punteggi frazionari, formule larghe e testo portato a 24 px; inoltre tastiera sui due pulsanti della home ed emulazione touch in verticale e orizzontale. `tests/online.py` è aggiornato all'ingresso diretto Start e mantiene i controlli su caricamento automatico e assenza di download. Nessun errore JavaScript rilevato nelle prove eseguite. Screenshot desktop/mobile ispezionati per logo, sottotitolo, menu e tabellone.
+
+
 ## Aggiornamento: distribuzione solo online, interfaccia 1.1.0
 
 Su nuova richiesta del responsabile, la versione corrente non propone download, caricamenti o esportazioni di file. La pagina iniziale apre gioco e regole; il gioco carica `datasets.json` e la banca selezionata dal sito. La partita si salva e riprende nello stesso browser, senza modifiche al motore o alle regole. La precedente consegna 1.0.0 è documentata nelle sezioni storiche successive; i requisiti di distribuzione offline sono superati dalla nuova richiesta.

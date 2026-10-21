@@ -17,9 +17,8 @@ with sync_playwright() as p:
  page.on('request',lambda r:requests.append(r.url))
  page.goto(base);assert page.locator('a[download],input[type=file]').count()==0
  assert 'Scarica' not in page.locator('body').inner_text()
- page.get_by_role('link',name='Avvia il quiz').click()
+ page.get_by_role('link',name='Start',exact=True).click()
  assert page.get_by_role('button',name='Riprendi partita').count()==0
- page.get_by_role('button',name='Nuova partita',exact=True).click()
  expect(page.get_by_role('button',name='Prepara anteprima')).to_be_enabled()
  assert page.locator('#bank-choice').input_value()=='termologia'
  assert page.evaluate('bank.bank.length')==100

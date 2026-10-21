@@ -1,8 +1,8 @@
 # Fool
 
-Quiz online di Riccardo Musumarra. **Interfaccia 1.1.0**, regolamento **18.0.1**.
+Quiz online di Riccardo Musumarra. **Interfaccia 1.2.0**, regolamento **18.0.1**.
 
-Apri **https://rickymusu-bit.github.io/quiz/** e scegli **Avvia il quiz** o **Scopri le regole**. Non sono previsti download, installazioni o selettori di file.
+Apri **https://rickymusu-bit.github.io/quiz/** e scegli **Start** o **Regole**. Non sono previsti download, installazioni o selettori di file.
 
 ## Domande già sul sito
 
@@ -20,11 +20,13 @@ Alla campanella una domanda già svelata deve essere conclusa; solo dopo l'esito
 
 La nuova richiesta del responsabile di offrire il quiz solo online sostituisce i precedenti requisiti di distribuzione offline e scambio di file. Il motore e il formato di salvataggio restano compatibili con 1.0.0: le partite già conservate nello stesso browser vengono riprese senza modificare le regole.
 
-## Schermo e aspetto
+## Logo e interfaccia responsive
 
-Dimensioni supportate e verificate: **1280×800, 1440×900, 1920×1080 pixel CSS**, a zoom 100%. Testo operativo minimo 18 px, domande 22,5 px, alternative 18,9 px; le etichette di servizio possono essere più piccole. I contenuti operativi non vengono tagliati o ridotti sotto queste dimensioni per farli entrare. Prima dell'inizio sono verificate tutte le domande estratte con soluzioni e spiegazioni; ogni successivo quesito è verificato prima dello svelamento. Contenuti e nomi arbitrariamente lunghi possono essere segnalati come non idonei: allargare la finestra o correggere i contenuti. Se il ridimensionamento rende inidonea una risposta, il timer viene messo in pausa.
+La home usa il logo ufficiale fornito dal responsabile, il sottotitolo **Solo uno sciocco pensa di vincere** e due soli pulsanti sovrapposti: **Start** e **Regole**. Lo sfondo riprende cielo rosso e pavimento di pietra del riferimento, nell'estetica di Doom del 1993. Immagini e caratteri sono serviti dal sito stesso; provenienza e licenze sono in [assets/README.md](assets/README.md).
 
-Veste provvisoria ispirata a Doom classico: pannelli scuri, bordi squadrati, griglia pixel, titoli monospaziati e accento ambra. Palette, font specifici e logo restano scelte sostituibili, non preferenze approvate. Nessun suono aggiunto. L'app non contiene risorse grafiche di Doom.
+Home, configurazione, gioco, dialoghi e regole si adattano alla larghezza disponibile, senza una finestra minima obbligatoria. Su mobile le alternative diventano una colonna e i dettagli di inventari/effetti sono espandibili per ciascun gruppo. Se serve, la pagina scorre in verticale; le formule molto larghe possono scorrere nel proprio riquadro, senza tagliarle o rimpicciolirle. Restano disponibili focus visibile, tastiera e comandi touch. Un ridimensionamento normale non sospende il timer; solo un effettivo problema di larghezza non gestita attiva la protezione del layout.
+
+La matrice browser comprende schermi da 240×320 a 2560×1440, orientamento orizzontale, emulazione touch e caratteri ingranditi. Queste sono le dimensioni provate, non una limitazione imposta al sito. Dettagli delle prove in [VERIFICHE_IMPLEMENTAZIONE.md](docs/VERIFICHE_IMPLEMENTAZIONE.md).
 
 ## Fonti e verifiche
 
@@ -47,6 +49,7 @@ node tests/engine.test.js
 python3 tests/browser.py
 python3 tests/layout.py
 python3 tests/online.py
+python3 tests/responsive.py
 ```
 
 La rigenerazione usa soltanto la libreria standard Python. I test motore usano Node; i test browser richiedono Python Playwright e Chromium (`/usr/bin/chromium`). Il sito generato è statico e viene pubblicato sul ramo `gh-pages`. `src/home.html` genera la pagina iniziale; `src/app.js` gestisce il caricamento online e i salvataggi nel browser.

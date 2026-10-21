@@ -1,5 +1,8 @@
 # Fool — Specifiche del programma
 
+> **Aggiornamento responsive — interfaccia 1.2.0, grafica 1.3.0.** Il responsabile richiede Doom 1993, logo ufficiale allegato, sottotitolo «Solo uno sciocco pensa di vincere», menu Start/Regole e visualizzazione su mobile e desktop. Questa richiesta sostituisce il vincolo di finestra minima e l'assenza assoluta di scorrimento di SPEC-33: il layout si ridispone, può scorrere verticalmente e offre scorrimento interno alle formule molto larghe, senza tagliare testo o comandi. I dettagli dei gruppi sono espandibili su mobile. Il ridimensionamento di per sé non mette in pausa il timer; resta la protezione per un reale overflow orizzontale non gestito. Regolamento e motore sono invariati. Si vedano ASPETTO_GRAFICO.md e VERIFICHE_IMPLEMENTAZIONE.md per indicazioni e prove correnti.
+
+
 > **Aggiornamento della distribuzione — interfaccia 1.1.0, su richiesta del responsabile.** Fool viene offerto solo online su GitHub Pages, senza download né selezione di file. Per la distribuzione, questa indicazione sostituisce le precedenti parti locali/offline di SPEC-02, il caricamento manuale della banca di SPEC-05 e l'esportazione/importazione locale di SPEC-30. Le banche, con lo stesso schema SPEC-13 e gli stessi ID, vengono caricate dal catalogo del sito; il rifornimento SPEC-34 consulta le banche online e accetta soltanto quesiti nuovi compatibili. Il salvataggio e la ripresa avvengono nello stesso browser, senza sincronizzazione tra dispositivi. Regolamento 18.0.1, motore e formato dei salvataggi restano invariati. Le sezioni sottostanti conservano l'analisi della precedente consegna: per distribuzione e verifiche correnti consultare README e VERIFICHE_IMPLEMENTAZIONE.md.
 
 

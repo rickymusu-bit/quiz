@@ -1,79 +1,63 @@
 # Fool — Specifiche dell’aspetto grafico
 
-Versione: **1.2.1** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
+Versione: **1.3.0** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
 
-## 1. Scopo e stato
+## 1. Scopo e fonti
 
-Questo documento raccoglie progressivamente le caratteristiche grafiche indicate dal responsabile per **Fool**, nome del quiz. È il riferimento per l’identità visiva del programma e della presentazione HTML delle regole.
-
-È un documento di progettazione: la sua creazione non modifica gli HTML esistenti. Le indicazioni successive vanno integrate qui, distinguendo decisioni approvate e dettagli ancora da scegliere. Le sezioni non ancora compilate non autorizzano a inventare preferenze del responsabile.
-
-Il [regolamento](REGOLAMENTO_UFFICIALE.md) definisce il gioco; le [specifiche del programma](SPECIFICHE_PROGRAMMA.md) ne definiscono il comportamento e i vincoli. Questo documento definisce l’aspetto. Le scelte grafiche devono conservare le informazioni e i comandi richiesti dagli altri due documenti.
+Questo documento raccoglie le indicazioni grafiche approvate per **Fool**, per la home, il quiz e la presentazione delle regole. Le indicazioni correnti sostituiscono i precedenti dettagli lasciati aperti soltanto nelle aree esplicitamente definite dal responsabile. Il [regolamento](REGOLAMENTO_UFFICIALE.md) resta la fonte delle regole di gioco; le [specifiche del programma](SPECIFICHE_PROGRAMMA.md) ne descrivono il funzionamento.
 
 ## 2. Indicazioni approvate
 
 | ID | Caratteristica | Indicazione |
 | --- | --- | --- |
 | VIS-01 | Nome del gioco | **Fool** |
-| VIS-02 | Riferimento visivo | Un aspetto grafico ispirato a **Doom classico**, con **estetica pixel** |
-| VIS-03 | Ambito | Identità visiva del software del quiz; la presentazione HTML delle regole deve usare lo stesso nome e una veste coerente |
-| VIS-04 | Aggiornamenti successivi | Raccogliere in questo documento le caratteristiche grafiche che il responsabile elencherà |
+| VIS-02 | Riferimento visivo | **Doom del 1993**, con estetica pixel |
+| VIS-03 | Ambito | Identità coerente di home, quiz e presentazione delle regole |
+| VIS-04 | Aggiornamenti | Raccogliere qui le indicazioni successive del responsabile |
+| VIS-05 | Logo ufficiale | Prima immagine allegata nella richiesta del 21/10/2026, `15033.jpg`, conservata in `assets/fool-logo.jpg` |
+| VIS-06 | Sottotitolo della home | **Solo uno sciocco pensa di vincere** |
+| VIS-07 | Menu della home | Due riquadri cliccabili, uno sopra l'altro: **Start** sopra, **Regole** sotto |
+| VIS-08 | Sfondo | Richiamo alla seconda immagine, `15034.jpg`: cielo rosso e pavimento scuro di pietra, con estetica Doom 1993 |
+| VIS-09 | Responsività | Il sito, il gioco e le regole si adattano a mobile e desktop, in entrambe le orientazioni, senza imporre la precedente finestra minima |
 
-Il riferimento approvato è **Doom classico**, con estetica pixel. Questa scelta stabilisce la direzione visiva di Fool; non cambia il regolamento o le funzioni del quiz. Palette, caratteri specifici, logo, materiali, disposizione, animazioni e suoni restano da definire con le prossime indicazioni del responsabile. L’estetica pixel deve rispettare la leggibilità di testi e formule prevista nelle specifiche.
+Il logo mantiene i byte originali del JPEG. L'inserimento nel sito usa un filtro SVG di visualizzazione che rende trasparente il fondo quasi nero, conservando i colori del marchio. Lo sfondo è una risorsa generata a partire dallo stile del riferimento, priva della scritta presente nel riferimento.
 
-## 3. Applicazione del nome
+## 3. Home e navigazione
 
-Il titolo visibile del prodotto diventa **Fool**: copertina, titolo della pagina/browser, menu, schermate finali e intestazioni della presentazione devono essere coerenti quando verranno aggiornati gli HTML.
+La home presenta il logo, il sottotitolo esatto e i due soli pulsanti richiesti. **Start** apre direttamente la configurazione del gioco, senza una seconda copertina obbligatoria; se è presente una partita nello stesso browser, il docente può riprenderla dalla configurazione. **Regole** apre la presentazione navigabile. Il logo nell'intestazione delle pagine interne riporta alla home.
 
-Il nome della fase di spareggio è **«Battaglia finale»**.
+L'aspetto dei riquadri usa bordi metallici squadrati, caratteri pixel e testo rosso. Sono scelte di implementazione coerenti con il riferimento; non introducono regole o funzioni aggiuntive. Il carattere VT323 è ospitato sul sito con la relativa licenza SIL OFL. Non sono stati aggiunti suoni o animazioni del gioco.
 
-Gli HTML sono esclusi dalla rinomina su richiesta del responsabile, perché da rifare da capo; mantengono contenuto e nomi originari. La provenienza conserva i riferimenti storici verificabili. Il nome del prodotto non richiede di cambiare il nome del repository, invalidare i salvataggi o rinominare automaticamente file e percorsi già collegati.
+## 4. Adattamento e leggibilità
 
-## 4. Vincoli già stabiliti per l’interfaccia
+La richiesta di responsività su qualunque schermo supera il precedente requisito di finestra minima 1280×800 e il divieto assoluto di scorrimento di SPEC-33. Non si tagliano informazioni e non si rendono minuscoli i testi per mantenerli tutti in una schermata. I contenuti possono scorrere in verticale; formule particolarmente larghe hanno un proprio scorrimento orizzontale, utilizzabile anche da tastiera.
 
-Questi vincoli provengono dalle specifiche funzionali; non sono ulteriori preferenze estetiche:
+- Logo e immagini mantengono le proporzioni e si ridimensionano con la finestra.
+- Alternative su due colonne dove c'è spazio e su una colonna sugli schermi stretti.
+- Tabellone con punteggi, serie, sanzioni e gruppo rispondente; su mobile inventari ed effetti si consultano nei dettagli espandibili di ogni gruppo.
+- Pannelli, dialoghi, anteprima, esito e navigazione delle regole si dispongono senza uscire lateralmente dalla pagina.
+- Pulsanti principali con area tattile di almeno 44 pixel; focus visibile e navigazione da tastiera.
+- Il solo ridimensionamento a una finestra piccola non blocca il gioco né ferma il timer. Rimane una protezione con pausa in caso di elemento realmente troppo largo e non gestibile dal layout.
+- Nessuna modifica a domande, punteggi, serie, sanzioni, bonus, timer, salvataggi o Battaglia finale.
 
-- Schermata operativa adattata a larghezza e altezza disponibili, con tutte le informazioni della schermata corrente leggibili senza scorrimento, nei limiti di dimensioni e contenuti verificati secondo SPEC-33.
-- Nessun testo tagliato, comando fuori schermo o riduzione della leggibilità per imitare lo stile scelto.
-- Stato di turno, timer/pausa, domanda, risposte, punteggi, serie, bonus e sanzioni distinguibili nella fase appropriata.
-- Focus visibile e uso da tastiera; correttezza, errore, pausa ed eliminazione riconoscibili anche tramite testo, oltre al colore.
-- Copertina, configurazione, anteprima docente, scelta Svela e passa, risposta, esito, pausa, gestione sanzioni, sospensione/ripresa e spareggio devono appartenere allo stesso sistema visivo.
-- Risorse necessarie disponibili nell’HTML autonomo anche offline; comportamento di gioco e scelte grafiche devono restare coerenti con le specifiche.
+## 5. Dettagli ancora aperti
 
-## 5. Caratteristiche da raccogliere
+Logo, sottotitolo, menu, riferimento del 1993, sfondo e responsività sono approvati. Ulteriori icone, animazioni, suoni e variazioni grafiche dei singoli bonus restano da indicare dal responsabile. Le etichette devono continuare a rendere visibili Aura attiva, tipo e autore vincolato delle copie Karma, eliminazioni e sanzioni; gli stati non sono espressi soltanto tramite colore.
 
-| Area | Stato attuale |
-| --- | --- |
-| Edizione/stile di Doom di riferimento | **Approvato: Doom classico, estetica pixel** |
-| Logo e trattamento del nome Fool | Da definire |
-| Palette, contrasti e colori degli stati | Da definire |
-| Caratteri per titoli, testo, timer e punteggi | Da definire |
-| Sfondo, pannelli, bordi, texture e materiali | Da definire |
-| Disposizione del tabellone e delle informazioni di gioco | Da definire rispettando SPEC-33 |
-| Aspetto dei pulsanti e dei cinque bonus | Da definire: Salta turno, Ruba punti, Svela e passa, Aura e Karma |
-| Karma trasformato | Visualizzare tipo ottenuto e gruppo bersaglio obbligato; stile di icona/etichetta da definire |
-| Protezione Aura attiva | Rappresentazione grafica da definire; durata fino al prossimo turno; blocca solo nuovi attacchi, incluso Svela e passa; attacco bloccato consumato |
-| Rappresentazione delle sanzioni e dell’eliminazione | Da definire |
-| Transizioni e animazioni | Da definire |
-| Eventuali suoni | Da definire; nessun suono è stato richiesto finora |
-| Adattamenti della presentazione delle regole | Da definire dopo la direzione del programma |
+## 6. Risorse e verifiche
 
-## 6. Verifica prima dell’implementazione definitiva
+Provenienza e licenza delle risorse: [assets/README.md](../assets/README.md). Sorgenti: `src/home.html`, `src/style.css`, `src/logo-filter.svg` e `src/app.js`. Rigenerazione: `python3 tools/build.py`.
 
-Le verifiche visive devono coprire le schermate e le dimensioni supportate, includendo domande lunghe, formule, molti bonus accumulati e punteggi frazionari. La somiglianza al riferimento va verificata insieme alla leggibilità e all’uso in classe.
-
-Le caratteristiche VIS approvate devono essere collegate alle schermate pertinenti e aggiornate quando cambia una scelta. Le aree «da definire» restano aperte per le prossime indicazioni; questa prima edizione non costituisce una proposta grafica già realizzata.
+Le verifiche comprendono home e menu, tutte le 100 domande e le 21 sezioni delle regole su mobile e desktop, orientamento orizzontale, testi ingranditi, nomi lunghi, quote frazionarie, formule eccessivamente larghe, pannelli disciplinari, bonus, salvataggio e ripresa. Esiti effettivi in [VERIFICHE_IMPLEMENTAZIONE.md](VERIFICHE_IMPLEMENTAZIONE.md).
 
 ## 7. Revisioni
 
-Percorso stabile, versione interna e cronologia Git.
+Percorsi stabili e cronologia Git conservano le edizioni precedenti.
 
 | Versione | Data | Modifica |
 | --- | --- | --- |
-| 1.0.0 | 21/10/2026 | Nome Fool, direzione estetica Doom e documento per raccogliere le successive indicazioni grafiche |
-| 1.1.0 | 21/10/2026 | Riferimento precisato: Doom classico con estetica pixel; altri dettagli visivi ancora da raccogliere |
-| 1.1.1 | 21/10/2026 | Aggiunta Aura alle aree grafiche da definire; nessuna icona o animazione ancora approvata |
-| 1.1.2 | 21/10/2026 | Karma aggiunto al catalogo grafico e indicazione di Aura fino al prossimo turno; nessuna nuova icona approvata |
-| 1.1.3 | 21/10/2026 | Informazioni grafiche necessarie per la copia trasformata da Karma e il bersaglio obbligato; aspetto ancora da definire |
-| 1.2.0 | 21/10/2026 | Nome Fool e denominazione bonus; HTML esclusi dalla modifica; interazioni Aura/Karma definite |
-| 1.2.1 | 21/10/2026 | Spareggio rinominato «Battaglia finale»; meccaniche invariate |
+| 1.0.0 | 21/10/2026 | Nome Fool, direzione Doom e raccolta delle caratteristiche |
+| 1.1.0–1.1.3 | 21/10/2026 | Estetica pixel e requisiti visivi di Aura e Karma |
+| 1.2.0 | 21/10/2026 | Nome Fool, bonus e interazioni Aura/Karma |
+| 1.2.1 | 21/10/2026 | Spareggio rinominato «Battaglia finale» |
+| 1.3.0 | 21/10/2026 | Logo ufficiale, Doom 1993, sottotitolo, menu Start/Regole, sfondo dal riferimento e responsività mobile/desktop |

@@ -2,22 +2,44 @@
 <html lang="it">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Fool, il quiz per la classe di Riccardo Musumarra. Gioca online con le domande di termologia già disponibili e scopri le regole.">
-<meta name="theme-color" content="#151615">
-<title>Fool — Il quiz per la classe</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Fool. Solo uno sciocco pensa di vincere. Il quiz online per la classe.">
+<meta name="theme-color" content="#090809">
+<title>Fool — Solo uno sciocco pensa di vincere</title>
+<link rel="icon" href="assets/fool-logo.jpg" type="image/jpeg">
+<link rel="preload" href="assets/fool-logo.jpg" as="image">
 <style>
-:root{color-scheme:dark;--bg:#151615;--panel:#232523;--line:#55594f;--ink:#eee9d8;--muted:#b8b9aa;--accent:#ebad57}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:18px/1.6 system-ui,sans-serif;background-image:linear-gradient(90deg,#ffffff03 1px,transparent 1px),linear-gradient(#ffffff03 1px,transparent 1px);background-size:8px 8px}a{color:var(--accent)}a:focus-visible{outline:3px solid var(--accent);outline-offset:5px}.wrap{width:min(1100px,calc(100% - 48px));margin:auto}header{border-bottom:2px solid var(--line)}header .wrap{display:flex;justify-content:space-between;align-items:center;gap:20px;padding-block:20px}.brand{font:bold 24px ui-monospace,monospace;letter-spacing:.17em;color:var(--accent);text-decoration:none}nav{display:flex;gap:24px}nav a{font-size:15px;text-decoration:none;color:var(--muted)}.hero{padding-block:80px 64px;max-width:900px}.eyebrow{font:14px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase;color:var(--accent)}h1{font:bold clamp(80px,14vw,150px)/1 ui-monospace,monospace;letter-spacing:.04em;color:var(--accent);text-shadow:5px 5px #683f26;margin:24px 0}h2{font-size:28px;line-height:1.2}p{margin:12px 0}.lead{font-size:clamp(23px,4vw,34px);line-height:1.3;max-width:760px}.muted{color:var(--muted)}.actions{display:flex;flex-wrap:wrap;gap:16px;margin-top:30px}.button{display:inline-block;text-decoration:none;font-weight:650;padding:13px 22px;border:2px solid #777d6d;border-bottom-color:#10120e;color:var(--ink);background:#393d35}.button:hover{background:#505445}.primary{background:#76512b;border-color:var(--accent)}.primary:hover{background:#8c6234}.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding-bottom:56px}.fact{border-top:2px solid var(--line);padding-top:18px}.fact strong{display:block;font:700 26px ui-monospace,monospace}.fact span{font-size:16px;color:var(--muted)}.resources{display:grid;grid-template-columns:1fr 1fr;gap:20px;padding-bottom:56px}.card{background:var(--panel);border:2px solid var(--line);padding:26px}.card h2{margin-top:0}.card p{color:var(--muted)}.card a{display:inline-block;margin-top:10px}.steps{padding-bottom:56px}.steps ol{padding-left:24px}.steps li{margin:12px 0}.note{font-size:16px;color:var(--muted)}footer{border-top:2px solid var(--line);padding-block:24px;font-size:14px;color:var(--muted)}footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px}@media(max-width:650px){.wrap{width:calc(100% - 32px)}header .wrap{align-items:flex-start}nav{gap:14px;flex-wrap:wrap;justify-content:flex-end}.hero{padding-block:48px}.facts{gap:12px}.fact strong{font-size:22px}.fact span{font-size:14px}.resources{grid-template-columns:1fr}.card{padding:22px}.actions .button{text-align:center;flex:1 1 180px}h2{font-size:24px}}
+@font-face{font-family:FoolTerminal;src:url('assets/vt323-regular.ttf') format('truetype');font-style:normal;font-weight:400;font-display:swap}
+:root{color-scheme:dark;background:#090809;color:#f4e9cc;font-family:system-ui,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;min-width:0;min-height:100svh;background:#090809 url('assets/doom-background.png') center center/cover no-repeat}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;background:linear-gradient(180deg,#0005,transparent 45%,#0007),radial-gradient(ellipse at center,#0000 35%,#0009 100%)}
+main{position:relative;min-height:100svh;display:flex;align-items:center;justify-content:center;padding:max(18px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));text-align:center}
+.home-content{width:min(1120px,100%);display:flex;flex-direction:column;align-items:center;gap:clamp(12px,2.2vh,24px)}
+h1{width:100%;margin:0;line-height:0}
+.home-logo{display:block;width:100%;height:auto;max-height:42svh;object-fit:contain;filter:url(#fool-logo-key)}
+.subtitle{margin:0;padding:0 6px;font:400 clamp(25px,3.1vw,43px)/1.08 FoolTerminal,ui-monospace,monospace;color:#f4e9cc;text-shadow:2px 2px #000,0 2px 8px #000;overflow-wrap:anywhere}
+.menu{display:grid;grid-template-columns:1fr;gap:12px;width:min(340px,88%);margin-top:clamp(3px,1.5vh,14px)}
+.menu a{display:flex;align-items:center;justify-content:center;min-height:clamp(54px,7vh,76px);padding:8px 24px;border:3px solid;border-color:#80766b #251e1c #171314 #625a53;background:linear-gradient(#333132,#1c1a1d);color:#ed4a32;text-decoration:none;font:400 clamp(34px,4vw,49px)/1 FoolTerminal,ui-monospace,monospace;text-shadow:2px 2px #260000,0 -1px #ffad6a;box-shadow:3px 4px 0 #000b,inset 0 0 0 2px #0e0d0d}
+.menu a:hover{color:#ffb66f;border-top-color:#b98b63;background:linear-gradient(#49302e,#24191b)}
+.menu a:active{transform:translate(1px,2px);box-shadow:1px 2px #000b,inset 0 0 0 2px #0e0d0d}
+.menu a:focus-visible{outline:3px solid #ffe4ac;outline-offset:5px}
+@media(max-height:500px){.home-content{gap:8px}.home-logo{max-height:32svh}.subtitle{font-size:clamp(20px,4vh,29px)}.menu{gap:8px;margin-top:0;width:min(290px,78%)}.menu a{min-height:44px;font-size:32px;padding-block:4px}}
+@media(prefers-reduced-motion:reduce){.menu a:active{transform:none}}
 </style>
 </head>
 <body>
-<header><div class="wrap"><a class="brand" href="./" aria-label="Fool, pagina iniziale">FOOL</a><nav aria-label="Navigazione principale"><a href="Fool_regole.html">Le regole</a><a href="#materiali">Materiali</a><a href="https://github.com/rickymusu-bit/quiz">GitHub</a></nav></div></header>
-<main class="wrap">
-<section class="hero" aria-labelledby="titolo"><p class="eyebrow">Il quiz per la classe · Riccardo Musumarra</p><h1 id="titolo">FOOL</h1><p class="lead">Conoscenza, strategia e gioco di squadra.</p><p class="muted">Tre gruppi si sfidano tra domande, bonus e colpi di scena. Per i vincitori, un 10 blu sul registro.</p><div class="actions"><a class="button primary" href="Fool.html">Avvia il quiz →</a><a class="button" href="Fool_regole.html">Scopri le regole</a></div></section>
-<div class="facts" aria-label="Il gioco in numeri"><div class="fact"><strong>3 gruppi</strong><span>Un portavoce per squadra</span></div><div class="fact"><strong>33 domande</strong><span>Quattro alternative per quesito</span></div><div class="fact"><strong>5 bonus</strong><span>Da conservare e usare nel proprio turno</span></div></div>
-<section id="materiali" class="resources" aria-label="Contenuti del quiz"><article class="card"><p class="eyebrow">Le domande sono già pronte</p><h2>Termologia</h2><p>100 domande su temperatura, calore, dilatazione, passaggi di stato e trasmissione del calore. La banca si carica direttamente nel gioco.</p><a href="Fool.html">Gioca con la termologia →</a></article><article class="card"><p class="eyebrow">Tutto nel browser</p><h2>Le regole, in un clic</h2><p>Scopri come si gioca e proietta le regole alla classe, con indice e navigazione da tastiera.</p><a href="Fool_regole.html">Apri le regole →</a></article></section>
-<section class="steps" aria-labelledby="come-iniziare"><h2 id="come-iniziare">Pronti a giocare?</h2><ol><li>Apri il quiz: le domande si caricano automaticamente dal sito.</li><li>Configura i tre gruppi e controlla l’anteprima prima di proiettare alla classe.</li><li>Avvia la partita. Puoi sospenderla e riprenderla dallo stesso browser.</li></ol><p class="note">Il docente conduce la partita e inserisce le risposte dei portavoce. Per il tabellone usa una finestra di almeno 1280 × 800 pixel. Configurazione e anteprima mostrano le soluzioni.</p></section>
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute;pointer-events:none"><defs><filter id="fool-logo-key" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  1 1 1 0 0"/><feComponentTransfer><feFuncA type="discrete" tableValues="0 1 1 1 1"/></feComponentTransfer></filter></defs></svg>
+
+<main>
+<div class="home-content">
+<h1><img class="home-logo" src="assets/fool-logo.jpg" alt="Fool" width="1280" height="427" fetchpriority="high"></h1>
+<p class="subtitle">Solo uno sciocco pensa di vincere</p>
+<nav class="menu" aria-label="Menu principale">
+<a href="Fool.html?start=1">Start</a>
+<a href="Fool_regole.html">Regole</a>
+</nav>
+</div>
 </main>
-<footer><div class="wrap"><span>Fool · App 1.1.0 · Regolamento 18.0.1</span><a href="https://github.com/rickymusu-bit/quiz">Sorgenti e documentazione su GitHub</a></div></footer>
 </body>
 </html>
