@@ -1,8 +1,8 @@
 # Chi vuol essere rimandato — Specifiche del programma
 
-Versione: **13.0.0** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
+Versione: **14.0.0** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
 
-Regolamento di riferimento: [REGOLAMENTO_UFFICIALE.md, v13.0.0](REGOLAMENTO_UFFICIALE.md).
+Regolamento di riferimento: [REGOLAMENTO_UFFICIALE.md, v14.0.0](REGOLAMENTO_UFFICIALE.md).
 
 ## 1. Scopo e gerarchia
 
@@ -10,7 +10,7 @@ Questo documento raccoglie le specifiche funzionali, i vincoli tecnici e i crite
 
 L'analisi iniziale è stata eseguita sul commit `4b7f285cfc4bec5507bed559ada3efa479b29e95`, leggendo il programma `Chi_vuol_essere_rimandato_quiz_v3_20261008.html`, il regolamento HTML v9, il template e il prompt dataset v1. È una verifica del sorgente, non una certificazione funzionale in browser.
 
-Stati dei requisiti: **presente** = riscontrato nel sorgente; **da implementare** = requisito per una futura modifica; **da decidere** = dipende da una questione DEC del regolamento. Le presenti modifiche sono documentali e non aggiornano gli HTML. **Il programma v3 e la presentazione v9 non sono conformi al regolamento 13.0.0**: vanno adeguati rotazione fissa con il solo passaggio da premio, errore/scadenza, timer, conclusione, sospensione/ripresa, spareggio, premio finale, pausa manuale e disposizione della schermata in altezza. La lettura del sorgente non equivale a una verifica in browser.
+Stati dei requisiti: **presente** = riscontrato nel sorgente; **da implementare** = requisito per una futura modifica; **da decidere** = dipende da una questione DEC del regolamento. Le presenti modifiche sono documentali e non aggiornano gli HTML. **Il programma v3 e la presentazione v9 non sono conformi al regolamento 14.0.0**: vanno adeguati rotazione fissa con il solo passaggio da premio, errore/scadenza, timer, conclusione, sospensione/ripresa, spareggio, premio finale, pausa manuale e disposizione della schermata in altezza. La lettura del sorgente non equivale a una verifica in browser.
 
 ## 2. Utenti e distribuzione
 
@@ -131,7 +131,7 @@ Prima della partita mostrare separatamente il numero di quesiti estratti per le 
 
 Errore/scadenza ordinari e ogni sanzione confermata azzerano n. Rifiuto accettato, turno saltato, turni altrui e passaggio senza risposta non lo cambiano. La corretta di una domanda passata incrementa la serie di chi risponde, non quella di chi passa; punti ed eventuale premio seguono il rispondente. Calcolare guadagno lordo con base configurata SPEC-38 e moltiplicatore di quel gruppo; applicare poi Ruba punti, se attivo.
 
-I predefiniti base restano 100/200/300. Tre facili consecutive valgono 100 + 110 + 120 = 330. Una media alla terza corretta vale 240, non 260. Con base intera e singola divisione a metà usare centesimi interi o aritmetica decimale esatta; con configurazioni ampie controllare la rappresentabilità, senza imporre un limite di serie. Il confronto finale usa valori esatti. Nello spareggio non si attribuiscono nuovi punti e i premi sono cancellati.
+I predefiniti base restano 100/200/300. Tre facili consecutive valgono 100 + 110 + 120 = 330. Una media alla terza corretta vale 240, non 260. Con più Ruba punti la divisione può produrre frazioni periodiche: conservare punteggi razionali esatti, non limitarsi a centesimi interi. Con configurazioni ampie controllare la rappresentabilità, senza imporre un limite di serie. Il confronto finale usa valori esatti. Nello spareggio non si attribuiscono nuovi punti e i premi sono cancellati.
 
 **SPEC-36 — Premi, quota per turno ed effetti (da implementare; REG-25–REG-28).** Catalogo: `salta_turno`, `ruba_punti`, `svela_e_passa`. Parametro p configurabile prima della partita come percentuale finita 0–100; validazione esplicita e nessun valore predefinito inventato se manca. Una prova di vincita dopo ciascuna corretta ordinaria, poi scelta uniforme di un solo tipo: 1/3 condizionato alla vincita, p/3 complessivo per tipo se p è espresso come probabilità. A p=0 nessun premio; p=100% un premio per corretta ordinaria. Nessuna estrazione per errore/scadenza, sanzione, sola quota Ruba punti o corrette nello spareggio. Registrare una sola volta prova ed esito, evitando nuove estrazioni con doppi clic, ridisegni o ripresa.
 
@@ -141,9 +141,9 @@ Svela e passa richiede domanda ancora nascosta; Salta turno e Ruba punti sono ut
 
 **Salta turno.** Ogni attivazione aggiunge un’occasione da saltare al bersaglio. Due attivazioni lecite in turni diversi o da gruppi diversi sullo stesso bersaglio si sommano. All’assegnazione, un salto consuma una sola occasione del contatore; proseguire nella rotazione fino a un gruppo disponibile, senza scartare, svelare o consumare la domanda. Il salto non azzera la serie. Verificare prima la condizione di unico superstite: non tenere aperta una partita già vinta a causa di salti pendenti.
 
-**Ruba punti.** Un solo effetto attivo per bersaglio. Rifiutare una seconda attivazione sul medesimo bersaglio senza consumare copia/quota e mostrare chi lo ha già marcato; sono ammessi effetti separati su bersagli diversi. L’effetto attende la prossima risposta/scadenza valida del bersaglio: turni altrui, salti e rifiuti accettati non lo consumano. Su corretta calcolare prima la nuova serie e il lordo del bersaglio, poi accreditare metà al bersaglio e metà al beneficiario in un’unica transazione. Totale delle quote uguale al lordo; nessuna modifica a punti già acquisiti, serie del beneficiario o sue estrazioni. Il bersaglio conserva la possibilità ordinaria di premio per la sua corretta. Su errore/scadenza niente quote e consumo dell’effetto. Esempio: facile 100 alla terza corretta → 120 lordo → 60 ciascuno; con base personalizzata 1 e seconda corretta → 1,10 → 0,55 ciascuno.
+**Ruba punti.** Consentire più effetti attivi sul medesimo bersaglio, mantenendo per ciascuno beneficiario e bersaglio. Le nuove attivazioni restano soggette a possesso, proprio turno e massimo un premio attivato per turno. Alla risposta corretta raccogliere i beneficiari attivi **distinti**, aggiungere il bersaglio e calcolare una sola volta il lordo con la nuova serie del rispondente. Con k beneficiari assegnare a ognuno dei k + 1 gruppi lordo/(k + 1), in una transazione unica. Nessun dimezzamento in cascata o premio del 50% separato per ogni effetto. Più copie dello stesso beneficiario non aumentano il numero delle quote: l’interfaccia deve segnalare l’eventuale attivazione ridondante prima del consumo, senza inventare una quota aggiuntiva. Solo il rispondente modifica la serie ed è eleggibile per l’estrazione; gli accrediti passivi non sono risposte corrette. Con A e C beneficiari su B e lordo 240: 80 ciascuno. Con unico beneficiario e lordo 120: 60 ciascuno. Su errore/scadenza nessuna quota; consumare insieme tutti gli effetti di quella risposta. Turni altrui, salti e rifiuti accettati non consumano gli effetti.
 
-Eliminazione: cancellare inventario dell’eliminato e tutti gli effetti in cui è beneficiario o bersaglio, senza trasferirli. Ingresso nello spareggio: cancellare tutti gli inventari ed effetti, senza nuove assegnazioni o attivazioni. Fine partita: gli oggetti senza occasioni utili non creano nuove domande né alterano il risultato. Salvare inventari, quota di turno, selezioni in corso, effetti, estrazioni e quote già accreditate; non riapplicare nulla alla ripresa.
+Eliminazione: cancellare inventario dell’eliminato e tutti gli effetti in cui è beneficiario o bersaglio, senza trasferirli. Se viene eliminato un beneficiario Ruba punti, conservare gli effetti degli altri beneficiari sullo stesso bersaglio; determinare le quote dagli effetti ancora validi al momento della risposta. Se è eliminato il bersaglio, cancellare tutti gli effetti su di lui. Nessun ricalcolo retroattivo di quote già accreditate. Ingresso nello spareggio: cancellare tutti gli inventari ed effetti, senza nuove assegnazioni o attivazioni. Fine partita: gli oggetti senza occasioni utili non creano nuove domande né alterano il risultato. Salvare inventari, quota di turno, selezioni in corso, effetti, estrazioni e quote già accreditate; non riapplicare nulla alla ripresa.
 
 **SPEC-37 — Svela e passa e rotazione dal destinatario (da implementare; REG-28).** Attivabile solo nel proprio turno prima dello svelamento e se nessun premio è già stato usato nel turno. Alla conferma consumare una copia e marcare la quota, poi mostrare stessa domanda e quattro alternative **con timer non avviato e risposte bloccate**. Mostrare le scelte «Rispondi» e «Passa a…», con soli destinatari attivi. Nessuna scadenza viene scalata durante la scelta.
 
@@ -161,7 +161,7 @@ Un rifiuto accettato conserva gruppo rispondente e quota già usata, sostituendo
 | Punti domanda media | 200 | `media` |
 | Punti domanda difficile | 300 | `difficile` |
 
-Il docente può modificare ciascun valore prima dell’avvio; accettare interi positivi finiti e rappresentabili esattamente, rifiutando input vuoti, non numerici, negativi, zero, frazioni o valori che renderebbero non esatti i calcoli della partita. Non imporre rapporti fissi 1:2:3 quando il docente personalizza i tre valori. Il dataset continua a dichiarare la difficoltà nel campo `difficolta`: non deve duplicare il punteggio della configurazione.
+Il docente può modificare ciascun valore prima dell’avvio; accettare interi positivi finiti e rappresentabili esattamente nel formato razionale scelto, rifiutando input vuoti, non numerici, negativi, zero, frazioni o valori che renderebbero non esatti i calcoli della partita. Non imporre rapporti fissi 1:2:3 quando il docente personalizza i tre valori. Il dataset continua a dichiarare la difficoltà nel campo `difficolta`: non deve duplicare il punteggio della configurazione.
 
 All’avvio conservare la tabella effettiva come parte della partita e usare quella per tutte le risposte ordinarie; la ripresa da salvataggio non deve sostituirla con i predefiniti o con le impostazioni di una nuova partita. Mostrare nell’anteprima docente il valore base e nell’esito il dettaglio **base × moltiplicatore = lordo**, con eventuale ripartizione Ruba punti successiva. Non applicare i punti base allo spareggio a eliminazione o al premio finale 10 blu. Le sanzioni non sottraggono punti: usare solo il contatore separato di SPEC-39, senza −1, −100 o penalità proporzionali.
 
@@ -173,6 +173,8 @@ Alla terza sanzione eliminare immediatamente anche il gruppo che sta rispondendo
 
 Dopo l’intero intervento disciplinare, prima di rispondere, premiare o avanzare, valutare i gruppi attivi: **zero = tutti sconfitti, nessun 10; uno = vincitore immediato con 10**, anche prima delle 33; due o più = prosegue. Se lo stesso intervento conferma sanzioni a più gruppi, completarle tutte prima di dichiarare il vincitore, così l’ultimo superstite temporaneo non vince se viene anch’esso eliminato dall’intervento. Conservare sanzioni, serie e motivi di eliminazione nel salvataggio e nel passaggio allo spareggio. Un rifiuto o la campanella non possono rinviare una terza sanzione confermata.
 
+
+**SPEC-40 — Quote e punteggi razionali esatti (da implementare; REG-27).** La divisione in parti uguali può essere periodica: lordo 100 con due beneficiari dà 100/3 a ciascuno. Non arrotondare ciascun accredito a 33,33 perdendo 0,01, né assegnare il residuo a un gruppo rompendo l’uguaglianza. Conservare guadagni, quote e totali con numeratore/denominatore ridotti o altra rappresentazione razionale equivalente; somme, confronti finali e parità devono usare i valori esatti, non le stringhe visualizzate. Serializzare nel salvataggio numeratori/denominatori in modo da non perdere precisione e validare denominatori positivi. Eventuali importi approssimati a schermo devono essere riconoscibili come tali e permettere di consultare la quota esatta nell’esito. Eseguire tutti gli accrediti della stessa risposta insieme, prima di determinare vincitore o spareggio. La somma esatta delle quote deve essere uguale al lordo.
 
 ## 7. Coerenza fra documenti, programma e presentazione
 
@@ -257,20 +259,23 @@ Questa è una lista di scenari da usare per le implementazioni successive; non d
 | ACC-65 | Cinque corrette consecutive facili, base 100 | Guadagni 100, 110, 120, 130, 140; serie non bloccata a tre né moltiplicatore limitato (SPEC-35) |
 | ACC-66 | Rifiuto accettato e turno saltato con serie attiva | Serie invariata; rifiuto sostituito allo stesso gruppo senza avanzare l’indice valido; salto conserva la stessa domanda per il successivo (SPEC-23/35/36) |
 | ACC-67 | Due o più Salta turno sullo stesso gruppo, ottenuti con attivazioni lecite | Effetti sommati; perde altrettante occasioni, una per volta; nessuna domanda consumata e serie invariata (SPEC-36) |
-| ACC-68 | Ruba punti già attivo su B, tentativo di un secondo su B | Rifiuto del secondo senza consumare copia o quota; primo effetto e beneficiario invariati (SPEC-36) |
+| ACC-68 | A ha già Ruba punti su B e C ne attiva un secondo nel proprio turno | Attivazione di C accettata e copia consumata una volta; lordo 240 di B diviso in 80 per A, B e C (SPEC-36) |
 | ACC-69 | Ruba punti attivo e B salta o ottiene un rifiuto accettato | Effetto conservato fino alla prossima risposta/scadenza valida di B (SPEC-36) |
 | ACC-70 | Svela e passa: attesa nella scelta, poi tiene o passa | Timer e risposte fermi durante scelta; alla conferma parte il tempo intero e copia resta consumata (SPEC-37) |
 | ACC-71 | Destinatario tenta premio o contro-passaggio dopo Svela e passa | Quota della domanda già usata: operazione respinta senza consumo. Rotazione successiva dal destinatario rispondente (SPEC-36/37) |
 | ACC-72 | Terza sanzione al rispondente mentre risposta/scadenza è pendente | Sanzione prioritaria: eliminazione, nessun punto/esito/premio da quella domanda; sostituzione per il successivo se partita prosegue (SPEC-39) |
 | ACC-73 | Intervento lascia uno o zero gruppi attivi prima delle 33 | Uno: vittoria immediata e 10 blu; zero: tutti sconfitti, nessun 10. Verifica dopo l’intervento disciplinare completo (SPEC-24/39) |
-| ACC-74 | Eliminato il bersaglio o beneficiario di Ruba punti, oppure gruppo con Salta turno pendente | Effetti che coinvolgono eliminato cancellati, nessun trasferimento; premio di chi l’aveva già usato non restituito (SPEC-36/39) |
+| ACC-74 | A e C beneficiari su B, poi A viene eliminato | Effetto A→B cancellato; C→B conservato. Alla corretta di B, lordo diviso solo tra B e C. Se B è eliminato, spariscono entrambi gli effetti (SPEC-36/39) |
+| ACC-75 | Due beneficiari distinti sullo stesso bersaglio, lordo 100 | Tre quote esatte da 100/3; somma esatta 100 e nessun centesimo assegnato arbitrariamente. Classifica e salvataggio usano valori razionali (SPEC-40) |
+| ACC-76 | Più copie dello stesso beneficiario sullo stesso bersaglio | Una sola quota per gruppo distinto; nessuna moltiplicazione del guadagno tramite copie duplicate (SPEC-36/40) |
+| ACC-77 | Rifiuto/salto o errore del bersaglio con due effetti attivi | Rifiuto/salto conserva entrambi; errore/scadenza li consuma entrambi senza quote. Ripresa non duplica effetti o accrediti (SPEC-36) |
 
 ## 9. Passi successivi
 
-Le decisioni DEC-01–DEC-19 sono risolte o superate dal regolamento 13.0.0; non continuare a usare le precedenti righe «da decidere» come blocchi per implementare quanto approvato. I dettagli tecnici reversibili vanno scelti in coerenza con i requisiti e verificati.
+Le decisioni DEC-01–DEC-19 sono risolte o superate dal regolamento 14.0.0; non continuare a usare le precedenti righe «da decidere» come blocchi per implementare quanto approvato. I dettagli tecnici reversibili vanno scelti in coerenza con i requisiti e verificati.
 
 1. Adeguare il motore del gioco: punteggi base configurabili, serie da seconda corretta senza tetto, rotazione dal rispondente, rifiuti sostituiti e salti cumulabili senza consumo domanda.
-2. Implementare un premio per turno, inventario, tre premi equiprobabili con p configurabile, Ruba punti esclusivo per bersaglio e cancellazioni su eliminazione/ingresso spareggio.
+2. Implementare un premio per turno, inventario, tre premi equiprobabili con p configurabile, Ruba punti simultanei con divisione in parti uguali per gruppi distinti e cancellazioni su eliminazione/ingresso spareggio.
 3. Implementare pannello sanzioni con pausa automatica e precedenza disciplinare, azzeramento serie, terza sanzione eliminatoria, vittoria anticipata e sconfitta di tutti.
 4. Integrare salvataggio/ripresa, layout verificato senza scorrimento e presentazione allineata alla stessa versione. Il default di p non è stato scelto: il programma può richiedere un valore prima dell’avvio.
 5. Eseguire gli scenari pertinenti alla logica e i controlli visuali; le tabelle di questa edizione sono specifiche di verifica, non risultati di test già eseguiti.
@@ -294,3 +299,4 @@ Si mantengono percorsi stabili, versione interna e cronologia Git. Aggiornare qu
 | 11.0.0 | 21/10/2026 | Configurazione dei punti base 100/200/300, calcolo per difficoltà, salvataggio dei valori ed esempi aggiornati; sanzioni non riscalate |
 | 12.0.0 | 21/10/2026 | Sanzioni separate dai punti, eliminazione disciplinare a 3, persistenza e ammissibilità alla vittoria; nuovi scenari e casi limite |
 | 13.0.0 | 21/10/2026 | Decisioni premi/turni consolidate, moltiplicatore corretto da seconda risposta senza tetto, sanzioni prioritarie e pausa automatica, rifiuti sostituiti e cancellazioni effetti |
+| 14.0.0 | 21/10/2026 | Ruba punti simultanei e quote uguali per gruppi distinti; calcolo razionale esatto, gestione duplicati ed eliminazione selettiva dei beneficiari |
