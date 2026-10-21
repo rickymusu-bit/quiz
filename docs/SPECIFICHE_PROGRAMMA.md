@@ -1,8 +1,8 @@
 # Chi vuol essere rimandato — Specifiche del programma
 
-Versione: **1.0.0** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
+Versione: **2.0.0** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
 
-Regolamento di riferimento: [REGOLAMENTO_UFFICIALE.md, v1.0.0](REGOLAMENTO_UFFICIALE.md).
+Regolamento di riferimento: [REGOLAMENTO_UFFICIALE.md, v2.0.0](REGOLAMENTO_UFFICIALE.md).
 
 ## 1. Scopo e gerarchia
 
@@ -10,7 +10,7 @@ Questo documento raccoglie le specifiche funzionali, i vincoli tecnici e i crite
 
 L'analisi iniziale è stata eseguita sul commit `4b7f285cfc4bec5507bed559ada3efa479b29e95`, leggendo il programma `Chi_vuol_essere_rimandato_quiz_v3_20261008.html`, il regolamento HTML v9, il template e il prompt dataset v1. È una verifica del sorgente, non una certificazione funzionale in browser.
 
-Stati dei requisiti: **presente** = riscontrato nel sorgente; **da implementare** = requisito per una futura modifica; **da decidere** = dipende da una questione DEC del regolamento. Le presenti modifiche sono documentali e non aggiornano gli HTML.
+Stati dei requisiti: **presente** = riscontrato nel sorgente; **da implementare** = requisito per una futura modifica; **da decidere** = dipende da una questione DEC del regolamento. Le presenti modifiche sono documentali e non aggiornano gli HTML. **Il programma v3 e la presentazione v9 non sono conformi al regolamento 2.0.0** per errore/scadenza, timer predefinito e premio finale. Le descrizioni del comportamento esistente non autorizzano a usare le vecchie regole per una sessione 2.0.0.
 
 ## 2. Utenti e distribuzione
 
@@ -25,7 +25,7 @@ Stati dei requisiti: **presente** = riscontrato nel sorgente; **da implementare*
 | SPEC-04 | Tre nomi di gruppo distinti senza distinzione fra maiuscole e minuscole; nomi vuoti sostituiti da nomi predefiniti | Presente |
 | SPEC-05 | Caricamento e validazione del JSON prima dell'estrazione; un nuovo caricamento invalida quello precedente | Presente |
 | SPEC-06 | Numero intero di domande da 1 a 33; al caricamento propone il minimo fra 33 e disponibilità. La partita ordinaria è di 33 | Presente |
-| SPEC-07 | Timer intero da 1 a 600 secondi, valore ordinario 30; comunicarne le variazioni prima della partita (REG-03) | Controllo presente; comunicazione automatica da implementare |
+| SPEC-07 | Timer totale intero da 1 a 600 secondi, predefinito 45: 15 per lettura + 30 per risposta; comunicarne le variazioni prima della partita (REG-03). Fasi e blocco risposta dipendono da DEC-09 | Da adeguare: oggi predefinito 30; controllo intervallo presente |
 | SPEC-08 | Selezione degli argomenti e quote intere non negative; somma uguale al totale e quota non superiore alla disponibilità; ribilanciamento delle quote | Presente |
 | SPEC-09 | Estrazione casuale senza ripetizioni di ID nella partita, nel rispetto delle quote; mescolamento di domande e alternative conservando la risposta corretta | Presente |
 | SPEC-10 | Anteprima docente con domande, alternative, soluzione e spiegazione; sostituzione singola con domanda inutilizzata dello stesso argomento e difficoltà; messaggio se non disponibile | Presente |
@@ -64,11 +64,11 @@ Non si confondono le 100 domande per argomento della banca con le 33 estratte pe
 | Copertina | Avvia | Configurazione |
 | Configurazione | Prepara con dati validi | Estrazione e anteprima docente |
 | Anteprima | Cambia domanda / torna indietro | Sostituzione controllata / configurazione |
-| Anteprima | Inizia partita | Azzera punteggi, serie, salti e qualifiche; sorteggia titolare e mostra domanda nascosta |
+| Anteprima | Inizia partita | Azzera punteggi, serie e salti; sorteggia titolare e mostra domanda nascosta |
 | Domanda nascosta | Passa | Testo ancora nascosto; cambia titolare, applica eventuali salti |
 | Domanda nascosta | Svela | Mostra domanda e alternative; avvia timer, salvo passaggio obbligatorio |
-| Risposta a tempo | Seleziona alternativa prima della scadenza | Un solo esito; +1 o −1 e blocco delle alternative |
-| Risposta a tempo | Scadenza | Un solo esito −1, anche se la scheda era in background |
+| Risposta a tempo | Seleziona alternativa prima della scadenza | Un solo esito; +1 se corretta, 0 se errata; blocco delle alternative (da adeguare) |
+| Risposta a tempo | Scadenza | Un solo esito a 0 punti, anche se la scheda era in background (da adeguare) |
 | Risposta a tempo | Chiedi rifiuto | Pausa del timer e decisione docente |
 | Valutazione rifiuto | Annulla / nega | Riprende il tempo residuo senza ripartire da zero |
 | Valutazione rifiuto | Accetta | Scarta la domanda; passa alla successiva secondo DEC-03 |
@@ -85,13 +85,13 @@ Non si confondono le 100 domande per argomento della banca con le 33 estratte pe
 
 | ID | Requisito | Regole | Stato |
 | --- | --- | --- | --- |
-| SPEC-19 | Punteggi interi anche negativi; corretta +1, errore/scadenza −1; nessuna eliminazione | REG-07, REG-09, REG-10 | Presente |
+| SPEC-19 | Punteggi interi anche negativi; corretta +1, errore/scadenza 0; sottrazioni solo per sanzioni; nessuna eliminazione. Errore/scadenza interrompono la serie e fanno ruotare il turno | REG-07, REG-09, REG-10 | Da adeguare: oggi errore/scadenza sottraggono 1 |
 | SPEC-20 | Dopo la terza corretta consecutiva disabilitare lo svelamento finché il gruppo non passa | REG-08 | Presente; azzeramenti da chiarire in DEC-02 |
-| SPEC-21 | Tabellone con titolare, punteggi, serie, salti e soglia premio raggiunta | REG-02, REG-08, REG-15, REG-21 | Presente |
+| SPEC-21 | Tabellone con titolare, punteggi, serie e salti; eliminare badge e stato permanente «10 blu raggiunto» | REG-02, REG-08, REG-15, REG-21 | Da adeguare: oggi mostra la vecchia qualifica a soglia |
 | SPEC-22 | Sanzione scelta dal docente per uno specifico gruppo: disturbo −1; suggerimenti/proteste sanzionabili −1 e salto | REG-11–REG-16 | Presente; casi limite DEC-04–DEC-06 |
 | SPEC-23 | Rifiuto con soli due motivi ammessi; decisione docente; nessun rifiuto dopo risposta o scadenza | REG-17–REG-19 | Presente; la tempestività è valutata dal docente, non dal solo stato del pulsante |
-| SPEC-24 | Non terminare a 10; conservare il raggiungimento della soglia anche se il punteggio diminuisce; elencare tutti i qualificati alla fine | REG-20, REG-21 | Presente |
-| SPEC-25 | Riepilogo con punteggi, qualificati, numero di domande con risposta/scadenza e numero di rifiuti; nessuna scrittura automatica su ClasseViva | REG-20–REG-22 | Presente |
+| SPEC-24 | Alla conclusione confrontare i punteggi finali e indicare il gruppo con il massimo; proporre facoltativamente il medesimo punteggio come voto blu. Nessuna qualifica permanente a 10; punteggi persi per sanzioni incidono sul risultato finale. Parità e punteggi fuori scala secondo DEC-07/08, senza soluzioni automatiche implicite | REG-20, REG-21 | Da implementare: il programma attuale usa il premio a soglia |
+| SPEC-25 | Riepilogo con punteggi finali, vincitore e voto blu proposto facoltativamente; segnalare parità o punteggio fuori scala come casi da decidere. Includere numero di domande con risposta/scadenza e rifiuti; nessuna scrittura automatica su ClasseViva | REG-20–REG-22 | Da adeguare: oggi elenca i gruppi qualificati con la vecchia soglia |
 
 Il registro eventi attuale conserva al massimo otto messaggi in memoria e ne mostra quattro. Il caricamento della pagina non ripristina una partita precedente. Salvataggio, ripresa dopo chiusura e annullamento di un'operazione non sono implementati né promessi da questa versione.
 
@@ -101,7 +101,7 @@ Il registro eventi attuale conserva al massimo otto messaggi in memoria e ne mos
 
 **SPEC-27 — Tracciabilità della presentazione (da implementare).** Ogni sezione HTML deve essere collegata agli ID REG pertinenti e mostrare la versione del regolamento. Le semplificazioni del linguaggio per la classe devono conservare condizioni, conseguenze ed eccezioni. L'attuale v9 non dichiara la versione di questo documento né descrive tutte le convenzioni operative.
 
-**SPEC-28 — Dati comuni (miglioramento proposto, non implementato).** In una futura implementazione spostare parametri condivisi — gruppi, domande ordinarie, timer ordinario, punteggi, soglia e limite serie — in una configurazione strutturata validata. Il programma e la presentazione devono incorporare gli stessi valori e la stessa versione durante la generazione degli HTML, così da mantenere l'uso offline. Non aggiungere un caricamento di rete obbligatorio. Il regolamento resta la fonte semantica: un JSON di numeri non sostituisce le condizioni espresse nel testo.
+**SPEC-28 — Dati comuni (miglioramento proposto, non implementato).** In una futura implementazione spostare parametri condivisi — gruppi, domande ordinarie, timer ordinario e sua ripartizione, punteggi e limite serie — in una configurazione strutturata validata. Il programma e la presentazione devono incorporare gli stessi valori e la stessa versione durante la generazione degli HTML, così da mantenere l'uso offline. Non aggiungere un caricamento di rete obbligatorio. Il regolamento resta la fonte semantica: un JSON di numeri non sostituisce le condizioni espresse nel testo.
 
 **SPEC-29 — Controlli prima di distribuire (da implementare).** Affiancare controlli automatici per punteggi, transizioni, dataset e valori condivisi a una verifica visiva della presentazione. Un controllo dei soli numeri non prova che un testo spieghi correttamente tutte le regole.
 
@@ -116,20 +116,23 @@ Questa è una lista di scenari da usare per le implementazioni successive; non d
 | ACC-03 | Quote insufficienti, somma errata o timer fuori intervallo | Preparazione bloccata senza partita parziale (SPEC-06–SPEC-09) |
 | ACC-04 | Estrazione e sostituzione in anteprima | Quote rispettate, nessun ID duplicato; sostituzione stesso argomento/difficoltà o messaggio di indisponibilità (SPEC-09, SPEC-10) |
 | ACC-05 | Risposta corretta dopo mescolamento delle alternative | +1 una sola volta, soluzione coerente, prossima domanda al titolare (SPEC-09, SPEC-17, SPEC-19) |
-| ACC-06 | Errore o nessuna risposta | −1 una sola volta; prossima domanda al successivo disponibile; valori negativi ammessi (SPEC-19) |
+| ACC-06 | Errore o nessuna risposta | Punteggio invariato, serie interrotta e prossima domanda al successivo disponibile; nessuna penalità automatica (SPEC-19) |
 | ACC-07 | Terza corretta consecutiva con altre domande disponibili | Svelamento bloccato e scelta di un altro gruppo (SPEC-20) |
 | ACC-08 | Richiesta tempestiva di rifiuto annullata | Timer ripreso dal residuo; nessuna variazione di punti; decisione del docente rispettata (SPEC-23) |
 | ACC-09 | Disturbo, suggerimento o protesta sanzionabile | Penalità al gruppo selezionato, indipendente dall'esito altrui; salto secondo DEC-04/05 (SPEC-22) |
-| ACC-10 | Un gruppo raggiunge 10, poi perde punti; un altro raggiunge 10 | La partita prosegue; entrambi restano qualificati nel riepilogo (SPEC-24) |
+| ACC-10 | Risultati finali A=8, B=7, C=6; in una seconda sessione A passa da 10 a 8 per sanzioni e B termina a 9 | Prima sessione: vince A, voto proposto facoltativamente 8. Seconda: vince B, voto proposto 9; nessun premio permanente per A (SPEC-24) |
 | ACC-11 | Fine modulo durante risposta oppure ultima domanda rifiutata | Timer fermo, riepilogo coerente; gestione domanda in corso secondo DEC-06 (SPEC-25) |
 | ACC-12 | Doppio clic, clic alla scadenza, ritorno da scheda in background | Un solo esito e un solo aggiornamento dei punti (SPEC-17) |
 | ACC-13 | HTML aperti localmente senza rete; schermo piccolo e tastiera | Risorse/formule disponibili, comandi leggibili e raggiungibili (SPEC-02, SPEC-03) |
 | ACC-14 | Confronto di ogni sezione della presentazione con gli ID REG | Nessuna contraddizione e versione dichiarata quando SPEC-27 sarà implementato |
+| ACC-15 | Avvio con impostazioni predefinite | Tempo totale 45 secondi dallo svelamento, ripartizione dichiarata 15+30; verifica del blocco iniziale dopo DEC-09 (SPEC-07) |
+| ACC-16 | Parità al primo posto oppure massimo superiore a 10, nullo o negativo | Segnalazione del caso aperto; nessuno spareggio, arrotondamento o tetto automatico non deliberato (SPEC-24, SPEC-25) |
+| ACC-17 | Gruppo vincitore non accetta il voto proposto | Nessuna attribuzione automatica; la vittoria resta tale. Modalità della scelta secondo DEC-08 (REG-21, REG-22) |
 
 ## 9. Passi successivi proposti
 
-1. Risolvere DEC-01–DEC-06 con il responsabile, in particolare passaggi ripetuti, serie e turni saltati.
-2. Allineare la presentazione e introdurre versione e riferimenti REG nel programma.
+1. Risolvere DEC-01–DEC-09 con il responsabile, inclusi pareggi, punteggi fuori scala, scelta del voto e fasi del timer.
+2. Adeguare programma e presentazione al regolamento 2.0.0: errore/scadenza 0, timer 45 secondi e premio al vincitore per punteggio finale. Introdurre versione e riferimenti REG.
 3. Introdurre configurazione condivisa e schema del dataset solo con una migrazione esplicita; conservare gli HTML autonomi.
 4. Automatizzare gli scenari fondamentali prima di cambiare la logica del gioco. Valutare separatamente ripresa della partita e annullamento dell'ultima operazione del docente.
 
@@ -140,3 +143,4 @@ Si mantengono percorsi stabili, versione interna e cronologia Git. Aggiornare qu
 | Versione | Data | Modifica |
 | --- | --- | --- |
 | 1.0.0 | 21/10/2026 | Inventario iniziale, requisiti tracciabili, lacune e criteri di accettazione |
+| 2.0.0 | 21/10/2026 | Allineamento dei requisiti e degli scenari al regolamento 2.0.0; vecchi HTML esplicitamente da adeguare |
