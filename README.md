@@ -2,7 +2,7 @@
 
 Sito: https://rickymusu-bit.github.io/quiz/
 
-Interfaccia 1.2.0, regolamento 18.0.1. GitHub Pages pubblica il ramo `gh-pages`, cartella `/`.
+Interfaccia 1.2.1, regolamento 18.0.1. GitHub Pages pubblica il ramo `gh-pages`, cartella `/`.
 
 Il sito offre il quiz e le regole direttamente nel browser. Non sono presenti pulsanti di download, selettori di file o importazione/esportazione delle partite. Le domande vengono caricate automaticamente dal catalogo `datasets.json` e dalle banche pubblicate sul sito. Il dataset rimane una risorsa interna del sito, senza collegamenti di download per l'utente.
 
@@ -17,3 +17,7 @@ Home con logo ufficiale fornito dal responsabile, sottotitolo «Solo uno sciocco
 Home, gioco, dialoghi e regole si adattano alla larghezza della finestra, senza il precedente blocco minimo 1280×800. Su mobile i dettagli dei gruppi sono espandibili; testo e comandi possono scorrere verticalmente. Formule molto larghe scorrono nel loro riquadro. Sono stati verificati desktop, telefono, orientamento orizzontale, touch, tastiera e testi ingranditi.
 
 Logo, sfondo e carattere sono in `assets/`, con provenienza in `assets/README.md` e licenza del carattere in `assets/vt323-license.txt`.
+
+La home unica è `/quiz/`: «Torna alla schermata iniziale» e il logo riportano a quell’indirizzo. `Fool.html` apre la configurazione e permette la ripresa, senza una copertina interna duplicata.
+
+Anche nelle regole è presente un pulsante esplicito «Torna alla schermata iniziale».
