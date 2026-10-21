@@ -1,12 +1,12 @@
 # Fool — Specifiche del programma
 
-Versione: **18.0.0** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
+Versione: **18.0.1** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
 
-Regolamento di riferimento: [REGOLAMENTO_UFFICIALE.md, v18.0.0](REGOLAMENTO_UFFICIALE.md).
+Regolamento di riferimento: [REGOLAMENTO_UFFICIALE.md, v18.0.1](REGOLAMENTO_UFFICIALE.md).
 
 ## 1. Scopo, fonti e stato dell’adeguamento
 
-Queste sono le specifiche del comportamento da implementare per **Fool**, allineate al [regolamento ufficiale v18.0.0](REGOLAMENTO_UFFICIALE.md) e alle [specifiche grafiche v1.2.0](ASPETTO_GRAFICO.md). La direzione visiva approvata è **Doom classico, con estetica pixel**; palette, font, logo e dettagli non ancora approvati restano raccolti nel documento grafico, senza inventarli qui.
+Queste sono le specifiche del comportamento da implementare per **Fool**, allineate al [regolamento ufficiale v18.0.1](REGOLAMENTO_UFFICIALE.md) e alle [specifiche grafiche v1.2.1](ASPETTO_GRAFICO.md). La direzione visiva approvata è **Doom classico, con estetica pixel**; palette, font, logo e dettagli non ancora approvati restano raccolti nel documento grafico, senza inventarli qui.
 
 Il regolamento stabilisce le regole, questo documento le traduce in stati, calcoli, comandi, salvataggi e verifiche, il documento grafico stabilisce la veste visiva. La presentazione HTML deve spiegare le medesime regole e dichiararne la versione.
 
@@ -126,7 +126,7 @@ Il salvataggio deve distinguere i seguenti dati, senza ricavarli dalle sole etic
 
 | Dato logico | Vincolo |
 | --- | --- |
-| Versioni e impostazioni | Formato salvataggio, regolamento 18.0.0, tabella basi, tempo e p effettivi; nessuna sostituzione con default alla ripresa |
+| Versioni e impostazioni | Formato salvataggio, regolamento 18.0.1, tabella basi, tempo e p effettivi; nessuna sostituzione con default alla ripresa |
 | Fase e schermata | Fase ordinaria/spareggio/conclusa distinta da domanda nascosta, scelta, risposta, esito, pausa e dialogo |
 | Turno | Identificativo del turno, titolare iniziale, rispondente effettivo e riferimento per la rotazione successiva |
 | Quota bonus | Un flag comune al turno; passa e rifiuto non lo rinnovano |
@@ -140,7 +140,7 @@ Il salvataggio deve distinguere i seguenti dati, senza ricavarli dalle sole etic
 
 Validare coerenza dei dati oltre al JSON: gruppo rispondente esistente, inventari e salti non negativi, serie non negativa, nessun bonus utilizzabile nello spareggio, quota coerente con l’attivazione e punteggi razionali con denominatore positivo. Un salvataggio di una vecchia versione non va reinterpretato automaticamente come compatibile con le nuove regole: migrazione esplicita oppure messaggio di incompatibilità, senza sovrascrivere la partita attiva.
 
-**SPEC-31 — «Chi vuol essere eliminato» (da implementare; REG-23).** Dopo le 33 domande valide, in caso di parità al massimo tra gruppi attivi, cancellare tutti gli inventari dei bonus e tutti gli effetti pendenti (Salta turno e Ruba punti inclusi), per ogni gruppo. Solo dopo questo reset entrare nello spareggio e salvarne lo stato: la ripresa non deve recuperare bonus eliminati. Sorteggiare una volta l’ordine dei partecipanti; usare quesiti non svelati della banca ordinaria a quattro alternative e lo stesso tempo impostato per la partita. Una corretta mantiene in gara e ruota; errore/scadenza eliminano. Non assegnare o consentire uso di bonus. Le sanzioni continuano, azzerano la serie e alla terza eliminano con priorità. Il rifiuto accettato sostituisce allo stesso gruppo, senza cambiare la serie. Dopo l’intervento completo, un superstite vince il 10 blu; nessun superstite significa sconfitta di tutti. Nessun punto o moltiplicatore aggiuntivo nello spareggio.
+**SPEC-31 — «Battaglia finale» (da implementare; REG-23).** Dopo le 33 domande valide, in caso di parità al massimo tra gruppi attivi, cancellare tutti gli inventari dei bonus e tutti gli effetti pendenti (Salta turno e Ruba punti inclusi), per ogni gruppo. Solo dopo questo reset entrare nello spareggio e salvarne lo stato: la ripresa non deve recuperare bonus eliminati. Sorteggiare una volta l’ordine dei partecipanti; usare quesiti non svelati della banca ordinaria a quattro alternative e lo stesso tempo impostato per la partita. Una corretta mantiene in gara e ruota; errore/scadenza eliminano. Non assegnare o consentire uso di bonus. Le sanzioni continuano, azzerano la serie e alla terza eliminano con priorità. Il rifiuto accettato sostituisce allo stesso gruppo, senza cambiare la serie. Dopo l’intervento completo, un superstite vince il 10 blu; nessun superstite significa sconfitta di tutti. Nessun punto o moltiplicatore aggiuntivo nello spareggio.
 
 Usare quesiti extra non svelati, della banca ordinaria e pertinenti agli argomenti selezionati. Il numero di extra non è limitabile a priori: prevedere rifornimento validato nello stesso formato SPEC-13 senza azzerare lo spareggio. A esaurimento sospendere e chiedere altri quesiti, senza ripetizioni silenziose o vincitori dichiarati per sola carenza di domande.
 
@@ -230,7 +230,7 @@ Dopo l’intero intervento disciplinare, prima di rispondere, premiare o avanzar
 **SPEC-40 — Quote e punteggi razionali esatti (da implementare; REG-27).** La divisione in parti uguali può essere periodica: lordo 100 con due beneficiari dà 100/3 a ciascuno. Non arrotondare ciascun accredito a 33,33 perdendo 0,01, né assegnare il residuo a un gruppo rompendo l’uguaglianza. Conservare guadagni, quote e totali con numeratore/denominatore ridotti o altra rappresentazione razionale equivalente; somme, confronti finali e parità devono usare i valori esatti, non le stringhe visualizzate. Serializzare nel salvataggio numeratori/denominatori in modo da non perdere precisione e validare denominatori positivi. Eventuali importi approssimati a schermo devono essere riconoscibili come tali e permettere di consultare la quota esatta nell’esito. Eseguire tutti gli accrediti della stessa risposta insieme, prima di determinare vincitore o spareggio. La somma esatta delle quote deve essere uguale al lordo.
 
 
-**SPEC-41 — Nome e riferimento grafico (da implementare).** Usare **Fool** come nome visibile del gioco nella copertina, nel titolo del documento HTML/browser, nei menu, nei riepiloghi e nella presentazione delle regole. Per la veste grafica seguire [ASPETTO_GRAFICO.md](ASPETTO_GRAFICO.md), mantenendo separati requisiti approvati e dettagli ancora da definire. L’ispirazione a Doom classico e l’estetica pixel non modificano logica di gioco, leggibilità, funzionamento offline o layout operativo richiesti dalle altre specifiche. Usare Fool nei documenti, nel prompt e nei titoli dei dataset. Gli HTML esistenti e i loro nomi rimangono invariati su richiesta del responsabile, in attesa di rifacimento; mantenere validi i riferimenti e la provenienza. Repository, ID e schema non cambiano. Conservare lo spareggio «Chi vuol essere eliminato».
+**SPEC-41 — Nome e riferimento grafico (da implementare).** Usare **Fool** come nome visibile del gioco nella copertina, nel titolo del documento HTML/browser, nei menu, nei riepiloghi e nella presentazione delle regole. Per la veste grafica seguire [ASPETTO_GRAFICO.md](ASPETTO_GRAFICO.md), mantenendo separati requisiti approvati e dettagli ancora da definire. L’ispirazione a Doom classico e l’estetica pixel non modificano logica di gioco, leggibilità, funzionamento offline o layout operativo richiesti dalle altre specifiche. Usare Fool nei documenti, nel prompt e nei titoli dei dataset. Gli HTML esistenti e i loro nomi rimangono invariati su richiesta del responsabile, in attesa di rifacimento; mantenere validi i riferimenti e la provenienza. Repository, ID e schema non cambiano. Conservare lo spareggio «Battaglia finale».
 
 **SPEC-42 — Aura fino al prossimo turno (da implementare; REG-29).** Aura è uno dei cinque tipi equiprobabili: 1/5 condizionato alla vincita, p/5 complessivo per una corretta ordinaria. Possesso della copia e protezione sono stati distinti. Conferma di attivazione nel proprio turno: consuma una copia e la quota bonus e attiva la protezione fino all’evento di **inizio del prossimo turno dello stesso gruppo**, non al termine del giro generale o del turno di un avversario. Non disattivarla al primo attacco. All’inizio del turno successivo rimuovere la protezione prima delle nuove azioni.
 
@@ -299,7 +299,7 @@ Salvare ID della copia, tipo ottenuto, possessore, ID dell’attaccante ammesso 
 
 ## 7.2. Riferimento grafico e leggibilità
 
-Nome e riferimento visivo sono definiti in SPEC-41 e ASPETTO_GRAFICO.md v1.2.0. Il layout operativo di SPEC-33 deve includere anche inventario, stato di quota bonus, destinatario della domanda, contatori sanzioni e beneficiari Ruba punti, quando pertinenti. Il pixel style non autorizza font illeggibili o formule rasterizzate indistinguibili. Le decisioni grafiche ancora aperte restano nel documento grafico.
+Nome e riferimento visivo sono definiti in SPEC-41 e ASPETTO_GRAFICO.md v1.2.1. Il layout operativo di SPEC-33 deve includere anche inventario, stato di quota bonus, destinatario della domanda, contatori sanzioni e beneficiari Ruba punti, quando pertinenti. Il pixel style non autorizza font illeggibili o formule rasterizzate indistinguibili. Le decisioni grafiche ancora aperte restano nel documento grafico.
 
 ## 8. Criteri di accettazione
 
@@ -408,7 +408,7 @@ Questa è una lista di scenari da usare per l’implementazione; non dichiara te
 
 ## 9. Passi successivi
 
-Le decisioni DEC-01–DEC-21 sono risolte o superate dal regolamento 18.0.0. Implementare le regole correnti e verificare SPEC-42/43. I dettagli tecnici reversibili vanno scelti in coerenza con i requisiti. Gli HTML esistenti restano esclusi da questa revisione, in attesa di rifacimento.
+Le decisioni DEC-01–DEC-21 sono risolte o superate dal regolamento 18.0.1. Implementare le regole correnti e verificare SPEC-42/43. I dettagli tecnici reversibili vanno scelti in coerenza con i requisiti. Gli HTML esistenti restano esclusi da questa revisione, in attesa di rifacimento.
 
 1. Adeguare il motore del gioco: punteggi base configurabili, serie da seconda corretta senza tetto, rotazione dal rispondente, rifiuti sostituiti e salti cumulabili senza consumo domanda.
 2. Implementare un bonus per turno, inventario, cinque bonus equiprobabili con p configurabile, Ruba punti simultanei con divisione in parti uguali per gruppi distinti e cancellazioni su eliminazione/ingresso spareggio.
@@ -443,3 +443,4 @@ Si mantengono percorsi stabili, versione interna e cronologia Git. Aggiornare qu
 | 16.0.0 | 21/10/2026 | Aura fino al prossimo turno con scadenza persistente; Karma come quinto premio equiprobabile e requisiti di cronologia, con perimetro di copia da definire |
 | 17.0.0 | 21/10/2026 | Karma passivo: copia trasformata dal malus subito, bersaglio obbligato all’attaccante, quota distinta fra trasformazione e uso, provenienza persistente |
 | 18.0.0 | 21/10/2026 | Nome Fool; premi di gioco denominati bonus; probabilità predefinita 90%; interazioni Aura e Karma definite, una sola copia trasformata per malus |
+| 18.0.1 | 21/10/2026 | Spareggio rinominato «Battaglia finale»; meccaniche invariate |

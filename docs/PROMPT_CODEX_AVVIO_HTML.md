@@ -1,6 +1,6 @@
 # Fool — Template per avviare l’implementazione con Codex
 
-Versione: **1.1.0** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
+Versione: **1.1.1** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
 
 Incollare in Codex il blocco seguente, lavorando nel repository `rickymusu-bit/quiz`. I percorsi sono relativi alla radice del repository. Questo template avvia la realizzazione del programma; non è il programma già implementato.
 
@@ -43,7 +43,7 @@ AMBITO E CONSEGNA
   come rigenerarlo. Evita dipendenze non necessarie.
 - Dichiara versione dell’app e del regolamento applicato; usa Fool in tutti
   i titoli visibili e bonus per gli oggetti di gioco. Il premio finale resta
-  il 10 blu sul registro. Non modificare il nome dello spareggio approvato.
+  il 10 blu sul registro. Lo spareggio si chiama Battaglia finale.
 - Realizza anche il nuovo documento delle regole. Non pubblicare un sito
   e non alterare configurazioni di hosting. Aggiorna README e istruzioni
   per aprire entrambi gli HTML e distinguere archivio e materiali attuali.
@@ -171,3 +171,4 @@ VERIFICHE E RESOCONTO
 | --- | --- | --- |
 | 1.0.0 | 21/10/2026 | Prompt iniziale per il nuovo HTML autonomo, con fonti autorevoli, incrementi, requisiti offline e verifiche |
 | 1.1.0 | 21/10/2026 | Due consegne: programma e regole per la classe; vecchi HTML da archiviare con aggiornamento dei riferimenti |
+| 1.1.1 | 21/10/2026 | Spareggio rinominato «Battaglia finale»; meccaniche invariate |

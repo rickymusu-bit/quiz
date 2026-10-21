@@ -1,6 +1,6 @@
 # Fool — Specifiche dell’aspetto grafico
 
-Versione: **1.2.0** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
+Versione: **1.2.1** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
 
 ## 1. Scopo e stato
 
@@ -25,7 +25,7 @@ Il riferimento approvato è **Doom classico**, con estetica pixel. Questa scelta
 
 Il titolo visibile del prodotto diventa **Fool**: copertina, titolo della pagina/browser, menu, schermate finali e intestazioni della presentazione devono essere coerenti quando verranno aggiornati gli HTML.
 
-Il nome della fase di spareggio **«Chi vuol essere eliminato»** resta quello già approvato finché non viene chiesta una modifica specifica.
+Il nome della fase di spareggio è **«Battaglia finale»**.
 
 Gli HTML sono esclusi dalla rinomina su richiesta del responsabile, perché da rifare da capo; mantengono contenuto e nomi originari. La provenienza conserva i riferimenti storici verificabili. Il nome del prodotto non richiede di cambiare il nome del repository, invalidare i salvataggi o rinominare automaticamente file e percorsi già collegati.
 
@@ -76,3 +76,4 @@ Percorso stabile, versione interna e cronologia Git.
 | 1.1.2 | 21/10/2026 | Karma aggiunto al catalogo grafico e indicazione di Aura fino al prossimo turno; nessuna nuova icona approvata |
 | 1.1.3 | 21/10/2026 | Informazioni grafiche necessarie per la copia trasformata da Karma e il bersaglio obbligato; aspetto ancora da definire |
 | 1.2.0 | 21/10/2026 | Nome Fool e denominazione bonus; HTML esclusi dalla modifica; interazioni Aura/Karma definite |
+| 1.2.1 | 21/10/2026 | Spareggio rinominato «Battaglia finale»; meccaniche invariate |
