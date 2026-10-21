@@ -5,9 +5,11 @@ Materiali di **Fool**, il quiz di Riccardo Musumarra, separati dal repository `r
 - `Chi_vuol_essere_rimandato_quiz_v3_20261008.html`: gioco a quiz.
 - `Chi_vuol_essere_rimandato_regole_v9_20261008.html`: presentazione delle regole per la classe.
 - `Template_dataset_quiz_argomenti_v1_20261008.json`: modello del dataset.
-- `Prompt_generazione_dataset_quiz_v1_20261008.txt`: istruzioni per preparare i dataset.
+- [Prompt_generazione_dataset_quiz_v2_20261021.txt](Prompt_generazione_dataset_quiz_v2_20261021.txt): istruzioni aggiornate per preparare i dataset; la v1 è conservata come precedente.
 
 ## Documenti di riferimento
+
+- [Template di avvio per Codex](docs/PROMPT_CODEX_AVVIO_HTML.md) — prompt per realizzare da zero Fool.html e Fool_regole.html, archiviando i vecchi HTML, versione 1.1.0.
 
 - [Regolamento ufficiale](docs/REGOLAMENTO_UFFICIALE.md) — fonte normativa del gioco, versione 18.0.0.
 - [Specifiche del programma](docs/SPECIFICHE_PROGRAMMA.md) — comportamento riferito al regolamento 18.0.0, stati e comandi, dataset, salvataggi e criteri di accettazione, versione 18.0.0.
@@ -23,3 +25,5 @@ Scarica gli HTML e aprili nel browser. I materiali erano stati trasferiti integr
 Aura si attiva facoltativamente nel proprio turno e protegge dai soli nuovi attacchi, incluso Svela e passa, fino all’inizio del prossimo turno; gli attacchi bloccati vengono consumati. Per ogni malus applicato si trasforma una sola copia Karma, vincolata al suo autore. Probabilità predefinita dei bonus 90%, configurabile; cinque tipi equiprobabili.
 
 Gli HTML, inclusi i loro nomi, restano invariati su richiesta del responsabile: saranno rifatti da capo. La rinomina attuale riguarda documenti, prompt e metadati del dataset.
+
+Il template per Codex prevede due nuovi HTML autonomi, programma e regole per la classe, e lo spostamento degli HTML storici in `archivio/`. Questo è il prossimo lavoro di implementazione: i file storici non sono stati ancora spostati da questa revisione del prompt.
