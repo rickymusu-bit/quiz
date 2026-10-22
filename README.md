@@ -2,7 +2,7 @@
 
 Sito: https://rickymusu-bit.github.io/quiz/
 
-Interfaccia 1.2.2, regolamento 18.0.1. GitHub Pages pubblica il ramo `gh-pages`, cartella `/`.
+Interfaccia 1.2.2 (motore 1.2.0), regolamento 18.2.0. GitHub Pages pubblica il ramo `gh-pages`, cartella `/`.
 
 Il sito offre il quiz e le regole direttamente nel browser. Non sono presenti pulsanti di download, selettori di file o importazione/esportazione delle partite. Le domande vengono caricate automaticamente dal catalogo `datasets.json` e dalle banche pubblicate sul sito. Il dataset rimane una risorsa interna del sito, senza collegamenti di download per l'utente.
 
@@ -23,3 +23,7 @@ La home unica è `/quiz/`: «Torna alla schermata iniziale» e il logo riportano
 Anche nelle regole è presente un pulsante esplicito «Torna alla schermata iniziale».
 
 Il logo corrente è `assets/fool-logo.png`: le superfici blu sono ora grigio antracite/nero, con accenti arancioni e dorati conservati.
+
+## Massacro
+
+Dopo 33 domande si elimina il gruppo con il punteggio minimo, se ultimo univoco; in caso di parità all'ultimo posto nessun gruppo viene escluso arbitrariamente. I gruppi rimasti si sfidano con tre domande difficili consecutive ciascuno. Vince chi ne indovina di più; i gruppi ancora in parità al primo posto ripetono nuove batterie da tre. Le domande sono inedite nella partita e tratte dagli argomenti selezionati. I bonus sono disattivati. I salvataggi con regole precedenti non vengono reinterpretati automaticamente.
