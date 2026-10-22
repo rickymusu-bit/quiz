@@ -156,3 +156,9 @@ Non è una certificazione completa di tutte le combinazioni ACC-01–98 o di tut
 `tests/landscape.py`, eseguito in Chromium, verifica 640×360, 844×390, 1024×576, 1280×566, 1280×800, 1440×900 e 1920×1080. In ogni risoluzione sono passate tutte le 100 domande con alternative e spiegazioni e le 21 sezioni delle regole: larghezza e altezza del documento entro il viewport. Verificati inoltre preparazione, simboli persistenti sullo sfondo, rotazione semplificata, domanda nascosta/svelata/pausa/esito, sanzioni e inventario, schede e paginazione delle impostazioni, anteprima e indice delle regole. Nessun errore JavaScript rilevato.
 
 Verificato con l’API reale: schermo intero dalla home, ingresso nel gioco e nelle regole, ritorno alla home mantenendo la modalità, uscita e messaggio quando l’API non è disponibile. In verticale: invito a ruotare e pausa del timer, con ripresa esplicita tornando in orizzontale. Il contenuto viene ridimensionato e ridisposto; non viene nascosto per simulare l’assenza di scorrimento. Le dimensioni provate definiscono la matrice verificata, non una certificazione di tutti i browser/dispositivi.
+
+## Dataset Introduzione alla fisica e alla misura — 22/10/2026
+
+Aggiunto al catalogo il dataset originale del commit `a9ffc042927e2550b37511421bd8de00c2baab44` su main, senza modificare domande, ID o soluzioni. Il controllo delle alternative duplicate ora distingue maiuscole e minuscole: simboli SI come K/k e kg/Kg hanno significati differenti. Le alternative identiche restano rifiutate; un test verifica entrambi i casi sulla nuova banca.
+
+Passati 31 test motore. Verificata la nuova banca in Chromium a 1280×566 e 844×390: selezione da Start, avvio, risposta, salvataggio/ripresa e tutte le 100 domande con alternative e spiegazioni entro il viewport, senza errori JavaScript. Confermata identità del file dataset con quello su main (blob `92af963a0fbc82f6f3547b32115454daecaf2dbe`).

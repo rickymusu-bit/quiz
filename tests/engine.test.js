@@ -56,3 +56,14 @@ test('Sanzione decisiva nello spareggio assegna la vittoria e pulisce lo stato',
  assert.equal(g.s.phase,'spareggio');g.s.groups[0].sanctions=2;g.reveal();g.openSanctions();g.s.panel.counts[0]=1;g.closeSanctions(true);
  assert.equal(g.s.phase,'conclusa');assert.equal(g.s.winner,1);assert.equal(g.s.paused,false);assert.equal(F.Game.restore(g.snapshot()).s.winner,1);
 });
+
+// SI unit symbols are case sensitive: K/k and kg/Kg are distinct alternatives.
+test('Nuova banca fisica: simboli SI distinti e duplicati identici respinti',()=>{
+ const raw=JSON.parse(fs.readFileSync('dataset/fool_introduzione_fisica_misura_v1_20261022.json','utf8'));
+ const bank=F.parseDataset(JSON.stringify(raw),katex).bank;
+ assert.equal(bank.length,100);
+ assert.deepEqual(bank.find(q=>q.id==='misure_metrologia_007').options,['°K','K','k','Kel']);
+ assert.deepEqual(bank.find(q=>q.id==='misure_metrologia_018').options,['5 Kg','5 KG','5 kg','5 kG']);
+ raw.argomenti[0].domande[0].alternative[1]=raw.argomenti[0].domande[0].alternative[0];
+ assert.throws(()=>F.parseDataset(JSON.stringify(raw),katex),/alternative duplicate/);
+});
