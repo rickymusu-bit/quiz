@@ -363,7 +363,7 @@ SOFTWARE.
 <div id="viewport-stage"><header><a class="brand" href="./" aria-label="Fool, pagina iniziale"><img src="assets/fool-logo.png" alt="Fool" width="2171" height="724"></a><small>App 1.7.1 · Regolamento 18.0.1 · 21/10/2026</small></header><main id="main"></main></div><div id="message" role="status" aria-live="polite"></div><dialog id="dialog" aria-label="Decisione docente"></dialog><aside id="fit-warning" class="fit-warning" role="alert" hidden></aside><script>/* Fool 1.0.0 — modello e transizioni; nessuna dipendenza dal DOM. */
 (function(root){
 'use strict';
-const RULES='18.1.0', VERSION='1.1.0', TYPES=['salta','ruba','svela','aura','karma'];
+const RULES='18.2.0', VERSION='1.2.0', TYPES=['salta','ruba','svela','aura','karma'];
 const LABELS={salta:'Salta turno',ruba:'Ruba punti',svela:'Svela e passa',aura:'Aura',karma:'Karma'};
 const clone=x=>JSON.parse(JSON.stringify(x));
 function need(v,m){if(!v)throw Error(m)}
@@ -444,11 +444,17 @@ class Game {
  }
  eliminate(i,cause){const s=this.s,g=s.groups[i];g.out=true;g.cause=cause;g.inventory=[];g.aura=null;s.effects=s.effects.filter(e=>e.source!==i&&e.target!==i)}
  finishCheck(){const s=this.s,active=this.active();if(active.length<=1){s.draftBonus=null;s.phase='conclusa';s.winner=active[0]??null;this.stop();s.panel=null;s.paused=false;s.pauseReason='';s.suspendAfter=false;s.suspended=false;s.screen='final';return}
- if(s.phase==='spareggio'&&s.drawAsked===5){if(s.drawTurn<s.order.length-1){s.drawTurn++;s.drawAsked=0}else{const high=Math.max(...s.order.map(i=>s.drawWins[i]));const tied=s.order.filter(i=>s.drawWins[i]===high&&!s.groups[i].out);if(tied.length===1){s.phase='conclusa';s.winner=tied[0];s.screen='final';this.stop();s.suspendAfter=false;s.suspended=false;return}s.drawParticipants=tied;s.order=tied;s.drawTurn=0;s.drawAsked=0;s.drawWins=[0,0,0];s.drawRound++;this.log('Battaglia finale: nuova batteria di cinque domande per '+tied.map(i=>s.groups[i].name).join(', '))}}
+ if(s.phase==='spareggio'&&s.drawAsked===3){if(s.drawTurn<s.order.length-1){s.drawTurn++;s.drawAsked=0}else{const high=Math.max(...s.order.map(i=>s.drawWins[i]));const tied=s.order.filter(i=>s.drawWins[i]===high&&!s.groups[i].out);if(tied.length===1){s.phase='conclusa';s.winner=tied[0];s.screen='final';this.stop();s.suspendAfter=false;s.suspended=false;return}s.drawParticipants=tied;s.order=tied;s.drawTurn=0;s.drawAsked=0;s.drawWins=[0,0,0];s.drawRound++;this.log('Massacro: nuova batteria di tre domande per '+tied.map(i=>s.groups[i].name).join(', '))}}
  }
- if(s.phase==='ordinaria'&&s.valid===33){let top=[active[0]];for(const i of active.slice(1)){const c=compare(s.groups[i].score,s.groups[top[0]].score);if(c>0)top=[i];else if(c===0)top.push(i)}
- if(top.length===1){s.draftBonus=null;s.phase='conclusa';s.winner=top[0];s.screen='final';s.panel=null;s.paused=false;s.pauseReason='';s.suspendAfter=false;s.suspended=false;return}
- s.draftBonus=null;s.phase='spareggio';s.drawParticipants=top;s.order=shuffle(top,this.random);s.drawTurn=0;s.drawAsked=0;s.drawWins=[0,0,0];s.drawRound=1;s.effects=[];for(const g of s.groups){g.inventory=[];g.aura=null}s.owner=s.order[0];s.respondent=s.owner;s.turn++;s.usedBonus=false;s.queue=[];this.take();this.log('Battaglia finale: '+s.order.map(i=>s.groups[i].name).join(' → '));}}
+ if(s.phase==='ordinaria'&&s.valid===33){
+ // Elimina solo un ultimo classificato univoco. In caso di parità in coda
+ // nessun gruppo viene scelto arbitrariamente: gli ex aequo restano nel Massacro.
+ let worst=[active[0]];
+ for(const i of active.slice(1)){const c=compare(s.groups[i].score,s.groups[worst[0]].score);if(c<0)worst=[i];else if(c===0)worst.push(i)}
+ if(worst.length===1)this.eliminate(worst[0],'Ultimo posto dopo 33 domande');
+ const contestants=this.active();
+ if(contestants.length===1){s.phase='conclusa';s.winner=contestants[0];s.screen='final';s.panel=null;s.paused=false;s.pauseReason='';s.suspendAfter=false;s.suspended=false;return}
+ s.draftBonus=null;s.phase='spareggio';s.drawParticipants=contestants;s.order=shuffle(contestants,this.random);s.drawTurn=0;s.drawAsked=0;s.drawWins=[0,0,0];s.drawRound=1;s.effects=[];for(const g of s.groups){g.inventory=[];g.aura=null}s.owner=s.order[0];s.respondent=s.owner;s.turn++;s.usedBonus=false;s.queue=[];this.take();this.log('Massacro: '+s.order.map(i=>s.groups[i].name).join(' → '));}}
  next(expected){this.guard();this.revision(expected);need(this.s.screen==='result','Registrare prima un esito');this.newTurn(this.s.respondent)}
  openSanctions(){need(this.s.phase!=='conclusa'&&!this.s.panel&&!this.s.suspended,'Pannello non disponibile');this.pause('sanzioni',true);this.s.panel={type:'sanctions',id:this.uid(),counts:[0,0,0],reasons:['disturbo','disturbo','disturbo']}}
  closeSanctions(apply,expected){const s=this.s;need(s.panel?.type==='sanctions','Pannello sanzioni non aperto');this.revision(expected);const p=s.panel;for(const n of p.counts)integer(n,0,3,'Sanzioni');s.panel=null;
@@ -494,7 +500,7 @@ function validateSave(s){
  if(s.draftBonus!==null&&s.draftBonus!==undefined){const draft=s.draftBonus;need(s.phase==='ordinaria'&&!s.usedBonus&&['hidden','answer'].includes(s.screen)&&s.groups[s.owner].inventory.some(c=>c.id===draft.copyId)&& (draft.target===null||group(draft.target)),'Scelta bonus salvata non valida')}
  need(s.passLock===null||group(s.passLock),'Bersaglio passaggio non valido');need(s.screen!=='choice'||s.usedBonus&&s.phase==='ordinaria','Scelta senza bonus');
  need(s.phase!=='spareggio'||s.groups.every(g=>!g.inventory.length&&g.aura===null)&&!s.effects.length,'Bonus presenti nello spareggio');
- need(Array.isArray(s.drawParticipants)&&s.drawParticipants.every(group),'Partecipanti spareggio non validi');integer(s.drawRound,0,1000000,'Batteria');integer(s.drawTurn,0,2,'Gruppo nella batteria');integer(s.drawAsked,0,5,'Domande nel turno');need(Array.isArray(s.drawWins)&&s.drawWins.length===3,'Risultati spareggio non validi');s.drawWins.forEach((n)=>integer(n,0,5,'Corrette spareggio'));need(s.phase!=='spareggio'||s.drawTurn<s.order.length,'Gruppo spareggio inesistente');need(Array.isArray(s.events)&&s.events.every(e=>typeof e.id==='string'&&typeof e.message==='string'),'Eventi non validi');
+ need(Array.isArray(s.drawParticipants)&&s.drawParticipants.every(group),'Partecipanti spareggio non validi');integer(s.drawRound,0,1000000,'Batteria');integer(s.drawTurn,0,2,'Gruppo nella batteria');integer(s.drawAsked,0,3,'Domande nel turno');need(Array.isArray(s.drawWins)&&s.drawWins.length===3,'Risultati spareggio non validi');s.drawWins.forEach((n)=>integer(n,0,3,'Corrette spareggio'));need(s.phase!=='spareggio'||s.drawTurn<s.order.length,'Gruppo spareggio inesistente');need(Array.isArray(s.events)&&s.events.every(e=>typeof e.id==='string'&&typeof e.message==='string'),'Eventi non validi');
  need(s.panel===null||s.panel?.type==='sanctions'||s.panel?.type==='refusal','Pannello non valido');if(s.panel?.type==='sanctions'){need(Array.isArray(s.panel.counts)&&s.panel.counts.length===3&&s.panel.counts.every(n=>Number.isInteger(n)&&n>=0&&n<=3)&&Array.isArray(s.panel.reasons)&&s.panel.reasons.length===3&&s.panel.reasons.every(x=>typeof x==='string'),'Sanzioni pendenti non valide')}
  if(s.panel?.type==='refusal')need(['answer','choice'].includes(s.panel.from)&&typeof s.panel.wasRunning==='boolean'&&['non svolto','formattazione'].includes(s.panel.reason),'Rifiuto non valido');
  need(s.phase!=='conclusa'||s.screen==='final'&&(s.winner===null||group(s.winner)&&!s.groups[s.winner].out),'Vincitore non valido');
@@ -639,7 +645,7 @@ function endScreen(){
 function gameBody(){const s=game.s,revision=s.revision,b=node('section',undefined,'operation-body'+(s.screen==='hidden'?' hidden-question':''));
  if(s.suspended){b.append(node('h2','Partita sospesa'),node('p','Riprenderete con le stesse squadre e lo stesso stato. Il timer resta fermo.'),btn('Riprendi la sessione',command(()=>game.continueSession()),'primary'));return b}
  if(s.screen==='supply'){b.append(node('h2','Riserva esaurita'),node('p','La partita resta salvata. Controlla se sono state aggiunte nuove domande sul sito: punti e turni restano invariati.'),btn('Cerca nuove domande',refreshSupply,'primary'));return b}
- if(s.screen==='hidden'){b.append(node('div',s.phase==='spareggio'?'Battaglia finale · Batteria '+s.drawRound+' · '+(s.drawAsked+1)+'/5 · '+s.drawWins[s.respondent]+' corrette':'Domanda '+(s.valid+1)+' di 33','eyebrow'),node('h2','Tocca a '+s.groups[s.respondent].name),questionPoints(),node('p',s.phase==='spareggio'?'Cinque domande difficili consecutive per gruppo. Nessun bonus.':s.usedBonus?'Bonus del turno già usato':'Puoi usare un solo bonus in questo turno.','muted'),btn('Svela e avvia il tempo',command(()=>{assertFits(s.current);game.reveal(revision)}),'primary'));return b}
+ if(s.screen==='hidden'){b.append(node('div',s.phase==='spareggio'?'Massacro · Batteria '+s.drawRound+' · '+(s.drawAsked+1)+'/3 · '+s.drawWins[s.respondent]+' corrette':'Domanda '+(s.valid+1)+' di 33','eyebrow'),node('h2','Tocca a '+s.groups[s.respondent].name),questionPoints(),node('p',s.phase==='spareggio'?'Tre domande difficili consecutive per gruppo. Nessun bonus.':s.usedBonus?'Bonus del turno già usato':'Puoi usare un solo bonus in questo turno.','muted'),btn('Svela e avvia il tempo',command(()=>{assertFits(s.current);game.reveal(revision)}),'primary'));return b}
  if(s.current){b.append(questionPoints(),text('div',s.current.body,'question'));const answers=node('div',undefined,'answers');s.current.options.forEach((a,i)=>{const ab=btn('',command(()=>game.answer(i,revision)),'answer'+(s.result&&i===s.current.correct?' correct':''),s.screen!=='answer'||s.paused||!!s.panel||fitBlocked);ab.append(node('span','ABCD'[i],'letter'),text('span',a));answers.append(ab)});b.append(answers)}
  if(s.screen==='choice'){b.append(node('p','Svela e passa: scegli a timer fermo. Il tempo intero parte alla conferma.','good'));const row=node('div',undefined,'row');s.groups.forEach((g,i)=>{if(!g.out&&(i===s.owner||s.passLock===null||s.passLock===i))row.append(btn(i===s.owner?'Tieni la domanda':'Passa a '+g.name,command(()=>game.pass(i,revision))))});b.append(row)}
  if(s.screen==='answer'&&s.paused)b.append(node('p','IN PAUSA — risposte bloccate. Riprendi dal tempo residuo.','good'));
@@ -701,7 +707,7 @@ async function refreshSupply(){
  const currentGame=game;const available=await loadCatalog();const known=new Map(currentGame.s.bank.map(q=>[q.id,q]));const additions=new Map();
  for(const entry of available){const parsed=await loadBank(entry);for(const q of parsed.bank){const original=known.get(q.id)||additions.get(q.id);if(original){if(JSON.stringify(original)!==JSON.stringify(q))throw Error('Una domanda già presente è stata modificata. La partita resta invariata.');}else additions.set(q.id,q);}}
  if(game!==currentGame||game.s.screen!=='supply')return;
- const bank=[...additions.values()].filter(q=>game.s.config.quotas[q.topic]>0&&(game.s.config.difficulty==='misto'||q.difficulty===game.s.config.difficulty));
+ const bank=[...additions.values()].filter(q=>game.s.config.quotas[q.topic]>0&&(game.s.phase==='spareggio'?q.difficulty==='difficile':game.s.config.difficulty==='misto'||q.difficulty===game.s.config.difficulty));
  if(!bank.length)throw Error('Non sono ancora disponibili nuove domande per questa partita. Puoi riprovare dopo l’aggiornamento del sito.');
  game.supply({bank});preflight([game.s.current].filter(Boolean));changed();
 }
