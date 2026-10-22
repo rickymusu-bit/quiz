@@ -162,3 +162,7 @@ Verificato con l’API reale: schermo intero dalla home, ingresso nel gioco e ne
 Aggiunto al catalogo il dataset originale del commit `a9ffc042927e2550b37511421bd8de00c2baab44` su main, senza modificare domande, ID o soluzioni. Il controllo delle alternative duplicate ora distingue maiuscole e minuscole: simboli SI come K/k e kg/Kg hanno significati differenti. Le alternative identiche restano rifiutate; un test verifica entrambi i casi sulla nuova banca.
 
 Passati 31 test motore. Verificata la nuova banca in Chromium a 1280×566 e 844×390: selezione da Start, avvio, risposta, salvataggio/ripresa e tutte le 100 domande con alternative e spiegazioni entro il viewport, senza errori JavaScript. Confermata identità del file dataset con quello su main (blob `92af963a0fbc82f6f3547b32115454daecaf2dbe`).
+
+## Centratura della domanda nascosta — interfaccia 1.7.1
+
+Rimossa la colonna laterale dei punti: titolo, punti, testo e pulsante Svela sono ora su un asse centrale comune. Verificati in Chromium i centri orizzontali di tutti gli elementi e l’assenza di scorrimento a 844×390, 1280×566, 1440×900, 1920×1080 e 2560×1440; screenshot desktop ispezionato.

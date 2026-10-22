@@ -317,7 +317,7 @@ body.portrait #orientation-note { position: fixed; inset: 0; display: grid; alig
 .slide-meta { margin-bottom: 0; }
 
 #viewport-stage .stack { gap: .6rem; }
-.operation-body.hidden-question { display: grid; grid-template-columns: 1fr auto; align-content: center; align-items: center; }
+.operation-body.hidden-question { display: grid; grid-template-columns: minmax(0,1fr); align-content: center; align-items: center; justify-items: center; }
 .operation-body.hidden-question .eyebrow, .operation-body.hidden-question .muted, .operation-body.hidden-question button { grid-column: 1 / -1; }
 .operation-body.hidden-question button { justify-self: center; }
 .operation-body.hidden-question h2, .operation-body.hidden-question p { margin: .15rem 0; }
