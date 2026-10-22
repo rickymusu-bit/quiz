@@ -1,0 +1,1430 @@
+{
+  "versione": 1,
+  "titolo": "Fool — Introduzione alla fisica e alla misura — v1 — 22/10/2026",
+  "argomenti": [
+    {
+      "id": "metodo_scientifico",
+      "nome": "Metodo scientifico",
+      "domande": [
+        {
+          "id": "metodo_scientifico_001",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Qual è il primo passo quando si indaga un fenomeno sconosciuto?",
+          "alternative": [
+            "Osservare e formulare domande",
+            "Accettare una spiegazione",
+            "Calcolare una media",
+            "Scrivere una legge"
+          ],
+          "corretta": "A",
+          "spiegazione": "L'indagine parte da osservazioni e domande verificabili."
+        },
+        {
+          "id": "metodo_scientifico_002",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Che cosa rende scientificamente utile un'ipotesi?",
+          "alternative": [
+            "Il consenso della classe",
+            "La sua complessità",
+            "La sua originalità",
+            "La possibilità di metterla alla prova"
+          ],
+          "corretta": "D",
+          "spiegazione": "Un'ipotesi scientifica deve produrre conseguenze controllabili."
+        },
+        {
+          "id": "metodo_scientifico_003",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Due piante ricevono acqua diversa ma anche luce diversa. Qual è il problema?",
+          "alternative": [
+            "Manca una conclusione scritta",
+            "Il campione è troppo grande",
+            "Sono cambiate due variabili",
+            "La crescita è misurabile"
+          ],
+          "corretta": "C",
+          "spiegazione": "Variando acqua e luce insieme non si può isolare l'effetto dell'acqua."
+        },
+        {
+          "id": "metodo_scientifico_004",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "In un esperimento sulla crescita, quale può essere la variabile dipendente?",
+          "alternative": [
+            "La quantità d'acqua assegnata",
+            "L'altezza raggiunta dalla pianta",
+            "Il tipo di vaso scelto",
+            "Il giorno iniziale della prova"
+          ],
+          "corretta": "B",
+          "spiegazione": "La variabile dipendente è l'esito osservato in funzione dei fattori modificati."
+        },
+        {
+          "id": "metodo_scientifico_005",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "In una prova si cambia solo la temperatura dell'acqua. Che ruolo ha la temperatura?",
+          "alternative": [
+            "Variabile indipendente",
+            "Variabile dipendente",
+            "Errore sistematico",
+            "Unità di misura"
+          ],
+          "corretta": "A",
+          "spiegazione": "La temperatura è il fattore che lo sperimentatore modifica."
+        },
+        {
+          "id": "metodo_scientifico_006",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "A cosa serve ripetere un esperimento nelle stesse condizioni?",
+          "alternative": [
+            "Cambiare l'ipotesi ogni volta",
+            "Ottenere sempre lo stesso numero",
+            "Eliminare ogni incertezza",
+            "Verificare la riproducibilità"
+          ],
+          "corretta": "D",
+          "spiegazione": "Le repliche permettono di controllare la stabilità dei risultati, senza garantire misure identiche."
+        },
+        {
+          "id": "metodo_scientifico_007",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Una previsione non si verifica. Che cosa è opportuno fare?",
+          "alternative": [
+            "Eliminare il dato discordante",
+            "Dichiarare vera l'ipotesi",
+            "Riconsiderare l'ipotesi e la procedura",
+            "Ripetere solo i dati favorevoli"
+          ],
+          "corretta": "C",
+          "spiegazione": "Un risultato discordante richiede controllo della prova e possibile revisione dell'ipotesi."
+        },
+        {
+          "id": "metodo_scientifico_008",
+          "difficolta": "difficile",
+          "tipologia": "calcolo",
+          "testo": "Quale frase descrive un'osservazione e non una spiegazione?",
+          "alternative": [
+            "Il Sole ha riscaldato il banco",
+            "Il termometro segna 28 °C",
+            "Il metallo conduce meglio il calore",
+            "Il liquido è caldo perché reagisce"
+          ],
+          "corretta": "B",
+          "spiegazione": "La lettura strumentale riferisce un dato osservato."
+        },
+        {
+          "id": "metodo_scientifico_009",
+          "difficolta": "difficile",
+          "tipologia": "calcolo",
+          "testo": "Quale affermazione è una previsione verificabile?",
+          "alternative": [
+            "Con più luce, in queste condizioni, la pianta crescerà di più",
+            "Le piante amano la luce",
+            "Questa è la pianta più bella",
+            "La natura cerca l'equilibrio"
+          ],
+          "corretta": "A",
+          "spiegazione": "La previsione confronta un risultato misurabile tra condizioni definite."
+        },
+        {
+          "id": "metodo_scientifico_010",
+          "difficolta": "difficile",
+          "tipologia": "calcolo",
+          "testo": "In una prova sulla dissoluzione, perché si mantiene costante la quantità d'acqua?",
+          "alternative": [
+            "Per impedire qualunque dissoluzione",
+            "Per rendere inutile il cronometro",
+            "Per aumentare automaticamente la precisione",
+            "Per isolare l'effetto del fattore studiato"
+          ],
+          "corretta": "D",
+          "spiegazione": "Le variabili di controllo evitano fattori confondenti."
+        },
+        {
+          "id": "metodo_scientifico_011",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Quale coppia rappresenta correttamente ipotesi e previsione?",
+          "alternative": [
+            "Ipotesi: 30 s; previsione: ho letto il cronometro",
+            "Ipotesi: la prova è finita; previsione: ho una tabella",
+            "Ipotesi: il calore accelera la dissoluzione; previsione: in acqua calda il tempo diminuisce",
+            "Ipotesi: 20 °C; previsione: il termometro è digitale"
+          ],
+          "corretta": "C",
+          "spiegazione": "L'ipotesi propone una spiegazione e la previsione indica un esito osservabile."
+        },
+        {
+          "id": "metodo_scientifico_012",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Due gruppi ottengono risultati diversi. Qual è la scelta migliore?",
+          "alternative": [
+            "Scegliere il dato più vicino all'attesa",
+            "Confrontare metodi, strumenti e condizioni",
+            "Eliminare l'intero esperimento",
+            "Fare la media senza controlli"
+          ],
+          "corretta": "B",
+          "spiegazione": "Le differenze vanno interpretate controllando le condizioni di misura."
+        },
+        {
+          "id": "metodo_scientifico_013",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Che cosa distingue una teoria scientifica da un'ipotesi appena proposta?",
+          "alternative": [
+            "La teoria è sostenuta da molte verifiche ed evidenze",
+            "La teoria non può mai cambiare",
+            "La teoria è soltanto un'opinione",
+            "La teoria non produce previsioni"
+          ],
+          "corretta": "A",
+          "spiegazione": "Una teoria offre una spiegazione ampia sostenuta da prove e sempre rivedibile."
+        },
+        {
+          "id": "metodo_scientifico_014",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Un test mostra che l'ipotesi funziona una volta. Quale conclusione è giustificata?",
+          "alternative": [
+            "L'ipotesi è definitivamente dimostrata",
+            "Tutte le altre ipotesi sono impossibili",
+            "L'esperimento non va documentato",
+            "L'esito la sostiene, ma servono altri controlli"
+          ],
+          "corretta": "D",
+          "spiegazione": "Un solo esito concorde non rende una spiegazione infallibile."
+        },
+        {
+          "id": "metodo_scientifico_015",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Perché una procedura sperimentale deve essere descritta chiaramente?",
+          "alternative": [
+            "Per rendere più lungo il rapporto",
+            "Per nascondere le condizioni di prova",
+            "Per consentire ad altri di ripeterla",
+            "Per evitare di riportare misure"
+          ],
+          "corretta": "C",
+          "spiegazione": "La descrizione permette la verifica indipendente."
+        },
+        {
+          "id": "metodo_scientifico_016",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Quale situazione mette alla prova un'ipotesi sulla velocità di scioglimento?",
+          "alternative": [
+            "Confrontare due bevande di colore diverso senza tempi",
+            "Confrontare tempi misurati a due temperature con uguale quantità d'acqua",
+            "Chiedere quale bevanda sembra migliore",
+            "Guardare un solo bicchiere senza cronometro"
+          ],
+          "corretta": "B",
+          "spiegazione": "Serve un confronto misurato che cambi il fattore studiato."
+        },
+        {
+          "id": "metodo_scientifico_017",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Che cos'è un dato quantitativo?",
+          "alternative": [
+            "Una misura espressa con numero e unità",
+            "Un'impressione sulla superficie",
+            "Una descrizione soltanto a parole",
+            "Un giudizio sulla bellezza"
+          ],
+          "corretta": "A",
+          "spiegazione": "I dati quantitativi esprimono grandezze con valori numerici."
+        },
+        {
+          "id": "metodo_scientifico_018",
+          "difficolta": "difficile",
+          "tipologia": "calcolo",
+          "testo": "Una misura smentisce la previsione. Quale atteggiamento è scientifico?",
+          "alternative": [
+            "Correggerla perché concordi",
+            "Ignorarla se isolata",
+            "Nasconderla nel rapporto",
+            "Registrarla anche se inattesa"
+          ],
+          "corretta": "D",
+          "spiegazione": "I dati non si modificano per salvare un'ipotesi."
+        },
+        {
+          "id": "metodo_scientifico_019",
+          "difficolta": "difficile",
+          "tipologia": "calcolo",
+          "testo": "Che cosa significa controllare una variabile?",
+          "alternative": [
+            "Cambiarla insieme al fattore studiato",
+            "Non misurarla mai",
+            "Mantenerla uguale tra le prove confrontate",
+            "Usarla solo nella conclusione"
+          ],
+          "corretta": "C",
+          "spiegazione": "Una variabile controllata rimane nelle stesse condizioni durante il confronto."
+        },
+        {
+          "id": "metodo_scientifico_020",
+          "difficolta": "difficile",
+          "tipologia": "calcolo",
+          "testo": "Quale domanda è più adatta a un'indagine sperimentale scolastica?",
+          "alternative": [
+            "Qual è il colore più bello?",
+            "Come varia il tempo di scioglimento con la temperatura?",
+            "Perché ogni oggetto è speciale?",
+            "Quale bevanda piace a tutti?"
+          ],
+          "corretta": "B",
+          "spiegazione": "La prima domanda definisce grandezze misurabili."
+        },
+        {
+          "id": "metodo_scientifico_021",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Quale informazione va indicata insieme a una tabella di risultati?",
+          "alternative": [
+            "Le unità delle grandezze misurate",
+            "Solo il nome di chi ha misurato",
+            "Solo l'ipotesi iniziale",
+            "Soltanto il titolo del libro"
+          ],
+          "corretta": "A",
+          "spiegazione": "Senza unità i valori numerici non sono interpretabili."
+        },
+        {
+          "id": "metodo_scientifico_022",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "In un confronto fra lampade, quale scelta rende più equo l'esperimento?",
+          "alternative": [
+            "Mettere ogni lampada a una distanza diversa",
+            "Usare strumenti diversi senza confronto",
+            "Spegnere una lampada durante la misura",
+            "Misurare la luminosità alla stessa distanza"
+          ],
+          "corretta": "D",
+          "spiegazione": "La distanza è una condizione che va controllata."
+        },
+        {
+          "id": "metodo_scientifico_023",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Per quale motivo un modello scientifico può essere modificato?",
+          "alternative": [
+            "Le formule devono cambiare ogni anno",
+            "La scienza vieta modelli stabili",
+            "Nuove osservazioni possono mostrarne i limiti",
+            "Ogni osservatore sceglie la propria realtà"
+          ],
+          "corretta": "C",
+          "spiegazione": "I modelli sono revisionabili quando emergono evidenze o limiti."
+        },
+        {
+          "id": "metodo_scientifico_024",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Un esperimento controllato dà tre tempi: 12, 13 e 11 s. Quale valore è la media?",
+          "alternative": [
+            "11 s",
+            "12 s",
+            "13 s",
+            "36 s"
+          ],
+          "corretta": "B",
+          "spiegazione": "La media è (12+13+11)/3 = 12 s."
+        },
+        {
+          "id": "metodo_scientifico_025",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Quale frase distingue conclusione e risultato?",
+          "alternative": [
+            "Il risultato è un dato; la conclusione lo interpreta rispetto all'ipotesi",
+            "Il risultato è un'opinione; la conclusione è lo strumento",
+            "Sono due nomi per lo stesso numero",
+            "La conclusione precede sempre l'esperimento"
+          ],
+          "corretta": "A",
+          "spiegazione": "Prima si ottengono risultati, poi si valuta che cosa implicano."
+        }
+      ]
+    },
+    {
+      "id": "misure_metrologia",
+      "nome": "Metrologia e Sistema Internazionale",
+      "domande": [
+        {
+          "id": "misure_metrologia_001",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Qual è l'unità SI di base della lunghezza?",
+          "alternative": [
+            "centimetro (cm)",
+            "chilometro (km)",
+            "millimetro (mm)",
+            "metro (m)"
+          ],
+          "corretta": "D",
+          "spiegazione": "Il metro è l'unità di base della lunghezza nel SI."
+        },
+        {
+          "id": "misure_metrologia_002",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Qual è l'unità SI di base del tempo?",
+          "alternative": [
+            "minuto (min)",
+            "ora (h)",
+            "secondo (s)",
+            "giorno (d)"
+          ],
+          "corretta": "C",
+          "spiegazione": "Il secondo è l'unità di base SI del tempo."
+        },
+        {
+          "id": "misure_metrologia_003",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Qual è l'unità SI di base della massa?",
+          "alternative": [
+            "grammo (g)",
+            "chilogrammo (kg)",
+            "tonnellata (t)",
+            "milligrammo (mg)"
+          ],
+          "corretta": "B",
+          "spiegazione": "L'unità di base della massa è il chilogrammo."
+        },
+        {
+          "id": "misure_metrologia_004",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Quanto vale 2,5 km in metri?",
+          "alternative": [
+            "2500 m",
+            "250 m",
+            "25 m",
+            "25000 m"
+          ],
+          "corretta": "A",
+          "spiegazione": "Si moltiplica 2,5 per 1000."
+        },
+        {
+          "id": "misure_metrologia_005",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Quanto vale 350 cm in metri?",
+          "alternative": [
+            "0,35 m",
+            "35 m",
+            "3500 m",
+            "3,5 m"
+          ],
+          "corretta": "D",
+          "spiegazione": "Poiché 100 cm = 1 m, 350/100 = 3,5 m."
+        },
+        {
+          "id": "misure_metrologia_006",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Quanti secondi ci sono in 3 minuti?",
+          "alternative": [
+            "30 s",
+            "120 s",
+            "180 s",
+            "300 s"
+          ],
+          "corretta": "C",
+          "spiegazione": "3 × 60 = 180 secondi."
+        },
+        {
+          "id": "misure_metrologia_007",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Qual è il simbolo corretto per il kelvin?",
+          "alternative": [
+            "°K",
+            "K",
+            "k",
+            "Kel"
+          ],
+          "corretta": "B",
+          "spiegazione": "Il simbolo SI del kelvin è K, senza segno di grado."
+        },
+        {
+          "id": "misure_metrologia_008",
+          "difficolta": "difficile",
+          "tipologia": "calcolo",
+          "testo": "Che cosa indica il prefisso milli-?",
+          "alternative": [
+            "Un millesimo",
+            "Un centesimo",
+            "Mille volte",
+            "Un milione di volte"
+          ],
+          "corretta": "A",
+          "spiegazione": "Milli- significa un fattore 10 alla meno 3."
+        },
+        {
+          "id": "misure_metrologia_009",
+          "difficolta": "difficile",
+          "tipologia": "calcolo",
+          "testo": "Quanto vale 4,2 g in milligrammi?",
+          "alternative": [
+            "420 mg",
+            "42 mg",
+            "42000 mg",
+            "4200 mg"
+          ],
+          "corretta": "D",
+          "spiegazione": "1 g = 1000 mg, quindi 4,2 g = 4200 mg."
+        },
+        {
+          "id": "misure_metrologia_010",
+          "difficolta": "difficile",
+          "tipologia": "calcolo",
+          "testo": "Quale grandezza si misura in metri quadrati?",
+          "alternative": [
+            "Lunghezza",
+            "Volume",
+            "Area",
+            "Tempo"
+          ],
+          "corretta": "C",
+          "spiegazione": "Il metro quadrato esprime una superficie."
+        },
+        {
+          "id": "misure_metrologia_011",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Quanto vale 1 cm² in m²?",
+          "alternative": [
+            "0,01 m²",
+            "0,0001 m²",
+            "0,1 m²",
+            "0,001 m²"
+          ],
+          "corretta": "B",
+          "spiegazione": "1 cm = 0,01 m; elevando al quadrato si ha 0,0001 m²."
+        },
+        {
+          "id": "misure_metrologia_012",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Quale delle seguenti è una grandezza derivata?",
+          "alternative": [
+            "Velocità",
+            "Lunghezza",
+            "Massa",
+            "Tempo"
+          ],
+          "corretta": "A",
+          "spiegazione": "La velocità deriva dal rapporto fra lunghezza e tempo."
+        },
+        {
+          "id": "misure_metrologia_013",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Come si scrive 0,00056 in notazione scientifica?",
+          "alternative": [
+            "5,6 × 10⁻³",
+            "56 × 10⁻⁴",
+            "5,6 × 10⁴",
+            "5,6 × 10⁻⁴"
+          ],
+          "corretta": "D",
+          "spiegazione": "La virgola si sposta di quattro posti verso destra."
+        },
+        {
+          "id": "misure_metrologia_014",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Qual è la notazione scientifica di 730000?",
+          "alternative": [
+            "7,3 × 10⁴",
+            "73 × 10⁵",
+            "7,3 × 10⁵",
+            "0,73 × 10⁵"
+          ],
+          "corretta": "C",
+          "spiegazione": "7,3 moltiplicato per 100000 restituisce 730000."
+        },
+        {
+          "id": "misure_metrologia_015",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Quanto vale 0,75 L in millilitri?",
+          "alternative": [
+            "75 mL",
+            "750 mL",
+            "7500 mL",
+            "7,5 mL"
+          ],
+          "corretta": "B",
+          "spiegazione": "Un litro contiene 1000 millilitri."
+        },
+        {
+          "id": "misure_metrologia_016",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Quale misura contiene tre cifre significative?",
+          "alternative": [
+            "2,50 m",
+            "2,5 m",
+            "0,02 m",
+            "3 m"
+          ],
+          "corretta": "A",
+          "spiegazione": "Lo zero finale dopo la virgola è significativo in 2,50."
+        },
+        {
+          "id": "misure_metrologia_017",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Quante cifre significative contiene 0,00420?",
+          "alternative": [
+            "2",
+            "4",
+            "5",
+            "3"
+          ],
+          "corretta": "D",
+          "spiegazione": "Gli zeri iniziali non contano; 4, 2 e lo zero finale sì."
+        },
+        {
+          "id": "misure_metrologia_018",
+          "difficolta": "difficile",
+          "tipologia": "calcolo",
+          "testo": "Quale scrittura rispetta il simbolo corretto dell'unità di massa?",
+          "alternative": [
+            "5 Kg",
+            "5 KG",
+            "5 kg",
+            "5 kG"
+          ],
+          "corretta": "C",
+          "spiegazione": "Il simbolo del chilogrammo usa entrambe le lettere minuscole."
+        },
+        {
+          "id": "misure_metrologia_019",
+          "difficolta": "difficile",
+          "tipologia": "calcolo",
+          "testo": "Quanto vale 6 m² in cm²?",
+          "alternative": [
+            "600 cm²",
+            "60000 cm²",
+            "6000 cm²",
+            "60 cm²"
+          ],
+          "corretta": "B",
+          "spiegazione": "1 m² = 10000 cm²; quindi 6 m² = 60000 cm²."
+        },
+        {
+          "id": "misure_metrologia_020",
+          "difficolta": "difficile",
+          "tipologia": "calcolo",
+          "testo": "Un rettangolo misura 3 m per 2 m. Qual è la sua area?",
+          "alternative": [
+            "6 m²",
+            "5 m²",
+            "6 m",
+            "12 m²"
+          ],
+          "corretta": "A",
+          "spiegazione": "L'area è base × altezza = 3 × 2 = 6 m²."
+        },
+        {
+          "id": "misure_metrologia_021",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Quale unità è adatta al volume di una scatola?",
+          "alternative": [
+            "cm²",
+            "cm",
+            "g",
+            "cm³"
+          ],
+          "corretta": "D",
+          "spiegazione": "Il volume occupa tre dimensioni spaziali."
+        },
+        {
+          "id": "misure_metrologia_022",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Quanto vale 1 m³ in litri?",
+          "alternative": [
+            "100 L",
+            "10 L",
+            "1000 L",
+            "10000 L"
+          ],
+          "corretta": "C",
+          "spiegazione": "1 m³ equivale a 1000 dm³ e ogni dm³ è un litro."
+        },
+        {
+          "id": "misure_metrologia_023",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Un risultato è scritto 8,0 cm. Che cosa segnala lo zero finale?",
+          "alternative": [
+            "Una lunghezza nulla",
+            "La precisione di scrittura al decimo di cm",
+            "Un valore di 80 cm",
+            "L'assenza di incertezza"
+          ],
+          "corretta": "B",
+          "spiegazione": "8,0 presenta due cifre significative e una cifra decimale."
+        },
+        {
+          "id": "misure_metrologia_024",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Quale strumento è più adatto a misurare la durata di una corsa?",
+          "alternative": [
+            "Cronometro",
+            "Bilancia",
+            "Righello",
+            "Termometro"
+          ],
+          "corretta": "A",
+          "spiegazione": "Un cronometro misura intervalli di tempo."
+        },
+        {
+          "id": "misure_metrologia_025",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Quale unità SI si usa per la temperatura termodinamica?",
+          "alternative": [
+            "grado Celsius",
+            "grado Fahrenheit",
+            "caloria",
+            "kelvin"
+          ],
+          "corretta": "D",
+          "spiegazione": "Il kelvin è l'unità SI di base della temperatura termodinamica."
+        }
+      ]
+    },
+    {
+      "id": "grafici_piano_cartesiano",
+      "nome": "Grafici e piano cartesiano",
+      "domande": [
+        {
+          "id": "grafici_piano_cartesiano_001",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Nel punto (3; −2), qual è l'ascissa?",
+          "alternative": [
+            "−2",
+            "1",
+            "3",
+            "−3"
+          ],
+          "corretta": "C",
+          "spiegazione": "L'ascissa è il primo numero della coppia ordinata."
+        },
+        {
+          "id": "grafici_piano_cartesiano_002",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Nel punto (−4; 5), qual è l'ordinata?",
+          "alternative": [
+            "−4",
+            "5",
+            "1",
+            "−5"
+          ],
+          "corretta": "B",
+          "spiegazione": "L'ordinata è il secondo numero della coppia."
+        },
+        {
+          "id": "grafici_piano_cartesiano_003",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "In quale quadrante si trova (2; 3)?",
+          "alternative": [
+            "Primo",
+            "Secondo",
+            "Terzo",
+            "Quarto"
+          ],
+          "corretta": "A",
+          "spiegazione": "Con x e y positive il punto appartiene al primo quadrante."
+        },
+        {
+          "id": "grafici_piano_cartesiano_004",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "In quale quadrante si trova (−2; 4)?",
+          "alternative": [
+            "Primo",
+            "Terzo",
+            "Quarto",
+            "Secondo"
+          ],
+          "corretta": "D",
+          "spiegazione": "Ascissa negativa e ordinata positiva identificano il secondo quadrante."
+        },
+        {
+          "id": "grafici_piano_cartesiano_005",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "In quale quadrante si trova (−3; −1)?",
+          "alternative": [
+            "Primo",
+            "Secondo",
+            "Terzo",
+            "Quarto"
+          ],
+          "corretta": "C",
+          "spiegazione": "Entrambe le coordinate negative individuano il terzo quadrante."
+        },
+        {
+          "id": "grafici_piano_cartesiano_006",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "In quale quadrante si trova (4; −1)?",
+          "alternative": [
+            "Primo",
+            "Quarto",
+            "Secondo",
+            "Terzo"
+          ],
+          "corretta": "B",
+          "spiegazione": "Ascissa positiva e ordinata negativa individuano il quarto quadrante."
+        },
+        {
+          "id": "grafici_piano_cartesiano_007",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Quali sono le coordinate dell'origine?",
+          "alternative": [
+            "(0; 0)",
+            "(1; 0)",
+            "(0; 1)",
+            "(1; 1)"
+          ],
+          "corretta": "A",
+          "spiegazione": "L'origine è l'intersezione fra i due assi."
+        },
+        {
+          "id": "grafici_piano_cartesiano_008",
+          "difficolta": "difficile",
+          "tipologia": "calcolo",
+          "testo": "Se un punto ha ordinata 0, dove si trova?",
+          "alternative": [
+            "Sull'asse y",
+            "Solo nel primo quadrante",
+            "Solo nel secondo quadrante",
+            "Sull'asse x"
+          ],
+          "corretta": "D",
+          "spiegazione": "Tutti i punti con y = 0 appartengono all'asse orizzontale."
+        },
+        {
+          "id": "grafici_piano_cartesiano_009",
+          "difficolta": "difficile",
+          "tipologia": "calcolo",
+          "testo": "Se un punto ha ascissa 0, dove si trova?",
+          "alternative": [
+            "Sull'asse x",
+            "Solo nel terzo quadrante",
+            "Sull'asse y",
+            "Solo nel quarto quadrante"
+          ],
+          "corretta": "C",
+          "spiegazione": "Tutti i punti con x = 0 appartengono all'asse verticale."
+        },
+        {
+          "id": "grafici_piano_cartesiano_010",
+          "difficolta": "difficile",
+          "tipologia": "calcolo",
+          "testo": "Un grafico prezzo-quantità usa x = quaderni, y = euro. Quanto indica (3; 6)?",
+          "alternative": [
+            "Sei quaderni costano tre euro",
+            "Tre quaderni costano sei euro",
+            "Tre euro costano sei quaderni",
+            "Sei euro costano sei quaderni"
+          ],
+          "corretta": "B",
+          "spiegazione": "La coordinata x indica la quantità e y il prezzo."
+        },
+        {
+          "id": "grafici_piano_cartesiano_011",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Per una relazione y = 2x, quale punto appartiene alla retta?",
+          "alternative": [
+            "(3; 6)",
+            "(3; 5)",
+            "(6; 3)",
+            "(2; 6)"
+          ],
+          "corretta": "A",
+          "spiegazione": "Sostituendo x = 3 si ottiene y = 6."
+        },
+        {
+          "id": "grafici_piano_cartesiano_012",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Per una relazione y = x + 4, quanto vale y se x = 2?",
+          "alternative": [
+            "4",
+            "2",
+            "8",
+            "6"
+          ],
+          "corretta": "D",
+          "spiegazione": "Il valore è 2 + 4 = 6."
+        },
+        {
+          "id": "grafici_piano_cartesiano_013",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Una retta crescente indica che, all'aumentare di x, y tende a...",
+          "alternative": [
+            "diminuire",
+            "rimanere nulla",
+            "aumentare",
+            "cambiare sempre segno"
+          ],
+          "corretta": "C",
+          "spiegazione": "Per una retta crescente il valore di y cresce con x."
+        },
+        {
+          "id": "grafici_piano_cartesiano_014",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Una retta orizzontale indica una grandezza y...",
+          "alternative": [
+            "sempre negativa",
+            "costante",
+            "proporzionale a x",
+            "sempre crescente"
+          ],
+          "corretta": "B",
+          "spiegazione": "Una linea orizzontale mantiene la stessa ordinata."
+        },
+        {
+          "id": "grafici_piano_cartesiano_015",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "In una proporzionalità diretta y = kx, quale punto attraversa sempre la retta?",
+          "alternative": [
+            "L'origine",
+            "(1; 1)",
+            "(0; 1)",
+            "(1; 0)"
+          ],
+          "corretta": "A",
+          "spiegazione": "Ponendo x = 0 si ottiene necessariamente y = 0."
+        },
+        {
+          "id": "grafici_piano_cartesiano_016",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Se y = 3x, quanto vale y per x = 4?",
+          "alternative": [
+            "7",
+            "1",
+            "16",
+            "12"
+          ],
+          "corretta": "D",
+          "spiegazione": "Il coefficiente 3 moltiplica x: 3 × 4 = 12."
+        },
+        {
+          "id": "grafici_piano_cartesiano_017",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Se il prezzo unitario è 2 euro, quanto costano 5 pezzi?",
+          "alternative": [
+            "7 euro",
+            "2,5 euro",
+            "10 euro",
+            "12 euro"
+          ],
+          "corretta": "C",
+          "spiegazione": "La proporzionalità diretta dà 2 × 5 = 10 euro."
+        },
+        {
+          "id": "grafici_piano_cartesiano_018",
+          "difficolta": "difficile",
+          "tipologia": "calcolo",
+          "testo": "Una tabella riporta x: 1,2,3 e y: 4,8,12. Qual è il rapporto y/x?",
+          "alternative": [
+            "3",
+            "4",
+            "8",
+            "12"
+          ],
+          "corretta": "B",
+          "spiegazione": "In ogni coppia il rapporto y/x è 4."
+        },
+        {
+          "id": "grafici_piano_cartesiano_019",
+          "difficolta": "difficile",
+          "tipologia": "calcolo",
+          "testo": "Una grandezza è inversamente proporzionale a x. Se x raddoppia, y...",
+          "alternative": [
+            "si dimezza",
+            "raddoppia",
+            "resta identica",
+            "quadruplica"
+          ],
+          "corretta": "A",
+          "spiegazione": "A prodotto xy costante, raddoppiare x dimezza y."
+        },
+        {
+          "id": "grafici_piano_cartesiano_020",
+          "difficolta": "difficile",
+          "tipologia": "calcolo",
+          "testo": "Se x × y = 12, quanto vale y quando x = 3?",
+          "alternative": [
+            "9",
+            "15",
+            "36",
+            "4"
+          ],
+          "corretta": "D",
+          "spiegazione": "Si calcola y = 12/3 = 4."
+        },
+        {
+          "id": "grafici_piano_cartesiano_021",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Un grafico distanza-tempo mostra una linea orizzontale. Che cosa indica?",
+          "alternative": [
+            "La distanza cresce regolarmente",
+            "La distanza diminuisce regolarmente",
+            "La distanza rappresentata resta costante",
+            "Il tempo torna indietro"
+          ],
+          "corretta": "C",
+          "spiegazione": "Una linea orizzontale non mostra variazione della grandezza verticale."
+        },
+        {
+          "id": "grafici_piano_cartesiano_022",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Nel grafico y in funzione di x, quale variabile va normalmente sull'asse orizzontale?",
+          "alternative": [
+            "y",
+            "x",
+            "Il loro prodotto",
+            "La loro somma"
+          ],
+          "corretta": "B",
+          "spiegazione": "Per convenzione l'ascissa rappresenta la variabile x."
+        },
+        {
+          "id": "grafici_piano_cartesiano_023",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Una tabella contiene (1; 2), (2; 4), (3; 6). Qual è la legge compatibile?",
+          "alternative": [
+            "y = 2x",
+            "y = x + 2",
+            "y = 3x",
+            "y = 2/x"
+          ],
+          "corretta": "A",
+          "spiegazione": "Tutti i punti soddisfano y = 2x."
+        },
+        {
+          "id": "grafici_piano_cartesiano_024",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Quanto vale la pendenza della retta che passa per (0; 1) e (2; 5)?",
+          "alternative": [
+            "4",
+            "3",
+            "6",
+            "2"
+          ],
+          "corretta": "D",
+          "spiegazione": "La pendenza è (5−1)/(2−0) = 2."
+        },
+        {
+          "id": "grafici_piano_cartesiano_025",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "In un grafico temperatura-tempo, quale unità è adatta all'asse del tempo?",
+          "alternative": [
+            "gradi Celsius",
+            "metri",
+            "secondi",
+            "chilogrammi"
+          ],
+          "corretta": "C",
+          "spiegazione": "L'asse del tempo deve essere espresso in un'unità temporale."
+        }
+      ]
+    },
+    {
+      "id": "strumenti_errori_incertezza",
+      "nome": "Strumenti, errori e incertezza",
+      "domande": [
+        {
+          "id": "strumenti_errori_incertezza_001",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Che cosa indica la risoluzione di uno strumento digitale?",
+          "alternative": [
+            "Il valore massimo teorico",
+            "La più piccola variazione leggibile",
+            "La massa dello strumento",
+            "Il numero di pulsanti"
+          ],
+          "corretta": "B",
+          "spiegazione": "La risoluzione è il passo minimo mostrabile dallo strumento."
+        },
+        {
+          "id": "strumenti_errori_incertezza_002",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Una bilancia digitale mostra 12,34 g. Qual è il passo dell'ultima cifra?",
+          "alternative": [
+            "0,01 g",
+            "0,1 g",
+            "1 g",
+            "0,001 g"
+          ],
+          "corretta": "A",
+          "spiegazione": "L'ultima cifra del display è nei centesimi di grammo."
+        },
+        {
+          "id": "strumenti_errori_incertezza_003",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Quale errore si ripete sempre nello stesso verso a causa di uno zero spostato?",
+          "alternative": [
+            "Casuale",
+            "Di trascrizione",
+            "Di arrotondamento",
+            "Sistematico"
+          ],
+          "corretta": "D",
+          "spiegazione": "Uno scostamento fisso dello zero introduce un errore sistematico."
+        },
+        {
+          "id": "strumenti_errori_incertezza_004",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Quale fenomeno può produrre variazioni casuali nelle letture?",
+          "alternative": [
+            "Uno zero sempre spostato",
+            "Una scala stampata errata",
+            "Piccole oscillazioni imprevedibili",
+            "Un righello deformato sempre uguale"
+          ],
+          "corretta": "C",
+          "spiegazione": "Le fluttuazioni non prevedibili producono dispersione casuale."
+        },
+        {
+          "id": "strumenti_errori_incertezza_005",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Qual è una buona pratica per ridurre l'effetto degli errori casuali?",
+          "alternative": [
+            "Eliminare l'unità di misura",
+            "Ripetere le misure e confrontarle",
+            "Usare solo la lettura più alta",
+            "Arrotondare tutti i dati a interi"
+          ],
+          "corretta": "B",
+          "spiegazione": "Le ripetizioni permettono una stima più robusta del risultato."
+        },
+        {
+          "id": "strumenti_errori_incertezza_006",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Tre letture sono 10, 11 e 12 cm. Qual è la media?",
+          "alternative": [
+            "11 cm",
+            "10 cm",
+            "12 cm",
+            "33 cm"
+          ],
+          "corretta": "A",
+          "spiegazione": "(10 + 11 + 12)/3 = 11 cm."
+        },
+        {
+          "id": "strumenti_errori_incertezza_007",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Quattro letture sono 4, 5, 6, 5 s. Qual è la media?",
+          "alternative": [
+            "4 s",
+            "6 s",
+            "20 s",
+            "5 s"
+          ],
+          "corretta": "D",
+          "spiegazione": "(4+5+6+5)/4 = 5 s."
+        },
+        {
+          "id": "strumenti_errori_incertezza_008",
+          "difficolta": "difficile",
+          "tipologia": "calcolo",
+          "testo": "Qual è la semidispersione massima di letture comprese tra 8 e 12 cm?",
+          "alternative": [
+            "4 cm",
+            "10 cm",
+            "2 cm",
+            "20 cm"
+          ],
+          "corretta": "C",
+          "spiegazione": "(12−8)/2 = 2 cm."
+        },
+        {
+          "id": "strumenti_errori_incertezza_009",
+          "difficolta": "difficile",
+          "tipologia": "calcolo",
+          "testo": "Una misura è (20 ± 1) cm. Quale intervallo indica?",
+          "alternative": [
+            "Da 20 a 22 cm",
+            "Da 19 a 21 cm",
+            "Da 18 a 20 cm",
+            "Da 1 a 20 cm"
+          ],
+          "corretta": "B",
+          "spiegazione": "Gli estremi sono 20−1 e 20+1 cm."
+        },
+        {
+          "id": "strumenti_errori_incertezza_010",
+          "difficolta": "difficile",
+          "tipologia": "calcolo",
+          "testo": "Per una misura (50 ± 2) g, qual è l'incertezza relativa?",
+          "alternative": [
+            "0,04",
+            "0,4",
+            "0,02",
+            "0,25"
+          ],
+          "corretta": "A",
+          "spiegazione": "Si divide 2 per 50: 0,04."
+        },
+        {
+          "id": "strumenti_errori_incertezza_011",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "L'incertezza relativa 0,05 corrisponde a quale percentuale?",
+          "alternative": [
+            "0,5%",
+            "50%",
+            "0,05%",
+            "5%"
+          ],
+          "corretta": "D",
+          "spiegazione": "0,05 × 100 = 5%."
+        },
+        {
+          "id": "strumenti_errori_incertezza_012",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Quale misura è relativamente più precisa?",
+          "alternative": [
+            "(10 ± 1) cm",
+            "(20 ± 1) cm",
+            "(100 ± 1) cm",
+            "(5 ± 1) cm"
+          ],
+          "corretta": "C",
+          "spiegazione": "Il rapporto 1/100 è il più piccolo dei quattro."
+        },
+        {
+          "id": "strumenti_errori_incertezza_013",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Se aumenta l'incertezza assoluta a parità di valore misurato, quella relativa...",
+          "alternative": [
+            "diminuisce",
+            "aumenta",
+            "si annulla",
+            "resta sempre uguale"
+          ],
+          "corretta": "B",
+          "spiegazione": "L'incertezza relativa è il rapporto fra incertezza assoluta e misura."
+        },
+        {
+          "id": "strumenti_errori_incertezza_014",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Che cosa si intende per accuratezza?",
+          "alternative": [
+            "Vicinanza a un valore di riferimento attendibile",
+            "Numero delle cifre del display",
+            "Ripetibilità dei risultati",
+            "Velocità di lettura"
+          ],
+          "corretta": "A",
+          "spiegazione": "L'accuratezza riguarda la vicinanza al valore di riferimento."
+        },
+        {
+          "id": "strumenti_errori_incertezza_015",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Che cosa indica una buona precisione delle misure ripetute?",
+          "alternative": [
+            "Valori sempre esatti",
+            "Valori sempre interi",
+            "Valori sempre maggiori del riferimento",
+            "Valori poco dispersi"
+          ],
+          "corretta": "D",
+          "spiegazione": "La precisione di ripetizione indica scarsa dispersione."
+        },
+        {
+          "id": "strumenti_errori_incertezza_016",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Una bilancia dà sempre 2 g in più ma risultati molto simili. Come sono le misure?",
+          "alternative": [
+            "Poco precise ma accurate",
+            "Né precise né ripetibili",
+            "Precise ma poco accurate",
+            "Esatte e prive di errori"
+          ],
+          "corretta": "C",
+          "spiegazione": "Le misure sono raggruppate ma distanti dal valore vero per un errore sistematico."
+        },
+        {
+          "id": "strumenti_errori_incertezza_017",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Quale lettura è più corretta su una scala analogica?",
+          "alternative": [
+            "Guardare molto di lato",
+            "Guardare perpendicolarmente alla scala",
+            "Usare sempre il valore più alto",
+            "Leggere la scala senza unità"
+          ],
+          "corretta": "B",
+          "spiegazione": "Guardare frontalmente riduce l'errore di parallasse."
+        },
+        {
+          "id": "strumenti_errori_incertezza_018",
+          "difficolta": "difficile",
+          "tipologia": "calcolo",
+          "testo": "Che cos'è l'errore di parallasse?",
+          "alternative": [
+            "Una lettura alterata dalla posizione dell'occhio",
+            "Un guasto del cronometro digitale",
+            "Un errore dovuto alla conversione",
+            "Una variazione casuale del campione"
+          ],
+          "corretta": "A",
+          "spiegazione": "La lettura cambia apparentemente quando l'occhio non è allineato alla scala."
+        },
+        {
+          "id": "strumenti_errori_incertezza_019",
+          "difficolta": "difficile",
+          "tipologia": "calcolo",
+          "testo": "Un righello segna millimetri. Qual è la minima divisione graduata?",
+          "alternative": [
+            "1 cm",
+            "0,1 m",
+            "10 cm",
+            "1 mm"
+          ],
+          "corretta": "D",
+          "spiegazione": "Le tacche consecutive sono distanti 1 mm."
+        },
+        {
+          "id": "strumenti_errori_incertezza_020",
+          "difficolta": "difficile",
+          "tipologia": "calcolo",
+          "testo": "Quale scrittura comunica valore e incertezza assoluta?",
+          "alternative": [
+            "15,0 ± 0,2 senza unità",
+            "15 cm esatti",
+            "(15,0 ± 0,2) cm",
+            "15,0 cm e basta"
+          ],
+          "corretta": "C",
+          "spiegazione": "Una misura completa con incertezza riporta valore, margine e unità."
+        },
+        {
+          "id": "strumenti_errori_incertezza_021",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Due strumenti misurano lo stesso oggetto: uno ha passo 1 cm, l'altro 1 mm. Quale distingue variazioni più piccole?",
+          "alternative": [
+            "Quello con passo 1 cm",
+            "Quello con passo 1 mm",
+            "Entrambi allo stesso modo",
+            "Nessuno dei due può misurare"
+          ],
+          "corretta": "B",
+          "spiegazione": "Un millimetro è una divisione dieci volte più piccola di un centimetro."
+        },
+        {
+          "id": "strumenti_errori_incertezza_022",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "La media di 9, 9 e 15 cm è 11 cm. Che cosa rivela il dato 15?",
+          "alternative": [
+            "Una lettura distante dalle altre da verificare",
+            "Una misura automaticamente falsa",
+            "Una prova che la media è 9",
+            "La totale assenza di dispersione"
+          ],
+          "corretta": "A",
+          "spiegazione": "15 cm è più distante dalle altre letture: va controllato, non cancellato a priori."
+        },
+        {
+          "id": "strumenti_errori_incertezza_023",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Se una misura è 40 cm con incertezza 2 cm, qual è l'incertezza percentuale?",
+          "alternative": [
+            "2%",
+            "20%",
+            "0,5%",
+            "5%"
+          ],
+          "corretta": "D",
+          "spiegazione": "(2/40) × 100 = 5%."
+        },
+        {
+          "id": "strumenti_errori_incertezza_024",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Perché non ha senso indicare moltissime cifre se lo strumento è poco risoluto?",
+          "alternative": [
+            "La misura diventerebbe negativa",
+            "L'unità di misura cambierebbe",
+            "Le cifre extra non sono giustificate dalla misura",
+            "La grandezza non sarebbe più fisica"
+          ],
+          "corretta": "C",
+          "spiegazione": "Le cifre comunicate devono essere coerenti con l'informazione disponibile."
+        },
+        {
+          "id": "strumenti_errori_incertezza_025",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Una lettura è (7,0 ± 0,5) cm. Quale valore è compreso nell'intervallo?",
+          "alternative": [
+            "6,4 cm",
+            "7,4 cm",
+            "7,6 cm",
+            "8,0 cm"
+          ],
+          "corretta": "B",
+          "spiegazione": "L'intervallo va da 6,5 a 7,5 cm."
+        }
+      ]
+    }
+  ]
+}

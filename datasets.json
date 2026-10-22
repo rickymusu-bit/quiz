@@ -5,6 +5,11 @@
       "id": "termologia",
       "nome": "Termologia · 100 domande",
       "url": "Dataset_termologia_100_domande_v1_20261021.json"
+    },
+    {
+      "id": "introduzione-fisica-misura",
+      "nome": "Introduzione alla fisica e alla misura · 100 domande",
+      "url": "dataset/fool_introduzione_fisica_misura_v1_20261022.json"
     }
   ]
 }
