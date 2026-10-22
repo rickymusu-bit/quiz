@@ -1,5 +1,11 @@
 # Fool — implementazione e verifiche
 
+## Sanzioni con −/+ e conclusione esplicita — interfaccia 1.3.2, 22/10/2026
+
+Sostituiti gli input numerici delle sanzioni con pulsanti −/+ e output, limitati alle sanzioni ancora necessarie per arrivare a tre. Il totale futuro e l’eliminazione sono espliciti; gli interventi restano da confermare. Le scelte pendenti sono conservate nel browser. La conclusione del motore pulisce stato di pausa, motivo, sospensione, campanella e pannelli. Il renderer chiude il dialogo e gli avvisi residui, nasconde il timer e porta il focus al vincitore. Il normale caso di due eliminazioni successive risultava già vincente nel motore prima della modifica; la chiusura dello stato e la presentazione finale sono ora esplicite e coperte da regressione, senza attribuire una causa non riprodotta al blocco segnalato. La X corrente è un PNG generato trasparente, ispezionato e applicato direttamente; il precedente SVG non è più referenziato dall’app.
+
+Verifiche: 30 test motore superati; regressione su tutti i sei ordini di due eliminazioni successive dagli stati domanda nascosta, risposta, scelta e risultato, con ripresa intermedia, più sanzione decisiva nello spareggio. `tests/sanctions.py` verifica −/+, limiti, annullamento, timer fermo, modifiche/motivi pendenti dopo ricarica, terza sanzione del secondo gruppo, vittoria del superstite, assenza di dialoghi/avvisi/pausa, ripresa del risultato e nuova partita a 240×320, 390×844, 844×390 e 1440×900. `tests/display.py` verifica il PNG e le liste su mobile/desktop; `tests/responsive.py` supera il flusso su dieci dimensioni, tastiera, touch e testo grande. Screenshot del pannello e della vittoria ispezionati; nessun errore JavaScript.
+
 ## Punti, bonus per riga e gruppi eliminati — interfaccia 1.3.1, 22/10/2026
 
 Su richiesta del responsabile, la domanda mostra il valore in punti invece di argomento e difficoltà, prima e dopo lo svelamento. Il valore è quello base effettivamente configurato; lo spareggio non attribuisce punti. L’anteprima docente usa lo stesso criterio. I bonus nel tabellone e nell’inventario sono liste senza numeri né marcatori, con una voce per riga e quantità. I soli gruppi eliminati hanno una X rossa originale in SVG ispirata al riferimento 15044.jpg, senza sfondo e senza bloccare i comandi sottostanti; la dicitura ELIMINATO resta disponibile.

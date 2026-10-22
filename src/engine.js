@@ -81,9 +81,9 @@ class Game {
  s.result=result;s.screen='result';s.paused=false;this.log((correct?'Corretta':'Errore / tempo scaduto')+' — '+g.name,{outcome:clone(result)});this.finishCheck();if(s.suspendAfter&&s.phase!=='conclusa'){s.suspended=true;s.suspendAfter=false}
  }
  eliminate(i,cause){const s=this.s,g=s.groups[i];g.out=true;g.cause=cause;g.inventory=[];g.aura=null;s.effects=s.effects.filter(e=>e.source!==i&&e.target!==i)}
- finishCheck(){const s=this.s,active=this.active();if(active.length<=1){s.draftBonus=null;s.phase='conclusa';s.winner=active[0]??null;this.stop();s.suspended=false;s.screen='final';return}
+ finishCheck(){const s=this.s,active=this.active();if(active.length<=1){s.draftBonus=null;s.phase='conclusa';s.winner=active[0]??null;this.stop();s.panel=null;s.paused=false;s.pauseReason='';s.suspendAfter=false;s.suspended=false;s.screen='final';return}
  if(s.phase==='ordinaria'&&s.valid===33){let top=[active[0]];for(const i of active.slice(1)){const c=compare(s.groups[i].score,s.groups[top[0]].score);if(c>0)top=[i];else if(c===0)top.push(i)}
- if(top.length===1){s.draftBonus=null;s.phase='conclusa';s.winner=top[0];s.screen='final';s.suspended=false;return}
+ if(top.length===1){s.draftBonus=null;s.phase='conclusa';s.winner=top[0];s.screen='final';s.panel=null;s.paused=false;s.pauseReason='';s.suspendAfter=false;s.suspended=false;return}
  s.draftBonus=null;s.phase='spareggio';s.drawParticipants=top;s.order=shuffle(top,this.random);s.effects=[];for(const g of s.groups){g.inventory=[];g.aura=null}s.owner=s.order[0];s.respondent=s.owner;s.turn++;s.usedBonus=false;s.queue=[];this.take();this.log('Battaglia finale: '+s.order.map(i=>s.groups[i].name).join(' → '));}}
  next(expected){this.guard();this.revision(expected);need(this.s.screen==='result','Registrare prima un esito');this.newTurn(this.s.respondent)}
  openSanctions(){need(this.s.phase!=='conclusa'&&!this.s.panel&&!this.s.suspended,'Pannello non disponibile');this.pause('sanzioni',true);this.s.panel={type:'sanctions',id:this.uid(),counts:[0,0,0],reasons:['disturbo','disturbo','disturbo']}}

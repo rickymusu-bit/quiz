@@ -244,4 +244,10 @@ dialog .columns { margin: 1rem 0; }
 .bonus-inventory-list .bonus-group { display: list-item; }
 .bonus-inventory-list .bonus-group button { margin: .4rem 0 .2rem .6rem; }
 .team.out { position: relative; }
-.team.out::after { content: ''; position: absolute; inset: .3rem; background: url('assets/eliminated-x.svg') center / 100% 100% no-repeat; opacity: .9; pointer-events: none; }
+.team.out::after { content: ''; position: absolute; inset: .3rem; background: url('assets/eliminated-x.png') center / contain no-repeat; opacity: .9; pointer-events: none; }
+
+.sanction-stepper { display: flex; align-items: center; gap: .5rem; }
+.sanction-stepper button { width: 3rem; min-height: 48px; font-size: 1.6rem; padding: .2rem; }
+.sanction-stepper output { min-width: 2ch; text-align: center; font: 400 2rem FoolTerminal, monospace; }
+.sanction-total { font-size: .85rem; color: var(--accent); }
+.final-title { color: var(--accent); }

@@ -25,7 +25,7 @@ with sync_playwright() as p:
         page.screenshot(path=str(ROOT/'tests/question.png'),full_page=True)
         page.get_by_role('button',name='Pausa',exact=True).click()
         before=page.evaluate('game.left()');page.wait_for_timeout(300);assert before==page.evaluate('game.left()')
-        page.get_by_role('button',name='Sanzioni',exact=True).click();page.locator('#sanction-0').fill('1');page.get_by_role('button',name='Conferma intervento').click();assert page.evaluate('game.s.groups[0].sanctions')==1;assert not page.evaluate('game.running')
+        page.get_by_role('button',name='Sanzioni',exact=True).click();page.locator('#sanction-plus-0').click();page.get_by_role('button',name='Conferma intervento').click();assert page.evaluate('game.s.groups[0].sanctions')==1;assert not page.evaluate('game.running')
         page.get_by_role('button',name='Riprendi timer').click()
         page.locator('.answer').nth(page.evaluate('game.s.current.correct')).click();page.wait_for_timeout(100)
         page.screenshot(path=str(ROOT/'tests/result.png'),full_page=True)

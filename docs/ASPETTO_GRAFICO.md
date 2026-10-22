@@ -1,6 +1,6 @@
 # Fool — Specifiche dell’aspetto grafico
 
-Versione: **1.4.1** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
+Versione: **1.4.2** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
 
 ## 1. Scopo e fonti
 
@@ -68,3 +68,11 @@ Percorsi stabili e cronologia Git conservano le edizioni precedenti.
 Nel quiz il metadato della domanda mostra soltanto il valore in punti base configurati, senza livello di difficoltà o nome dell’argomento; nello spareggio il valore è zero perché non si attribuiscono punti. Il valore resta visibile anche dopo lo svelamento. Anche l’intestazione dell’anteprima docente usa i punti, lasciando argomenti e difficoltà nei soli parametri di Impostazioni.
 
 I cinque bonus di ciascun gruppo sono elencati uno per riga, senza numeri o marcatori, con quantità visibile. Anche le copie nell’inventario sono in una lista senza numerazione. Quando il gruppo è eliminato, il suo riquadro riceve una X rossa a pennellate, ispirata al riferimento 15044.jpg; il disegno è un SVG originale su fondo trasparente. Il segno si adatta al riquadro e non intercetta clic o touch. La dicitura ELIMINATO rimane per l’accessibilità e la leggibilità dello stato.
+
+## 7. Sanzioni e conclusione — aggiornamento del 22/10/2026
+
+La X corrente è un PNG generato con canale alfa (`assets/eliminated-x.png`), applicato direttamente al riquadro senza intercettare i comandi. Il precedente SVG non è più usato.
+
+Il pannello delle sanzioni usa pulsanti −/+ e un contatore di sola lettura. Si preparano le nuove sanzioni da 0 al numero necessario a raggiungere 3; un riepilogo indica il totale dopo conferma e l’eventuale eliminazione. Le modifiche pendenti e il motivo si conservano nel salvataggio, senza applicare sanzioni finché non si conferma. «Chiudi senza sanzionare» le annulla.
+
+Quando resta un solo gruppo in gioco, la conclusione pulisce pausa, sospensione e pannelli residui; l’interfaccia chiude il dialogo, rimuove l’eventuale avviso di layout e porta il focus al titolo della vittoria. Il timer non è più mostrato e il riquadro del superstite indica VINCITORE.

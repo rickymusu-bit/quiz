@@ -36,3 +36,23 @@ test('Salvataggio scelta bonus incompleta, nessun consumo; vincoli convalidati',
 test('Un evento della vecchia domanda resta invalido dopo una nuova rivelazione',()=>{const {g}=setup();g.reveal();const revision=g.s.revision;g.answer(g.s.current.correct,revision);g.next();g.reveal();const current=g.s.current.id;assert.throws(()=>g.answer(0,revision));assert.equal(g.s.screen,'answer');assert.equal(g.s.current.id,current);assert.equal(g.s.valid,1)});
 
 test('Icone: conservate alla ripresa, validate e compatibili con i vecchi salvataggi',()=>{const icons=['skull','crown','shield'];const {g}=setup({icons});assert.deepEqual(F.Game.restore(g.snapshot()).s.config.icons,icons);for(const bad of [[],['skull','bolt','unknown'],null,'skull'])assert.throws(()=>setup({icons:bad}));const old=setup().g.snapshot();assert.equal(F.Game.restore(old).s.config.icons,undefined);const bad=g.snapshot();bad.config.icons=['skull'];assert.throws(()=>F.Game.restore(bad))});
+
+test('Eliminazioni successive: vittoria del superstite da ogni stato, senza pause o pannelli residui',()=>{
+ for(const first of [0,1,2])for(const second of [0,1,2].filter(i=>i!==first))for(const screen of ['hidden','answer','choice','result']){
+  let {g}=setup();g.s.groups[second].sanctions=2;g.s.groups[2].score=F.rational(555);
+  if(screen==='answer')g.reveal();
+  if(screen==='choice')g.use(copy(g,0,'svela'));
+  if(screen==='result')win(g);
+  g.openSanctions();g.s.panel.counts[first]=3;g.closeSanctions(true);
+  assert.equal(g.s.phase,'ordinaria');g=F.Game.restore(g.snapshot());
+  g.openSanctions();g.s.panel.counts[second]=1;g.s.suspendAfter=true;g.closeSanctions(true);
+  const remaining=[0,1,2].find(i=>i!==first&&i!==second);assert.equal(g.s.phase,'conclusa');assert.equal(g.s.winner,remaining);assert.equal(g.s.screen,'final');
+  assert.equal(g.running,false);assert.equal(g.s.paused,false);assert.equal(g.s.suspended,false);assert.equal(g.s.suspendAfter,false);assert.equal(g.s.panel,null);assert.equal(g.s.pauseReason,'');
+  assert.equal(F.Game.restore(g.snapshot()).s.winner,remaining);
+ }
+});
+test('Sanzione decisiva nello spareggio assegna la vittoria e pulisce lo stato',()=>{
+ const {g}=setup();g.s.valid=32;g.s.groups[0].score=F.rational(100);g.s.groups[1].score=F.rational(100);g.reveal();g.answer((g.s.current.correct+1)%4);
+ assert.equal(g.s.phase,'spareggio');g.s.groups[0].sanctions=2;g.reveal();g.openSanctions();g.s.panel.counts[0]=1;g.closeSanctions(true);
+ assert.equal(g.s.phase,'conclusa');assert.equal(g.s.winner,1);assert.equal(g.s.paused,false);assert.equal(F.Game.restore(g.snapshot()).s.winner,1);
+});

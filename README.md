@@ -1,6 +1,6 @@
 # Fool
 
-Quiz online di Riccardo Musumarra. **Interfaccia 1.3.1**, regolamento **18.0.1**.
+Quiz online di Riccardo Musumarra. **Interfaccia 1.3.2**, regolamento **18.0.1**.
 
 Apri **https://rickymusu-bit.github.io/quiz/** e scegli **Start**, **Regole** o **Impostazioni**. Non sono previsti download, installazioni o selettori di file.
 
@@ -54,6 +54,8 @@ python3 tests/online.py
 python3 tests/responsive.py
 python3 tests/settings.py
 python3 tests/navigation.py
+python3 tests/display.py
+python3 tests/sanctions.py
 ```
 
 La rigenerazione usa soltanto la libreria standard Python. I test motore usano Node; i test browser richiedono Python Playwright e Chromium (`/usr/bin/chromium`). Il sito generato è statico e viene pubblicato sul ramo `gh-pages`. `src/home.html` genera la pagina iniziale; `src/app.js` gestisce il caricamento online e i salvataggi nel browser.

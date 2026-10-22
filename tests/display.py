@@ -27,11 +27,11 @@ with sync_playwright() as p:
   expect(page.locator('.question-points')).to_have_text(str(value)+' punti')
   page.get_by_role('button',name='Pausa',exact=True).click()
   # Eliminate the first team through the real discipline UI.
-  page.get_by_role('button',name='Sanzioni',exact=True).click();page.locator('#sanction-0').fill('3')
+  page.get_by_role('button',name='Sanzioni',exact=True).click();page.locator('#sanction-plus-0').click(click_count=3)
   page.get_by_role('button',name='Conferma intervento').click()
   assert page.evaluate('game.s.groups[0].out')
   out=page.locator('.team.out');expect(out).to_have_count(1)
-  assert 'eliminated-x.svg' in out.evaluate('e=>getComputedStyle(e,"::after").backgroundImage')
+  assert 'eliminated-x.png' in out.evaluate('e=>getComputedStyle(e,"::after").backgroundImage')
   assert out.evaluate('e=>getComputedStyle(e,"::after").pointerEvents')=='none'
   # The overlay never blocks the details control and follows card size.
   out.locator('summary').click()

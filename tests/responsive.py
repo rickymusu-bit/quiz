@@ -39,7 +39,7 @@ with sync_playwright() as p:
   before=page.evaluate('game.left()');page.wait_for_timeout(120);assert page.evaluate('game.left()')==before
   page.get_by_role('button',name='Sanzioni',exact=True).click()
   expect(page.get_by_role('button',name='Conferma intervento')).to_be_visible()
-  page.locator('#sanction-0').fill('1');page.get_by_role('button',name='Conferma intervento').click()
+  page.locator('#sanction-plus-0').click();page.get_by_role('button',name='Conferma intervento').click()
   assert page.evaluate('game.s.groups[0].sanctions')==1;assert not page.evaluate('game.running')
   if w<=650:
    details=page.locator('.team details').first
