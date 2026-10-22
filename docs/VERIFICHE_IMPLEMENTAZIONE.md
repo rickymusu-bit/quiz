@@ -1,5 +1,13 @@
 # Fool — implementazione e verifiche
 
+## Bonus e Moltiplicatore visibili, feedback animato — interfaccia 1.5.0, 22/10/2026
+
+Rimossi selettore delle icone e icone dei gruppi, sezione Dettagli e contatore della serie. Il tabellone espone sempre bonus, effetti e Moltiplicatore; il calcolo resta quello già usato per la prossima risposta corretta. Il motore mantiene internamente la serie senza mostrarla. I vecchi salvataggi con icone restano compatibili, senza disegnarle; le nuove partite non registrano icone. Sotto 350 px i riquadri si impilano per mantenerne leggibili le voci.
+
+Feedback tramite Web Animations: riquadro e conferma per una nuova corretta, evidenziazione della voce del bonus ottenuto e del valore del moltiplicatore se aumentato. Effetti di 0,7–1,4 secondi, senza attese o variazioni del modello; non si riattivano per semplice rendering/ripresa, né su risposte errate. Con `prefers-reduced-motion: reduce` non partono. Nessuna modifica al motore, alle probabilità, al timer o al formato dei salvataggi.
+
+`tests/scoreboard.py` supera otto flussi (240/390/844/1440 px, movimento normale/ridotto), con due corrette dello stesso gruppo, bonus garantito nella fixture, crescita del moltiplicatore, assenza di replay dopo rendering/ricarica e nessun effetto celebrativo su errore; controlla assenza di icone, Serie e disclosure e visibilità delle cinque voci per gruppo. `tests/responsive.py` supera dieci dimensioni, touch, tastiera e testo ingrandito. `tests/settings.py` passa con un solo selettore di argomento e vecchi salvataggi con icone. `tests/display.py` e `tests/browser.py` aggiornati e superati. Screenshot del tabellone a 240 e 390 px ispezionati; nessun errore JavaScript o overflow laterale.
+
 ## Finali WINS e GAME OVER — interfaccia 1.4.0, 22/10/2026
 
 La vittoria mostra solo il nome del gruppo e WINS; l’eliminazione di tutti mostra GAME OVER. Le due scritte sono PNG trasparenti generati nel medesimo stile a pennellate rosse della X, ispezionati anche nei finali mobile. Un solo pulsante sotto l’esito torna alla home ufficiale. Non compaiono intestazione, tabellone, timer, toolbar, premio o indicazioni sul registro. La ripresa di una partita conclusa riapre lo stesso finale. Il testo del premio è rimosso da `src/app.js` e resta nelle regole, il cui sorgente non è stato modificato (SHA-256 `1aa2838af1177e4cee18cc9bf29cdf5df86ffbfaf44a3e272f4fdc6e897c36d5`). Nessuna modifica al motore o al formato dei salvataggi.

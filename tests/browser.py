@@ -14,7 +14,7 @@ with sync_playwright() as p:
     page.on('pageerror',lambda e:errors.append(str(e)))
     page.on('request',lambda r:requests.append(r.url) if r.url.startswith('http') and not r.url.startswith(base) else None)
     page.goto(base+'Fool.html')
-    page.wait_for_function('bank && document.getElementById("icon2")')
+    page.wait_for_function('bank && document.getElementById("name2")')
     assert page.locator('input[type=file],a[download]').count()==0
     page.get_by_role('button',name='Inizia partita').click();page.wait_for_timeout(150)
     print('MESSAGE',page.locator('#message').inner_text());print('STATE',page.evaluate('({screen:game?.s.screen,ui,fitBlocked})'))

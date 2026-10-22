@@ -40,23 +40,23 @@ with sync_playwright() as p:
   expect(page.get_by_role('button',name='Inizia partita')).to_be_enabled()
   assert page.locator('#seconds,#probability,#difficulty,#quotas,[id^=base-]').count()==0
   assert page.get_by_role('button',name='Prepara anteprima').count()==0
-  assert page.locator('input').count()==3 and page.locator('select').count()==4;fits(page)
-  for i,(name,icon) in enumerate([('Demoni','skull'),('Razzi','crown'),('Marines','shield')]):
-   page.locator('#name'+str(i)).fill(name);page.locator('#icon'+str(i)).select_option(icon)
+  assert page.locator('input').count()==3 and page.locator('select').count()==1;fits(page)
+  for i,name in enumerate(['Demoni','Razzi','Marines']):
+   page.locator('#name'+str(i)).fill(name)
   page.get_by_role('button',name='Inizia partita').click()
   expect(page.get_by_role('button',name='Svela e avvia il tempo')).to_be_visible();fits(page)
-  config=page.evaluate('game.s.config');assert config['names']==['Demoni','Razzi','Marines'];assert config['icons']==['skull','crown','shield']
+  config=page.evaluate('game.s.config');assert config['names']==['Demoni','Razzi','Marines'];assert 'icons' not in config
   assert config['seconds']==60 and config['probability']==0 and config['bases']['facile']==150
-  assert page.locator('.team .team-icon').count()==3
+  assert page.locator('.team .team-icon').count()==0
   snapshot=page.evaluate('localStorage.getItem("fool-v1")')
   page.goto(base+'Fool.html?settings=1');expect(page.locator('#seconds')).to_have_value('60')
   page.locator('#seconds').fill('90');page.get_by_role('button',name='Salva impostazioni').click()
   assert page.evaluate('localStorage.getItem("fool-v1")')==snapshot
   page.goto(base+'Fool.html');page.get_by_role('button',name='Riprendi partita',exact=True).click()
-  assert page.evaluate('game.s.config.seconds')==60 and page.evaluate('game.s.config.icons')==config['icons']
-  # Old saves without icons remain usable and receive visual fallback badges.
-  page.evaluate('()=>{delete game.s.config.icons;persist()}');page.reload();page.get_by_role('button',name='Riprendi partita',exact=True).click()
-  assert page.locator('.team .team-icon').count()==3
+  assert page.evaluate('game.s.config.seconds')==60
+  # Old saves with icons remain usable, but icons are never rendered.
+  page.evaluate('()=>{game.s.config.icons=["skull","bolt","star"];persist()}');page.reload();page.get_by_role('button',name='Riprendi partita',exact=True).click()
+  assert page.locator('.team .team-icon').count()==0
   # Storage denied: defaults still start a game; saving settings reports failure.
   page.add_init_script("Storage.prototype.getItem=function(){throw Error('blocked')};Storage.prototype.setItem=function(){throw Error('blocked')}")
   page.goto(base+'Fool.html?settings=1');page.get_by_role('button',name='Salva impostazioni').click()
@@ -66,4 +66,4 @@ with sync_playwright() as p:
   assert not errors,errors
   page.close()
  browser.close()
- print('Impostazioni e Start: persistenza, validazione, anteprima separata, icone/ripresa, vecchi salvataggi e storage bloccato: OK su 240/390/1440 px')
+ print('Impostazioni e Start: persistenza, validazione, anteprima separata, ripresa senza icone, vecchi salvataggi e storage bloccato: OK su 240/390/1440 px')

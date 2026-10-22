@@ -1,8 +1,7 @@
 'use strict';
 const F=Fool,$=id=>document.getElementById(id),main=$('main');
 let bank=null,prepared=null,game=null,previewIndex=0,ui='config',fitting=false,fitBlocked=false,messageTimer,inventoryCanResume=false,catalog=null,selectedBankId=null,configurationLoad=0,lastFinalGame=null,settingsDraft=null,setupMode=new URL(location.href).searchParams.get('settings')==='1'?'settings':'config';
-const teamDraft={names:['Gruppo 1','Gruppo 2','Gruppo 3'],icons:['skull','bolt','star']};
-const ICONS={skull:['☠︎','Teschio'],bolt:['ϟ','Fulmine'],star:['★','Stella'],swords:['⚔︎','Spade'],shield:['⛨','Scudo'],crown:['♛','Corona']};
+const teamDraft={names:['Gruppo 1','Gruppo 2','Gruppo 3']};
 const node=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n};
 function btn(text,fn,cls='',disabled=false){const b=node('button',text,cls);b.type='button';b.disabled=disabled;b.onclick=()=>act(fn);return b}
 function act(fn){try{const result=fn();if(result&&typeof result.catch==='function')result.catch(e=>message(e.message))}catch(e){message(e.message)}}
@@ -26,7 +25,7 @@ async function loadCatalog(){
 async function loadBank(entry){const parsed=F.parseDataset(await fetchSiteText(entry.url),katex);return {...parsed,source:entry.id};}
 function persist(){if(!game)return;try{localStorage.setItem('fool-v1',JSON.stringify(game.snapshot()));return true}catch(e){message('Il browser non consente di conservare la partita. Mantieni aperta questa pagina.');return false}}
 function changed(){persist();renderGame()}
-function command(fn){return()=>{fn();changed()}}
+function command(fn){return()=>{const before=feedbackState();fn();changed();animateOutcome(before)}}
 function localSave(){try{return localStorage.getItem('fool-v1')}catch(e){return null}}
 function offerResume(parent){if(localSave())parent.append(btn('Riprendi partita',()=>restoreGame(localSave())))}
 function goHome(){persist();configurationLoad++;location.assign(new URL('./',location.href).href)}
@@ -37,10 +36,9 @@ function balancedQuotas(filter){
  return Object.fromEntries(topics.map((t,i)=>[t,values[i]]));
 }
 function settingsStore(){const raw=localStorage.getItem('fool-settings-v1');if(!raw)return {version:1,profiles:{}};const data=JSON.parse(raw);if(data?.version!==1||!data.profiles||typeof data.profiles!=='object'||Array.isArray(data.profiles))throw Error('Impostazioni salvate non valide');return data}
-function settingsConfig(value,names=teamDraft.names,icons=teamDraft.icons){return {seconds:value.seconds,probability:value.probability,difficulty:value.difficulty,bases:value.bases,quotas:value.quotas,names,icons}}
-function savedSettings(){try{const value=settingsStore().profiles[selectedBankId];if(value){F.prepare(bank.bank,settingsConfig(value,['Gruppo 1','Gruppo 2','Gruppo 3'],['skull','bolt','star']));return value}}catch(e){message('Impostazioni non disponibili: sono stati caricati i valori predefiniti. Puoi salvarli di nuovo da Impostazioni.')}return defaultSettings()}
-function rememberTeams(){for(let i=0;i<3;i++){if($('name'+i))teamDraft.names[i]=$('name'+i).value;if($('icon'+i))teamDraft.icons[i]=$('icon'+i).value}}
-function teamIcon(key){const [symbol,label]=ICONS[key]||ICONS.skull;const icon=node('span',symbol,'team-icon');icon.setAttribute('role','img');icon.setAttribute('aria-label',label);return icon}
+function settingsConfig(value,names=teamDraft.names){return {seconds:value.seconds,probability:value.probability,difficulty:value.difficulty,bases:value.bases,quotas:value.quotas,names}}
+function savedSettings(){try{const value=settingsStore().profiles[selectedBankId];if(value){F.prepare(bank.bank,settingsConfig(value,['Gruppo 1','Gruppo 2','Gruppo 3']));return value}}catch(e){message('Impostazioni non disponibili: sono stati caricati i valori predefiniti. Puoi salvarli di nuovo da Impostazioni.')}return defaultSettings()}
+function rememberTeams(){for(let i=0;i<3;i++)if($('name'+i))teamDraft.names[i]=$('name'+i).value}
 async function configure(){
  const request=++configurationLoad;ui=setupMode;game=null;main.className='';main.replaceChildren();const loading=heading(setupMode==='settings'?'Impostazioni':'Prepara Fool','Caricamento delle domande dal sito…');if(setupMode==='config')offerResume(loading);
  try{const available=await loadCatalog();if(request!==configurationLoad||ui!==setupMode)return;catalog=available;const entry=catalog.find(x=>x.id===selectedBankId)||catalog[0];selectedBankId=entry.id;
@@ -50,10 +48,10 @@ async function configure(){
 }
 function renderConfiguration(){
  main.replaceChildren();const editing=setupMode==='settings',value=settingsDraft?.source===bank.source?settingsDraft.value:savedSettings();
- const p=heading(editing?'Impostazioni':'Prepara Fool',editing?'I parametri si applicano alle nuove partite e si conservano in questo browser. Salva prima di cambiare argomento.':'Scegli nomi, icone e argomento delle domande.');if(!editing)offerResume(p);
+ const p=heading(editing?'Impostazioni':'Prepara Fool',editing?'I parametri si applicano alle nuove partite e si conservano in questo browser. Salva prima di cambiare argomento.':'Scegli i nomi dei gruppi e l’argomento delle domande.');if(!editing)offerResume(p);
  const choice=select('Argomento delle domande','bank-choice',catalog.map(x=>[x.id,x.nome]),selectedBankId);choice.querySelector('select').onchange=()=>act(async()=>{rememberTeams();selectedBankId=$('bank-choice').value;bank=null;prepared=null;settingsDraft=null;await configure()});p.append(choice);
  if(!editing){
-  const grid=node('div',undefined,'columns setup-teams');for(let i=0;i<3;i++){const card=node('section',undefined,'panel');const title=node('h3','Gruppo '+(i+1));const badge=teamIcon(teamDraft.icons[i]);title.prepend(badge);card.append(title,input('Nome del gruppo '+(i+1),'name'+i,teamDraft.names[i]));const icons=select('Icona del gruppo '+(i+1),'icon'+i,Object.entries(ICONS).map(([key,[symbol,name]])=>[key,symbol+' '+name]),teamDraft.icons[i]);icons.querySelector('select').onchange=()=>{teamDraft.icons[i]=$('icon'+i).value;title.replaceChild(teamIcon(teamDraft.icons[i]),title.firstChild)};card.append(icons);grid.append(card)}p.append(grid);
+  const grid=node('div',undefined,'columns setup-teams');for(let i=0;i<3;i++){const card=node('section',undefined,'panel');card.append(node('h3','Gruppo '+(i+1)),input('Nome del gruppo '+(i+1),'name'+i,teamDraft.names[i]));grid.append(card)}p.append(grid);
   const row=node('div',undefined,'row');row.append(btn('Inizia partita',()=>{rememberTeams();prepared=F.prepare(bank.bank,settingsConfig(savedSettings()));start()},'primary'),btn('Torna alla schermata iniziale',goHome));p.append(row);return;
  }
  const grid=node('div',undefined,'columns settings-grid');const time=node('section',undefined,'panel');time.append(node('h3','Tempo e bonus'),input('Secondi per domanda','seconds',value.seconds,'number'),input('Probabilità bonus (%)','probability',value.probability,'number'),select('Difficoltà','difficulty',[['misto','Misto'],['facile','Facile'],['media','Media'],['difficile','Difficile']],value.difficulty));grid.append(time);
@@ -75,15 +73,26 @@ function scoreboard(){
  const s=game.s,grid=node('div',undefined,'columns scoreboard');
  s.groups.forEach((g,i)=>{
   const t=node('section',undefined,'team'+(i===(s.phase==='conclusa'?s.winner:s.respondent)?' active':'')+(g.out?' out':''));
-  const title=node('h3',g.name);title.prepend(teamIcon(s.config.icons?.[i]||['skull','bolt','star'][i]));const status=g.out?'ELIMINATO':s.phase==='conclusa'?(i===s.winner?'VINCITORE':''):s.phase==='spareggio'&&!s.order.includes(i)?'FUORI SPAREGGIO':i===s.respondent?'RISPONDE':'';
+  t.dataset.team=String(i);const title=node('h3',g.name);const status=g.out?'ELIMINATO':s.phase==='conclusa'?(i===s.winner?'VINCITORE':''):s.phase==='spareggio'&&!s.order.includes(i)?'FUORI SPAREGGIO':i===s.respondent?'RISPONDE':'';
   if(status)title.append(node('span',status,'team-label'));t.append(title,node('strong',F.exact(g.score)+' pt'));
-  t.append(node('p','Serie '+g.streak+' · sanzioni '+g.sanctions+'/3','team-status'));
-  const info=node('details');info.open=innerWidth>650;const summary=node('summary','Dettagli');summary.setAttribute('aria-label','Bonus ed effetti di '+g.name);info.append(summary,node('p','Prossima corretta ×'+((10+g.streak)/10).toFixed(2).replace('.',',')));
-  const counts=F.TYPES.map(type=>[type,g.inventory.filter(c=>c.type===type).length]);const bonuses=node('ul',undefined,'bonus-list');for(const [type,n]of counts)bonuses.append(node('li',F.LABELS[type]+' ×'+n));info.append(bonuses);
+  t.append(node('p','Sanzioni '+g.sanctions+'/3','team-status'));
+  const info=node('div',undefined,'team-info'),multiplier=node('p',undefined,'multiplier');multiplier.append(node('span','Moltiplicatore','multiplier-label'),node('span','×'+((10+g.streak)/10).toFixed(2).replace('.',','),'multiplier-value'));info.append(multiplier);
+  const counts=F.TYPES.map(type=>[type,g.inventory.filter(c=>c.type===type).length]);const bonuses=node('ul',undefined,'bonus-list');for(const [type,n]of counts){const item=node('li',F.LABELS[type]+' ×'+n);item.dataset.bonus=type;bonuses.append(item)}info.append(bonuses);
   const locks=[...new Map(g.inventory.filter(c=>c.target!==null).map(c=>[c.type+':'+c.target,F.LABELS[c.type]+' solo → '+s.groups[c.target].name])).values()];
   const effects=s.effects.filter(e=>e.target===i).map(e=>F.LABELS[e.type]+' da '+s.groups[e.source].name);const details=[...locks,...effects];
   if(g.aura!==null)details.push('Aura attiva fino al prossimo turno');if(g.out)details.push(g.cause);if(details.length)info.append(node('p',details.join(' · ')));t.append(info);grid.append(t);
  });return grid;
+}
+function feedbackState(){return game?{game,result:game.s.result?.id,streaks:game.s.groups.map(g=>g.streak)}:null}
+function animateOutcome(before){
+ const r=game?.s.result;if(!before||before.game!==game||!r?.correct||r.id===before.result||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+ const pulse=(target,frames,duration=1100)=>target?.animate?.(frames,{duration,easing:'ease-out'});
+ const card=main.querySelector('[data-team="'+r.respondent+'"]');
+ pulse(card,[{boxShadow:'inset 0 0 0 3px #c2e4ad, 0 0 20px #c2e4ad99'},{boxShadow:'inset 0 0 0 0px #c2e4ad00, 0 0 0px #c2e4ad00'}]);
+ pulse(main.querySelector('.solution > strong'),[{color:'#fff8c5',textShadow:'0 0 12px #c2e4ad'},{color:'#c2e4ad',textShadow:'0 0 0px transparent'}]);
+ if(r.bonus)pulse(card?.querySelector('[data-bonus="'+r.bonus.type+'"]'),[{backgroundColor:'#9e622d',color:'#fff8c5'},{backgroundColor:'transparent',color:'#f0e9d9'}],1400);
+ if(game.s.groups[r.respondent].streak>before.streaks[r.respondent])pulse(card?.querySelector('.multiplier-value'),[{color:'#fff8c5',textShadow:'0 0 16px #efb36e'},{color:'#efb36e',textShadow:'0 0 0px transparent'}],1400);
+ if(!card)pulse(main.querySelector('.end-wordmark'),[{opacity:.65},{opacity:1}],700);
 }
 function questionPoints(){return node('p',(game.s.phase==='ordinaria'?game.s.config.bases[game.s.current.difficulty]:0)+' punti','question-points')}
 function endScreen(){

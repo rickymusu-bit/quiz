@@ -21,7 +21,7 @@ with sync_playwright() as p:
   assert page.evaluate('!document.querySelector(".operation-body").textContent.includes(game.s.current.difficulty)')
   assert page.locator('.team ul.bonus-list li').count()==15
   assert page.locator('.team ol').count()==0
-  page.locator('.team summary').first.click() if w<=650 else None
+  assert page.locator('.team details,.team summary,.team-icon').count()==0
   assert page.locator('.team .bonus-list li').first.evaluate('e=>getComputedStyle(e.parentElement).listStyleType')=='none'
   page.get_by_role('button',name='Svela e avvia il tempo').click()
   expect(page.locator('.question-points')).to_have_text(str(value)+' punti')
@@ -33,8 +33,7 @@ with sync_playwright() as p:
   out=page.locator('.team.out');expect(out).to_have_count(1)
   assert 'eliminated-x.png' in out.evaluate('e=>getComputedStyle(e,"::after").backgroundImage')
   assert out.evaluate('e=>getComputedStyle(e,"::after").pointerEvents')=='none'
-  # The overlay never blocks the details control and follows card size.
-  out.locator('summary').click()
+  # The overlay adapts to the card with permanently visible bonuses.
   assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+1')
   page.screenshot(path=str(ROOT/f'tests/display-eliminated-{w}.png'),full_page=True)
   page.reload();page.get_by_role('button',name='Riprendi partita',exact=True).click()

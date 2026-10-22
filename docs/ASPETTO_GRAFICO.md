@@ -1,6 +1,6 @@
 # Fool — Specifiche dell’aspetto grafico
 
-Versione: **1.5.0** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
+Versione: **1.6.0** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
 
 ## 1. Scopo e fonti
 
@@ -24,7 +24,7 @@ La revisione corrente porta le superfici blu a grigio antracite e nero, conserva
 
 ## 3. Home e navigazione
 
-La home presenta il logo, il sottotitolo esatto e tre pulsanti in colonna: **Start**, **Regole**, **Impostazioni**. **Start** apre la preparazione breve: tre nomi, tre icone selezionabili e argomento della banca online. **Inizia partita** entra nella domanda nascosta senza mostrare le soluzioni. Le icone monocromatiche sono visibili anche sul tabellone e conservate nel salvataggio; le vecchie partite ricevono icone predefinite. **Regole** apre la presentazione navigabile. **Impostazioni** (`Fool.html?settings=1`) raccoglie parametri, quote e anteprima docente; il salvataggio dei parametri è separato da quello della partita. Il logo nelle pagine interne riporta alla home.
+La home presenta il logo, il sottotitolo esatto e tre pulsanti in colonna: **Start**, **Regole**, **Impostazioni**. **Start** apre la preparazione breve: tre nomi e argomento della banca online. **Inizia partita** entra nella domanda nascosta senza mostrare le soluzioni. **Regole** apre la presentazione navigabile. **Impostazioni** (`Fool.html?settings=1`) raccoglie parametri, quote e anteprima docente; il salvataggio dei parametri è separato da quello della partita. Il logo nelle pagine interne riporta alla home.
 
 L'aspetto dei riquadri usa bordi metallici squadrati, caratteri pixel e testo rosso. Sono scelte di implementazione coerenti con il riferimento; non introducono regole o funzioni aggiuntive. Il carattere VT323 è ospitato sul sito con la relativa licenza SIL OFL. Non sono stati aggiunti suoni o animazioni del gioco.
 
@@ -34,7 +34,7 @@ La richiesta di responsività su qualunque schermo supera il precedente requisit
 
 - Logo e immagini mantengono le proporzioni e si ridimensionano con la finestra.
 - Alternative su due colonne dove c'è spazio e su una colonna sugli schermi stretti.
-- Tabellone con punteggi, serie, sanzioni e gruppo rispondente; su mobile inventari ed effetti si consultano nei dettagli espandibili di ogni gruppo.
+- Tabellone con punteggi, sanzioni e gruppo rispondente; Moltiplicatore, bonus ed effetti sempre visibili, senza icone, indicatore della serie o sezioni espandibili.
 - Pannelli, dialoghi, anteprima, esito e navigazione delle regole si dispongono senza uscire lateralmente dalla pagina.
 - Pulsanti principali con area tattile di almeno 44 pixel; focus visibile e navigazione da tastiera.
 - Il solo ridimensionamento a una finestra piccola non blocca il gioco né ferma il timer. Rimane una protezione con pausa in caso di elemento realmente troppo largo e non gestibile dal layout.
@@ -42,7 +42,7 @@ La richiesta di responsività su qualunque schermo supera il precedente requisit
 
 ## 5. Dettagli ancora aperti
 
-Logo, sottotitolo, menu, riferimento del 1993, sfondo e responsività sono approvati. Ulteriori icone, animazioni, suoni e variazioni grafiche dei singoli bonus restano da indicare dal responsabile. Le etichette devono continuare a rendere visibili Aura attiva, tipo e autore vincolato delle copie Karma, eliminazioni e sanzioni; gli stati non sono espressi soltanto tramite colore.
+Logo, sottotitolo, menu, riferimento del 1993, sfondo e responsività sono approvati. Le icone dei gruppi sono state rimosse; le animazioni per corretta, bonus e aumento del moltiplicatore sono approvate. Suoni e altre variazioni restano da indicare dal responsabile. Le etichette devono continuare a rendere visibili Aura attiva, tipo e autore vincolato delle copie Karma, eliminazioni e sanzioni; gli stati non sono espressi soltanto tramite colore.
 
 ## 6. Risorse e verifiche
 
@@ -82,3 +82,9 @@ Quando resta un solo gruppo in gioco, la conclusione pulisce pausa, sospensione 
 La schermata di vittoria mostra soltanto il nome scelto dal gruppo e la scritta WINS. Se tutti sono eliminati, mostra soltanto GAME OVER. Entrambe le scritte sono PNG trasparenti generati a pennellate rosse nello stile della X; si ridimensionano mantenendo le proporzioni. Un solo pulsante, sotto l’esito, riporta alla schermata iniziale ufficiale. Nome del gruppo a capo se lungo, testo alternativo per le immagini, titolo raggiungibile dal focus. Le schermate finali nascondono intestazione, tabellone, timer e comandi di gioco.
 
 Tutti i riferimenti al premio sono rimossi dai finali e dal codice dell’interfaccia. Le informazioni rimangono nelle regole, senza modificarne il contenuto; una futura modifica del premio non richiederà di riscrivere la schermata dell’esito. La ripresa di una partita conclusa riapre lo stesso finale.
+
+## 9. Tabellone e animazioni — aggiornamento del 22/10/2026
+
+Rimossi i selettori delle icone dalla preparazione e le icone dal tabellone. Non è più mostrata la serie di risposte corrette: il contatore resta interno al motore. La precedente voce Prossima corretta si chiama **Moltiplicatore**, con valore evidenziato. Bonus ed effetti sono sempre espliciti nel riquadro, senza Dettagli o disclosure, anche su mobile. Sotto 350 px i riquadri si dispongono in colonna per mantenere leggibili nomi e bonus.
+
+Una nuova risposta corretta evidenzia brevemente il riquadro e la conferma dell’esito; il bonus ottenuto e il moltiplicatore aumentato ricevono un’evidenziazione dedicata. Gli effetti sono brevi, non richiedono attese e non alterano punteggi, timer o estrazioni. Non si ripetono ridisegnando la pagina o riprendendo un salvataggio; con preferenza di sistema per movimento ridotto non vengono avviati. I vecchi salvataggi con icone restano caricabili, senza mostrarle.

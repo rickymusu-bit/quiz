@@ -106,8 +106,6 @@ main { max-width: 1200px; margin: auto; padding: clamp(.75rem, 3vw, 1.5rem); }
 .team h3 { margin-top: 0; }
 .team .team-label { display: block; margin: .2rem 0; color: var(--accent); font-size: .72rem; font-weight: 600; }
 .team-status { color: var(--muted); }
-.team details { font-size: .8rem; }
-.team summary { cursor: pointer; min-height: 34px; padding-block: .4rem; }
 .tag { display: inline-block; border: 1px solid #6c725f; padding: .1rem .35rem; font-size: .75rem; }
 .help { line-height: 1.6; }
 .good { color: var(--good); }
@@ -205,7 +203,7 @@ dialog .columns { margin: 1rem 0; }
   .operational .team { padding: .45rem .35rem; border-width: 2px; }
   .team h3 { font-size: .85rem; line-height: 1.3; }
   .team strong { font-size: 1.05rem; }
-  .team p, .team details { font-size: .78rem; }
+  .team p, .team-info { font-size: .78rem; }
   .team .team-label { font-size: .66rem; }
   .team summary { min-height: 40px; }
   .statusline { gap: .6rem; }
@@ -233,7 +231,6 @@ dialog .columns { margin: 1rem 0; }
 .setup-teams input, .setup-teams select { width: 100%; }
 .settings-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 #quotas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem 1rem; }
-.team-icon { display: inline-flex; align-items: center; justify-content: center; width: 1.65em; height: 1.65em; margin-right: .45em; color: var(--accent); background: #111215; border: 1px solid #77716a; font-family: serif; vertical-align: middle; }
 @media (max-width: 650px) { .settings-grid, #quotas { grid-template-columns: 1fr; } }
 
 .question-points { color: var(--accent); font: 400 1.8rem/1.1 FoolTerminal, monospace; }
@@ -259,3 +256,9 @@ body.finished header { display: none; }
 .winner-name { font: 400 clamp(2.5rem, 8vw, 6rem)/1.05 FoolTerminal, monospace; overflow-wrap: anywhere; max-width: 100%; }
 .end-wordmark { display: block; width: min(100%, 850px); height: auto; max-height: 55svh; object-fit: contain; }
 .ending button { font: 400 clamp(1.1rem, 3vw, 1.5rem) FoolTerminal, monospace; }
+
+.team-info { font-size: .8rem; }
+.multiplier-label, .multiplier-value { display: block; }
+.multiplier-label { font-size: .72rem; }
+.multiplier-value { color: var(--accent); font: 700 1.2rem ui-monospace, monospace; }
+@media (max-width: 350px) { .scoreboard.columns { grid-template-columns: 1fr; } }

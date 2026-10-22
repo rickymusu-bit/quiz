@@ -1,12 +1,12 @@
 # Fool
 
-Quiz online di Riccardo Musumarra. **Interfaccia 1.4.0**, regolamento **18.0.1**.
+Quiz online di Riccardo Musumarra. **Interfaccia 1.5.0**, regolamento **18.0.1**.
 
 Apri **https://rickymusu-bit.github.io/quiz/** e scegli **Start**, **Regole** o **Impostazioni**. Non sono previsti download, installazioni o selettori di file.
 
 ## Domande già sul sito
 
-Il gioco legge il catalogo `datasets.json` e carica automaticamente la banca selezionata dal sito. È disponibile Termologia, con 100 domande. Con **Start** si scelgono soltanto nomi e icone dei tre gruppi e l’argomento dal catalogo, poi **Inizia partita** avvia il gioco con domanda nascosta. **Impostazioni**, sotto Regole nella home, raccoglie tempo, punti base, probabilità bonus, difficoltà e quote dei sottoargomenti: totale 33. **Salva impostazioni** conserva un profilo per ogni banca in `localStorage` (`fool-settings-v1`) per le nuove partite nello stesso browser. Da Impostazioni si può aprire l’anteprima docente con le soluzioni, da usare prima della proiezione.
+Il gioco legge il catalogo `datasets.json` e carica automaticamente la banca selezionata dal sito. È disponibile Termologia, con 100 domande. Con **Start** si scelgono soltanto i nomi dei tre gruppi e l’argomento dal catalogo, poi **Inizia partita** avvia il gioco con domanda nascosta. **Impostazioni**, sotto Regole nella home, raccoglie tempo, punti base, probabilità bonus, difficoltà e quote dei sottoargomenti: totale 33. **Salva impostazioni** conserva un profilo per ogni banca in `localStorage` (`fool-settings-v1`) per le nuove partite nello stesso browser. Da Impostazioni si può aprire l’anteprima docente con le soluzioni, da usare prima della proiezione.
 
 Il catalogo contiene `versione: 1` e l'elenco `banche`, ciascuna con `id`, `nome` e `url` relativa al sito. Per aggiungere una banca, pubblicare il relativo contenuto nello schema esistente e aggiungerla al catalogo. Le domande mantengono il contratto del dataset e i loro ID originali. Il catalogo e le banche devono provenire dallo stesso sito; errori di rete o validazione bloccano l'avvio e offrono **Riprova**.
 
@@ -26,7 +26,7 @@ La sola home è `https://rickymusu-bit.github.io/quiz/`: «Torna alla schermata 
 
 La home usa il logo ufficiale rivisto su richiesta del responsabile, con superfici grigio/nero al posto del blu, il sottotitolo **Solo uno sciocco pensa di vincere** e tre pulsanti sovrapposti: **Start**, **Regole**, **Impostazioni**. Lo sfondo riprende cielo rosso e pavimento di pietra del riferimento, nell'estetica di Doom del 1993. Immagini e caratteri sono serviti dal sito stesso; provenienza e licenze sono in [assets/README.md](assets/README.md).
 
-Home, configurazione, gioco, dialoghi e regole si adattano alla larghezza disponibile, senza una finestra minima obbligatoria. Su mobile le alternative diventano una colonna e i dettagli di inventari/effetti sono espandibili per ciascun gruppo. Se serve, la pagina scorre in verticale; le formule molto larghe possono scorrere nel proprio riquadro, senza tagliarle o rimpicciolirle. Restano disponibili focus visibile, tastiera e comandi touch. Un ridimensionamento normale non sospende il timer; solo un effettivo problema di larghezza non gestita attiva la protezione del layout.
+Home, configurazione, gioco, dialoghi e regole si adattano alla larghezza disponibile, senza una finestra minima obbligatoria. Su mobile le alternative diventano una colonna mentre bonus, effetti e Moltiplicatore restano visibili in ogni riquadro, senza menu Dettagli. Se serve, la pagina scorre in verticale; le formule molto larghe possono scorrere nel proprio riquadro, senza tagliarle o rimpicciolirle. Restano disponibili focus visibile, tastiera e comandi touch. Un ridimensionamento normale non sospende il timer; solo un effettivo problema di larghezza non gestita attiva la protezione del layout.
 
 La matrice browser comprende schermi da 240×320 a 2560×1440, orientamento orizzontale, emulazione touch e caratteri ingranditi. Queste sono le dimensioni provate, non una limitazione imposta al sito. Dettagli delle prove in [VERIFICHE_IMPLEMENTAZIONE.md](docs/VERIFICHE_IMPLEMENTAZIONE.md).
 
@@ -59,6 +59,7 @@ python3 tests/navigation.py
 python3 tests/display.py
 python3 tests/sanctions.py
 python3 tests/endings.py
+python3 tests/scoreboard.py
 ```
 
 La rigenerazione usa soltanto la libreria standard Python. I test motore usano Node; i test browser richiedono Python Playwright e Chromium (`/usr/bin/chromium`). Il sito generato è statico e viene pubblicato sul ramo `gh-pages`. `src/home.html` genera la pagina iniziale; `src/app.js` gestisce il caricamento online e i salvataggi nel browser.

@@ -41,10 +41,8 @@ with sync_playwright() as p:
   expect(page.get_by_role('button',name='Conferma intervento')).to_be_visible()
   page.locator('#sanction-plus-0').click();page.get_by_role('button',name='Conferma intervento').click()
   assert page.evaluate('game.s.groups[0].sanctions')==1;assert not page.evaluate('game.running')
-  if w<=650:
-   details=page.locator('.team details').first
-   details.locator('summary').click();assert details.get_attribute('open') is not None
-   fits(page,('team-details',w,h))
+  assert page.locator('.team details,.team summary,.team-icon').count()==0
+  for item in page.locator('.team .bonus-list li').all():expect(item).to_be_visible()
   page.get_by_role('button',name='Bonus e inventari',exact=True).click()
   page.get_by_role('button',name='Chiudi',exact=True).click()
   page.get_by_role('button',name='Riprendi timer',exact=True).click()
