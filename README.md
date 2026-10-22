@@ -1,6 +1,6 @@
 # Fool
 
-Quiz online di Riccardo Musumarra. **Interfaccia 1.5.0**, regolamento **18.0.1**.
+Quiz online di Riccardo Musumarra. **Interfaccia 1.6.0**, regolamento **18.0.1**.
 
 Apri **https://rickymusu-bit.github.io/quiz/** e scegli **Start**, **Regole** o **Impostazioni**. Non sono previsti download, installazioni o selettori di file.
 
@@ -26,11 +26,13 @@ La sola home è `https://rickymusu-bit.github.io/quiz/`: «Torna alla schermata 
 
 La home usa il logo ufficiale rivisto su richiesta del responsabile, con superfici grigio/nero al posto del blu, il sottotitolo **Solo uno sciocco pensa di vincere** e tre pulsanti sovrapposti: **Start**, **Regole**, **Impostazioni**. Lo sfondo riprende cielo rosso e pavimento di pietra del riferimento, nell'estetica di Doom del 1993. Immagini e caratteri sono serviti dal sito stesso; provenienza e licenze sono in [assets/README.md](assets/README.md).
 
-Home, configurazione, gioco, dialoghi e regole si adattano alla larghezza disponibile, senza una finestra minima obbligatoria. Su mobile le alternative diventano una colonna mentre bonus, effetti e Moltiplicatore restano visibili in ogni riquadro, senza menu Dettagli. Se serve, la pagina scorre in verticale; le formule molto larghe possono scorrere nel proprio riquadro, senza tagliarle o rimpicciolirle. Restano disponibili focus visibile, tastiera e comandi touch. Un ridimensionamento normale non sospende il timer; solo un effettivo problema di larghezza non gestita attiva la protezione del layout.
+Home, configurazione, gioco, dialoghi e regole si adattano alla larghezza disponibile, senza una finestra minima obbligatoria. Su mobile le alternative diventano una colonna mentre bonus ed effetti restano visibili e il Moltiplicatore compare in percentuale solo quando attivo in ogni riquadro, senza menu Dettagli. Se serve, la pagina scorre in verticale; le formule molto larghe possono scorrere nel proprio riquadro, senza tagliarle o rimpicciolirle. Restano disponibili focus visibile, tastiera e comandi touch. Un ridimensionamento normale non sospende il timer; solo un effettivo problema di larghezza non gestita attiva la protezione del layout.
 
 La matrice browser comprende schermi da 240×320 a 2560×1440, orientamento orizzontale, emulazione touch e caratteri ingranditi. Queste sono le dimensioni provate, non una limitazione imposta al sito. Dettagli delle prove in [VERIFICHE_IMPLEMENTAZIONE.md](docs/VERIFICHE_IMPLEMENTAZIONE.md).
 
-I finali mostrano solo il nome del gruppo con **WINS**, oppure **GAME OVER** se tutti sono eliminati, e il pulsante per tornare alla schermata iniziale. Le scritte a pennellate rosse sono PNG trasparenti; i dettagli del premio restano esclusivamente nelle regole.
+I finali mostrano solo il nome del gruppo con **WINS**, oppure **GAME OVER** se tutti sono eliminati, e il pulsante per tornare alla schermata iniziale. Le scritte a pennellate sono PNG trasparenti: WINS giallo, GAME OVER rosso; i dettagli del premio restano esclusivamente nelle regole.
+
+Per ogni risposta compare un grande esito pixel: **CORRETTO** giallo oppure **SBAGLIATO** rosso. Dopo la scomparsa si evidenziano bonus e variazione del moltiplicatore. Le percentuali attive (110%, 120%, …) usano gialli sempre più chiari; il valore base non viene mostrato. Le quantità dei bonus non hanno il prefisso ×.
 
 ## Fonti e verifiche
 

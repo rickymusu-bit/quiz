@@ -1,6 +1,6 @@
 'use strict';
 const F=Fool,$=id=>document.getElementById(id),main=$('main');
-let bank=null,prepared=null,game=null,previewIndex=0,ui='config',fitting=false,fitBlocked=false,messageTimer,inventoryCanResume=false,catalog=null,selectedBankId=null,configurationLoad=0,lastFinalGame=null,settingsDraft=null,setupMode=new URL(location.href).searchParams.get('settings')==='1'?'settings':'config';
+let bank=null,prepared=null,game=null,previewIndex=0,ui='config',fitting=false,fitBlocked=false,messageTimer,inventoryCanResume=false,catalog=null,selectedBankId=null,configurationLoad=0,feedbackEpoch=0,lastFinalGame=null,settingsDraft=null,setupMode=new URL(location.href).searchParams.get('settings')==='1'?'settings':'config';
 const teamDraft={names:['Gruppo 1','Gruppo 2','Gruppo 3']};
 const node=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n};
 function btn(text,fn,cls='',disabled=false){const b=node('button',text,cls);b.type='button';b.disabled=disabled;b.onclick=()=>act(fn);return b}
@@ -25,7 +25,7 @@ async function loadCatalog(){
 async function loadBank(entry){const parsed=F.parseDataset(await fetchSiteText(entry.url),katex);return {...parsed,source:entry.id};}
 function persist(){if(!game)return;try{localStorage.setItem('fool-v1',JSON.stringify(game.snapshot()));return true}catch(e){message('Il browser non consente di conservare la partita. Mantieni aperta questa pagina.');return false}}
 function changed(){persist();renderGame()}
-function command(fn){return()=>{const before=feedbackState();fn();changed();animateOutcome(before)}}
+function command(fn){return()=>{const before=feedbackState();fn();changed();return animateOutcome(before)}}
 function localSave(){try{return localStorage.getItem('fool-v1')}catch(e){return null}}
 function offerResume(parent){if(localSave())parent.append(btn('Riprendi partita',()=>restoreGame(localSave())))}
 function goHome(){persist();configurationLoad++;location.assign(new URL('./',location.href).href)}
@@ -40,7 +40,7 @@ function settingsConfig(value,names=teamDraft.names){return {seconds:value.secon
 function savedSettings(){try{const value=settingsStore().profiles[selectedBankId];if(value){F.prepare(bank.bank,settingsConfig(value,['Gruppo 1','Gruppo 2','Gruppo 3']));return value}}catch(e){message('Impostazioni non disponibili: sono stati caricati i valori predefiniti. Puoi salvarli di nuovo da Impostazioni.')}return defaultSettings()}
 function rememberTeams(){for(let i=0;i<3;i++)if($('name'+i))teamDraft.names[i]=$('name'+i).value}
 async function configure(){
- const request=++configurationLoad;ui=setupMode;game=null;main.className='';main.replaceChildren();const loading=heading(setupMode==='settings'?'Impostazioni':'Prepara Fool','Caricamento delle domande dal sito…');if(setupMode==='config')offerResume(loading);
+ cancelFeedback();const request=++configurationLoad;ui=setupMode;game=null;main.className='';main.replaceChildren();const loading=heading(setupMode==='settings'?'Impostazioni':'Prepara Fool','Caricamento delle domande dal sito…');if(setupMode==='config')offerResume(loading);
  try{const available=await loadCatalog();if(request!==configurationLoad||ui!==setupMode)return;catalog=available;const entry=catalog.find(x=>x.id===selectedBankId)||catalog[0];selectedBankId=entry.id;
  if(!bank||bank.source!==entry.id){const loaded=await loadBank(entry);if(request!==configurationLoad||ui!==setupMode)return;bank=loaded;}
  renderConfiguration();
@@ -76,28 +76,45 @@ function scoreboard(){
   t.dataset.team=String(i);const title=node('h3',g.name);const status=g.out?'ELIMINATO':s.phase==='conclusa'?(i===s.winner?'VINCITORE':''):s.phase==='spareggio'&&!s.order.includes(i)?'FUORI SPAREGGIO':i===s.respondent?'RISPONDE':'';
   if(status)title.append(node('span',status,'team-label'));t.append(title,node('strong',F.exact(g.score)+' pt'));
   t.append(node('p','Sanzioni '+g.sanctions+'/3','team-status'));
-  const info=node('div',undefined,'team-info'),multiplier=node('p',undefined,'multiplier');multiplier.append(node('span','Moltiplicatore','multiplier-label'),node('span','×'+((10+g.streak)/10).toFixed(2).replace('.',','),'multiplier-value'));info.append(multiplier);
-  const counts=F.TYPES.map(type=>[type,g.inventory.filter(c=>c.type===type).length]);const bonuses=node('ul',undefined,'bonus-list');for(const [type,n]of counts){const item=node('li',F.LABELS[type]+' ×'+n);item.dataset.bonus=type;bonuses.append(item)}info.append(bonuses);
+  const info=node('div',undefined,'team-info');if(g.streak>0&&s.phase==='ordinaria'&&!g.out)info.append(multiplierDisplay(g.streak));
+  const counts=F.TYPES.map(type=>[type,g.inventory.filter(c=>c.type===type).length]);const bonuses=node('ul',undefined,'bonus-list');for(const [type,n]of counts){const item=node('li',F.LABELS[type]+' '+n);item.dataset.bonus=type;bonuses.append(item)}info.append(bonuses);
   const locks=[...new Map(g.inventory.filter(c=>c.target!==null).map(c=>[c.type+':'+c.target,F.LABELS[c.type]+' solo → '+s.groups[c.target].name])).values()];
   const effects=s.effects.filter(e=>e.target===i).map(e=>F.LABELS[e.type]+' da '+s.groups[e.source].name);const details=[...locks,...effects];
   if(g.aura!==null)details.push('Aura attiva fino al prossimo turno');if(g.out)details.push(g.cause);if(details.length)info.append(node('p',details.join(' · ')));t.append(info);grid.append(t);
  });return grid;
 }
+const POSITIVE='#ffe600',NEGATIVE='#ff3322';
+function multiplierDisplay(streak,lost=false){
+ const p=node('p',undefined,'multiplier'+(lost?' multiplier-lost':'')),value=node('span',(100+10*streak)+'%','multiplier-value');
+ value.style.color=lost?NEGATIVE:'hsl(52 100% '+(50+Math.min(streak,35))+'%)';
+ p.append(node('span','Moltiplicatore','multiplier-label'),value);if(lost)p.setAttribute('aria-label','Moltiplicatore perso: '+value.textContent);return p;
+}
+function ratioPercent(ratio){const [n,d]=ratio.split('/').map(Number);return Math.round(n/d*100)+'%'}
 function feedbackState(){return game?{game,result:game.s.result?.id,streaks:game.s.groups.map(g=>g.streak)}:null}
-function animateOutcome(before){
- const r=game?.s.result;if(!before||before.game!==game||!r?.correct||r.id===before.result||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
- const pulse=(target,frames,duration=1100)=>target?.animate?.(frames,{duration,easing:'ease-out'});
- const card=main.querySelector('[data-team="'+r.respondent+'"]');
- pulse(card,[{boxShadow:'inset 0 0 0 3px #c2e4ad, 0 0 20px #c2e4ad99'},{boxShadow:'inset 0 0 0 0px #c2e4ad00, 0 0 0px #c2e4ad00'}]);
- pulse(main.querySelector('.solution > strong'),[{color:'#fff8c5',textShadow:'0 0 12px #c2e4ad'},{color:'#c2e4ad',textShadow:'0 0 0px transparent'}]);
- if(r.bonus)pulse(card?.querySelector('[data-bonus="'+r.bonus.type+'"]'),[{backgroundColor:'#9e622d',color:'#fff8c5'},{backgroundColor:'transparent',color:'#f0e9d9'}],1400);
- if(game.s.groups[r.respondent].streak>before.streaks[r.respondent])pulse(card?.querySelector('.multiplier-value'),[{color:'#fff8c5',textShadow:'0 0 16px #efb36e'},{color:'#efb36e',textShadow:'0 0 0px transparent'}],1400);
- if(!card)pulse(main.querySelector('.end-wordmark'),[{opacity:.65},{opacity:1}],700);
+function cancelFeedback(){feedbackEpoch++;document.querySelector('.answer-feedback')?.remove()}
+async function animateOutcome(before){
+ const r=game?.s.result;if(!before||before.game!==game||!r||r.id===before.result)return;
+ const epoch=feedbackEpoch,reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+ const overlay=node('div',undefined,'answer-feedback '+(r.correct?'positive':'negative')),word=node('span',r.correct?'CORRETTO':'SBAGLIATO');
+ overlay.setAttribute('role','status');overlay.setAttribute('aria-live','polite');overlay.setAttribute('aria-atomic','true');overlay.append(word);document.body.append(overlay);
+ if(!reduced)word.animate?.([{opacity:0,offset:0},{opacity:1,offset:.12},{opacity:1,offset:.78},{opacity:0,offset:1}],{duration:900,easing:'ease-out'});
+ await new Promise(resolve=>setTimeout(resolve,reduced?650:950));
+ if(epoch!==feedbackEpoch||before.game!==game||game.s.result?.id!==r.id)return;overlay.remove();
+ const card=main.querySelector('[data-team="'+r.respondent+'"]');if(!card)return;
+ const pulse=(target,color)=>{if(!target||reduced)return;const base=getComputedStyle(target).color;target.animate?.([{color,backgroundColor:color+'44',textShadow:'0 0 18px '+color},{color:base,backgroundColor:'transparent',textShadow:'0 0 0px transparent'}],{duration:1100,easing:'ease-out'})};
+ const old=before.streaks[r.respondent],next=game.s.groups[r.respondent].streak;
+ if(next>old)pulse(card.querySelector('.multiplier-value'),POSITIVE);
+ else if(next<old){
+  let value=card.querySelector('.multiplier-value');
+  if(!value&&game.s.phase==='ordinaria'&&!game.s.groups[r.respondent].out){const lost=multiplierDisplay(old,true);card.querySelector('.team-info').prepend(lost);value=lost.querySelector('.multiplier-value');setTimeout(()=>lost.remove(),reduced?650:1150)}
+  pulse(value,NEGATIVE);
+ }
+ if(r.bonus)pulse(card.querySelector('[data-bonus="'+r.bonus.type+'"]'),POSITIVE);
 }
 function questionPoints(){return node('p',(game.s.phase==='ordinaria'?game.s.config.bases[game.s.current.difficulty]:0)+' punti','question-points')}
 function endScreen(){
  const s=game.s,b=node('section',undefined,'ending'),title=node('h2',undefined,'final-title');title.tabIndex=-1;
- const art=node('img');art.className='end-wordmark';art.src=s.winner===null?'assets/game-over.png':'assets/wins.png';art.alt=s.winner===null?'GAME OVER':'WINS';art.setAttribute('fetchpriority','high');
+ const art=node('img');art.className='end-wordmark';art.src=s.winner===null?'assets/game-over.png':'assets/wins-yellow.png';art.alt=s.winner===null?'GAME OVER':'WINS';if(s.winner!==null)b.classList.add('victory');art.setAttribute('fetchpriority','high');
  if(s.winner!==null)title.append(node('span',s.groups[s.winner].name,'winner-name'));
  title.append(art);b.append(title,btn('Torna alla schermata iniziale',goHome,'primary'));return b;
 }
@@ -108,9 +125,9 @@ function gameBody(){const s=game.s,revision=s.revision,b=node('section',undefine
  if(s.current){b.append(questionPoints(),text('div',s.current.body,'question'));const answers=node('div',undefined,'answers');s.current.options.forEach((a,i)=>{const ab=btn('',command(()=>game.answer(i,revision)),'answer'+(s.result&&i===s.current.correct?' correct':''),s.screen!=='answer'||s.paused||!!s.panel||fitBlocked);ab.append(node('span','ABCD'[i],'letter'),text('span',a));answers.append(ab)});b.append(answers)}
  if(s.screen==='choice'){b.append(node('p','Svela e passa: scegli a timer fermo. Il tempo intero parte alla conferma.','good'));const row=node('div',undefined,'row');s.groups.forEach((g,i)=>{if(!g.out&&(i===s.owner||s.passLock===null||s.passLock===i))row.append(btn(i===s.owner?'Tieni la domanda':'Passa a '+g.name,command(()=>game.pass(i,revision))))});b.append(row)}
  if(s.screen==='answer'&&s.paused)b.append(node('p','IN PAUSA — risposte bloccate. Riprendi dal tempo residuo.','good'));
- if(s.screen==='result'){const r=s.result,ex=node('div',undefined,'solution');ex.append(node('strong',r.correct?'Risposta corretta':'Risposta errata / tempo scaduto'),text('p','Soluzione '+ 'ABCD'[s.current.correct]+': '+s.current.options[s.current.correct]),text('p',s.current.explanation));if(r.base)ex.append(node('p',r.base+' × '+r.multiplier+' = '+F.exact(r.gross)+' pt'+(r.beneficiaries.length?' · quota esatta '+F.exact(r.share)+' a '+[r.respondent,...r.beneficiaries].map(i=>s.groups[i].name).join(', '):'')));if(r.bonus)ex.append(node('p','Bonus vinto: '+F.LABELS[r.bonus.type]+' — conservato in inventario.','good'));b.append(ex)}
+ if(s.screen==='result'){const r=s.result,ex=node('div',undefined,'solution');ex.append(node('strong',r.correct?'Risposta corretta':'Risposta errata / tempo scaduto',r.correct?'good':'bad'),text('p','Soluzione '+ 'ABCD'[s.current.correct]+': '+s.current.options[s.current.correct]),text('p',s.current.explanation));if(r.base)ex.append(node('p',r.base+' × '+ratioPercent(r.multiplier)+' = '+F.exact(r.gross)+' pt'+(r.beneficiaries.length?' · quota esatta '+F.exact(r.share)+' a '+[r.respondent,...r.beneficiaries].map(i=>s.groups[i].name).join(', '):'')));if(r.bonus)ex.append(node('p','Bonus vinto: '+F.LABELS[r.bonus.type]+' — conservato in inventario.','good'));b.append(ex)}
  return b}
-function renderGame(){if(!game)return;ui='game';const s=game.s,revision=s.revision;document.body.classList.toggle('finished',s.phase==='conclusa');if(s.phase==='conclusa'){closeDialog();fitBlocked=false;$('fit-warning').hidden=true;main.className='final-screen';main.replaceChildren(endScreen());if(lastFinalGame!==s.id){lastFinalGame=s.id;requestAnimationFrame(()=>{main.querySelector('.final-title')?.focus({preventScroll:true})})}return}main.className='operational';main.replaceChildren();main.append(scoreboard());const status=node('div',undefined,'statusline');status.append(node('div',(s.phase==='spareggio'?'Battaglia finale · extra '+(s.extra+1):s.phase==='conclusa'?'Fool · conclusa':'Fool · '+s.valid+'/33 concluse')+(s.phase==='conclusa'?'':' · rotazione '+s.order.map(i=>s.groups[i].name).join(' → ')),'turn'),node('div',timerText(),'timer'));status.lastChild.id='timer';main.append(status);if(s.phase!=='conclusa'&&s.owner!==s.respondent)main.append(node('div','Titolare: '+s.groups[s.owner].name+' · risponde: '+s.groups[s.respondent].name,'muted'));main.append(gameBody());
+function renderGame(){cancelFeedback();if(!game)return;ui='game';const s=game.s,revision=s.revision;document.body.classList.toggle('finished',s.phase==='conclusa');if(s.phase==='conclusa'){closeDialog();fitBlocked=false;$('fit-warning').hidden=true;main.className='final-screen';main.replaceChildren(endScreen());if(lastFinalGame!==s.id){lastFinalGame=s.id;requestAnimationFrame(()=>{main.querySelector('.final-title')?.focus({preventScroll:true})})}return}main.className='operational';main.replaceChildren();main.append(scoreboard());const status=node('div',undefined,'statusline');status.append(node('div',(s.phase==='spareggio'?'Battaglia finale · extra '+(s.extra+1):s.phase==='conclusa'?'Fool · conclusa':'Fool · '+s.valid+'/33 concluse')+(s.phase==='conclusa'?'':' · rotazione '+s.order.map(i=>s.groups[i].name).join(' → ')),'turn'),node('div',timerText(),'timer'));status.lastChild.id='timer';main.append(status);if(s.phase!=='conclusa'&&s.owner!==s.respondent)main.append(node('div','Titolare: '+s.groups[s.owner].name+' · risponde: '+s.groups[s.respondent].name,'muted'));main.append(gameBody());
  const bar=node('nav',undefined,'toolbar');bar.setAttribute('aria-label','Comandi docente');if(s.phase!=='conclusa'&&!s.suspended){if(s.screen==='answer')bar.append(btn(s.paused?'Riprendi timer':'Pausa',command(()=>{if(s.paused){if(fitBlocked)throw Error('Correggere prima le dimensioni della finestra.');game.resume(revision)}else game.pause()})));if(s.screen==='result')bar.append(btn('Prossima domanda',command(()=>{game.next(revision);if(game.s.current)preflight([game.s.current])}),'primary'));bar.append(btn('Bonus e inventari',showInventory),btn('Sanzioni',command(()=>{game.openSanctions();showSanctions()})));if(['answer','choice'].includes(s.screen))bar.append(btn('Richiedi rifiuto',showRefusal));bar.append(btn('Campanella / sospendi',command(()=>game.bell())))}
  bar.append(btn('Salva nel browser',saveBrowser),btn('Schermo intero',toggleFullscreen));main.append(bar);
  if(s.suspendAfter)main.append(node('p','Campanella: concludere questa domanda, poi sospensione.','muted'));
@@ -124,7 +141,7 @@ function closeDialog(){const d=$('dialog');if(d.open)d.close();}
 function groupsOfInventory(g){const groups=new Map();for(const c of g.inventory){const key=c.type+':'+c.target;const a=groups.get(key)||[];a.push(c);groups.set(key,a)}return [...groups.values()]}
 function showInventory(){const s=game.s;const wasRunning=game.running;inventoryCanResume=wasRunning;if(wasRunning)game.pause('inventario');persist();dialog('Bonus e inventari',d=>{
  const choose=select('Gruppo','inventory-team',s.groups.map((g,i)=>[i,g.name]),s.respondent);d.append(choose);const list=node('div',undefined,'inventory-list');d.append(list);let page=0;
- const draw=()=>{list.replaceChildren();const i=Number($('inventory-team').value),g=s.groups[i],sets=groupsOfInventory(g);const start=page*5,entries=node('ul',undefined,'bonus-inventory-list');if(sets.length)list.append(entries);for(const copies of sets.slice(start,start+5)){const c=copies[0],r=node('li',undefined,'bonus-group');r.append(node('span',F.LABELS[c.type]+' ×'+copies.length+(c.target===null?'':' · solo contro '+s.groups[c.target].name+(s.groups[c.target].out?' (eliminato)':''))));const disabled=i!==s.owner||i!==s.respondent||s.usedBonus||g.out||s.phase!=='ordinaria'||!['hidden','answer'].includes(s.screen)||s.screen==='answer'&&s.paused&&!inventoryCanResume||c.type==='karma'||c.type==='svela'&&s.screen!=='hidden'||c.target!==null&&s.groups[c.target].out;r.append(btn('Usa',()=>selectBonus(c), '',disabled));entries.append(r)}if(!sets.length)list.append(node('p','Nessun bonus conservato.'));if(sets.length>5){const nav=node('div',undefined,'row');nav.append(btn('Precedenti',()=>{page--;draw()},'',page===0),btn('Successivi',()=>{page++;draw()},'',start+5>=sets.length));list.append(nav)}};choose.querySelector('select').onchange=()=>{page=0;draw()};draw();d.append(node('p','Karma si trasforma da solo quando subisci un malus. Un solo uso per turno. Dopo aver chiuso, riprendi il timer.','muted'),btn('Chiudi',()=>{closeDialog();changed()}));});}
+ const draw=()=>{list.replaceChildren();const i=Number($('inventory-team').value),g=s.groups[i],sets=groupsOfInventory(g);const start=page*5,entries=node('ul',undefined,'bonus-inventory-list');if(sets.length)list.append(entries);for(const copies of sets.slice(start,start+5)){const c=copies[0],r=node('li',undefined,'bonus-group');r.append(node('span',F.LABELS[c.type]+' '+copies.length+(c.target===null?'':' · solo contro '+s.groups[c.target].name+(s.groups[c.target].out?' (eliminato)':''))));const disabled=i!==s.owner||i!==s.respondent||s.usedBonus||g.out||s.phase!=='ordinaria'||!['hidden','answer'].includes(s.screen)||s.screen==='answer'&&s.paused&&!inventoryCanResume||c.type==='karma'||c.type==='svela'&&s.screen!=='hidden'||c.target!==null&&s.groups[c.target].out;r.append(btn('Usa',()=>selectBonus(c), '',disabled));entries.append(r)}if(!sets.length)list.append(node('p','Nessun bonus conservato.'));if(sets.length>5){const nav=node('div',undefined,'row');nav.append(btn('Precedenti',()=>{page--;draw()},'',page===0),btn('Successivi',()=>{page++;draw()},'',start+5>=sets.length));list.append(nav)}};choose.querySelector('select').onchange=()=>{page=0;draw()};draw();d.append(node('p','Karma si trasforma da solo quando subisci un malus. Un solo uso per turno. Dopo aver chiuso, riprendi il timer.','muted'),btn('Chiudi',()=>{closeDialog();changed()}));});}
 function selectBonus(copy){const s=game.s,revision=s.revision;s.draftBonus=s.draftBonus||{copyId:copy.id,target:null};persist();dialog('Attiva '+F.LABELS[copy.type],d=>{let target=null;if(['salta','ruba'].includes(copy.type)){const candidates=s.groups.map((g,i)=>[i,g]).filter(([i,g])=>i!==s.owner&&!g.out&&(copy.target===null||copy.target===i));if(!candidates.length)throw Error('Nessun bersaglio valido');d.append(select('Bersaglio','bonus-target',candidates.map(([i,g])=>[i,g.name]),s.draftBonus.target??candidates[0][0]));$('bonus-target').onchange=()=>{s.draftBonus.target=Number($('bonus-target').value);persist()};}d.append(node('p','La conferma consuma una copia e l’unico bonus del turno, anche se Aura blocca l’attacco.'));d.append(btn('Conferma uso',()=>{if($('bonus-target'))target=Number($('bonus-target').value);const paused=s.paused;if(s.screen==='answer'&&paused)s.paused=false;try{game.use(copy.id,target,revision)}catch(e){if(paused)s.paused=true;throw e}if(s.screen==='answer'&&paused){if(inventoryCanResume)game.run();else{s.paused=true;s.pauseReason='ripresa'}}closeDialog();changed()},'primary'),btn('Annulla',()=>{s.draftBonus=null;closeDialog();changed()}));});}
 function showSanctions(){
  const s=game.s,revision=s.revision,pending=s.panel;
@@ -188,7 +205,7 @@ $('fit-warning').append(node('h2','Contenuto da adattare'),node('p','Timer fermo
 $('dialog').addEventListener('cancel',e=>{e.preventDefault();message('Usa i pulsanti del pannello per completare o annullare la decisione.');});
 window.addEventListener('resize',()=>{if(ui==='game')requestAnimationFrame(checkFit)});
 window.addEventListener('beforeunload',persist);
-setInterval(()=>{if(!game||ui!=='game')return;const old=game.s.screen;game.tick();if(old!==game.s.screen){changed();return}if($('timer'))$('timer').textContent=timerText()},100);
+setInterval(()=>{if(!game||ui!=='game')return;const old=game.s.screen,before=feedbackState();game.tick();if(old!==game.s.screen){changed();act(()=>animateOutcome(before));return}if($('timer'))$('timer').textContent=timerText()},100);
 setInterval(persist,3000);
 if(new URL(location.href).searchParams.get('start')==='1')history.replaceState(null,'',location.pathname);
 act(configure);

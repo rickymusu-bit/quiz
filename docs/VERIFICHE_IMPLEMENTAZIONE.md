@@ -1,5 +1,13 @@
 # Fool — implementazione e verifiche
 
+## Feedback pixel sequenziale e percentuali — interfaccia 1.6.0, 22/10/2026
+
+Ogni nuova risposta corretta/errata, inclusa la scadenza, mostra CORRETTO giallo o SBAGLIATO rosso al centro del viewport con carattere pixel. Dopo circa un secondo il messaggio scompare e si evidenziano in giallo moltiplicatore aumentato e bonus ottenuto. In caso di perdita si mostra brevemente il precedente moltiplicatore barrato e rosso, poi lo si rimuove. Nessun comando è bloccato; un nuovo rendering annulla la sequenza pendente, la ripresa non la ripete. Con movimento ridotto il messaggio è statico e più breve, senza bagliori animati.
+
+Il moltiplicatore è percentuale (110%, 120%, …), nascosto al valore base o quando non applicabile. La luminosità del giallo cresce monotonamente con la serie interna. Il dettaglio del punteggio mostra la percentuale applicata. Quantità di bonus senza × sia nel tabellone sia nell’inventario. Il nome del vincitore e il nuovo PNG WINS sono gialli; usato `assets/wins-yellow.png` per distinguere la risorsa dalle precedenti copie rosse in cache. GAME OVER e X restano rossi. Nessuna modifica al motore o al formato dei salvataggi.
+
+`tests/scoreboard.py`: otto flussi (240/390/844/1440 px, movimento normale/ridotto), due corrette dello stesso gruppo, ordine messaggio→bagliori, colori, crescita percentuale e schiarimento, perdita rossa e scomparsa del valore, quantità senza × nel tabellone e nell’inventario, ripresa senza replay, avanzamento anticipato che annulla il feedback e timeout. Verificate dimensioni dei messaggi e assenza di overflow. `tests/responsive.py`: flusso su dieci dimensioni, tastiera, touch e testo grande. `tests/endings.py`: vittoria/sconfitta, ripresa, home e nomi lunghi. Nessun errore JavaScript. Screenshot di CORRETTO, moltiplicatore perso e finale WINS giallo ispezionati.
+
 ## Bonus e Moltiplicatore visibili, feedback animato — interfaccia 1.5.0, 22/10/2026
 
 Rimossi selettore delle icone e icone dei gruppi, sezione Dettagli e contatore della serie. Il tabellone espone sempre bonus, effetti e Moltiplicatore; il calcolo resta quello già usato per la prossima risposta corretta. Il motore mantiene internamente la serie senza mostrarla. I vecchi salvataggi con icone restano compatibili, senza disegnarle; le nuove partite non registrano icone. Sotto 350 px i riquadri si impilano per mantenerne leggibili le voci.

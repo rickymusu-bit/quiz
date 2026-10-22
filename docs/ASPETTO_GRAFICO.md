@@ -1,6 +1,6 @@
 # Fool — Specifiche dell’aspetto grafico
 
-Versione: **1.6.0** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
+Versione: **1.7.0** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
 
 ## 1. Scopo e fonti
 
@@ -26,7 +26,7 @@ La revisione corrente porta le superfici blu a grigio antracite e nero, conserva
 
 La home presenta il logo, il sottotitolo esatto e tre pulsanti in colonna: **Start**, **Regole**, **Impostazioni**. **Start** apre la preparazione breve: tre nomi e argomento della banca online. **Inizia partita** entra nella domanda nascosta senza mostrare le soluzioni. **Regole** apre la presentazione navigabile. **Impostazioni** (`Fool.html?settings=1`) raccoglie parametri, quote e anteprima docente; il salvataggio dei parametri è separato da quello della partita. Il logo nelle pagine interne riporta alla home.
 
-L'aspetto dei riquadri usa bordi metallici squadrati, caratteri pixel e testo rosso. Sono scelte di implementazione coerenti con il riferimento; non introducono regole o funzioni aggiuntive. Il carattere VT323 è ospitato sul sito con la relativa licenza SIL OFL. Non sono stati aggiunti suoni o animazioni del gioco.
+L'aspetto dei riquadri usa bordi metallici squadrati, caratteri pixel e testo rosso. Sono scelte di implementazione coerenti con il riferimento; non introducono regole o funzioni aggiuntive. Il carattere VT323 è ospitato sul sito con la relativa licenza SIL OFL. Non sono stati aggiunti suoni; il feedback animato è descritto negli aggiornamenti successivi.
 
 ## 4. Adattamento e leggibilità
 
@@ -79,7 +79,7 @@ Quando resta un solo gruppo in gioco, la conclusione pulisce pausa, sospensione 
 
 ## 8. Schermate finali — aggiornamento del 22/10/2026
 
-La schermata di vittoria mostra soltanto il nome scelto dal gruppo e la scritta WINS. Se tutti sono eliminati, mostra soltanto GAME OVER. Entrambe le scritte sono PNG trasparenti generati a pennellate rosse nello stile della X; si ridimensionano mantenendo le proporzioni. Un solo pulsante, sotto l’esito, riporta alla schermata iniziale ufficiale. Nome del gruppo a capo se lungo, testo alternativo per le immagini, titolo raggiungibile dal focus. Le schermate finali nascondono intestazione, tabellone, timer e comandi di gioco.
+La schermata di vittoria mostra soltanto il nome scelto dal gruppo e la scritta WINS. Se tutti sono eliminati, mostra soltanto GAME OVER. Le scritte sono PNG trasparenti nello stile a pennellate della X: WINS è giallo, GAME OVER rosso; si ridimensionano mantenendo le proporzioni. Un solo pulsante, sotto l’esito, riporta alla schermata iniziale ufficiale. Nome del gruppo a capo se lungo, testo alternativo per le immagini, titolo raggiungibile dal focus. Le schermate finali nascondono intestazione, tabellone, timer e comandi di gioco.
 
 Tutti i riferimenti al premio sono rimossi dai finali e dal codice dell’interfaccia. Le informazioni rimangono nelle regole, senza modificarne il contenuto; una futura modifica del premio non richiederà di riscrivere la schermata dell’esito. La ripresa di una partita conclusa riapre lo stesso finale.
 
@@ -88,3 +88,11 @@ Tutti i riferimenti al premio sono rimossi dai finali e dal codice dell’interf
 Rimossi i selettori delle icone dalla preparazione e le icone dal tabellone. Non è più mostrata la serie di risposte corrette: il contatore resta interno al motore. La precedente voce Prossima corretta si chiama **Moltiplicatore**, con valore evidenziato. Bonus ed effetti sono sempre espliciti nel riquadro, senza Dettagli o disclosure, anche su mobile. Sotto 350 px i riquadri si dispongono in colonna per mantenere leggibili nomi e bonus.
 
 Una nuova risposta corretta evidenzia brevemente il riquadro e la conferma dell’esito; il bonus ottenuto e il moltiplicatore aumentato ricevono un’evidenziazione dedicata. Gli effetti sono brevi, non richiedono attese e non alterano punteggi, timer o estrazioni. Non si ripetono ridisegnando la pagina o riprendendo un salvataggio; con preferenza di sistema per movimento ridotto non vengono avviati. I vecchi salvataggi con icone restano caricabili, senza mostrarle.
+
+## 10. Esiti pixel e colori — aggiornamento del 22/10/2026
+
+Ogni nuova risposta mostra al centro dello schermo CORRETTO giallo oppure SBAGLIATO rosso, con carattere pixel VT323. Anche una scadenza mostra SBAGLIATO. Il messaggio scompare prima dell’evidenziazione del moltiplicatore e dell’eventuale bonus. Giallo per incremento e bonus ottenuto; rosso per un moltiplicatore perso. In quest’ultimo caso compare brevemente il precedente valore barrato, poi viene rimosso.
+
+Il Moltiplicatore è espresso come 110%, 120%, ecc., e non compare al valore base (100%) né quando non applicabile. Le tonalità di giallo si schiariscono al crescere del valore. Anche il dettaglio del calcolo dei punti usa la percentuale del moltiplicatore applicato. Le quantità dei bonus sono scritte senza prefisso ×, nel tabellone e nell’inventario. Nome del vincitore e WINS sono gialli; GAME OVER e X di eliminazione restano rossi.
+
+La sequenza è solo visiva, non blocca i comandi e non altera il modello. Un cambio di schermata annulla il feedback pendente; la ripresa non lo ripete. Con movimento ridotto il messaggio è statico e più breve, senza animazioni di bagliore; i colori e i testi restano disponibili.

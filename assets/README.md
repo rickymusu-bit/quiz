@@ -1,6 +1,7 @@
 # Risorse visive di Fool
 
-- `wins.png` e `game-over.png`: scritte finali generate in PNG trasparente a pennellate rosse, usando la X come riferimento stilistico, su richiesta del responsabile il 22/10/2026.
+- `wins-yellow.png`: revisione corrente WINS, gialla con sfondo trasparente e stile a pennellate, ottenuta tramite editing del riferimento WINS su richiesta del 22/10/2026.
+- `wins.png` (precedente rosso, non più usato dal sito) e `game-over.png`: scritte finali generate in PNG trasparente a pennellate rosse, usando la X come riferimento stilistico, su richiesta del responsabile il 22/10/2026.
 - `eliminated-x.png`: X rossa a pennellate generata come PNG con trasparenza su richiesta del responsabile il 22/10/2026; sovrapposta ai soli riquadri dei gruppi eliminati.
 - `eliminated-x.svg`: precedente risorsa, non più usata dal sito; segno vettoriale originale a pennellate rosse, ispirato al riferimento `15044.jpg` del 22/10/2026; fondo trasparente, sovrapposto ai soli gruppi eliminati.
 - `fool-logo.png`: versione corrente del logo, con le superfici blu portate a grigio antracite/nero su richiesta del responsabile. Revisione realizzata tramite editing dell’immagine di riferimento, conservando lettering e accenti arancioni/dorati. È usata in schermata iniziale, intestazioni e icona.
