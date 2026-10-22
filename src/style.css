@@ -235,3 +235,13 @@ dialog .columns { margin: 1rem 0; }
 #quotas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem 1rem; }
 .team-icon { display: inline-flex; align-items: center; justify-content: center; width: 1.65em; height: 1.65em; margin-right: .45em; color: var(--accent); background: #111215; border: 1px solid #77716a; font-family: serif; vertical-align: middle; }
 @media (max-width: 650px) { .settings-grid, #quotas { grid-template-columns: 1fr; } }
+
+.question-points { color: var(--accent); font: 400 1.8rem/1.1 FoolTerminal, monospace; }
+.bonus-list { margin: .5rem 0; padding: 0; list-style: none; }
+.bonus-list li { margin-block: .3rem; }
+.bonus-list li::marker, .bonus-inventory-list li::marker { color: var(--accent); }
+.bonus-inventory-list { margin: 0; padding: 0; list-style: none; }
+.bonus-inventory-list .bonus-group { display: list-item; }
+.bonus-inventory-list .bonus-group button { margin: .4rem 0 .2rem .6rem; }
+.team.out { position: relative; }
+.team.out::after { content: ''; position: absolute; inset: .3rem; background: url('assets/eliminated-x.svg') center / 100% 100% no-repeat; opacity: .9; pointer-events: none; }

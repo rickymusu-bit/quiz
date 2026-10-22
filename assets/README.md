@@ -1,5 +1,6 @@
 # Risorse visive di Fool
 
+- `eliminated-x.svg`: segno vettoriale originale a pennellate rosse, ispirato al riferimento `15044.jpg` del 22/10/2026; fondo trasparente, sovrapposto ai soli gruppi eliminati.
 - `fool-logo.png`: versione corrente del logo, con le superfici blu portate a grigio antracite/nero su richiesta del responsabile. Revisione realizzata tramite editing dell’immagine di riferimento, conservando lettering e accenti arancioni/dorati. È usata in schermata iniziale, intestazioni e icona.
 - `fool-logo.jpg`: riferimento originale fornito da Riccardo Musumarra nella richiesta del 21/10/2026, allegato `15033.jpg`. I byte dell'immagine originale sono conservati. Un filtro SVG del sito rende trasparente il fondo quasi nero in fase di visualizzazione e mantiene i colori della grafica; il riferimento JPEG originale non viene riscritto.
 - `doom-background.png`: sfondo generato a partire dal riferimento `15034.jpg`, con cielo rosso e pavimento di pietra, estetica pixel ispirata a Doom del 1993. Non contiene scritte o loghi del riferimento. L'originale generato è stato conservato nell'ambiente di lavoro e copiato nel progetto.

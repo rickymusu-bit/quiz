@@ -1,5 +1,11 @@
 # Fool — implementazione e verifiche
 
+## Punti, bonus per riga e gruppi eliminati — interfaccia 1.3.1, 22/10/2026
+
+Su richiesta del responsabile, la domanda mostra il valore in punti invece di argomento e difficoltà, prima e dopo lo svelamento. Il valore è quello base effettivamente configurato; lo spareggio non attribuisce punti. L’anteprima docente usa lo stesso criterio. I bonus nel tabellone e nell’inventario sono liste senza numeri né marcatori, con una voce per riga e quantità. I soli gruppi eliminati hanno una X rossa originale in SVG ispirata al riferimento 15044.jpg, senza sfondo e senza bloccare i comandi sottostanti; la dicitura ELIMINATO resta disponibile.
+
+`python3 tests/display.py`: valore punti, assenza di metadati nella domanda nascosta, liste senza numerazione, eliminazione tramite sanzioni, X solo sul gruppo eliminato, apertura dei dettagli, persistenza dopo ricarica e inventario su 240×320, 390×844 e 1440×900; nessun errore JavaScript. `python3 tests/responsive.py`: flusso completo su dieci dimensioni fino a 2560×1440, tastiera, touch e testo ingrandito, senza overflow laterale. Screenshot mobile e desktop ispezionati. Motore, regole e formato dei salvataggi invariati.
+
 ## Preparazione rapida e Impostazioni — interfaccia 1.3.0
 
 La home ha tre pulsanti: Start, Regole, Impostazioni. Start consente soltanto nomi e icone dei tre gruppi e argomento dal catalogo online; Inizia partita entra nella domanda nascosta senza anteprima. Timer, probabilità bonus, difficoltà, punti base e quote sono in Impostazioni, insieme all’anteprima docente facoltativa (estrazione di esempio). I parametri validati sono conservati per banca in `fool-settings-v1`, separati da `fool-v1`: aggiornare le impostazioni non cambia le partite già iniziate. Le sei icone monocromatiche compaiono nei gruppi e nel tabellone; il metadato opzionale è salvato nella configurazione e i vecchi salvataggi restano validi con icone predefinite. Formato, versione del motore e regolamento restano invariati.

@@ -1,6 +1,6 @@
 # Fool — Specifiche dell’aspetto grafico
 
-Versione: **1.4.0** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
+Versione: **1.4.1** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
 
 ## 1. Scopo e fonti
 
@@ -62,3 +62,9 @@ Percorsi stabili e cronologia Git conservano le edizioni precedenti.
 | 1.2.1 | 21/10/2026 | Spareggio rinominato «Battaglia finale» |
 | 1.3.0 | 21/10/2026 | Logo ufficiale, Doom 1993, sottotitolo, menu Start/Regole, sfondo dal riferimento e responsività mobile/desktop |
 | 1.3.1 | 21/10/2026 | Superfici blu del logo sostituite da grigio/nero su richiesta del responsabile |
+
+## 6. Indicazioni del 22/10/2026
+
+Nel quiz il metadato della domanda mostra soltanto il valore in punti base configurati, senza livello di difficoltà o nome dell’argomento; nello spareggio il valore è zero perché non si attribuiscono punti. Il valore resta visibile anche dopo lo svelamento. Anche l’intestazione dell’anteprima docente usa i punti, lasciando argomenti e difficoltà nei soli parametri di Impostazioni.
+
+I cinque bonus di ciascun gruppo sono elencati uno per riga, senza numeri o marcatori, con quantità visibile. Anche le copie nell’inventario sono in una lista senza numerazione. Quando il gruppo è eliminato, il suo riquadro riceve una X rossa a pennellate, ispirata al riferimento 15044.jpg; il disegno è un SVG originale su fondo trasparente. Il segno si adatta al riquadro e non intercetta clic o touch. La dicitura ELIMINATO rimane per l’accessibilità e la leggibilità dello stato.
