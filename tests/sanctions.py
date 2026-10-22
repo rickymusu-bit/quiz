@@ -48,18 +48,18 @@ with sync_playwright() as p:
   expect(page.locator('#sanction-plus-1')).to_be_disabled()
   page.screenshot(path=str(ROOT/f'tests/sanctions-{w}.png'),full_page=True)
   page.get_by_role('button',name='Conferma intervento').click()
-  expect(page.get_by_role('heading',name='Gruppo 3 vince Fool!',exact=True)).to_be_visible()
+  expect(page.get_by_role('heading',name='Gruppo 3 WINS',exact=True)).to_be_visible()
   expect(page.locator('#dialog')).not_to_be_visible();expect(page.locator('#fit-warning')).not_to_be_visible()
   assert page.evaluate('game.s.winner')==2 and page.evaluate('game.s.phase')=='conclusa'
   assert not page.evaluate('game.s.paused || game.running || game.s.suspended')
-  expect(page.locator('#timer')).to_have_text('')
-  expect(page.locator('.team.out')).to_have_count(2);expect(page.locator('.team').nth(2).locator('.team-label')).to_have_text('VINCITORE');fits(page)
+  assert page.locator('#timer').count()==0
+  assert page.locator('.team').count()==0;fits(page)
   page.screenshot(path=str(ROOT/f'tests/winner-{w}.png'),full_page=True)
   page.reload();page.get_by_role('button',name='Riprendi partita',exact=True).click()
-  expect(page.get_by_role('heading',name='Gruppo 3 vince Fool!',exact=True)).to_be_visible()
+  expect(page.get_by_role('heading',name='Gruppo 3 WINS',exact=True)).to_be_visible()
   assert page.evaluate('game.s.winner')==2
-  page.get_by_role('button',name='Nuova partita',exact=True).click()
-  expect(page.get_by_role('button',name='Inizia partita')).to_be_enabled()
+  page.get_by_role('button',name='Torna alla schermata iniziale',exact=True).click()
+  expect(page.get_by_role('link',name='Start',exact=True)).to_be_visible()
   assert not errors,errors
   page.close()
  browser.close()

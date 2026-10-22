@@ -1,6 +1,6 @@
 # Fool
 
-Quiz online di Riccardo Musumarra. **Interfaccia 1.3.2**, regolamento **18.0.1**.
+Quiz online di Riccardo Musumarra. **Interfaccia 1.4.0**, regolamento **18.0.1**.
 
 Apri **https://rickymusu-bit.github.io/quiz/** e scegli **Start**, **Regole** o **Impostazioni**. Non sono previsti download, installazioni o selettori di file.
 
@@ -30,6 +30,8 @@ Home, configurazione, gioco, dialoghi e regole si adattano alla larghezza dispon
 
 La matrice browser comprende schermi da 240×320 a 2560×1440, orientamento orizzontale, emulazione touch e caratteri ingranditi. Queste sono le dimensioni provate, non una limitazione imposta al sito. Dettagli delle prove in [VERIFICHE_IMPLEMENTAZIONE.md](docs/VERIFICHE_IMPLEMENTAZIONE.md).
 
+I finali mostrano solo il nome del gruppo con **WINS**, oppure **GAME OVER** se tutti sono eliminati, e il pulsante per tornare alla schermata iniziale. Le scritte a pennellate rosse sono PNG trasparenti; i dettagli del premio restano esclusivamente nelle regole.
+
 ## Fonti e verifiche
 
 - [Regolamento ufficiale](docs/REGOLAMENTO_UFFICIALE.md), autorità normativa.
@@ -56,6 +58,7 @@ python3 tests/settings.py
 python3 tests/navigation.py
 python3 tests/display.py
 python3 tests/sanctions.py
+python3 tests/endings.py
 ```
 
 La rigenerazione usa soltanto la libreria standard Python. I test motore usano Node; i test browser richiedono Python Playwright e Chromium (`/usr/bin/chromium`). Il sito generato è statico e viene pubblicato sul ramo `gh-pages`. `src/home.html` genera la pagina iniziale; `src/app.js` gestisce il caricamento online e i salvataggi nel browser.

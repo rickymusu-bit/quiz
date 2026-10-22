@@ -1,5 +1,11 @@
 # Fool — implementazione e verifiche
 
+## Finali WINS e GAME OVER — interfaccia 1.4.0, 22/10/2026
+
+La vittoria mostra solo il nome del gruppo e WINS; l’eliminazione di tutti mostra GAME OVER. Le due scritte sono PNG trasparenti generati nel medesimo stile a pennellate rosse della X, ispezionati anche nei finali mobile. Un solo pulsante sotto l’esito torna alla home ufficiale. Non compaiono intestazione, tabellone, timer, toolbar, premio o indicazioni sul registro. La ripresa di una partita conclusa riapre lo stesso finale. Il testo del premio è rimosso da `src/app.js` e resta nelle regole, il cui sorgente non è stato modificato (SHA-256 `1aa2838af1177e4cee18cc9bf29cdf5df86ffbfaf44a3e272f4fdc6e897c36d5`). Nessuna modifica al motore o al formato dei salvataggi.
+
+`tests/endings.py`: vittoria e sconfitta attraverso il pannello sanzioni su 240×320, 390×844, 844×390 e 1440×900; immagini caricate, esito accessibile, solo un pulsante, assenza di informazioni sul premio e comandi extra, ricarica/ripresa, home canonica e nome di gruppo molto lungo senza overflow; premio ancora presente nelle regole. `tests/sanctions.py` aggiornato e superato: due eliminazioni successive, nuovo finale, ripresa e ritorno alla home. Nessun errore JavaScript; screenshot finali mobile ispezionati.
+
 ## Sanzioni con −/+ e conclusione esplicita — interfaccia 1.3.2, 22/10/2026
 
 Sostituiti gli input numerici delle sanzioni con pulsanti −/+ e output, limitati alle sanzioni ancora necessarie per arrivare a tre. Il totale futuro e l’eliminazione sono espliciti; gli interventi restano da confermare. Le scelte pendenti sono conservate nel browser. La conclusione del motore pulisce stato di pausa, motivo, sospensione, campanella e pannelli. Il renderer chiude il dialogo e gli avvisi residui, nasconde il timer e porta il focus al vincitore. Il normale caso di due eliminazioni successive risultava già vincente nel motore prima della modifica; la chiusura dello stato e la presentazione finale sono ora esplicite e coperte da regressione, senza attribuire una causa non riprodotta al blocco segnalato. La X corrente è un PNG generato trasparente, ispezionato e applicato direttamente; il precedente SVG non è più referenziato dall’app.

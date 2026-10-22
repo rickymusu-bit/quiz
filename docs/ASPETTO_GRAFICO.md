@@ -1,6 +1,6 @@
 # Fool — Specifiche dell’aspetto grafico
 
-Versione: **1.4.2** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
+Versione: **1.5.0** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
 
 ## 1. Scopo e fonti
 
@@ -76,3 +76,9 @@ La X corrente è un PNG generato con canale alfa (`assets/eliminated-x.png`), ap
 Il pannello delle sanzioni usa pulsanti −/+ e un contatore di sola lettura. Si preparano le nuove sanzioni da 0 al numero necessario a raggiungere 3; un riepilogo indica il totale dopo conferma e l’eventuale eliminazione. Le modifiche pendenti e il motivo si conservano nel salvataggio, senza applicare sanzioni finché non si conferma. «Chiudi senza sanzionare» le annulla.
 
 Quando resta un solo gruppo in gioco, la conclusione pulisce pausa, sospensione e pannelli residui; l’interfaccia chiude il dialogo, rimuove l’eventuale avviso di layout e porta il focus al titolo della vittoria. Il timer non è più mostrato e il riquadro del superstite indica VINCITORE.
+
+## 8. Schermate finali — aggiornamento del 22/10/2026
+
+La schermata di vittoria mostra soltanto il nome scelto dal gruppo e la scritta WINS. Se tutti sono eliminati, mostra soltanto GAME OVER. Entrambe le scritte sono PNG trasparenti generati a pennellate rosse nello stile della X; si ridimensionano mantenendo le proporzioni. Un solo pulsante, sotto l’esito, riporta alla schermata iniziale ufficiale. Nome del gruppo a capo se lungo, testo alternativo per le immagini, titolo raggiungibile dal focus. Le schermate finali nascondono intestazione, tabellone, timer e comandi di gioco.
+
+Tutti i riferimenti al premio sono rimossi dai finali e dal codice dell’interfaccia. Le informazioni rimangono nelle regole, senza modificarne il contenuto; una futura modifica del premio non richiederà di riscrivere la schermata dell’esito. La ripresa di una partita conclusa riapre lo stesso finale.
