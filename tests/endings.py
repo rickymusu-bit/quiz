@@ -12,7 +12,7 @@ threading.Thread(target=server.serve_forever,daemon=True).start()
 base='http://127.0.0.1:'+str(server.server_port)+'/'+ROOT.name+'/'
 with sync_playwright() as p:
  browser=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox'])
- for w,h in [(240,320),(390,844),(844,390),(1440,900)]:
+ for w,h in [(640,360),(844,390),(844,390),(1440,900)]:
   for defeat in [False,True]:
    page=browser.new_page(viewport={'width':w,'height':h});errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
    page.goto(base+'Fool.html');page.get_by_role('button',name='Inizia partita').click()
@@ -41,7 +41,7 @@ with sync_playwright() as p:
    assert not errors,errors
    page.close()
  # A long user-chosen name wraps without clipping; prize remains only in the rules.
- page=browser.new_page(viewport={'width':240,'height':320});page.goto(base+'Fool.html')
+ page=browser.new_page(viewport={'width':640,'height':360});page.goto(base+'Fool.html')
  page.locator('#name2').fill('Squadra '+('X'*100));page.get_by_role('button',name='Inizia partita').click()
  page.evaluate('()=>{game.openSanctions();game.s.panel.counts=[3,3,0];game.closeSanctions(true);changed()}')
  expect(page.get_by_role('img',name='WINS',exact=True)).to_be_visible()

@@ -12,7 +12,7 @@ threading.Thread(target=server.serve_forever,daemon=True).start()
 base='http://127.0.0.1:'+str(server.server_port)+'/'
 with sync_playwright() as p:
  browser=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox'])
- for w,h in [(240,320),(390,844),(844,390),(1440,900)]:
+ for w,h in [(640,360),(844,390),(1280,566),(1440,900)]:
   for reduced in [False,True]:
    page=browser.new_page(viewport={'width':w,'height':h},reduced_motion='reduce' if reduced else 'no-preference');errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
    page.goto(base+'Fool.html');page.get_by_role('button',name='Inizia partita').click()
@@ -69,7 +69,7 @@ with sync_playwright() as p:
    assert not errors,errors
    page.close()
  # Advancing early cancels pending feedback; timeouts use the same negative banner.
- page=browser.new_page(viewport={'width':390,'height':844});page.goto(base+'Fool.html');page.get_by_role('button',name='Inizia partita').click()
+ page=browser.new_page(viewport={'width':844,'height':390});page.goto(base+'Fool.html');page.get_by_role('button',name='Inizia partita').click()
  page.get_by_role('button',name='Svela e avvia il tempo').click();page.locator('.answer').nth(page.evaluate('game.s.current.correct')).click()
  expect(page.locator('.answer-feedback')).to_have_text('CORRETTO')
  page.get_by_role('button',name='Prossima domanda',exact=True).click();expect(page.locator('.answer-feedback')).to_have_count(0)

@@ -1,12 +1,12 @@
 # Fool
 
-Quiz online di Riccardo Musumarra. **Interfaccia 1.6.0**, regolamento **18.0.1**.
+Quiz online di Riccardo Musumarra. **Interfaccia 1.7.0**, regolamento **18.0.1**.
 
 Apri **https://rickymusu-bit.github.io/quiz/** e scegli **Start**, **Regole** o **Impostazioni**. Non sono previsti download, installazioni o selettori di file.
 
 ## Domande già sul sito
 
-Il gioco legge il catalogo `datasets.json` e carica automaticamente la banca selezionata dal sito. È disponibile Termologia, con 100 domande. Con **Start** si scelgono soltanto i nomi dei tre gruppi e l’argomento dal catalogo, poi **Inizia partita** avvia il gioco con domanda nascosta. **Impostazioni**, sotto Regole nella home, raccoglie tempo, punti base, probabilità bonus, difficoltà e quote dei sottoargomenti: totale 33. **Salva impostazioni** conserva un profilo per ogni banca in `localStorage` (`fool-settings-v1`) per le nuove partite nello stesso browser. Da Impostazioni si può aprire l’anteprima docente con le soluzioni, da usare prima della proiezione.
+Il gioco legge il catalogo `datasets.json` e carica automaticamente la banca selezionata dal sito. È disponibile Termologia, con 100 domande. Con **Start** si scelgono i nomi e i simboli dei tre gruppi e l’argomento dal catalogo, poi **Inizia partita** avvia il gioco con domanda nascosta. **Impostazioni**, sotto Regole nella home, raccoglie tempo, punti base, probabilità bonus, difficoltà e quote dei sottoargomenti: totale 33. **Salva impostazioni** conserva un profilo per ogni banca in `localStorage` (`fool-settings-v1`) per le nuove partite nello stesso browser. Da Impostazioni si può aprire l’anteprima docente con le soluzioni, da usare prima della proiezione.
 
 Il catalogo contiene `versione: 1` e l'elenco `banche`, ciascuna con `id`, `nome` e `url` relativa al sito. Per aggiungere una banca, pubblicare il relativo contenuto nello schema esistente e aggiungerla al catalogo. Le domande mantengono il contratto del dataset e i loro ID originali. Il catalogo e le banche devono provenire dallo stesso sito; errori di rete o validazione bloccano l'avvio e offrono **Riprova**.
 
@@ -26,9 +26,11 @@ La sola home è `https://rickymusu-bit.github.io/quiz/`: «Torna alla schermata 
 
 La home usa il logo ufficiale rivisto su richiesta del responsabile, con superfici grigio/nero al posto del blu, il sottotitolo **Solo uno sciocco pensa di vincere** e tre pulsanti sovrapposti: **Start**, **Regole**, **Impostazioni**. Lo sfondo riprende cielo rosso e pavimento di pietra del riferimento, nell'estetica di Doom del 1993. Immagini e caratteri sono serviti dal sito stesso; provenienza e licenze sono in [assets/README.md](assets/README.md).
 
-Home, configurazione, gioco, dialoghi e regole si adattano alla larghezza disponibile, senza una finestra minima obbligatoria. Su mobile le alternative diventano una colonna mentre bonus ed effetti restano visibili e il Moltiplicatore compare in percentuale solo quando attivo in ogni riquadro, senza menu Dettagli. Se serve, la pagina scorre in verticale; le formule molto larghe possono scorrere nel proprio riquadro, senza tagliarle o rimpicciolirle. Restano disponibili focus visibile, tastiera e comandi touch. Un ridimensionamento normale non sospende il timer; solo un effettivo problema di larghezza non gestita attiva la protezione del layout.
+Il sito è progettato per **schermi orizzontali**. Home, preparazione, quiz, dialoghi e regole si ridimensionano per rimanere entro larghezza e altezza disponibili, senza scorrimento verticale. Le impostazioni sono divise in schede; le quote degli argomenti sono paginate. In verticale appare **Ruota lo schermo** e una domanda in corso viene messa in pausa.
 
-La matrice browser comprende schermi da 240×320 a 2560×1440, orientamento orizzontale, emulazione touch e caratteri ingranditi. Queste sono le dimensioni provate, non una limitazione imposta al sito. Dettagli delle prove in [VERIFICHE_IMPLEMENTAZIONE.md](docs/VERIFICHE_IMPLEMENTAZIONE.md).
+Il pulsante **Schermo intero** nella home mantiene questa modalità anche entrando nel gioco o nelle regole e tornando alla schermata iniziale, sui browser che supportano l’API. I simboli scelti appaiono grandi e attenuati sullo sfondo dei riquadri. Sotto i gruppi restano solo la rotazione e il timer. Bonus e moltiplicatore attivo rimangono visibili.
+
+La matrice corrente comprende sette risoluzioni orizzontali da 640×360 a 1920×1080, tutte le 100 domande e le 21 sezioni delle regole. Dettagli delle prove in [VERIFICHE_IMPLEMENTAZIONE.md](docs/VERIFICHE_IMPLEMENTAZIONE.md).
 
 I finali mostrano solo il nome del gruppo con **WINS**, oppure **GAME OVER** se tutti sono eliminati, e il pulsante per tornare alla schermata iniziale. Le scritte a pennellate sono PNG trasparenti: WINS giallo, GAME OVER rosso; i dettagli del premio restano esclusivamente nelle regole.
 
@@ -52,6 +54,7 @@ Il motore, separato dal DOM, è in `src/engine.js`; interfaccia, stile e regole 
 ```sh
 python3 tools/build.py
 node tests/engine.test.js
+python3 tests/landscape.py
 python3 tests/browser.py
 python3 tests/layout.py
 python3 tests/online.py

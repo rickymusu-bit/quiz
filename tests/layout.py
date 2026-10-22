@@ -17,7 +17,7 @@ with sync_playwright() as p:
     data=(ROOT/'Dataset_termologia_100_domande_v1_20261021.json').read_text()
     page.evaluate('raw=>{bank=F.parseDataset(raw,katex);const quotas={};bank.bank.forEach(q=>quotas[q.topic]=0);let left=33;while(left)for(const t in quotas)if(left&&quotas[t]<10){quotas[t]++;left--}prepared=F.prepare(bank.bank,{names:["Gruppo A","Gruppo B","Gruppo C"],seconds:45,probability:90,bases:{facile:100,media:200,difficile:300},difficulty:"misto",quotas},()=>0);game=F.Game.start(prepared,{random:()=>0});ui="game";renderGame()}',data)
     layouts=[]
-    for width,height in [(240,320),(280,653),(320,568),(390,844),(768,1024),(844,390),(1024,768),(1280,800),(1440,900),(1920,1080)]:
+    for width,height in [(640,360),(653,280),(568,320),(844,390),(1024,768),(844,390),(1024,768),(1280,800),(1440,900),(1920,1080)]:
         page.set_viewport_size({'width':width,'height':height})
         bad=page.evaluate('()=>bank.bank.filter(q=>!fitProbe(q)).map(q=>q.id)')
         assert not bad,(width,height,bad)
@@ -45,7 +45,7 @@ with sync_playwright() as p:
     page.context.set_offline(False)
     page.goto(base+'Fool_regole.html')
     slide_results=[]
-    for width,height in [(240,320),(280,653),(320,568),(390,844),(768,1024),(844,390),(1024,768),(1280,800),(1440,900),(1920,1080)]:
+    for width,height in [(640,360),(653,280),(568,320),(844,390),(1024,768),(844,390),(1024,768),(1280,800),(1440,900),(1920,1080)]:
         page.set_viewport_size({'width':width,'height':height})
         for i in range(21):
             page.locator('#section').select_option(str(i))

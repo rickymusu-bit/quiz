@@ -12,7 +12,7 @@ threading.Thread(target=server.serve_forever,daemon=True).start()
 base='http://127.0.0.1:'+str(server.server_port)+'/'
 with sync_playwright() as p:
  browser=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox'])
- for w,h in [(240,320),(390,844),(1440,900)]:
+ for w,h in [(640,360),(844,390),(1440,900)]:
   page=browser.new_page(viewport={'width':w,'height':h});errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
   page.goto(base+'Fool.html');page.get_by_role('button',name='Inizia partita').click()
   value=page.evaluate('game.s.config.bases[game.s.current.difficulty]')
@@ -48,4 +48,4 @@ with sync_playwright() as p:
   assert not errors,errors
   page.close()
  browser.close()
- print('Display: solo punti, bonus per riga senza numeri, X sui soli eliminati e ripresa: OK su 240/390/1440 px')
+ print('Display: solo punti, bonus per riga senza numeri, X sui soli eliminati e ripresa: OK su schermi orizzontali')

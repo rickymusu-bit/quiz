@@ -13,7 +13,7 @@ base='http://127.0.0.1:'+str(server.server_port)+'/'+ROOT.name+'/'
 def fits(page):assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+1')
 with sync_playwright() as p:
  browser=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox'])
- for w,h in [(240,320),(390,844),(1440,900)]:
+ for w,h in [(640,360),(844,390),(1440,900)]:
   page=browser.new_page(viewport={'width':w,'height':h});errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
   page.goto(base);assert page.locator('.menu a').all_text_contents()==['Start','Regole','Impostazioni']
   page.get_by_role('link',name='Impostazioni',exact=True).click()
@@ -24,11 +24,13 @@ with sync_playwright() as p:
   saved=page.evaluate('localStorage.getItem("fool-settings-v1")')
   # Invalid edits never overwrite the valid profile; failed quota availability is caught.
   for field,value in [('seconds','0'),('quota-0','11')]:
+   page.get_by_role('button',name='Argomenti' if field.startswith('quota-') else 'Generali',exact=True).click()
    old=page.locator('#'+field).input_value();page.locator('#'+field).fill(value)
    page.get_by_role('button',name='Salva impostazioni').click()
    assert page.evaluate('localStorage.getItem("fool-settings-v1")')==saved
    page.locator('#'+field).fill(old)
   # Optional answer preview is confined to settings and does not start/overwrite a game.
+  page.get_by_role('button',name='Anteprima',exact=True).click()
   page.get_by_role('button',name='Prepara anteprima').click()
   expect(page.get_by_role('heading',name='Anteprima docente')).to_be_visible();fits(page)
   assert page.get_by_role('button',name='Inizia partita').count()==0
@@ -40,12 +42,12 @@ with sync_playwright() as p:
   expect(page.get_by_role('button',name='Inizia partita')).to_be_enabled()
   assert page.locator('#seconds,#probability,#difficulty,#quotas,[id^=base-]').count()==0
   assert page.get_by_role('button',name='Prepara anteprima').count()==0
-  assert page.locator('input').count()==3 and page.locator('select').count()==1;fits(page)
+  assert page.locator('input').count()==3 and page.locator('select').count()==4;fits(page)
   for i,name in enumerate(['Demoni','Razzi','Marines']):
    page.locator('#name'+str(i)).fill(name)
   page.get_by_role('button',name='Inizia partita').click()
   expect(page.get_by_role('button',name='Svela e avvia il tempo')).to_be_visible();fits(page)
-  config=page.evaluate('game.s.config');assert config['names']==['Demoni','Razzi','Marines'];assert 'icons' not in config
+  config=page.evaluate('game.s.config');assert config['names']==['Demoni','Razzi','Marines'];assert config['icons']==['skull','bolt','star']
   assert config['seconds']==60 and config['probability']==0 and config['bases']['facile']==150
   assert page.locator('.team .team-icon').count()==0
   snapshot=page.evaluate('localStorage.getItem("fool-v1")')
@@ -54,7 +56,7 @@ with sync_playwright() as p:
   assert page.evaluate('localStorage.getItem("fool-v1")')==snapshot
   page.goto(base+'Fool.html');page.get_by_role('button',name='Riprendi partita',exact=True).click()
   assert page.evaluate('game.s.config.seconds')==60
-  # Old saves with icons remain usable, but icons are never rendered.
+  # Old saves with icons remain usable, and their symbols appear in the background.
   page.evaluate('()=>{game.s.config.icons=["skull","bolt","star"];persist()}');page.reload();page.get_by_role('button',name='Riprendi partita',exact=True).click()
   assert page.locator('.team .team-icon').count()==0
   # Storage denied: defaults still start a game; saving settings reports failure.
@@ -66,4 +68,4 @@ with sync_playwright() as p:
   assert not errors,errors
   page.close()
  browser.close()
- print('Impostazioni e Start: persistenza, validazione, anteprima separata, ripresa senza icone, vecchi salvataggi e storage bloccato: OK su 240/390/1440 px')
+ print('Impostazioni e Start: persistenza, validazione, anteprima separata, ripresa con simboli, vecchi salvataggi e storage bloccato: OK su schermi orizzontali')

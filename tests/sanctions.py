@@ -13,7 +13,7 @@ base='http://127.0.0.1:'+str(server.server_port)+'/'
 def fits(page):assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+1')
 with sync_playwright() as p:
  browser=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox'])
- for w,h in [(240,320),(390,844),(844,390),(1440,900)]:
+ for w,h in [(640,360),(844,390),(844,390),(1440,900)]:
   page=browser.new_page(viewport={'width':w,'height':h});errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
   page.goto(base+'Fool.html');page.get_by_role('button',name='Inizia partita').click()
   page.get_by_role('button',name='Svela e avvia il tempo').click()

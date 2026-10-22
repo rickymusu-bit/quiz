@@ -1,5 +1,7 @@
 # Fool — Specifiche del programma
 
+> **Aggiornamento del 22/10/2026 — interfaccia 1.7.0.** La richiesta corrente prevede schermi orizzontali, senza scorrimento verticale. Sostituisce le precedenti indicazioni responsive nelle parti incompatibili. Home, gioco, dialoghi e regole si ridimensionano all’area disponibile; in verticale compare un invito a ruotare e il timer si sospende. Start include nuovamente i simboli, mostrati sullo sfondo dei gruppi. Schermo intero è disponibile anche nella home. Regolamento e formato dei salvataggi restano invariati.
+
 > **Aggiornamento responsive — interfaccia 1.2.0, grafica 1.3.0.** Il responsabile richiede Doom 1993, logo ufficiale allegato, sottotitolo «Solo uno sciocco pensa di vincere», menu Start/Regole e visualizzazione su mobile e desktop. Questa richiesta sostituisce il vincolo di finestra minima e l'assenza assoluta di scorrimento di SPEC-33: il layout si ridispone, può scorrere verticalmente e offre scorrimento interno alle formule molto larghe, senza tagliare testo o comandi. I dettagli dei gruppi sono espandibili su mobile. Il ridimensionamento di per sé non mette in pausa il timer; resta la protezione per un reale overflow orizzontale non gestito. Regolamento e motore sono invariati. Si vedano ASPETTO_GRAFICO.md e VERIFICHE_IMPLEMENTAZIONE.md per indicazioni e prove correnti.
 
 

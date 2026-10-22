@@ -150,3 +150,9 @@ Hash Git blob verificati sui byte recuperati, senza modifiche:
 ## Limiti dichiarati
 
 Non è una certificazione completa di tutte le combinazioni ACC-01–98 o di tutte le dimensioni/contenuti possibili. La matrice automatica usa il dataset di termologia presente; inventari trasformati complessi, nomi lunghi e più effetti vengono comunque ricontrollati dinamicamente prima di consentire una risposta. Un inventario numeroso si consulta anche nel pannello paginato. La grafica è provvisoria e le scelte finali restano al responsabile. Non sono stati cambiati regolamento, hosting o integrazioni con il registro.
+
+## Verifiche del 22/10/2026 — interfaccia 1.7.0
+
+`tests/landscape.py`, eseguito in Chromium, verifica 640×360, 844×390, 1024×576, 1280×566, 1280×800, 1440×900 e 1920×1080. In ogni risoluzione sono passate tutte le 100 domande con alternative e spiegazioni e le 21 sezioni delle regole: larghezza e altezza del documento entro il viewport. Verificati inoltre preparazione, simboli persistenti sullo sfondo, rotazione semplificata, domanda nascosta/svelata/pausa/esito, sanzioni e inventario, schede e paginazione delle impostazioni, anteprima e indice delle regole. Nessun errore JavaScript rilevato.
+
+Verificato con l’API reale: schermo intero dalla home, ingresso nel gioco e nelle regole, ritorno alla home mantenendo la modalità, uscita e messaggio quando l’API non è disponibile. In verticale: invito a ruotare e pausa del timer, con ripresa esplicita tornando in orizzontale. Il contenuto viene ridimensionato e ridisposto; non viene nascosto per simulare l’assenza di scorrimento. Le dimensioni provate definiscono la matrice verificata, non una certificazione di tutti i browser/dispositivi.

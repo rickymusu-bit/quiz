@@ -1,6 +1,6 @@
 # Fool — Specifiche dell’aspetto grafico
 
-Versione: **1.7.0** · Data: **21/10/2026** · Responsabile: **Riccardo Musumarra**
+Versione: **1.8.0** · Data: **22/10/2026** · Responsabile: **Riccardo Musumarra**
 
 ## 1. Scopo e fonti
 
@@ -18,13 +18,13 @@ Questo documento raccoglie le indicazioni grafiche approvate per **Fool**, per l
 | VIS-06 | Sottotitolo della home | **Solo uno sciocco pensa di vincere** |
 | VIS-07 | Menu della home | Tre riquadri cliccabili in colonna: **Start**, **Regole**, **Impostazioni** |
 | VIS-08 | Sfondo | Richiamo alla seconda immagine, `15034.jpg`: cielo rosso e pavimento scuro di pietra, con estetica Doom 1993 |
-| VIS-09 | Responsività | Il sito, il gioco e le regole si adattano a mobile e desktop, in entrambe le orientazioni, senza imporre la precedente finestra minima |
+| VIS-09 | Responsività | Il sito è pensato per schermi orizzontali: adattamento a larghezza e altezza senza scorrimento verticale; in verticale appare un invito a ruotare |
 
 La revisione corrente porta le superfici blu a grigio antracite e nero, conservando forma e accenti arancioni/dorati. Il riferimento JPEG originale è conservato separatamente. L'inserimento nel sito usa un filtro SVG di visualizzazione che rende trasparente il fondo quasi nero, conservando i colori del marchio. Lo sfondo è una risorsa generata a partire dallo stile del riferimento, priva della scritta presente nel riferimento.
 
 ## 3. Home e navigazione
 
-La home presenta il logo, il sottotitolo esatto e tre pulsanti in colonna: **Start**, **Regole**, **Impostazioni**. **Start** apre la preparazione breve: tre nomi e argomento della banca online. **Inizia partita** entra nella domanda nascosta senza mostrare le soluzioni. **Regole** apre la presentazione navigabile. **Impostazioni** (`Fool.html?settings=1`) raccoglie parametri, quote e anteprima docente; il salvataggio dei parametri è separato da quello della partita. Il logo nelle pagine interne riporta alla home.
+La home presenta il logo, il sottotitolo esatto e tre pulsanti in colonna: **Start**, **Regole**, **Impostazioni**. **Start** apre la preparazione breve: nomi e simboli dei tre gruppi e argomento della banca online. **Inizia partita** entra nella domanda nascosta senza mostrare le soluzioni. **Regole** apre la presentazione navigabile. **Impostazioni** (`Fool.html?settings=1`) raccoglie parametri, quote e anteprima docente; il salvataggio dei parametri è separato da quello della partita. Il logo nelle pagine interne riporta alla home.
 
 L'aspetto dei riquadri usa bordi metallici squadrati, caratteri pixel e testo rosso. Sono scelte di implementazione coerenti con il riferimento; non introducono regole o funzioni aggiuntive. Il carattere VT323 è ospitato sul sito con la relativa licenza SIL OFL. Non sono stati aggiunti suoni; il feedback animato è descritto negli aggiornamenti successivi.
 
@@ -96,3 +96,9 @@ Ogni nuova risposta mostra al centro dello schermo CORRETTO giallo oppure SBAGLI
 Il Moltiplicatore è espresso come 110%, 120%, ecc., e non compare al valore base (100%) né quando non applicabile. Le tonalità di giallo si schiariscono al crescere del valore. Anche il dettaglio del calcolo dei punti usa la percentuale del moltiplicatore applicato. Le quantità dei bonus sono scritte senza prefisso ×, nel tabellone e nell’inventario. Nome del vincitore e WINS sono gialli; GAME OVER e X di eliminazione restano rossi.
 
 La sequenza è solo visiva, non blocca i comandi e non altera il modello. Un cambio di schermata annulla il feedback pendente; la ripresa non lo ripete. Con movimento ridotto il messaggio è statico e più breve, senza animazioni di bagliore; i colori e i testi restano disponibili.
+
+## Aggiornamento del 22/10/2026 — interfaccia 1.7.0
+
+Il requisito corrente riguarda solo schermi orizzontali e sostituisce le precedenti indicazioni sullo scorrimento verticale e sul layout verticale. Un adattamento proporzionale conserva tutto il contenuto entro lo schermo, inclusi dialoghi e regole; le impostazioni usano schede e quote paginate. In verticale compare «Ruota lo schermo» e il timer viene sospeso.
+
+Start ripristina la scelta dei simboli: teschio, fulmine, stella, spade, scudo e corona. Ogni simbolo appare grande, attenuato e decorativo sullo sfondo del rispettivo gruppo, dietro testi e X di eliminazione. La riga sotto i gruppi mostra solo rotazione e timer. Il pulsante «Schermo intero» nella home mantiene la modalità durante la navigazione interna quando il browser la supporta.

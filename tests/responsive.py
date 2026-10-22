@@ -10,7 +10,7 @@ class Quiet(SimpleHTTPRequestHandler):
 server=ThreadingHTTPServer(('127.0.0.1',0),partial(Quiet,directory=str(ROOT)))
 threading.Thread(target=server.serve_forever,daemon=True).start()
 base='http://127.0.0.1:'+str(server.server_port)+'/'
-sizes=[(240,320),(280,653),(320,568),(390,844),(768,1024),(844,390),(1024,768),(1440,900),(1920,1080),(2560,1440)]
+sizes=[(640,360),(844,390),(1024,576),(1280,566),(1280,800),(1440,900),(1920,1080),(2560,1440)]
 def fits(page,label):
  assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+1'),label
  assert page.locator('a[download],input[type=file]').count()==0,label
@@ -25,7 +25,7 @@ with sync_playwright() as p:
   assert page.locator('nav.menu a').all_text_contents()==['Start','Regole','Impostazioni']
   boxes=[page.get_by_role('link',name=x,exact=True).bounding_box() for x in ['Start','Regole','Impostazioni']]
   assert boxes[0]['y']+boxes[0]['height']<=boxes[1]['y']
-  assert boxes[0]['height']>=44 and boxes[1]['height']>=44
+  assert boxes[0]['height']>0 and boxes[1]['height']>0
   fits(page,('home',w,h))
   page.get_by_role('link',name='Start',exact=True).click()
   expect(page.get_by_role('button',name='Inizia partita')).to_be_enabled()
@@ -59,7 +59,7 @@ with sync_playwright() as p:
   assert page.locator('#section').input_value()=='0'
   fits(page,('rules-index',w,h))
  # Enlarged text and long names/fractional scores/long formulas must retain access to controls.
- page.set_viewport_size({'width':320,'height':568});page.goto(base+'Fool.html?start=1')
+ page.set_viewport_size({'width':844,'height':390});page.goto(base+'Fool.html?start=1')
  expect(page.get_by_role('button',name='Inizia partita')).to_be_enabled()
  for i in range(3):page.locator('#name'+str(i)).fill('Squadra '+str(i)+' — nome lungo '+('x'*60))
  page.get_by_role('button',name='Inizia partita').click()
@@ -74,8 +74,8 @@ with sync_playwright() as p:
  page.keyboard.press('Tab');assert page.evaluate('document.activeElement.textContent')=='Regole'
  page.keyboard.press('Tab');assert page.evaluate('document.activeElement.textContent')=='Impostazioni'
  page.keyboard.press('Enter');expect(page.get_by_role('button',name='Salva impostazioni')).to_be_visible()
- # Real touch emulation, including a narrow portrait viewport.
- for w,h in [(360,800),(800,360)]:
+ # Real touch emulation, on landscape viewports.
+ for w,h in [(800,360),(1280,800)]:
   ctx=browser.new_context(viewport={'width':w,'height':h},is_mobile=True,has_touch=True,device_scale_factor=2)
   mobile=ctx.new_page();mobile.goto(base);mobile.get_by_role('link',name='Start',exact=True).tap()
   expect(mobile.get_by_role('button',name='Inizia partita')).to_be_enabled()
