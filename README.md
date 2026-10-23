@@ -2,7 +2,7 @@
 
 Sito: https://rickymusu-bit.github.io/quiz/
 
-Interfaccia 1.8.1 (motore 1.2.0), regolamento 18.2.0. GitHub Pages pubblica il ramo `main`, cartella `/`.
+Interfaccia 1.9.0 (motore 1.2.0), regolamento 18.2.0. GitHub Pages pubblica il ramo `main`, cartella `/`.
 
 Il sito offre il quiz e le regole direttamente nel browser. Non sono presenti pulsanti di download, selettori di file o importazione/esportazione delle partite. Le domande vengono caricate automaticamente dal catalogo `datasets.json` e dalle banche pubblicate sul sito. Il dataset rimane una risorsa interna del sito, senza collegamenti di download per l'utente.
 
@@ -43,3 +43,11 @@ Bonus e inventari sono accanto a Svela e restano disponibili con la domanda svel
 Gli altri comandi sono raccolti nella sezione espandibile Opzioni in fondo alla partita. Riassegna punti permette di impostare il totale di un gruppo scrivendolo nella casella o usando + e − (un punto per pressione). Non è richiesto un motivo. Mostra un’anteprima e applica il totale solo dopo Conferma modifica. Conserva frazioni esatte, bonus e moltiplicatore e registra la correzione nel salvataggio. Il totale non può diventare negativo. Durante una domanda il pannello mette in pausa il timer, che il docente riprende esplicitamente da Opzioni. Nel Massacro i punti ordinari non si modificano.
 
 `python3 tests/options.py` verifica posizione bonus, svelamento diretto, pulsanti +/−, modifica del totale e annullamento, frazioni esatte, salvataggio/ripresa e pausa del timer su desktop e a schermo intero.
+
+## Domande configurabili e bonus indipendenti — 1.9.0
+
+In Impostazioni si sceglie un multiplo di 3 fra 3 e 99 domande (33 predefinite), rispettando disponibilità della banca e quote degli argomenti. Anteprima, contatori e passaggio al Massacro seguono quel totale. Ogni bonus — Nope, Irpef, Spoiler, Aura e Karma — ha una probabilità indipendente, predefinita al 30%, modificabile da 0 a 100%. Per una risposta corretta si possono vincere da zero a cinque bonus distinti: tutti compaiono nell’esito e vengono evidenziati nel riquadro del gruppo. Prima di svelare si possono attivare più copie di bonus nello stesso turno; il Massacro resta senza bonus.
+
+I vecchi salvataggi conservano domande, ordine, punteggi, timer e inventari. Quando mancano i nuovi campi, valgono 33 domande e probabilità indipendenti del 30%. Le vecchie impostazioni mantengono gli altri parametri e possono essere risalvate con i nuovi campi.
+
+Verifiche della PR #3: `node tests/engine.test.js` per estrazioni, probabilità indipendenti, attivazioni multiple, 99 domande, Massacro e vecchi salvataggi; `python3 tests/configurable.py` per impostazioni, anteprima, risultati con cinque bonus e ripresa; regressioni `tests/start.py`, `tests/keyboard.py`, `tests/options.py`. Le probabilità non devono sommare al 100%.
