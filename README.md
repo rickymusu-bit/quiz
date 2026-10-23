@@ -2,7 +2,7 @@
 
 Sito: https://rickymusu-bit.github.io/quiz/
 
-Interfaccia 1.7.2 (motore 1.2.0), regolamento 18.2.0. GitHub Pages pubblica il ramo `main`, cartella `/`.
+Interfaccia 1.7.3 (motore 1.2.0), regolamento 18.2.0. GitHub Pages pubblica il ramo `main`, cartella `/`.
 
 Il sito offre il quiz e le regole direttamente nel browser. Non sono presenti pulsanti di download, selettori di file o importazione/esportazione delle partite. Le domande vengono caricate automaticamente dal catalogo `datasets.json` e dalle banche pubblicate sul sito. Il dataset rimane una risorsa interna del sito, senza collegamenti di download per l'utente.
 
@@ -31,3 +31,7 @@ Dopo 33 domande si elimina il gruppo con il punteggio minimo, se ultimo univoco;
 ## Correzione Start — 1.7.2
 
 Corretta una parentesi graffa in eccesso nella transizione del Massacro: interrompeva il parsing JavaScript e lasciava vuota la schermata aperta da Start. Nessuna modifica alle regole del Massacro. `python3 tests/start.py` controlla la sintassi degli script incorporati e l’avvio dalla home, normale e a schermo intero, con entrambe le banche e ripresa della partita. Richiede Node, Python Playwright e Chromium.
+
+## Comandi da tastiera — 1.7.3
+
+Con una domanda svelata, **A, B, C, D** selezionano la risposta corrispondente. Dopo l’esito, **Invio** apre la prossima domanda, ancora nascosta: il timer parte con «Svela e avvia il tempo». Le scorciatoie sono disattivate durante pausa, sospensione, pannelli aperti, selezione bonus e scrittura nei campi; i tasti mantenuti premuti non ripetono le azioni. Invio conserva il comportamento normale su altri pulsanti o collegamenti che hanno il focus. `python3 tests/keyboard.py` verifica comandi, protezioni e ripresa anche a schermo intero.
