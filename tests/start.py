@@ -30,7 +30,7 @@ with sync_playwright() as p:
    view.get_by_role('button',name='Inizia partita').click();expect(view.get_by_role('button',name='Svela e avvia il tempo')).to_be_visible()
    frame=next(f for f in page.frames if 'Fool.html' in f.url)
    assert frame.evaluate('game.s.bank.length')==100
-   view.get_by_role('button',name='Svela e avvia il tempo').click();view.get_by_role('button',name='Conferma e svela').click();view.locator('.answer').nth(frame.evaluate('game.s.current.correct')).click()
+   view.get_by_role('button',name='Svela e avvia il tempo').click();view.locator('.answer').nth(frame.evaluate('game.s.current.correct')).click()
    assert frame.evaluate('game.s.valid')==1
    question=frame.evaluate('game.s.current.id')
    frame.goto(frame.url);view.get_by_role('button',name='Riprendi partita',exact=True).click()

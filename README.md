@@ -2,7 +2,7 @@
 
 Sito: https://rickymusu-bit.github.io/quiz/
 
-Interfaccia 1.8.0 (motore 1.2.0), regolamento 18.2.0. GitHub Pages pubblica il ramo `main`, cartella `/`.
+Interfaccia 1.8.1 (motore 1.2.0), regolamento 18.2.0. GitHub Pages pubblica il ramo `main`, cartella `/`.
 
 Il sito offre il quiz e le regole direttamente nel browser. Non sono presenti pulsanti di download, selettori di file o importazione/esportazione delle partite. Le domande vengono caricate automaticamente dal catalogo `datasets.json` e dalle banche pubblicate sul sito. Il dataset rimane una risorsa interna del sito, senza collegamenti di download per l'utente.
 
@@ -34,12 +34,12 @@ Corretta una parentesi graffa in eccesso nella transizione del Massacro: interro
 
 ## Comandi da tastiera — 1.7.3
 
-Con una domanda svelata, **A, B, C, D** selezionano la risposta corrispondente. Dopo l’esito, **Invio** apre la prossima domanda, ancora nascosta. Con una nuova pressione di **Invio**, si apre la conferma di svelamento; solo «Conferma e svela» rende visibile la domanda e avvia il timer. Le scorciatoie sono disattivate durante pausa, sospensione, pannelli aperti, selezione bonus e scrittura nei campi; i tasti mantenuti premuti non ripetono le azioni. Invio conserva il comportamento normale su altri pulsanti o collegamenti che hanno il focus. `python3 tests/keyboard.py` verifica comandi, protezioni e ripresa anche a schermo intero.
+Con una domanda svelata, **A, B, C, D** selezionano la risposta corrispondente. Dopo l’esito, **Invio** apre la prossima domanda, ancora nascosta. Con una nuova pressione di **Invio**, si svela direttamente la domanda e si avvia il timer. Le scorciatoie sono disattivate durante pausa, sospensione, pannelli aperti, selezione bonus e scrittura nei campi; i tasti mantenuti premuti non ripetono le azioni. Invio conserva il comportamento normale su altri pulsanti o collegamenti che hanno il focus. `python3 tests/keyboard.py` verifica comandi, protezioni e ripresa anche a schermo intero.
 
-## Comandi e correzioni — 1.8.0
+## Comandi e correzioni — 1.8.1
 
-Bonus e inventari sono accanto a Svela e restano disponibili con la domanda svelata. Svela, anche da Invio, apre una conferma: fino a «Conferma e svela» domanda e timer rimangono fermi. Annullando o ricaricando non viene consumata la domanda.
+Bonus e inventari sono accanto a Svela e restano disponibili con la domanda svelata. Svela, anche da Invio, mostra direttamente la domanda e avvia il timer, senza conferma intermedia.
 
-Gli altri comandi sono raccolti nella sezione espandibile Opzioni in fondo alla partita. Riassegna punti corregge i punti ordinari di un gruppo con Aggiungi/Togli, mostra un’anteprima del totale e richiede conferma. Conserva frazioni esatte, bonus e moltiplicatore e registra la correzione nel salvataggio. Il totale non può diventare negativo. Durante una domanda il pannello mette in pausa il timer, che il docente riprende esplicitamente da Opzioni. Nel Massacro i punti ordinari non si modificano.
+Gli altri comandi sono raccolti nella sezione espandibile Opzioni in fondo alla partita. Riassegna punti permette di impostare il totale di un gruppo scrivendolo nella casella o usando + e − (un punto per pressione). Non è richiesto un motivo. Mostra un’anteprima e applica il totale solo dopo Conferma modifica. Conserva frazioni esatte, bonus e moltiplicatore e registra la correzione nel salvataggio. Il totale non può diventare negativo. Durante una domanda il pannello mette in pausa il timer, che il docente riprende esplicitamente da Opzioni. Nel Massacro i punti ordinari non si modificano.
 
-`python3 tests/options.py` verifica posizione bonus, conferma/annullamento Svela, correzioni positive e negative, frazioni esatte, salvataggio/ripresa e pausa del timer su desktop e a schermo intero.
+`python3 tests/options.py` verifica posizione bonus, svelamento diretto, pulsanti +/−, modifica del totale e annullamento, frazioni esatte, salvataggio/ripresa e pausa del timer su desktop e a schermo intero.
