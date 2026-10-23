@@ -20,10 +20,14 @@ with sync_playwright() as p:
   expect(view.get_by_role('button',name='Inizia partita')).to_be_enabled();view.locator('#bank-choice').select_option(bank);expect(view.get_by_role('button',name='Inizia partita')).to_be_enabled()
   view.locator('#name0').fill('Gruppo A');view.locator('#name0').press('a');expect(view.locator('#name0')).to_have_value('Gruppo Aa')
   view.get_by_role('button',name='Inizia partita').click();frame=next(f for f in page.frames if 'Fool.html' in f.url)
+  def option(name):
+   if view.locator('.game-options').get_attribute('open') is None:view.get_by_text('Opzioni',exact=True).click()
+   return view.get_by_role('button',name=name,exact=True)
   for i,key in enumerate(['a','B','c','D']):
    page.keyboard.press(key);assert frame.evaluate('game.s.screen')=='hidden'
    assert view.locator('[data-game-action=reveal]').get_attribute('aria-keyshortcuts')=='Enter'
-   page.keyboard.down('Enter');page.keyboard.down('Enter');page.keyboard.up('Enter');assert frame.evaluate('game.s.screen')=='answer' and frame.evaluate('game.running')
+   page.keyboard.down('Enter');page.keyboard.down('Enter');page.keyboard.up('Enter');assert frame.evaluate('game.s.screen')=='hidden' and not frame.evaluate('game.running')
+   expect(view.get_by_role('button',name='Conferma e svela')).to_be_visible();page.keyboard.press('Enter');assert frame.evaluate('game.s.screen')=='answer' and frame.evaluate('game.running')
    frame.evaluate('fitFoolViewport()');assert frame.evaluate('document.documentElement.scrollHeight<=innerHeight+1 && document.documentElement.scrollWidth<=innerWidth+1')
    page.keyboard.press('Enter');page.keyboard.press('Control+a');assert frame.evaluate('game.s.valid')==i
    page.keyboard.press(key);assert frame.evaluate('game.s.result.option')==i and frame.evaluate('game.s.valid')==i+1
@@ -31,11 +35,11 @@ with sync_playwright() as p:
    assert view.locator('[data-game-action=next]').get_attribute('aria-keyshortcuts')=='Enter'
    page.keyboard.down('Enter');page.keyboard.down('Enter');page.keyboard.up('Enter')
    assert frame.evaluate('game.s.screen')=='hidden' and not frame.evaluate('game.running')
-  page.keyboard.press('Enter');assert frame.evaluate('game.s.screen')=='answer' and frame.evaluate('game.running');view.get_by_role('button',name='Pausa',exact=True).click();page.keyboard.press('a');assert frame.evaluate('game.s.valid')==4
-  view.get_by_role('button',name='Sanzioni',exact=True).click();page.keyboard.press('a');page.keyboard.press('Enter');assert frame.evaluate('game.s.valid')==4
+  page.keyboard.press('Enter');expect(view.get_by_role('button',name='Conferma e svela')).to_be_visible();page.keyboard.press('Enter');assert frame.evaluate('game.s.screen')=='answer' and frame.evaluate('game.running');option('Pausa').click();page.keyboard.press('a');assert frame.evaluate('game.s.valid')==4
+  option('Sanzioni').click();page.keyboard.press('a');page.keyboard.press('Enter');assert frame.evaluate('game.s.valid')==4
   # Enter may act on the dialog's focused button, but never submits a question.
   if view.locator('#dialog').is_visible():view.get_by_role('button',name='Chiudi senza sanzionare').click()
-  view.get_by_role('button',name='Riprendi timer',exact=True).click()
+  option('Riprendi timer').click()
   frame.evaluate('()=>{const e=document.createElement("input");e.id="typing-test";document.querySelector("main").append(e);e.focus()}')
   page.keyboard.press('a');page.keyboard.press('Enter');assert frame.evaluate('game.s.valid')==4
   frame.evaluate('()=>{document.getElementById("typing-test").remove();const e=document.createElement("p");e.id="typing-test";e.contentEditable="true";document.querySelector("main").append(e);e.focus()}')
@@ -46,9 +50,9 @@ with sync_playwright() as p:
   frame.evaluate('document.body.dispatchEvent(new KeyboardEvent("keydown",{key:"b",isComposing:true,bubbles:true,cancelable:true}))');assert frame.evaluate('game.s.valid')==4
   page.keyboard.press('a');assert frame.evaluate('game.s.valid')==5
   # Keep native Enter activation for other focused controls.
-  view.get_by_role('button',name='Sanzioni',exact=True).focus();page.keyboard.press('Enter');expect(view.locator('#dialog')).to_be_visible();view.get_by_role('button',name='Chiudi senza sanzionare').click()
+  option('Sanzioni').focus();page.keyboard.press('Enter');expect(view.locator('#dialog')).to_be_visible();view.get_by_role('button',name='Chiudi senza sanzionare').click()
   view.locator('.question-points').click();page.keyboard.press('Enter');assert frame.evaluate('game.s.screen')=='hidden'
-  frame.goto(frame.url);view.get_by_role('button',name='Riprendi partita',exact=True).click();page.keyboard.press('Enter');assert frame.evaluate('game.s.screen')=='answer' and frame.evaluate('game.running');page.keyboard.press('d');assert frame.evaluate('game.s.valid')==6
+  frame.goto(frame.url);view.get_by_role('button',name='Riprendi partita',exact=True).click();page.keyboard.press('Enter');expect(view.get_by_role('button',name='Conferma e svela')).to_be_visible();page.keyboard.press('Enter');assert frame.evaluate('game.s.screen')=='answer' and frame.evaluate('game.running');page.keyboard.press('d');assert frame.evaluate('game.s.valid')==6
   page.keyboard.press('Enter');frame.evaluate('()=>{game.bell();changed()}');page.keyboard.press('a');page.keyboard.press('Enter');assert frame.evaluate('game.s.suspended')
   frame.evaluate('()=>{game.continueSession();game.openSanctions();game.s.panel.counts=[3,3,3];game.closeSanctions(true);changed()}');page.keyboard.press('a');page.keyboard.press('Enter');assert frame.evaluate('game.s.phase')=='conclusa'
   frame.evaluate('fitFoolViewport()');assert frame.evaluate('document.documentElement.scrollHeight<=innerHeight+1')
