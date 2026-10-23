@@ -32,6 +32,7 @@ with sync_playwright() as p:
   assert v.locator('#score-reason,#score-operation').count()==0
   expect(v.locator('#score-total')).to_have_value('0');expect(v.get_by_role('button',name='Togli un punto')).to_be_disabled()
   v.get_by_role('button',name='Aggiungi un punto').click();expect(v.locator('#score-total')).to_have_value('1');v.get_by_role('button',name='Togli un punto').click();expect(v.locator('#score-total')).to_have_value('0')
+  box=v.get_by_role('button',name='Aggiungi un punto').bounding_box();page.mouse.move(box['x']+box['width']/2,box['y']+box['height']/2);page.mouse.down();page.wait_for_timeout(750);page.mouse.up();held=int(v.locator('#score-total').input_value());assert held>=10 and held%10==0;page.wait_for_timeout(200);assert int(v.locator('#score-total').input_value())==held
   v.locator('#score-total').fill('150');expect(v.locator('.score-preview')).to_contain_text('150 punti');assert frame.evaluate('F.exact(game.s.groups[0].score)')=='0';fits();v.get_by_role('button',name='Conferma modifica').click();assert frame.evaluate('F.exact(game.s.groups[0].score)')=='150'
   assert frame.evaluate('JSON.stringify({valid:game.s.valid,groups:game.s.groups.map(g=>({streak:g.streak,inventory:g.inventory,sanctions:g.sanctions}))})')==original
   frame.evaluate('()=>{game.s.groups[0].score=F.rational(100,3);changed()}')
