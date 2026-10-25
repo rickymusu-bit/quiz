@@ -10,6 +10,10 @@ La partita si conserva automaticamente nello stesso browser. Non viene sincroniz
 
 I sorgenti e le istruzioni per rigenerare le pagine sono nel ramo `codex/fool-offline-18-0-1` e nella pull request #1. Il nome storico del ramo non descrive la distribuzione corrente, che è solo online.
 
+## Generazione delle domande
+
+Per generare o revisionare quesiti delle banche Fool, utilizzare [il prompt dedicato](docs/PROMPT_GENERAZIONE_DOMANDE.md), adattato dai criteri didattici di Stringhe ma conforme a tempi, classificazioni e schema JSON di Fool. Il prompt non cambia il motore né autorizza nuove domande o la pubblicazione.
+
 ## Identità e schermi
 
 Home con logo ufficiale fornito dal responsabile, sottotitolo «Solo uno sciocco pensa di vincere» e menu verticale Start/Regole. Sfondo pixel con cielo rosso e pavimento di pietra, ispirato a Doom del 1993. Start apre direttamente la configurazione.
