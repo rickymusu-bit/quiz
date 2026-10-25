@@ -1,6 +1,6 @@
 # Fool — Prompt per la generazione delle domande
 
-**Versione:** v1.0.0  
+**Versione:** v1.0.1  
 **Data:** 25 ottobre 2026 (Europe/Rome)  
 **Ambito:** domande del gioco a squadre **Fool** nel repository `rickymusu-bit/quiz`.  
 **Origine:** adattamento dei criteri didattici di `rickymusu-bit/fisica/quiz/PROMPT_GENERAZIONE_DOMANDE.md`; non è una copia del formato del quiz individuale Stringhe.
@@ -94,7 +94,7 @@ Prima di esportare, ricontrolla `datasets.json`, il file della banca di destinaz
 
 Non usare il JSON di Stringhe (`category`, `level`, `prompt`, `options`, `correct`, `explanation`). Non aggiungere alle domande campi per tempo stimato, fonti, prerequisiti o valutazioni: vanno in una **scheda di revisione separata**, a meno che lo schema Fool venga deliberatamente modificato e approvato.
 
-I dataset pubblicati al momento dell'adozione sono `Dataset_termologia_100_domande_v1_20261021.json` e `dataset/fool_introduzione_fisica_misura_v1_20261022.json`; prima di lavorare, controlla se il catalogo li ha sostituiti. La versione del **prompt** è indipendente dal campo numerico `versione` del **dataset**: non cambiare lo schema o il valore di `versione` senza motivazione tecnica verificata.
+Il catalogo `datasets.json` è la fonte canonica per i percorsi delle banche. Quando una banca viene sostituita, aggiorna contestualmente catalogo, test e documentazione; cancella gli archivi dismessi soltanto dopo la verifica della sostituzione, conservandone la cronologia Git. La versione del **prompt** è indipendente dal campo numerico `versione` del **dataset**: non cambiare lo schema o il valore di `versione` senza motivazione tecnica verificata.
 
 ## 9. Scheda di revisione didattica e controlli
 
