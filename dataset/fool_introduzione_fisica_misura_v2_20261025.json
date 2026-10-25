@@ -1,0 +1,362 @@
+{
+  "versione": 2,
+  "titolo": "Fool — Introduzione alla fisica e alla misura (100 domande, seconda edizione)",
+  "argomenti": [
+    {
+      "id": "metodo_scientifico",
+      "nome": "Metodo scientifico",
+      "domande": [
+        {
+          "id": "metodo_scientifico_v2_001",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Quale azione avvia di solito una ricerca su un fenomeno sconosciuto?",
+          "alternative": [
+            "Osservare e formulare una domanda",
+            "Scegliere subito la conclusione",
+            "Scartare tutti i dati",
+            "Cercare solo conferme"
+          ],
+          "corretta": "A",
+          "spiegazione": "L'indagine nasce dall'osservazione e da un problema verificabile."
+        },
+        {
+          "id": "metodo_scientifico_v2_002",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Che cosa rende un'ipotesi controllabile scientificamente?",
+          "alternative": [
+            "Essere molto famosa",
+            "Permettere previsioni verificabili",
+            "Essere espressa con parole difficili",
+            "Non poter essere smentita"
+          ],
+          "corretta": "B",
+          "spiegazione": "Un'ipotesi scientifica deve permettere controlli tramite osservazioni o esperimenti."
+        },
+        {
+          "id": "metodo_scientifico_v2_003",
+          "difficolta": "facile",
+          "tipologia": "ragionamento",
+          "testo": "Un ricercatore cambia insieme luce e quantità d'acqua in due gruppi di piante. Quale difficoltà crea?",
+          "alternative": [
+            "Le piante non possono crescere",
+            "La luce non è misurabile",
+            "Non si isola l'effetto di un singolo fattore",
+            "Le piante sono troppo simili"
+          ],
+          "corretta": "C",
+          "spiegazione": "Per isolare un effetto occorre controllare le altre variabili."
+        },
+        {
+          "id": "metodo_scientifico_v2_004",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Qual è un dato direttamente quantitativo?",
+          "alternative": [
+            "La pianta è bella",
+            "La sostanza è interessante",
+            "Il cielo sembra minaccioso",
+            "La foglia misura 8 cm"
+          ],
+          "corretta": "D",
+          "spiegazione": "Un dato quantitativo contiene un valore misurabile con unità."
+        },
+        {
+          "id": "metodo_scientifico_v2_005",
+          "difficolta": "facile",
+          "tipologia": "ragionamento",
+          "testo": "Qual è la variabile indipendente in una prova che cambia solo la quantità d'acqua fornita?",
+          "alternative": [
+            "La quantità d'acqua scelta",
+            "L'altezza finale misurata",
+            "La specie delle piante",
+            "La conclusione dell'esperimento"
+          ],
+          "corretta": "A",
+          "spiegazione": "La variabile indipendente è il fattore modificato intenzionalmente."
+        },
+        {
+          "id": "metodo_scientifico_v2_006",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Una descrizione ripetibile dell'esperimento deve includere…",
+          "alternative": [
+            "Solo il risultato più bello",
+            "Materiali, procedura e condizioni",
+            "Il nome del più bravo",
+            "Una conclusione già scritta"
+          ],
+          "corretta": "B",
+          "spiegazione": "La procedura consente di riprodurre il test."
+        },
+        {
+          "id": "metodo_scientifico_v2_007",
+          "difficolta": "facile",
+          "tipologia": "ragionamento",
+          "testo": "In una prova si ripetono tre misure e si ottengono valori leggermente diversi. Che cosa è sensato fare?",
+          "alternative": [
+            "Eliminare i valori diversi",
+            "Scegliere quello più alto",
+            "Registrare tutte le misure e analizzare le differenze",
+            "Cambiare ipotesi senza controlli"
+          ],
+          "corretta": "C",
+          "spiegazione": "Le variazioni vanno registrate e valutate, non nascoste."
+        },
+        {
+          "id": "metodo_scientifico_v2_008",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "A quale categoria appartiene «il termometro indica 21 °C»?",
+          "alternative": [
+            "Teoria",
+            "Modello",
+            "Spiegazione causale",
+            "Osservazione misurata"
+          ],
+          "corretta": "D",
+          "spiegazione": "È una lettura strumentale, non una spiegazione."
+        },
+        {
+          "id": "metodo_scientifico_v2_009",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Un esperimento sembra confermare un'ipotesi una sola volta. Quale conclusione è più prudente?",
+          "alternative": [
+            "Servono ulteriori prove ripetibili",
+            "L'ipotesi è una legge definitiva",
+            "Il risultato prova ogni caso",
+            "Non si devono più fare misure"
+          ],
+          "corretta": "A",
+          "spiegazione": "Un singolo risultato favorevole non garantisce validità generale."
+        },
+        {
+          "id": "metodo_scientifico_v2_010",
+          "difficolta": "media",
+          "tipologia": "conoscenza",
+          "testo": "In un modello fisico una pallina è trattata come punto materiale. Che cosa si sta facendo?",
+          "alternative": [
+            "Affermare che tutte le palline non hanno dimensioni",
+            "Semplificare gli aspetti irrilevanti per il problema",
+            "Negare il moto reale",
+            "Eliminare le unità di misura"
+          ],
+          "corretta": "B",
+          "spiegazione": "Un modello conserva le caratteristiche pertinenti e trascura quelle non decisive."
+        },
+        {
+          "id": "metodo_scientifico_v2_011",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Per confrontare due materiali isolanti, quale prova è più equa?",
+          "alternative": [
+            "Usare recipienti e temperature iniziali diversi",
+            "Cambiare anche la quantità d'acqua",
+            "Mantenere uguali tutte le condizioni tranne l'isolante",
+            "Misurare solo uno dei recipienti"
+          ],
+          "corretta": "C",
+          "spiegazione": "Cambiare un solo fattore permette di attribuirgli l'effetto osservato."
+        },
+        {
+          "id": "metodo_scientifico_v2_012",
+          "difficolta": "media",
+          "tipologia": "calcolo",
+          "testo": "Tre misure di tempo sono 9 s, 12 s e 9 s. Qual è la media?",
+          "alternative": [
+            "9 s",
+            "11 s",
+            "12 s",
+            "10 s"
+          ],
+          "corretta": "D",
+          "spiegazione": "La media è (9 + 12 + 9)/3 = 10 s."
+        },
+        {
+          "id": "metodo_scientifico_v2_013",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "La previsione di un'ipotesi non si verifica. Qual è il passo corretto?",
+          "alternative": [
+            "Verificare procedure e ipotesi, poi eventualmente rivederle",
+            "Scartare il risultato contrario",
+            "Inventare valori coerenti",
+            "Interrompere le osservazioni"
+          ],
+          "corretta": "A",
+          "spiegazione": "Un risultato discordante invita a controllare dati e modello."
+        },
+        {
+          "id": "metodo_scientifico_v2_014",
+          "difficolta": "media",
+          "tipologia": "conoscenza",
+          "testo": "Perché una legge scientifica non coincide con un'opinione?",
+          "alternative": [
+            "Perché è sempre semplice",
+            "Perché è sostenuta da prove riproducibili nei limiti noti",
+            "Perché non può mai cambiare",
+            "Perché è votata dalla maggioranza"
+          ],
+          "corretta": "B",
+          "spiegazione": "La validità di una legge dipende dalle evidenze e dal suo campo di applicazione."
+        },
+        {
+          "id": "metodo_scientifico_v2_015",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Un gruppo dichiara che il sale si scioglie prima nell'acqua calda. Quale confronto testa l'affermazione?",
+          "alternative": [
+            "Cambiare sale e volume tra le prove",
+            "Confrontare due sostanze diverse",
+            "Usare stessa massa e agitazione, variando solo la temperatura",
+            "Misurare solo il colore"
+          ],
+          "corretta": "C",
+          "spiegazione": "Una prova controllata varia la temperatura mantenendo il resto uguale."
+        },
+        {
+          "id": "metodo_scientifico_v2_016",
+          "difficolta": "media",
+          "tipologia": "calcolo",
+          "testo": "Quattro prove durano 6 s, 8 s, 7 s e 7 s. Qual è la durata media?",
+          "alternative": [
+            "6 s",
+            "8 s",
+            "28 s",
+            "7 s"
+          ],
+          "corretta": "D",
+          "spiegazione": "La somma è 28 s; dividendo per quattro si ottengono 7 s."
+        },
+        {
+          "id": "metodo_scientifico_v2_017",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Due esperimenti danno esiti differenti. Quale informazione va controllata prima di confrontarli?",
+          "alternative": [
+            "Se procedure e condizioni erano comparabili",
+            "Il colore dei quaderni",
+            "Chi ha preparato il titolo",
+            "Il numero di pagine della relazione"
+          ],
+          "corretta": "A",
+          "spiegazione": "Differenze di procedura o condizioni possono spiegare risultati diversi."
+        },
+        {
+          "id": "metodo_scientifico_v2_018",
+          "difficolta": "media",
+          "tipologia": "conoscenza",
+          "testo": "Che cosa indica la variabile dipendente?",
+          "alternative": [
+            "Il fattore imposto dal docente",
+            "L'esito misurato in risposta alle condizioni",
+            "Un errore di stampa",
+            "Un dato che non si misura"
+          ],
+          "corretta": "B",
+          "spiegazione": "La variabile dipendente è il risultato che si osserva o misura."
+        },
+        {
+          "id": "metodo_scientifico_v2_019",
+          "difficolta": "difficile",
+          "tipologia": "ragionamento",
+          "testo": "Due terreni differiscono per acqua e luce; le piante nel primo crescono di più. Quale conclusione è giustificata?",
+          "alternative": [
+            "È sicuramente merito dell'acqua",
+            "È sicuramente merito della luce",
+            "Non si può attribuire l'effetto a uno dei due fattori",
+            "Il terreno non c'entra mai"
+          ],
+          "corretta": "C",
+          "spiegazione": "La variazione simultanea delle condizioni confonde le cause."
+        },
+        {
+          "id": "metodo_scientifico_v2_020",
+          "difficolta": "difficile",
+          "tipologia": "ragionamento",
+          "testo": "Un modello predice bene alcuni casi ma sbaglia sistematicamente altri. Come conviene procedere?",
+          "alternative": [
+            "Forzare i dati a seguire il modello",
+            "Usarlo senza indicarne limiti",
+            "Escludere tutti i casi discordanti",
+            "Rivedere ipotesi e campo di validità"
+          ],
+          "corretta": "D",
+          "spiegazione": "Un modello valido entro certe ipotesi va confrontato con le anomalie."
+        },
+        {
+          "id": "metodo_scientifico_v2_021",
+          "difficolta": "difficile",
+          "tipologia": "ragionamento",
+          "testo": "Due misure sono correlate: quando cresce A cresce anche B. Che cosa NON si può concludere dai soli dati?",
+          "alternative": [
+            "Che A provochi necessariamente B",
+            "Che esista una relazione osservata",
+            "Che i dati mostrino una tendenza",
+            "Che valga la pena fare nuovi controlli"
+          ],
+          "corretta": "A",
+          "spiegazione": "Una correlazione non dimostra da sola un rapporto causale."
+        },
+        {
+          "id": "metodo_scientifico_v2_022",
+          "difficolta": "difficile",
+          "tipologia": "ragionamento",
+          "testo": "Una lampada scalda di più una superficie nera che una bianca. Quale controllo rafforza il confronto?",
+          "alternative": [
+            "Spostare solo la lampada di un gruppo",
+            "Usare uguale distanza e uguale tempo di esposizione",
+            "Cambiare anche il materiale delle superfici",
+            "Usare termometri diversi senza confronto"
+          ],
+          "corretta": "B",
+          "spiegazione": "Le condizioni di esposizione devono restare confrontabili."
+        },
+        {
+          "id": "metodo_scientifico_v2_023",
+          "difficolta": "difficile",
+          "tipologia": "ragionamento",
+          "testo": "L'ipotesi «i metalli si scaldano più rapidamente» è troppo generica. Quale miglioramento è più importante?",
+          "alternative": [
+            "Eliminare ogni misura",
+            "Cambiare la parola metallo",
+            "Specificare quantità, condizioni e grandezza misurata",
+            "Decidere già il risultato"
+          ],
+          "corretta": "C",
+          "spiegazione": "Un'ipotesi sperimentale richiede condizioni e un esito osservabile ben definiti."
+        },
+        {
+          "id": "metodo_scientifico_v2_024",
+          "difficolta": "difficile",
+          "tipologia": "ragionamento",
+          "testo": "Un solo esperimento favorevole dimostra che una teoria è vera in ogni condizione?",
+          "alternative": [
+            "Sì, se condotto una volta",
+            "Sì, se produce un numero",
+            "Sì, se il risultato è grande",
+            "No, servono verifiche e limiti di validità"
+          ],
+          "corretta": "D",
+          "spiegazione": "Le evidenze sostengono una teoria nel dominio controllato, non in ogni caso."
+        },
+        {
+          "id": "metodo_scientifico_v2_025",
+          "difficolta": "difficile",
+          "tipologia": "ragionamento",
+          "testo": "Uno studente modifica i risultati discordanti per ottenere una retta perfetta. Quale principio viola?",
+          "alternative": [
+            "L'integrità dei dati osservati",
+            "La scelta della scala in gradi",
+            "Il concetto di unità derivata",
+            "La classificazione dei materiali"
+          ],
+          "corretta": "A",
+          "spiegazione": "I dati devono essere registrati fedelmente, anche quando smentiscono un'idea."
+        }
+      ]
+    }
+  ]
+}
