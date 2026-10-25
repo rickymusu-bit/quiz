@@ -466,13 +466,13 @@
           "tipologia": "conoscenza",
           "testo": "Il joule è unità SI di quale tipo?",
           "alternative": [
-            "Grandezza derivata",
+            "Unità derivata",
             "Lunghezza di base",
             "Tempo di base",
             "Temperatura di base"
           ],
           "corretta": "A",
-          "spiegazione": "Il joule è l'unità derivata dell'energia."
+          "spiegazione": "Il joule è l'unità di misura derivata dell'energia."
         },
         {
           "id": "misure_metrologia_v2_009",
@@ -1344,15 +1344,15 @@
           "id": "strumenti_errori_incertezza_v2_020",
           "difficolta": "difficile",
           "tipologia": "calcolo",
-          "testo": "Tre misure sono 11 mm, 12 mm e 13 mm. Qual è la semidispersione?",
+          "testo": "La media di tre misure è 12 cm. Due letture sono 10 cm e 12 cm. Qual è la terza?",
           "alternative": [
-            "2 mm",
-            "12 mm",
-            "1 mm",
-            "3 mm"
+            "12 cm",
+            "15 cm",
+            "14 cm",
+            "16 cm"
           ],
           "corretta": "C",
-          "spiegazione": "La semidispersione è (13 − 11)/2 = 1 mm."
+          "spiegazione": "La somma dev'essere 3·12 = 36 cm; la terza misura vale 36 − 10 − 12 = 14 cm."
         },
         {
           "id": "strumenti_errori_incertezza_v2_021",
