@@ -357,6 +357,362 @@
           "spiegazione": "I dati devono essere registrati fedelmente, anche quando smentiscono un'idea."
         }
       ]
+    },
+    {
+      "id": "misure_metrologia",
+      "nome": "Metrologia e Sistema Internazionale",
+      "domande": [
+        {
+          "id": "misure_metrologia_v2_001",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Quale simbolo SI indica il chilogrammo?",
+          "alternative": [
+            "Kg",
+            "kg",
+            "KG",
+            "kG"
+          ],
+          "corretta": "B",
+          "spiegazione": "Il prefisso kilo è k minuscola e il grammo è g minuscola."
+        },
+        {
+          "id": "misure_metrologia_v2_002",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Quale unità di base SI si usa per misurare un intervallo di tempo?",
+          "alternative": [
+            "Minuto",
+            "Ora",
+            "Secondo",
+            "Giorno"
+          ],
+          "corretta": "C",
+          "spiegazione": "L'unità di base del tempo è il secondo (s)."
+        },
+        {
+          "id": "misure_metrologia_v2_003",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Quale grandezza ha come unità SI il metro?",
+          "alternative": [
+            "Massa",
+            "Temperatura",
+            "Durata",
+            "Lunghezza"
+          ],
+          "corretta": "D",
+          "spiegazione": "Il metro (m) è l'unità di base della lunghezza."
+        },
+        {
+          "id": "misure_metrologia_v2_004",
+          "difficolta": "facile",
+          "tipologia": "calcolo",
+          "testo": "Un nastro misura 250 cm. Quanti metri sono?",
+          "alternative": [
+            "2,5 m",
+            "25 m",
+            "0,25 m",
+            "2500 m"
+          ],
+          "corretta": "A",
+          "spiegazione": "Si divide per 100: 250 cm = 2,5 m."
+        },
+        {
+          "id": "misure_metrologia_v2_005",
+          "difficolta": "facile",
+          "tipologia": "ragionamento",
+          "testo": "Quale strumento è adatto a misurare una durata di 30 secondi?",
+          "alternative": [
+            "Righello",
+            "Cronometro",
+            "Termometro",
+            "Dinamometro"
+          ],
+          "corretta": "B",
+          "spiegazione": "Il cronometro misura intervalli di tempo."
+        },
+        {
+          "id": "misure_metrologia_v2_006",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Quale prefisso moltiplica l'unità per 1000?",
+          "alternative": [
+            "Milli-",
+            "Centi-",
+            "Kilo-",
+            "Micro-"
+          ],
+          "corretta": "C",
+          "spiegazione": "Kilo- significa 10³."
+        },
+        {
+          "id": "misure_metrologia_v2_007",
+          "difficolta": "facile",
+          "tipologia": "calcolo",
+          "testo": "Una corsa dura 2 minuti. Quanti secondi sono?",
+          "alternative": [
+            "2 s",
+            "20 s",
+            "200 s",
+            "120 s"
+          ],
+          "corretta": "D",
+          "spiegazione": "2·60 = 120 s."
+        },
+        {
+          "id": "misure_metrologia_v2_008",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Il joule è unità SI di quale tipo?",
+          "alternative": [
+            "Grandezza derivata",
+            "Lunghezza di base",
+            "Tempo di base",
+            "Temperatura di base"
+          ],
+          "corretta": "A",
+          "spiegazione": "Il joule è l'unità derivata dell'energia."
+        },
+        {
+          "id": "misure_metrologia_v2_009",
+          "difficolta": "media",
+          "tipologia": "calcolo",
+          "testo": "Una bottiglia contiene 0,75 L. Quanti millilitri sono?",
+          "alternative": [
+            "75 mL",
+            "750 mL",
+            "7,5 mL",
+            "7500 mL"
+          ],
+          "corretta": "B",
+          "spiegazione": "1 L equivale a 1000 mL."
+        },
+        {
+          "id": "misure_metrologia_v2_010",
+          "difficolta": "media",
+          "tipologia": "calcolo",
+          "testo": "Un rettangolo è lungo 4 m e largo 3 m. Qual è l'area?",
+          "alternative": [
+            "7 m²",
+            "24 m²",
+            "12 m²",
+            "14 m²"
+          ],
+          "corretta": "C",
+          "spiegazione": "L'area è 4·3 = 12 m²."
+        },
+        {
+          "id": "misure_metrologia_v2_011",
+          "difficolta": "media",
+          "tipologia": "conoscenza",
+          "testo": "Come si scrive correttamente il simbolo del kelvin?",
+          "alternative": [
+            "°K",
+            "k",
+            "Kel",
+            "K"
+          ],
+          "corretta": "D",
+          "spiegazione": "Il simbolo SI del kelvin è K, senza segno di grado."
+        },
+        {
+          "id": "misure_metrologia_v2_012",
+          "difficolta": "media",
+          "tipologia": "calcolo",
+          "testo": "Una massa è 3,2 g. Quanti milligrammi sono?",
+          "alternative": [
+            "3200 mg",
+            "32 mg",
+            "0,32 mg",
+            "320 mg"
+          ],
+          "corretta": "A",
+          "spiegazione": "1 g = 1000 mg, quindi 3,2 g = 3200 mg."
+        },
+        {
+          "id": "misure_metrologia_v2_013",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "La misura 6,40 cm usa lo zero finale. Che cosa comunica?",
+          "alternative": [
+            "È un numero intero esatto",
+            "Lo zero finale è significativo alla precisione dichiarata",
+            "La misura è falsa",
+            "È obbligatoria una quarta cifra"
+          ],
+          "corretta": "B",
+          "spiegazione": "Lo zero dopo la virgola indica una cifra significativa dichiarata."
+        },
+        {
+          "id": "misure_metrologia_v2_014",
+          "difficolta": "media",
+          "tipologia": "calcolo",
+          "testo": "Quale notazione scientifica rappresenta 5700 m?",
+          "alternative": [
+            "57·10² m",
+            "0,57·10⁴ m",
+            "5,7·10³ m",
+            "570·10 m"
+          ],
+          "corretta": "C",
+          "spiegazione": "Il coefficiente normalizzato è compreso tra 1 e 10."
+        },
+        {
+          "id": "misure_metrologia_v2_015",
+          "difficolta": "media",
+          "tipologia": "calcolo",
+          "testo": "Un lato misura 2 cm. Qual è l'area di un quadrato con quel lato?",
+          "alternative": [
+            "2 cm²",
+            "8 cm²",
+            "0,04 cm²",
+            "4 cm²"
+          ],
+          "corretta": "D",
+          "spiegazione": "Per un quadrato A = lato² = 4 cm²."
+        },
+        {
+          "id": "misure_metrologia_v2_016",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Un volume di 1 m³ equivale a…",
+          "alternative": [
+            "1000 L",
+            "100 L",
+            "10 L",
+            "1 L"
+          ],
+          "corretta": "A",
+          "spiegazione": "1 m³ contiene 1000 dm³ e 1 dm³ corrisponde a 1 L."
+        },
+        {
+          "id": "misure_metrologia_v2_017",
+          "difficolta": "media",
+          "tipologia": "calcolo",
+          "testo": "Una misura vale 4,2 km. Quanti metri sono?",
+          "alternative": [
+            "420 m",
+            "4200 m",
+            "42 m",
+            "4,2 m"
+          ],
+          "corretta": "B",
+          "spiegazione": "Il chilometro vale 1000 m."
+        },
+        {
+          "id": "misure_metrologia_v2_018",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Quale scrittura dichiara tre cifre significative?",
+          "alternative": [
+            "4,0 m",
+            "4 m",
+            "4,00 m",
+            "4,000 m"
+          ],
+          "corretta": "C",
+          "spiegazione": "4,00 ha tre cifre significative, includendo gli zeri decimali."
+        },
+        {
+          "id": "misure_metrologia_v2_019",
+          "difficolta": "media",
+          "tipologia": "calcolo",
+          "testo": "Quanto valgono 3,0 cm² in m²?",
+          "alternative": [
+            "3·10⁻² m²",
+            "3·10⁻³ m²",
+            "3·10⁻⁵ m²",
+            "3·10⁻⁴ m²"
+          ],
+          "corretta": "D",
+          "spiegazione": "1 cm² = 10⁻⁴ m², quindi 3 cm² = 3·10⁻⁴ m²."
+        },
+        {
+          "id": "misure_metrologia_v2_020",
+          "difficolta": "difficile",
+          "tipologia": "ragionamento",
+          "testo": "Una misura è 0,00520 m. Quante cifre significative ha?",
+          "alternative": [
+            "Tre",
+            "Due",
+            "Cinque",
+            "Quattro"
+          ],
+          "corretta": "A",
+          "spiegazione": "Gli zeri iniziali non contano; 5, 2 e lo zero finale sono significativi."
+        },
+        {
+          "id": "misure_metrologia_v2_021",
+          "difficolta": "difficile",
+          "tipologia": "calcolo",
+          "testo": "Una scatola ha lati di 2 dm, 3 dm e 4 dm. Qual è il volume?",
+          "alternative": [
+            "9 dm³",
+            "24 dm³",
+            "12 dm³",
+            "16 dm³"
+          ],
+          "corretta": "B",
+          "spiegazione": "Il volume è il prodotto dei tre lati: 2·3·4 = 24 dm³."
+        },
+        {
+          "id": "misure_metrologia_v2_022",
+          "difficolta": "difficile",
+          "tipologia": "ragionamento",
+          "testo": "Si arrotonda 3,46 cm al decimo di centimetro. Che cosa si ottiene?",
+          "alternative": [
+            "3,46 cm",
+            "3,4 cm",
+            "3,5 cm",
+            "4 cm"
+          ],
+          "corretta": "C",
+          "spiegazione": "La cifra dei centesimi è 6, quindi il decimo sale a 5."
+        },
+        {
+          "id": "misure_metrologia_v2_023",
+          "difficolta": "difficile",
+          "tipologia": "calcolo",
+          "testo": "Un'area di 2,0 m² equivale a quanti cm²?",
+          "alternative": [
+            "2·10² cm²",
+            "2·10³ cm²",
+            "2·10⁵ cm²",
+            "2·10⁴ cm²"
+          ],
+          "corretta": "D",
+          "spiegazione": "1 m² = 10⁴ cm², quindi 2 m² = 2·10⁴ cm²."
+        },
+        {
+          "id": "misure_metrologia_v2_024",
+          "difficolta": "difficile",
+          "tipologia": "ragionamento",
+          "testo": "Quale misura è più dettagliata in termini di risoluzione dichiarata?",
+          "alternative": [
+            "2,50 m",
+            "2,5 m",
+            "3 m",
+            "2 m"
+          ],
+          "corretta": "A",
+          "spiegazione": "La cifra dei centesimi di metro specifica una risoluzione più fine."
+        },
+        {
+          "id": "misure_metrologia_v2_025",
+          "difficolta": "difficile",
+          "tipologia": "calcolo",
+          "testo": "Una velocità è 72 km/h. A quanti m/s corrisponde?",
+          "alternative": [
+            "72 m/s",
+            "20 m/s",
+            "36 m/s",
+            "10 m/s"
+          ],
+          "corretta": "B",
+          "spiegazione": "Si divide per 3,6: 72/3,6 = 20 m/s."
+        }
+      ]
     }
   ]
 }
