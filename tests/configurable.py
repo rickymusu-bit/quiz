@@ -34,8 +34,9 @@ with sync_playwright() as p:
   assert page.evaluate('game.s.config.questionCount')==3 and page.evaluate('game.s.queue.length')==2
   page.get_by_role('button',name='Svela e avvia il tempo').click();assert page.get_by_role('button',name='Bonus e inventari',exact=True).count()==0
   page.locator('.answer').nth(page.evaluate('game.s.current.correct')).click();assert page.evaluate('game.s.result.bonuses.length')==5
-  for name in ['Nope','Irpef','Spoiler','Aura','Karma']:expect(page.locator('.solution')).to_contain_text(name)
+  for name in ['Nope','Tasse','Spoiler','Aura','Karma']:expect(page.locator('.solution')).to_contain_text(name)
   expect(page.locator('.answer-feedback')).to_have_count(0)
+  assert page.locator('.multiplier-value').count()==0
   team=page.evaluate('game.s.result.respondent')
   for kind in ['salta','ruba','svela','aura','karma']:assert page.locator(f'.team[data-team="{team}"] [data-bonus="{kind}"]').evaluate('e=>e.getAnimations().length')==1
   page.get_by_role('button',name='Prossima domanda',exact=True).click()
