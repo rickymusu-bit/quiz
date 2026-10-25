@@ -1,0 +1,34 @@
+name: Verifica banche Fool
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'datasets.json'
+      - 'dataset/**'
+      - 'Dataset_*.json'
+      - 'tests/**'
+      - 'Fool.html'
+      - '.github/workflows/verifica-banche.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'datasets.json'
+      - 'dataset/**'
+      - 'Dataset_*.json'
+      - 'tests/**'
+      - 'Fool.html'
+      - '.github/workflows/verifica-banche.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  dataset-and-engine:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Convalida archivi e risposte
+        run: python3 tests/verify_datasets.py
+      - name: Esegui test motore
+        run: node --test tests/engine.test.js
