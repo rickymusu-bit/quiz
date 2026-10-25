@@ -523,7 +523,7 @@
             "20 °C",
             "40 °C",
             "45 °C",
-            "30 °C"
+            "40 °C"
           ],
           "corretta": "D",
           "spiegazione": "Stesso c: T = (3·50 + 1·10)/4 = 40 °C."
@@ -989,10 +989,10 @@
             "Condensazione liquida",
             "Evaporazione",
             "Fusione",
-            "Deposizione solido-gas inversa"
+            "Brinamento"
           ],
           "corretta": "D",
-          "spiegazione": "Il passaggio diretto da vapore a solido è deposizione o brinamento."
+          "spiegazione": "Il passaggio diretto da vapore a solido è brinamento, detto anche deposizione."
         },
         {
           "id": "passaggi_stato_v2_009",
