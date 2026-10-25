@@ -1166,7 +1166,7 @@
             "Resta uguale"
           ],
           "corretta": "D",
-          "spiegazione": "I due fattori si compensano nel prodotto AΔT."
+          "spiegazione": "L'area moltiplica P per 2 e il salto termico per 1/2: 2·(1/2) = 1, quindi P resta uguale."
         }
       ]
     },
