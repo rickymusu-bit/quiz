@@ -713,6 +713,362 @@
           "spiegazione": "Si divide per 3,6: 72/3,6 = 20 m/s."
         }
       ]
+    },
+    {
+      "id": "grafici_piano_cartesiano",
+      "nome": "Grafici e piano cartesiano",
+      "domande": [
+        {
+          "id": "grafici_piano_cartesiano_v2_001",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "In un piano cartesiano, qual è l'asse delle ascisse?",
+          "alternative": [
+            "L'asse verticale y",
+            "La diagonale principale",
+            "L'asse orizzontale x",
+            "Qualunque retta inclinata"
+          ],
+          "corretta": "C",
+          "spiegazione": "Le ascisse sono le coordinate sull'asse x."
+        },
+        {
+          "id": "grafici_piano_cartesiano_v2_002",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Il punto (−2; 3) ha ordinata…",
+          "alternative": [
+            "−2",
+            "−3",
+            "2",
+            "3"
+          ],
+          "corretta": "D",
+          "spiegazione": "L'ordinata è il secondo valore della coppia."
+        },
+        {
+          "id": "grafici_piano_cartesiano_v2_003",
+          "difficolta": "facile",
+          "tipologia": "ragionamento",
+          "testo": "Un punto è sull'asse x. Quale condizione soddisfa?",
+          "alternative": [
+            "L'ordinata vale zero",
+            "L'ascissa è sempre 1",
+            "Entrambe le coordinate sono positive",
+            "L'ordinata vale sempre 1"
+          ],
+          "corretta": "A",
+          "spiegazione": "Tutti i punti sull'asse orizzontale hanno y = 0."
+        },
+        {
+          "id": "grafici_piano_cartesiano_v2_004",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Un grafico altezza-tempo mostra sull'asse orizzontale…",
+          "alternative": [
+            "L'altezza",
+            "Il tempo",
+            "La velocità",
+            "La massa"
+          ],
+          "corretta": "B",
+          "spiegazione": "In un grafico di una grandezza in funzione del tempo, il tempo è sull'asse x."
+        },
+        {
+          "id": "grafici_piano_cartesiano_v2_005",
+          "difficolta": "facile",
+          "tipologia": "ragionamento",
+          "testo": "Una retta orizzontale nel grafico della temperatura in funzione del tempo indica…",
+          "alternative": [
+            "Riscaldamento continuo",
+            "Raffreddamento continuo",
+            "Temperatura costante",
+            "Tempo fermo"
+          ],
+          "corretta": "C",
+          "spiegazione": "L'ordinata non varia con l'ascissa."
+        },
+        {
+          "id": "grafici_piano_cartesiano_v2_006",
+          "difficolta": "facile",
+          "tipologia": "calcolo",
+          "testo": "La relazione è y = 3x. Quanto vale y per x = 2?",
+          "alternative": [
+            "3",
+            "9",
+            "1,5",
+            "6"
+          ],
+          "corretta": "D",
+          "spiegazione": "Sostituendo x = 2 si ottiene y = 6."
+        },
+        {
+          "id": "grafici_piano_cartesiano_v2_007",
+          "difficolta": "facile",
+          "tipologia": "ragionamento",
+          "testo": "Il punto (−1; −4) si trova nel…",
+          "alternative": [
+            "Terzo quadrante",
+            "Primo quadrante",
+            "Secondo quadrante",
+            "Quarto quadrante"
+          ],
+          "corretta": "A",
+          "spiegazione": "Entrambe le coordinate sono negative."
+        },
+        {
+          "id": "grafici_piano_cartesiano_v2_008",
+          "difficolta": "facile",
+          "tipologia": "conoscenza",
+          "testo": "Una proporzionalità diretta y = kx passa sempre…",
+          "alternative": [
+            "Per (1; 1)",
+            "Per l'origine",
+            "Solo nel secondo quadrante",
+            "Per (0; 1)"
+          ],
+          "corretta": "B",
+          "spiegazione": "Con x = 0 si ha sempre y = 0."
+        },
+        {
+          "id": "grafici_piano_cartesiano_v2_009",
+          "difficolta": "media",
+          "tipologia": "calcolo",
+          "testo": "Nel grafico y = x + 5, per x = 3 si ottiene…",
+          "alternative": [
+            "5",
+            "15",
+            "8",
+            "2"
+          ],
+          "corretta": "C",
+          "spiegazione": "3 + 5 = 8."
+        },
+        {
+          "id": "grafici_piano_cartesiano_v2_010",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Una linea cresce andando da sinistra a destra. Che cosa significa?",
+          "alternative": [
+            "x diminuisce sempre",
+            "y resta uguale",
+            "La scala y scompare",
+            "y aumenta al crescere di x"
+          ],
+          "corretta": "D",
+          "spiegazione": "La relazione rappresentata è crescente nell'intervallo."
+        },
+        {
+          "id": "grafici_piano_cartesiano_v2_011",
+          "difficolta": "media",
+          "tipologia": "calcolo",
+          "testo": "Una tabella riporta (1; 4), (2; 8), (3; 12). Il rapporto y/x vale…",
+          "alternative": [
+            "4",
+            "3",
+            "8",
+            "12"
+          ],
+          "corretta": "A",
+          "spiegazione": "Per tutte le coppie y/x = 4."
+        },
+        {
+          "id": "grafici_piano_cartesiano_v2_012",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Il prezzo totale P di libri identici è direttamente proporzionale al numero n. Che cosa accade raddoppiando n?",
+          "alternative": [
+            "P dimezza",
+            "P raddoppia",
+            "P resta uguale",
+            "P quadruplica"
+          ],
+          "corretta": "B",
+          "spiegazione": "Con prezzo unitario costante, P = kn."
+        },
+        {
+          "id": "grafici_piano_cartesiano_v2_013",
+          "difficolta": "media",
+          "tipologia": "calcolo",
+          "testo": "La retta passa per (0; 2) e (2; 6). Quale pendenza ha?",
+          "alternative": [
+            "4",
+            "6",
+            "2",
+            "1"
+          ],
+          "corretta": "C",
+          "spiegazione": "La pendenza è (6 − 2)/(2 − 0) = 2."
+        },
+        {
+          "id": "grafici_piano_cartesiano_v2_014",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Un grafico distanza-tempo è orizzontale per dieci secondi. Che cosa indica?",
+          "alternative": [
+            "Distanza che cresce",
+            "Distanza che dimezza",
+            "Accelerazione costante",
+            "Distanza invariata dall'origine"
+          ],
+          "corretta": "D",
+          "spiegazione": "L'ordinata distanza resta costante nell'intervallo."
+        },
+        {
+          "id": "grafici_piano_cartesiano_v2_015",
+          "difficolta": "media",
+          "tipologia": "conoscenza",
+          "testo": "Quale proprietà descrive una retta con pendenza negativa?",
+          "alternative": [
+            "y diminuisce quando x aumenta",
+            "y aumenta con x",
+            "y è sempre positiva",
+            "x non cambia mai"
+          ],
+          "corretta": "A",
+          "spiegazione": "Una pendenza negativa indica un andamento decrescente."
+        },
+        {
+          "id": "grafici_piano_cartesiano_v2_016",
+          "difficolta": "media",
+          "tipologia": "calcolo",
+          "testo": "Per y = 2x + 1, quale punto appartiene alla retta?",
+          "alternative": [
+            "(1; 2)",
+            "(2; 5)",
+            "(3; 5)",
+            "(0; 2)"
+          ],
+          "corretta": "B",
+          "spiegazione": "Con x = 2 si ottiene y = 5."
+        },
+        {
+          "id": "grafici_piano_cartesiano_v2_017",
+          "difficolta": "media",
+          "tipologia": "ragionamento",
+          "testo": "Se y è inversamente proporzionale a x e x triplica, come cambia y?",
+          "alternative": [
+            "Triplica",
+            "Diventa nove volte maggiore",
+            "Diventa un terzo",
+            "Resta uguale"
+          ],
+          "corretta": "C",
+          "spiegazione": "In y = k/x il prodotto xy rimane costante."
+        },
+        {
+          "id": "grafici_piano_cartesiano_v2_018",
+          "difficolta": "media",
+          "tipologia": "calcolo",
+          "testo": "Due punti sono (1; 3) e (4; 9). Quale differenza delle ordinate si osserva?",
+          "alternative": [
+            "3",
+            "4",
+            "9",
+            "6"
+          ],
+          "corretta": "D",
+          "spiegazione": "La differenza 9 − 3 è 6."
+        },
+        {
+          "id": "grafici_piano_cartesiano_v2_019",
+          "difficolta": "difficile",
+          "tipologia": "ragionamento",
+          "testo": "Un grafico sperimentale è quasi una retta passante per l'origine, ma i punti sono leggermente dispersi. Quale interpretazione è prudente?",
+          "alternative": [
+            "I dati sono compatibili con proporzionalità diretta entro le incertezze",
+            "La legge è certamente esatta",
+            "I dati non contengono alcuna informazione",
+            "Deve esserci proporzionalità inversa"
+          ],
+          "corretta": "A",
+          "spiegazione": "Piccole deviazioni sperimentali non escludono una relazione approssimativamente lineare."
+        },
+        {
+          "id": "grafici_piano_cartesiano_v2_020",
+          "difficolta": "difficile",
+          "tipologia": "calcolo",
+          "testo": "Una grandezza segue y = 12/x. Quanto vale y per x = 4?",
+          "alternative": [
+            "48",
+            "3",
+            "8",
+            "16"
+          ],
+          "corretta": "B",
+          "spiegazione": "12/4 = 3."
+        },
+        {
+          "id": "grafici_piano_cartesiano_v2_021",
+          "difficolta": "difficile",
+          "tipologia": "ragionamento",
+          "testo": "Due serie di dati hanno grafici con stessa pendenza ma ordinata iniziale diversa. Quale caratteristica condividono?",
+          "alternative": [
+            "Lo stesso valore iniziale",
+            "Gli stessi punti",
+            "La stessa variazione di y per unità di x",
+            "La stessa intersezione con y"
+          ],
+          "corretta": "C",
+          "spiegazione": "La pendenza determina la variazione di y rispetto a x."
+        },
+        {
+          "id": "grafici_piano_cartesiano_v2_022",
+          "difficolta": "difficile",
+          "tipologia": "calcolo",
+          "testo": "La retta passa per (1; 2) e (3; 10). Quale pendenza ha?",
+          "alternative": [
+            "8",
+            "2",
+            "5",
+            "4"
+          ],
+          "corretta": "D",
+          "spiegazione": "La pendenza è (10 − 2)/(3 − 1) = 4."
+        },
+        {
+          "id": "grafici_piano_cartesiano_v2_023",
+          "difficolta": "difficile",
+          "tipologia": "ragionamento",
+          "testo": "Una curva passa per (1; 12), (2; 6), (3; 4). Quale legge semplice è compatibile?",
+          "alternative": [
+            "y = 12/x",
+            "y = 12x",
+            "y = x + 11",
+            "y = 12 costante"
+          ],
+          "corretta": "A",
+          "spiegazione": "Il prodotto xy vale 12 in tutte le coppie."
+        },
+        {
+          "id": "grafici_piano_cartesiano_v2_024",
+          "difficolta": "difficile",
+          "tipologia": "calcolo",
+          "testo": "Il costo C di quaderni segue C = 2n + 3 euro, con n numero di quaderni. Quanto costa acquistarne 4?",
+          "alternative": [
+            "8 €",
+            "11 €",
+            "9 €",
+            "12 €"
+          ],
+          "corretta": "B",
+          "spiegazione": "C = 2·4 + 3 = 11 €."
+        },
+        {
+          "id": "grafici_piano_cartesiano_v2_025",
+          "difficolta": "difficile",
+          "tipologia": "ragionamento",
+          "testo": "La grandezza y cresce da 4 a 10 quando x cresce da 1 a 3. Qual è la variazione media Δy/Δx?",
+          "alternative": [
+            "6",
+            "2",
+            "3",
+            "9"
+          ],
+          "corretta": "C",
+          "spiegazione": "La variazione media è (10 − 4)/(3 − 1) = 3."
+        }
+      ]
     }
   ]
 }
