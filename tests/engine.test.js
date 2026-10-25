@@ -3,7 +3,10 @@ const {test}=require('node:test'),assert=require('node:assert/strict'),fs=requir
 const root=path.join(__dirname,'..'),html=fs.readFileSync(path.join(root,'Fool.html'),'utf8'),scripts=[...html.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)],script=scripts[1][1];
 const engine=script.slice(0,script.indexOf("\n'use strict';\nconst F=Fool"));assert(engine.length>10000,'Engine boundary missing');
 const context={module:{exports:{}},TextEncoder,performance};vm.runInNewContext(engine,context);const F=context.module.exports;
-const bank=F.parseDataset(fs.readFileSync(path.join(root,'Dataset_termologia_100_domande_v1_20261021.json'),'utf8')).bank,copy=x=>JSON.parse(JSON.stringify(x));
+const catalogue=JSON.parse(fs.readFileSync(path.join(root,'datasets.json'),'utf8'));
+const thermal=catalogue.banche.find(x=>x.id==='termologia');
+assert(thermal,'Termologia missing from dataset catalogue');
+const bank=F.parseDataset(fs.readFileSync(path.join(root,thermal.url),'utf8')).bank,copy=x=>JSON.parse(JSON.stringify(x));
 function settings(total=33,weights=30){const topics=[...new Set(bank.map(q=>q.topic))];return {names:['A','B','C'],seconds:45,bases:{facile:100,media:200,difficile:300},difficulty:'misto',questionCount:total,bonusWeights:Object.fromEntries(F.TYPES.map(t=>[t,weights])),quotas:Object.fromEntries(topics.map((t,i)=>[t,Math.floor(total/topics.length)+(i<total%topics.length?1:0)]))}}
 function game(total=33,weights=30){return F.Game.start(F.prepare(bank,settings(total,weights),()=>.25),{random:()=>.25,now:()=>100})}
 function win(g){g.reveal();g.answer(g.s.current.correct)}
