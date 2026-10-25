@@ -220,15 +220,15 @@
           "id": "metodo_scientifico_v2_016",
           "difficolta": "media",
           "tipologia": "calcolo",
-          "testo": "Quattro prove durano 6 s, 8 s, 7 s e 7 s. Qual è la durata media?",
+          "testo": "In quattro prove i tempi sono 6 s, 8 s, 7 s e 7 s. Quale percentuale dura 7 s?",
           "alternative": [
-            "6 s",
-            "8 s",
-            "28 s",
-            "7 s"
+            "25%",
+            "75%",
+            "100%",
+            "50%"
           ],
           "corretta": "D",
-          "spiegazione": "La somma è 28 s; dividendo per quattro si ottengono 7 s."
+          "spiegazione": "Due prove su quattro durano 7 s, quindi 2/4 = 50%."
         },
         {
           "id": "metodo_scientifico_v2_017",
@@ -1016,15 +1016,15 @@
           "id": "grafici_piano_cartesiano_v2_022",
           "difficolta": "difficile",
           "tipologia": "calcolo",
-          "testo": "La retta passa per (1; 2) e (3; 10). Quale pendenza ha?",
+          "testo": "Una retta di pendenza 3 passa per (2; 8). Quanto vale y quando x = 0?",
           "alternative": [
-            "8",
-            "2",
+            "6",
             "5",
-            "4"
+            "3",
+            "2"
           ],
           "corretta": "D",
-          "spiegazione": "La pendenza è (10 − 2)/(3 − 1) = 4."
+          "spiegazione": "Nella relazione y = 3x + b, passando per (2; 8) si ha 8 = 6 + b: b = 2."
         },
         {
           "id": "grafici_piano_cartesiano_v2_023",
@@ -1260,7 +1260,7 @@
           "id": "strumenti_errori_incertezza_v2_014",
           "difficolta": "media",
           "tipologia": "calcolo",
-          "testo": "Quattro misure sono 3 s, 5 s, 4 s e 4 s. Qual è la media?",
+          "testo": "Quattro misure sono 3 s, 5 s, 4 s e 4 s. Qual è la mediana?",
           "alternative": [
             "4 s",
             "5 s",
@@ -1268,7 +1268,7 @@
             "16 s"
           ],
           "corretta": "A",
-          "spiegazione": "La somma 16 s divisa per quattro dà 4 s."
+          "spiegazione": "Ordinando 3, 4, 4, 5 s, i due valori centrali sono entrambi 4 s."
         },
         {
           "id": "strumenti_errori_incertezza_v2_015",
@@ -1414,7 +1414,7 @@
           "id": "strumenti_errori_incertezza_v2_025",
           "difficolta": "difficile",
           "tipologia": "ragionamento",
-          "testo": "Misure ripetute passano da 5,0 a 5,2 cm ma lo strumento è graduato in centimetri. Quale problema emerge?",
+          "testo": "Un display digitale indica soltanto centimetri interi, ma una misura viene riportata come 5,20 cm. Quale problema emerge?",
           "alternative": [
             "I dati sono necessariamente perfetti",
             "La misura è sempre impossibile",
@@ -1422,7 +1422,7 @@
             "Si dichiarano dettagli non giustificati dalla scala"
           ],
           "corretta": "D",
-          "spiegazione": "La lettura riportata deve essere coerente con le divisioni e le capacità dello strumento."
+          "spiegazione": "Le cifre ai decimi e ai centesimi non sono giustificate dalla risoluzione del display."
         }
       ]
     }
