@@ -19,7 +19,7 @@ test('Six unique junkpunk vehicles and backward-compatible legacy games',()=>{
  assert.throws(()=>F.config({...cfg,vehicles:['ape','ape','truck']}),/tre veicoli diversi/);
  assert.throws(()=>F.config({...cfg,vehicles:['motorcross','chopper','truck']}),/tre veicoli diversi/);
  assert.equal(F.config(cfg).vehicles,undefined);
- assert.match(html,/assets\\/hell-race\\/vehicles\\.webp/);
+ assert.match(html,/assets\/hell-race\/vehicles\.webp/);
  assert.match(html,/vehicle-chooser/);
 });
 
