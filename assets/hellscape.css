@@ -17,7 +17,7 @@ main.operational .team{background:#120e0bd6;border:1px solid #bd835c;box-shadow:
 main.operational .team h3{font:28px/1.05 FoolTerminal,monospace;margin:0 0 10px;color:#ffe0a5}.team-label{font-size:14px}
 main.operational .team strong{font:34px/1 FoolTerminal,monospace;color:#ffcc76}.team-info{font-size:14px}.bonus-list{margin:10px 0 0;padding:0;list-style:none}.ammo-rounds{flex-wrap:wrap}
 #viewport-stage main.operational>.statusline{position:absolute;left:300px;right:18px;top:18px;min-height:38px;display:flex;justify-content:space-between;align-items:center;background:#130d0bd6;border:1px solid #906346;padding:6px 12px;font-size:14px;z-index:2}.statusline .timer{font:26px/1 FoolTerminal,monospace}
-#viewport-stage main.operational>.operation-body{position:absolute;top:68px;left:300px;right:18px;max-height:440px;min-height:0;display:block;padding:18px;background:#130d0bd6;border:1px solid #bd835c;box-shadow:4px 4px #08040380;backdrop-filter:blur(2px);overflow:auto;z-index:2;text-align:left}
+#viewport-stage main.operational>.operation-body{position:absolute;top:68px;left:300px;right:18px;max-height:620px;min-height:0;display:block;padding:18px;background:#130d0bd6;border:1px solid #bd835c;box-shadow:4px 4px #08040380;backdrop-filter:blur(2px);overflow:auto;z-index:2;text-align:left}
 #viewport-stage .operation-body.hidden-question{min-height:0;align-content:initial;text-align:left}
 #viewport-stage .operation-body .question{font-size:21px;line-height:1.28;margin:6px 0 14px}#viewport-stage .operation-body h2{font-size:34px}#viewport-stage .operation-body .question-points{font-size:23px;margin:0 0 8px}
 #viewport-stage .operation-body .answers{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0}
@@ -32,4 +32,13 @@ main.operational .team strong{font:34px/1 FoolTerminal,monospace;color:#ffcc76}.
 dialog .scoreboard{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}dialog .team{background:#1b1714;padding:12px}dialog{overscroll-behavior:contain}dialog button{min-height:44px}
 /* Keep the question and all four alternatives above the explanation. */
 #viewport-stage .operation-body .solution{max-height:none;overflow:visible;margin:12px 0 10px}
-#viewport-stage .operation-body>[data-game-action=next]{position:sticky;bottom:0;min-height:46px}
+#viewport-stage .operation-body>[data-game-action=next]{position:static;min-height:46px}
+
+/* Opaque feedback colors remain vivid when answer controls are disabled. */
+#viewport-stage .operation-body .answer:disabled{opacity:1}
+#viewport-stage .operation-body .answer.correct{background:#ffe044;border-color:#fff3a0 #c6a018 #a78308 #fff3a0;color:#241a00;text-shadow:none}
+#viewport-stage .operation-body .answer.selected:not(.correct){background:#b51f36;border-color:#ff6981 #700b1b #570615 #ff6981;color:#fff;text-shadow:none}
+#viewport-stage .operation-body .answer.correct .letter{color:#241a00}
+#viewport-stage .operation-body .answer.selected:not(.correct) .letter{color:#fff}
+#viewport-stage .operation-body:has(.solution){padding:16px}
+#viewport-stage .operation-body .solution p{margin:8px 0}
