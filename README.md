@@ -2,7 +2,7 @@
 
 Sito: https://rickymusu-bit.github.io/quiz/
 
-**Applicazione 2.2.1 · Motore 2.2.1 · Regolamento 19.2.0 · 26/10/2026**
+**Applicazione 2.3.0 · Motore 2.2.1 · Regolamento 19.2.0 · 26/10/2026**
 
 Fool è un quiz di fisica per tre giocatori, pubblicato su GitHub Pages dal ramo `main`. Il gioco carica automaticamente i quesiti dal catalogo `datasets.json`. Le domande appartengono a banche separate, associate a materie e argomenti; non è richiesto un server applicativo.
 
@@ -19,6 +19,14 @@ Alla fine delle domande previste **vince il giocatore attivo con più punti**. S
 Lo spareggio si apre **solo in caso di parità al primo posto dopo tutte le domande della partita ordinaria**. I giocatori in testa rispondono una domanda ciascuno nell'ordine di rotazione originario. Ogni risposta errata o tempo scaduto elimina il giocatore. Il giro termina **solo dopo che tutti i giocatori ancora presenti nel giro hanno risposto**, anche quando il primo viene eliminato. Alla fine del giro, un solo superstite vince; nessun superstite produce Game Over; più superstiti iniziano un nuovo giro.
 
 Le domande dello spareggio sono estratte fra **tutte quelle nuove del dataset**, senza vincoli di difficoltà, mantenendo il tempo della partita. Non si ripetono quesiti già mostrati; se la banca non basta, la partita attende l'aggiunta di nuovi quesiti. Durante lo spareggio il tabellone segnala che i punteggi sono congelati; non si assegnano punti né Ammo e l'esito dipende esclusivamente da risposte corrette o eliminazioni; si disattivano tutti gli effetti delle Ammo della fase ordinaria. Sanzioni, timer e sospensione restano disponibili.
+
+## Fuga dall'Inferno — scena animata v1.0.0
+
+Durante il quiz compare sotto le alternative (e prima della domanda svelata) una corsa in pixel art: tre piloti su veicoli steampunk attraversano un paesaggio di lava inseguiti da un demone. Lo sfondo scorre autonomamente; quando i punti cambiano, i veicoli avanzano e possono superarsi. Le posizioni sono una rappresentazione visiva dei punteggi esatti, anche razionali dopo Marx, **non un punteggio parallelo**. I giocatori eliminati perdono terreno.
+
+La porta dell'Inferno compare verso il completamento delle domande impostate (33 per impostazione predefinita). Durante lo spareggio i punti restano congelati e la porta rimane vicina. La schermata finale mostra il vincitore che fugge mentre il demone cattura gli altri; con Game Over senza superstiti, li cattura tutti. I finali anticipati per eliminazione funzionano senza attendere l'ultima domanda.
+
+Il modulo \`assets/hell-race.js\` è un Canvas pixel-art senza dipendenze, privo di influenza sulle regole, sul timer e sui salvataggi. La grafica si interrompe quando la pagina non è visibile e rispetta la preferenza di sistema per la riduzione del movimento. L'indicazione testuale accessibile integra le figure.
 
 ## Interfaccia e salvataggi
 
