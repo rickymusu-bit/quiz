@@ -12,6 +12,17 @@ function game(total=33,weights=30,difficulty='misto',custom){return F.Game.start
 function reply(g,correct){g.reveal();g.answer(correct?g.s.current.correct:(g.s.current.correct+1)%4)}
 function finishOrdinary(g,correct=false){const n=g.s.config.questionCount;for(let i=0;i<n;i++){reply(g,correct);if(i<n-1)g.next()}}
 test('Rules and names: Bullo, Marx and no multiplier',()=>{assert.equal(F.RULES,'19.2.0');assert.equal(F.LABELS.ruba,'Bullo');assert.equal(F.LABELS.marx,'Marx');assert.equal(F.TYPES.length,6);assert.equal(F.VERSION,'2.2.1')});
+test('Six unique junkpunk vehicles and backward-compatible legacy games',()=>{
+ const cfg=settings();
+ const selected=['ape','chopper','truck'];
+ assert.deepEqual(Array.from(F.config({...cfg,vehicles:selected}).vehicles),selected);
+ assert.throws(()=>F.config({...cfg,vehicles:['ape','ape','truck']}),/tre veicoli diversi/);
+ assert.throws(()=>F.config({...cfg,vehicles:['motorcross','chopper','truck']}),/tre veicoli diversi/);
+ assert.equal(F.config(cfg).vehicles,undefined);
+ assert.match(html,/assets\\/hell-race\\/vehicles\\.webp/);
+ assert.match(html,/vehicle-chooser/);
+});
+
 test('Default settings keep 33 questions and Marx at 15 percent',()=>{
  const cfg=settings();delete cfg.questionCount;delete cfg.bonusWeights.marx;
  const validated=F.config(cfg);assert.equal(validated.questionCount,33);
