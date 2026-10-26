@@ -16,18 +16,18 @@ with sync_playwright() as p:
  for full,w,h in [(False,1440,900),(True,844,390)]:
   page=browser.new_page(viewport={'width':w,'height':h});page.on('pageerror',lambda e:errors.append(str(e)));page.goto(base)
   if full:page.get_by_role('button',name='Schermo intero',exact=True).click();page.wait_for_function('!!document.fullscreenElement')
-  page.get_by_role('link',name='Start',exact=True).click();v=page.frame_locator('#play-frame') if full else page
+  page.get_by_role('link',name='Nuova partita',exact=True).click();v=page.frame_locator('#play-frame') if full else page
   expect(v.get_by_role('button',name='Inizia partita')).to_be_enabled();v.get_by_role('button',name='Inizia partita').click();frame=next(f for f in page.frames if 'Fool.html' in f.url)
   def fits():
    frame.evaluate('fitFoolViewport()');assert frame.evaluate('document.documentElement.scrollHeight<=innerHeight+1 && document.documentElement.scrollWidth<=innerWidth+1')
   def option(name):
    if v.locator('.game-options').get_attribute('open') is None:v.locator('.game-options summary').click()
    return v.get_by_role('button',name=name,exact=True)
+  expect(v.get_by_role('button',name='Riassegna punti',exact=True)).not_to_be_visible()
   assert option('Esci da schermo intero' if full else 'Schermo intero').is_visible()
   fits();page.screenshot(path=f'/tmp/options-hidden-{w}.png');a=v.locator('.question-actions .bonus-action').bounding_box();b=v.locator('.question-actions [data-game-action=reveal]').bounding_box();assert abs(a['y']-b['y'])<2
-  assert v.get_by_role('button',name='Bonus e inventari',exact=True).count()==1
-  expect(v.get_by_role('button',name='Riassegna punti',exact=True)).not_to_be_visible()
-  q=frame.evaluate('game.s.current.id');v.get_by_role('button',name='Bonus e inventari',exact=True).click();v.get_by_role('button',name='Chiudi',exact=True).click()
+  assert v.get_by_role('button',name='Inventario Ammo',exact=True).count()==1
+  q=frame.evaluate('game.s.current.id');v.get_by_role('button',name='Inventario Ammo',exact=True).click();v.get_by_role('button',name='Chiudi',exact=True).click()
   original=frame.evaluate('JSON.stringify({valid:game.s.valid,groups:game.s.groups.map(g=>({inventory:g.inventory,sanctions:g.sanctions}))})')
   option('Riassegna punti').click();v.locator('#score-team').select_option('0')
   assert v.locator('#score-reason,#score-operation').count()==0

@@ -16,7 +16,7 @@ with sync_playwright() as p:
  for fullscreen,bank,w,h in [(False,'termologia',1440,900),(True,'introduzione-fisica-misura',844,390)]:
   page=browser.new_page(viewport={'width':w,'height':h});page.on('pageerror',lambda e:errors.append(str(e)));page.goto(base)
   if fullscreen:page.get_by_role('button',name='Schermo intero',exact=True).click();page.wait_for_function('!!document.fullscreenElement')
-  page.get_by_role('link',name='Start',exact=True).click();view=page.frame_locator('#play-frame') if fullscreen else page
+  page.get_by_role('link',name='Nuova partita',exact=True).click();view=page.frame_locator('#play-frame') if fullscreen else page
   expect(view.get_by_role('button',name='Inizia partita')).to_be_enabled();view.locator('#bank-choice').select_option(bank);expect(view.get_by_role('button',name='Inizia partita')).to_be_enabled()
   view.locator('#name0').fill('Gruppo A');view.locator('#name0').press('a');expect(view.locator('#name0')).to_have_value('Gruppo Aa')
   view.get_by_role('button',name='Inizia partita').click();frame=next(f for f in page.frames if 'Fool.html' in f.url)

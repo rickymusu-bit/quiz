@@ -37,7 +37,8 @@ h1{width:100%;margin:0;line-height:0}
 <h1><img class="home-logo" src="assets/fool-logo.png" alt="Fool" width="2171" height="724" fetchpriority="high"></h1>
 <p class="subtitle">Solo uno sciocco pensa di vincere</p>
 <nav class="menu" aria-label="Menu principale">
-<a href="Fool.html?start=1">Start</a>
+<a href="Fool.html?start=1">Nuova partita</a>
+<a id="resume-game" href="Fool.html?resume=1" hidden>Riprendi partita</a>
 <a href="Fool_regole.html">Regole</a>
 <a href="Fool.html?settings=1">Impostazioni</a>
 <button id="home-fullscreen" type="button">Schermo intero</button>
@@ -47,10 +48,19 @@ h1{width:100%;margin:0;line-height:0}
 </main></div>
 <script>
 const fullscreenButton=document.getElementById('home-fullscreen'),fullscreenStatus=document.getElementById('fullscreen-status');
+function updateResumeLink(){
+ let available=false;
+ try{const saved=JSON.parse(localStorage.getItem('fool-v1'));available=!!saved&&['ordinaria','pareggio'].includes(saved.phase)&&Array.isArray(saved.groups)&&saved.groups.length===3}catch(error){}
+ document.getElementById('resume-game').hidden=!available;
+ window.fitFoolViewport?.();
+}
+updateResumeLink();
+window.addEventListener('pageshow',updateResumeLink);
+window.addEventListener('storage',updateResumeLink);
 window.foolToggleFullscreen=async()=>{try{if(document.fullscreenElement){await document.exitFullscreen()}else if(document.documentElement.requestFullscreen){await document.documentElement.requestFullscreen()}else throw Error('Lo schermo intero non è disponibile in questo browser.')}catch(error){fullscreenStatus.textContent='Il browser non consente lo schermo intero. Puoi continuare in questa finestra.';fullscreenStatus.hidden=false}};
 fullscreenButton.onclick=window.foolToggleFullscreen;
 document.addEventListener('fullscreenchange',()=>{fullscreenButton.textContent=document.fullscreenElement?'Esci da schermo intero':'Schermo intero'});
-window.foolReturnHome=()=>{document.getElementById('play-frame')?.remove();document.getElementById('viewport-stage').hidden=false;window.fitFoolViewport?.()};
+window.foolReturnHome=()=>{document.getElementById('play-frame')?.remove();document.getElementById('viewport-stage').hidden=false;updateResumeLink()};
 for(const link of document.querySelectorAll('.menu a'))link.addEventListener('click',event=>{if(!document.fullscreenElement)return;event.preventDefault();const frame=document.createElement('iframe');frame.id='play-frame';frame.title=link.textContent==='Regole'?'Regole di Fool':'Fool';frame.allow='fullscreen';frame.src=link.href;document.getElementById('viewport-stage').hidden=true;document.body.append(frame)});
 try{if(window.parent!==window&&window.parent.location.origin===location.origin&&window.parent.foolReturnHome)window.parent.foolReturnHome()}catch(error){}
 </script>
