@@ -10,7 +10,7 @@ function settings(total=33,weights=30,difficulty='misto'){const topics=[...new S
 function game(total=33,weights=30,difficulty='misto',custom){return F.Game.start(F.prepare(bank,custom||settings(total,weights,difficulty),()=>.25),{random:()=>.25,now:()=>100})}
 function reply(g,correct){g.reveal();g.answer(correct?g.s.current.correct:(g.s.current.correct+1)%4)}
 function finishOrdinary(g,correct=false){const n=g.s.config.questionCount;for(let i=0;i<n;i++){reply(g,correct);if(i<n-1)g.next()}}
-test('Rules and names: Bullo, Marx and no multiplier',()=>{assert.equal(F.RULES,'19.2.0');assert.equal(F.LABELS.ruba,'Bullo');assert.equal(F.LABELS.marx,'Marx');assert.equal(F.TYPES.length,6);assert.equal(F.VERSION,'2.2.1')});
+test('Rules and names: Bullo, Marx and no multiplier',()=>{assert.equal(F.RULES,'19.2.0');assert.equal(F.LABELS.ruba,'Bullo');assert.equal(F.LABELS.marx,'Marx');assert.equal(F.TYPES.length,6);assert.equal(F.VERSION,'2.3.0')});
 test('Default settings keep 33 questions and Marx at 15 percent',()=>{
  const cfg=settings();delete cfg.questionCount;delete cfg.bonusWeights.marx;
  const validated=F.config(cfg);assert.equal(validated.questionCount,33);
@@ -49,7 +49,30 @@ test('2.2.0 ordinary saved games restore without resetting their progress',()=>{
  const g=game(33,0);reply(g,true);const saved=g.snapshot();
  saved.version='2.2.0';saved.rules='19.2.0';
  const resumed=F.Game.restore(saved);assert.equal(resumed.s.phase,'ordinaria');
- assert.equal(resumed.s.config.questionCount,33);assert.equal(resumed.s.valid,1);assert.equal(resumed.s.version,'2.2.1');
+ assert.equal(resumed.s.config.questionCount,33);assert.equal(resumed.s.valid,1);assert.equal(resumed.s.version,'2.3.0');
+});
+test('Home resumes only an unfinished saved game and exposes both actions',()=>{
+ const home=fs.readFileSync(path.join(root,'index.html'),'utf8');
+ assert.match(home,/<a id="new-game-link" href="Fool.html\\?start=1">Nuova partita<\\/a>/);
+ assert.match(home,/<a id="resume-game-link" href="Fool.html\\?resume=1" hidden>Riprendi partita<\\/a>/);
+ const a=home.indexOf('function homeResumeAvailable(){'),b=home.indexOf('function refreshResumeLink()',a);
+ assert(a>=0&&b>a);
+ const source=home.slice(a,b)+';homeResumeAvailable()';
+ const run=raw=>vm.runInNewContext(source,{localStorage:{getItem:()=>raw}});
+ const saved={format:1,phase:'ordinaria',groups:[{},{},{}],config:{questionCount:33}};
+ assert.equal(run(null),false);
+ assert.equal(run('invalid json'),false);
+ assert.equal(run(JSON.stringify(saved)),true);
+ assert.equal(run(JSON.stringify({...saved,phase:'pareggio'})),true);
+ assert.equal(run(JSON.stringify({...saved,phase:'conclusa'})),false);
+});
+test('Saved 2.2.1 games resume in 2.3.0 without altering turn and score',()=>{
+ const g=game(33,0);reply(g,true);const before=g.s.groups.map(x=>F.exact(x.score)).join(',');
+ const legacy=g.snapshot();legacy.version='2.2.1';legacy.rules='19.2.0';
+ const resumed=F.Game.restore(legacy);
+ assert.equal(resumed.s.version,'2.3.0');
+ assert.equal(resumed.s.valid,1);assert.equal(resumed.s.phase,'ordinaria');
+ assert.equal(resumed.s.groups.map(x=>F.exact(x.score)).join(','),before);
 });
 test('3–99 questions: multiples of 3, unique, exact topic quotas',()=>{for(let n=3;n<=99;n+=3){const p=F.prepare(bank,settings(n));assert.equal(p.chosen.length,n);assert.equal(new Set(p.chosen.map(q=>q.id)).size,n);for(const [t,c]of Object.entries(p.config.quotas))assert.equal(p.chosen.filter(q=>q.topic===t).length,c)}});
 test('Invalid counts and probabilities are rejected',()=>{for(const n of [0,1,4,100,102,3.5])assert.throws(()=>F.prepare(bank,settings(n)));for(const v of [-1,101,NaN,'30']){const cfg=settings();cfg.bonusWeights.aura=v;assert.throws(()=>F.prepare(bank,cfg))}});
