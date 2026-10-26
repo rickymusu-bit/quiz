@@ -1,4 +1,4 @@
-"""Catch malformed embedded scripts before verifying the real homepage Start flow."""
+"""Verify New Game and conditional direct Resume through homepage, including fullscreen."""
 from pathlib import Path
 from http.server import ThreadingHTTPServer,SimpleHTTPRequestHandler
 from functools import partial
@@ -22,7 +22,9 @@ with sync_playwright() as p:
    page.goto(base)
    if fullscreen:
     page.get_by_role('button',name='Schermo intero',exact=True).click();page.wait_for_function('!!document.fullscreenElement')
-   page.get_by_role('link',name='Start',exact=True).click()
+   expect(page.get_by_role('link',name='Nuova partita',exact=True)).to_be_visible()
+   expect(page.locator('#resume-game-link')).to_be_hidden()
+   page.get_by_role('link',name='Nuova partita',exact=True).click()
    view=page.frame_locator('#play-frame') if fullscreen else page
    expect(view.get_by_role('heading',name='Prepara Fool')).to_be_visible()
    expect(view.get_by_role('button',name='Inizia partita')).to_be_enabled()
@@ -33,9 +35,19 @@ with sync_playwright() as p:
    view.get_by_role('button',name='Svela e avvia il tempo').click();view.locator('.answer').nth(frame.evaluate('game.s.current.correct')).click()
    assert frame.evaluate('game.s.valid')==1
    question=frame.evaluate('game.s.current.id')
-   frame.goto(frame.url);view.get_by_role('button',name='Riprendi partita',exact=True).click()
+   page.goto(base)
+   expect(page.locator('#resume-game-link')).to_be_visible()
+   if fullscreen:
+    page.get_by_role('button',name='Schermo intero',exact=True).click();page.wait_for_function('!!document.fullscreenElement')
+   page.get_by_role('link',name='Riprendi partita',exact=True).click()
+   view=page.frame_locator('#play-frame') if fullscreen else page
+   frame=next(f for f in page.frames if 'Fool.html' in f.url)
+   assert frame.evaluate('game.s.phase')=='ordinaria'
    assert frame.evaluate('game.s.current.id')==question
    view.get_by_role('button',name='Prossima domanda',exact=True).click();expect(view.get_by_role('button',name='Svela e avvia il tempo')).to_be_visible()
+   frame.evaluate('()=>{game.complete(null);changed()}')
+   page.goto(base)
+   expect(page.locator('#resume-game-link')).to_be_hidden()
    checks.append({'fullscreen':fullscreen,'bank':bank});page.close()
  assert not errors,errors
  browser.close();print(json.dumps({'start_answer_resume':checks,'errors':errors}))
