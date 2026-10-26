@@ -30,7 +30,6 @@ main.operational .team strong{font:34px/1 FoolTerminal,monospace;color:#ffcc76}.
 #viewport-stage main.showing-movement>.operation-body{visibility:hidden;pointer-events:none}main.showing-movement>.statusline{visibility:hidden}.movement-cue{position:absolute;top:30%;left:30%;right:5%;text-align:center;font:46px/1 FoolTerminal,monospace;color:#ffe0a5;text-shadow:3px 3px #000;pointer-events:none}
 #viewport-stage main.final-screen .ending{height:100%;position:relative;isolation:isolate;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:20px;background:none}#viewport-stage .ending .final-answer{max-width:800px;background:#130d0bd9;padding:12px;font-size:16px}#viewport-stage .ending .game-options{background:#130d0be8;padding:6px}.ending .final-title{margin:0}.ending .end-wordmark{max-height:110px}
 dialog .scoreboard{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}dialog .team{background:#1b1714;padding:12px}dialog{overscroll-behavior:contain}dialog button{min-height:44px}
-/* The correction replaces the question, leaving the chase visible. */
-#viewport-stage .operation-body:has(.solution)>.question,#viewport-stage .operation-body:has(.solution)>.answers,#viewport-stage .operation-body:has(.solution)>.question-points{display:none}
-#viewport-stage .operation-body .solution{max-height:330px;overflow:auto;margin:0 0 10px}
+/* Keep the question and all four alternatives above the explanation. */
+#viewport-stage .operation-body .solution{max-height:none;overflow:visible;margin:12px 0 10px}
 #viewport-stage .operation-body>[data-game-action=next]{position:sticky;bottom:0;min-height:46px}
