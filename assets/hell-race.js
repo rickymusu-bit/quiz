@@ -187,7 +187,7 @@
     state.groups.forEach((group, i) => {
       const ratio = scoreRatio(state.groups, i);
       const dest = W * (.36 + .22 * ratio) + 12 * progress;
-      const start = previous?.[i] ?? dest;
+      const start = previous ? W * (.36 + .22 * previous[i]) + 12 * progress : dest;
       let x = start + (dest - start) * smooth(sec / .9);
       let unit = 2;
       let visible = true;
@@ -237,7 +237,7 @@
     ctx.imageSmoothingEnabled = false;
     const next = state.groups.map((g, i) => scoreRatio(state.groups, i));
     const old = last?.key === state.id && !final ? last.x : null;
-    const previous = old?.map(v => canvas.width * (.36 + .22 * v) + 12 * (state.phase === 'pareggio' ? 1 : clamp(state.valid / (state.config.questionCount || 33), 0, 1)));
+    const previous = old;
     last = { key: state.id, x: next };
     const record = { frame: 0, canvas };
     live = record;
