@@ -61,3 +61,6 @@ dialog .scoreboard{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));ga
 .time-vial[data-paused=true] .vial-liquid{animation-play-state:paused}
 @keyframes vial-drift{to{background-position:49px 0,0 0}}
 @media(prefers-reduced-motion:reduce){.vial-liquid{animation:none;transition:none}}
+
+/* The selected vehicle replaces the former player emblem. */
+.team-symbol.team-vehicle{inset:auto 8px 8px auto;width:216px;height:132px;display:block;border:0;background-color:transparent;filter:grayscale(1);opacity:.27;pointer-events:none}
