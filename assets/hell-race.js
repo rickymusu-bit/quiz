@@ -1,22 +1,56 @@
-/* Fool — Fuga dall'Inferno v1.1.0 (2026-10-26): scena pixel-art illustrativa.
+/* Fool — Fuga dall'Inferno v1.2.0 (2026-10-26): scena pixel-art illustrativa.
    Nessuna modifica al motore, ai punteggi o ai salvataggi. */
 (function (root) {
   'use strict';
   const H = 384, lanes = [220, 280, 340];
   const colors = ['#d6ad75', '#be7554', '#b4a08c'];
   const VEHICLES = ['chopper', 'pickup', 'truck', 'coupe', 'offroad', 'ape'];
-  const sheets = { vehicles: null, demon: null };
-  // These are deliberately two atlases, not six independent network requests.
+  const sheets = { vehicles: null, demon: null, world: null, portal: null };
+  const files = { vehicles: 'vehicles-drive-v1.webp', demon: 'demon-actions-v1.webp', world: 'infernal-world-v1.webp', portal: 'portal-flames-v1.webp' };
+  // Shared atlases are decoded once; every state uses the same images.
   if (typeof root.Image === 'function') {
     for (const key of Object.keys(sheets)) {
       const img = new root.Image();
       img.decoding = 'async';
-      img.src = 'assets/hell-race/' + key + '.webp';
+      img.src = 'assets/hell-race/' + files[key];
       img.addEventListener('load', () => live?.redraw?.(), { once: true });
       sheets[key] = img;
     }
   }
   const imageReady = img => !!img && img.complete && img.naturalWidth > 0;
+  const frameBounds = new Map();
+  // One shared crop for each animation row prevents jitter between poses.
+  function frameRect(key, columns, rows, row, frame) {
+    const img = sheets[key], cw = img.naturalWidth / columns;
+    const bands=key==='vehicles'?[[70,245],[255,435],[440,625],[650,790],[800,960],[985,1165]]:null;
+    const rowTop=bands?bands[row][0]*img.naturalHeight/1280:row*img.naturalHeight/rows;
+    const ch=bands?(bands[row][1]-bands[row][0])*img.naturalHeight/1280:img.naturalHeight/rows;
+    const cacheKey = key + ':' + row;
+    if (!frameBounds.has(cacheKey)) {
+      const work = document.createElement('canvas');work.width=img.naturalWidth;work.height=img.naturalHeight;
+      const ctx=work.getContext('2d',{willReadFrequently:true});ctx.drawImage(img,0,0);
+      const pixels=ctx.getImageData(0,0,work.width,work.height).data;
+      let left=cw,top=ch,right=0,bottom=0;
+      for(let f=0;f<columns;f++)for(let y=0;y<Math.floor(ch);y++)for(let x=0;x<Math.floor(cw);x++){
+        const a=pixels[(Math.floor(rowTop+y)*work.width+Math.floor(f*cw+x))*4+3];
+        if(a>24){left=Math.min(left,x);right=Math.max(right,x+1);top=Math.min(top,y);bottom=Math.max(bottom,y+1)}
+      }
+      frameBounds.set(cacheKey,right>left?[left,top,right-left,bottom-top]:[0,0,cw,ch]);
+    }
+    const [x,y,w,h]=frameBounds.get(cacheKey);return [frame*cw+x,rowTop+y,w,h];
+  }
+  function sprite(c,key,columns,rows,row,frame,x,y,width,height){
+    if(!imageReady(sheets[key]))return false;
+    const rect=frameRect(key,columns,rows,row,frame),scale=Math.min(width/rect[2],height/rect[3]);
+    const w=rect[2]*scale,h=rect[3]*scale;
+    c.drawImage(sheets[key],...rect,Math.round(x+(width-w)/2),Math.round(y+height-h),Math.round(w),Math.round(h));return true;
+  }
+  function vehiclePreview(id){
+    const canvas=document.createElement('canvas');canvas.width=160;canvas.height=90;
+    const paint=()=>{const c=canvas.getContext('2d');c.imageSmoothingEnabled=false;c.clearRect(0,0,160,90);sprite(c,'vehicles',8,6,Math.max(0,VEHICLES.indexOf(id)),0,0,0,160,90)};
+    if(imageReady(sheets.vehicles))paint();else sheets.vehicles?.addEventListener('load',paint,{once:true});
+    return canvas;
+  }
   const reduce = root.matchMedia('(prefers-reduced-motion: reduce)');
   let live = null, last = null, roadPhase = 0, roadLastTime = null;
   const clamp = (n, a, b) => Math.min(b, Math.max(a, n));
@@ -90,15 +124,15 @@
     if (imageReady(sheets.vehicles)) {
       const chosen = VEHICLES.indexOf(g.vehicle || ''); 
       const id = chosen < 0 ? i % VEHICLES.length : chosen;
-      const col = id % 3, row = Math.floor(id / 3);
-      const destW = scale < 2 ? 47 : 64, destH = scale < 2 ? 28 : 38;
+      const destW = scale < 2 ? 52 : 80, destH = scale < 2 ? 32 : 50;
       const destX = Math.round(x - destW * .50);
-      const destY = Math.round(y - destH * .68 + Math.sin(tick * 13 + i) * .8);
-      for (let j = 0; j < 3; j++) {
-        const dist = (tick * 27 + j * 13) % 38;
-        r(c, destX - 5 - dist, destY + destH * .58 + j * 2, 4 + j, 2 + j, j % 2 ? '#4e3830' : '#9d4830');
+      const destY = Math.round(y - destH);
+      for (let j = 0; j < 5; j++) {
+        const dist = (tick * 38 + j * 11) % 48;
+        const puff=Math.max(1,Math.round(5*(1-dist/48)));
+        r(c, destX - dist, y - 4 - j % 3, puff*2, puff, j % 2 ? '#5a4133' : '#a16c45');
       }
-      c.drawImage(sheets.vehicles, col * 72, row * 44, 72, 44, destX, destY, destW, destH);
+      sprite(c,'vehicles',8,6,id,Math.floor(tick*10+i*2)%8,destX,destY,destW,destH);
       if (g.out) {
         c.fillStyle = '#0b0908aa';
         c.fillRect(destX, destY, destW, destH);
@@ -129,6 +163,17 @@
     }
   }
   function background(c, W, tick, progress) {
+    if(imageReady(sheets.world)){
+      const img=sheets.world;
+      // Distant architecture and foreground scroll at different velocities.
+      for(const [sy,sh,dy,dh,speed] of [[0,.63,0,190,5],[.63,.11,190,175,48],[.74,.26,365,19,48]]){
+        const tw=W*2,offset=(tick*speed)%tw;
+        for(let x=-offset;x<W;x+=tw)c.drawImage(img,0,img.naturalHeight*sy,img.naturalWidth,img.naturalHeight*sh,Math.floor(x),dy,tw,dh);
+      }
+      if(progress>.7){const enter=smooth((progress-.7)/.3);gate(c,W+65-enter*134,90,tick,false)}
+      return;
+    }
+
     c.save();c.scale(1,H/156);
     c.fillStyle = '#2c101b'; c.fillRect(0, 0, W, 156);
     r(c, 0, 0, W, 23, '#180b19');
@@ -176,6 +221,8 @@
     c.restore();
   }
   function gate(c, x, y, tick, open) {
+    if(sprite(c,'portal',8,1,0,Math.floor(tick*10)%8,x-15,y-8,85,open?190:145))return;
+
     // Portale in pietra basalto/ottone, con una luce celeste in contrasto col rosso infernale.
     r(c, x - 6, y + 8, 70, 128, '#100f1e');
     r(c, x + 5, y + 18, 46, 118, open ? '#fff0b1' : '#d5632c');
@@ -192,11 +239,11 @@
       r(c, x + 20, y + 37, 6, 64, '#ffe6aa');
     }
   }
-  function demon(c, tick, x = 32, shade = '#9b2831') {
+  function demon(c, tick, x = 32, shade = '#9b2831', mode = 'chase', actionTime = 0) {
     if (imageReady(sheets.demon)) {
-      const bounce = Math.sin(tick * 4.5) * 2.5;
-      const stretch = Math.sin(tick * 5.5) * 2;
-      c.drawImage(sheets.demon, Math.round(x - 27), Math.round(13 + bounce), 147, 117 + stretch);
+      const row=mode==='attack'?1:mode==='devour'?2:0;
+      const frame=row===0?Math.floor(tick*9)%4:Math.min(3,Math.floor(actionTime*9));
+      sprite(c,'demon',4,3,row,frame,x-40,9,170,125);
       return;
     }
     const y = 12 + Math.round(Math.sin(tick * 4) * 2);
@@ -235,13 +282,13 @@
     const total = Math.max(1, Number(state.config.questionCount || 33));
     const progress = state.phase === 'pareggio' || state.phase === 'conclusa' ? 1 : clamp(state.valid / total, 0, 1);
     const motion = reduced ? 0 : roadTime;
-    background(c, W, motion, final ? 1 : progress);
+    background(c, W, motion, final ? 0 : progress);
     const ended = final ? (reduced ? 5.2 : sec) : 0;
     const escape = smooth((ended - .25) / 2.8);
-    if (final) gate(c, W - 90, 230, motion, true);
+    if (final) gate(c, W - 90, 180, motion, true);
     let demonX = 15;
     if (final) demonX = 15 + smooth((ended - 1) / 3.4) * Math.max(70, W * .44);
-    c.save();c.translate(0,130);c.scale(1.3,1.3);demon(c, motion, demonX);c.restore();
+    c.save();c.translate(0,130);c.scale(1.3,1.3);demon(c, motion, demonX, '#9b2831', !final||ended<1?'chase':ended<1.65?'attack':'devour', ended<1.65?Math.max(0,ended-1):Math.max(0,(ended-1.65)%1.1));c.restore();
     state.groups.forEach((group, i) => {
       const configuredVehicle = state.config.vehicles?.[i] || ['chopper', 'pickup', 'ape'][i];
       const visualGroup = { ...group, vehicle: configuredVehicle };
@@ -249,7 +296,7 @@
       const dest = W * (.36 + .22 * ratio) + 12 * progress;
       const start = previous ? W * (.36 + .22 * previous[i]) + 12 * progress : dest;
       let x = start + (dest - start) * smooth(sec / .9);
-      let unit = 2;
+      let unit = 2, y = lanes[i];
       let visible = true;
       if (!final && group.out) x = Math.min(x, 125);
       if (final) {
@@ -260,14 +307,15 @@
           const victims = state.groups.map((g, j) => j).filter(j => j !== state.winner);
           const order = victims.indexOf(i);
           const consumed = smooth((ended - 1.65 - order * 1.1) / .7);
-          x += (demonX + 23 - x) * consumed;
+          x += (1.3 * demonX + 100 - x) * consumed;
+          y += (245 - y) * consumed;
           if (consumed > .85) unit = 1;
           if (consumed >= 1) visible = false;
         }
       }
       if (visible) {
-        racer(c, x, lanes[i], i, motion, visualGroup, unit);
-        nameTag(c, W, x, lanes[i] - 13, group.name, colors[i]);
+        racer(c, x, y, i, motion, visualGroup, unit);
+        nameTag(c, W, x, y - 13, group.name, colors[i]);
       }
     });
     if (final && ended > 3.6) {
@@ -314,8 +362,8 @@
       oldTime = now;
       if (roadLastTime !== null && !stop && !reduced) roadPhase += clamp((now - roadLastTime) / 1000, 0, .06);
       roadLastTime = now;
-      scene(ctx, width, state, Math.max(0, elapsed - freeze), final, previous, reduced, final ? elapsed : roadPhase);
-      if (!reduced && (!final || elapsed < 5.8)) record.frame = root.requestAnimationFrame(draw);
+      scene(ctx, width, state, Math.max(0, elapsed - freeze), final, previous, reduced, final ? Math.max(0,elapsed-freeze) : roadPhase);
+      if (!reduced && (!final || Math.max(0,elapsed-freeze) < 5.8)) record.frame = root.requestAnimationFrame(draw);
     };
     record.redraw = () => {
       if (live !== record || !canvas.isConnected) return;
@@ -325,5 +373,5 @@
     record.frame = root.requestAnimationFrame(draw);
     return fig;
   }
-  root.FoolHellRace = { createStage };
+  root.FoolHellRace = { createStage, vehiclePreview };
 })(window);
