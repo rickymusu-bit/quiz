@@ -2,7 +2,7 @@
 
 Sito: https://rickymusu-bit.github.io/quiz/
 
-**Applicazione 3.0.0 · Motore 2.2.1 · Regolamento 19.2.0 · 26/10/2026**
+**Applicazione 3.0.5 · Motore 2.2.1 · Regolamento 19.2.0 · 26/10/2026**
 
 Hellscape è un quiz di fisica per tre giocatori, pubblicato su GitHub Pages dal ramo `main`. Il gioco carica automaticamente i quesiti dal catalogo `datasets.json`. Le domande appartengono a banche separate, associate a materie e argomenti; non è richiesto un server applicativo.
 
@@ -84,8 +84,12 @@ Nella home: **N** nuova partita, **R** riprendi, **G** regole, **I** impostazion
 
 Il rifiuto delle domande è rimosso dal motore, dai comandi e dal regolamento. Un vecchio salvataggio con una richiesta in corso viene ripreso sulla stessa domanda, senza sostituzione e con timer fermo.
 
-## Interfaccia Hellscape 3.0.0
+## Interfaccia Hellscape 3.0.5
 
-La scena riempie lo schermo di gioco in rapporto 4:3, centrato e ridimensionato senza ritaglio in entrambe le orientazioni. Le finestre semitrasparenti mostrano soltanto il giocatore attivo (punti, vite e Ammo) e la domanda. Dopo la risposta la domanda scompare per 1,25 secondi, lasciando vedere il movimento, poi appare la correzione con spiegazione; con movimento ridotto l’intervallo è 0,4 secondi. La prossima domanda aggiorna entrambe le finestre. Le statistiche degli altri giocatori si aprono da Opzioni e fermano il timer. I pannelli lunghi scorrono internamente. Vite e spostamenti rappresentano le regole esistenti: un errore ordinario mantiene i punti, una sanzione toglie una vita.
+La scena riempie lo schermo di gioco in rapporto 4:3, centrato e ridimensionato senza ritaglio in entrambe le orientazioni. Le finestre semitrasparenti mostrano soltanto il giocatore attivo (punti, vite e Ammo) e la domanda. Dopo la risposta la domanda scompare per 1,25 secondi, lasciando vedere il movimento, poi appare la correzione con spiegazione; con movimento ridotto l’intervallo è 0,4 secondi. La prossima domanda aggiorna entrambe le finestre. Le statistiche degli altri giocatori si aprono da Opzioni e fermano il timer. Domanda, quattro alternative e spiegazione restano visibili insieme; la finestra cresce in altezza e il pulsante successivo segue il testo senza sovrapposizioni. Vite e spostamenti rappresentano le regole esistenti: un errore ordinario mantiene i punti, una sanzione toglie una vita.
 
 Percorsi `Fool.html`, API del motore e chiavi dei salvataggi conservati per compatibilità. Nessuna modifica a regole, dataset o formato dei salvataggi.
+
+I veicoli scelti sono disabilitati negli altri selettori e tornano disponibili quando vengono liberati. La personalizzazione include nome e veicolo. Le animazioni degli esiti non aggiungono scritte. Il pannello Inventario contiene soltanto oggetti, bersagli e comandi; le spiegazioni sono accessibili da Regole nelle Opzioni. La consultazione del regolamento ferma il timer. Opzioni include Salva e Torna alla home; all’uscita si sceglie Salva ed esci, Esci senza salvare oppure Annulla.
+
+Per ogni modifica all’interfaccia consegnare un’anteprima HTML offline e allegare in chat screenshot aggiornati prima dell’approvazione.
