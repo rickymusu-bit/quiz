@@ -1,4 +1,4 @@
-/* Fool — Fuga dall'Inferno: scena pixel-art puramente illustrativa.
+/* Fool — Fuga dall'Inferno v1.0.0 (2026-10-26): scena pixel-art illustrativa.
    Nessuna modifica al motore, ai punteggi o ai salvataggi. */
 (function (root) {
   'use strict';
@@ -22,6 +22,15 @@
     const a = BigInt(score.n) * BigInt(top.d) * 10000n;
     const b = BigInt(score.d) * BigInt(top.n);
     return clamp(Number(a / b) / 10000, 0, 1);
+  }
+  function positionScore(state, index) {
+    const relative = scoreRatio(state.groups, index);
+    const score = state.groups[index].score;
+    const n = BigInt(score.n), d = BigInt(score.d);
+    const base = BigInt(Math.max(...Object.values(state.config.bases || { standard: 300 })));
+    const ref = (base * BigInt(state.config.questionCount || 33)) / 5n || 1n;
+    const absolute = Number((n * 100000n) / (n + d * ref)) / 100000;
+    return .4 * relative + .6 * absolute;
   }
   function bitmap(c, x, y, lines, palette, size) {
     lines.forEach((row, j) => {
@@ -70,6 +79,13 @@
       r(c, left - 5 - dist, top + 3 + j * 3, 3 + j, 2 + j, j % 2 ? '#5e4743' : '#c56339');
     }
     bitmap(c, left, top, vehicle, palette, unit);
+    // Tre piloti con casco, maschera e occhialoni, distinti dai loro mezzi.
+    const headX = left + (i === 1 ? 11 : 12) * unit;
+    r(c, headX - unit, top - 2 * unit, 5 * unit, 4 * unit, '#291923');
+    r(c, headX, top - 4 * unit, 4 * unit, 4 * unit,
+      i === 0 ? '#a94b42' : i === 1 ? '#d2a266' : '#c9c2a0');
+    r(c, headX + 2 * unit, top - 2 * unit, 2 * unit, unit, '#f5d282');
+    r(c, headX + 2 * unit, top - unit, unit, unit, '#10111a');
     const wobble = Math.floor(tick * 9) % 2;
     r(c, left + 7 * unit, top + (7 + wobble) * unit, 5 * unit, unit, '#23191c');
     r(c, left + 18 * unit, top + (7 + wobble) * unit, 4 * unit, unit, '#23191c');
@@ -185,7 +201,7 @@
     if (final) demonX = 15 + smooth((ended - 1) / 3.4) * Math.max(70, W * .44);
     demon(c, motion, demonX);
     state.groups.forEach((group, i) => {
-      const ratio = scoreRatio(state.groups, i);
+      const ratio = positionScore(state, i);
       const dest = W * (.36 + .22 * ratio) + 12 * progress;
       const start = previous ? W * (.36 + .22 * previous[i]) + 12 * progress : dest;
       let x = start + (dest - start) * smooth(sec / .9);
@@ -235,7 +251,7 @@
     const ctx = canvas.getContext('2d', { alpha: false });
     if (!ctx) return fig;
     ctx.imageSmoothingEnabled = false;
-    const next = state.groups.map((g, i) => scoreRatio(state.groups, i));
+    const next = state.groups.map((g, i) => positionScore(state, i));
     const old = last?.key === state.id && !final ? last.x : null;
     const previous = old;
     last = { key: state.id, x: next };
