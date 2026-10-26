@@ -55,7 +55,7 @@ function homeResumeAvailable(){
   const raw=localStorage.getItem('fool-v1');
   if(!raw)return false;
   const saved=JSON.parse(raw);
-  return saved?.format===1&&['ordinaria','pareggio'].includes(saved.phase)&&Array.isArray(saved.groups)&&saved.groups.length===3&&Number.isInteger(saved.config?.questionCount)&&saved.config.questionCount>=3&&saved.config.questionCount<=99;
+  return saved?.format===1&&['ordinaria','pareggio'].includes(saved.phase)&&Array.isArray(saved.groups)&&saved.groups.length===3&&saved.config&&typeof saved.config==='object'&&(saved.config.questionCount===undefined||Number.isInteger(saved.config.questionCount)&&saved.config.questionCount>=3&&saved.config.questionCount<=99);
  }catch(error){return false}
 }
 function refreshResumeLink(){resumeGameLink.hidden=!homeResumeAvailable()}
