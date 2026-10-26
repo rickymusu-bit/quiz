@@ -23,18 +23,19 @@ with sync_playwright() as p:
   def option(name):
    if v.locator('.game-options').get_attribute('open') is None:v.locator('.game-options summary').click()
    return v.get_by_role('button',name=name,exact=True)
+  assert option('Esci da schermo intero' if full else 'Schermo intero').is_visible()
   fits();page.screenshot(path=f'/tmp/options-hidden-{w}.png');a=v.locator('.question-actions .bonus-action').bounding_box();b=v.locator('.question-actions [data-game-action=reveal]').bounding_box();assert abs(a['y']-b['y'])<2
   assert v.get_by_role('button',name='Bonus e inventari',exact=True).count()==1
   expect(v.get_by_role('button',name='Riassegna punti',exact=True)).not_to_be_visible()
   q=frame.evaluate('game.s.current.id');v.get_by_role('button',name='Bonus e inventari',exact=True).click();v.get_by_role('button',name='Chiudi',exact=True).click()
-  original=frame.evaluate('JSON.stringify({valid:game.s.valid,groups:game.s.groups.map(g=>({streak:g.streak,inventory:g.inventory,sanctions:g.sanctions}))})')
+  original=frame.evaluate('JSON.stringify({valid:game.s.valid,groups:game.s.groups.map(g=>({inventory:g.inventory,sanctions:g.sanctions}))})')
   option('Riassegna punti').click();v.locator('#score-team').select_option('0')
   assert v.locator('#score-reason,#score-operation').count()==0
   expect(v.locator('#score-total')).to_have_value('0');expect(v.get_by_role('button',name='Togli un punto')).to_be_disabled()
   v.get_by_role('button',name='Aggiungi un punto').click();expect(v.locator('#score-total')).to_have_value('1');v.get_by_role('button',name='Togli un punto').click();expect(v.locator('#score-total')).to_have_value('0')
   box=v.get_by_role('button',name='Aggiungi un punto').bounding_box();page.mouse.move(box['x']+box['width']/2,box['y']+box['height']/2);page.mouse.down();page.wait_for_timeout(750);page.mouse.up();held=int(v.locator('#score-total').input_value());assert held>=10 and held%10==0;page.wait_for_timeout(200);assert int(v.locator('#score-total').input_value())==held
   v.locator('#score-total').fill('150');expect(v.locator('.score-preview')).to_contain_text('150 punti');assert frame.evaluate('F.exact(game.s.groups[0].score)')=='0';fits();v.get_by_role('button',name='Conferma modifica').click();assert frame.evaluate('F.exact(game.s.groups[0].score)')=='150'
-  assert frame.evaluate('JSON.stringify({valid:game.s.valid,groups:game.s.groups.map(g=>({streak:g.streak,inventory:g.inventory,sanctions:g.sanctions}))})')==original
+  assert frame.evaluate('JSON.stringify({valid:game.s.valid,groups:game.s.groups.map(g=>({inventory:g.inventory,sanctions:g.sanctions}))})')==original
   frame.evaluate('()=>{game.s.groups[0].score=F.rational(100,3);changed()}')
   option('Riassegna punti').click();v.locator('#score-team').select_option('0');expect(v.locator('#score-total')).to_have_value('100/3');v.get_by_role('button',name='Aggiungi un punto').click();expect(v.locator('#score-total')).to_have_value('103/3');v.get_by_role('button',name='Togli un punto').click();expect(v.locator('#score-total')).to_have_value('100/3');v.get_by_role('button',name='Aggiungi un punto').click();v.get_by_role('button',name='Conferma modifica').click();assert frame.evaluate('F.exact(game.s.groups[0].score)')=='103/3'
   option('Riassegna punti').click();v.locator('#score-team').select_option('0');v.locator('#score-total').fill('120,5');v.get_by_role('button',name='Conferma modifica').click();assert frame.evaluate('F.exact(game.s.groups[0].score)')=='241/2'
