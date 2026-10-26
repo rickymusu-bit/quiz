@@ -1,4 +1,4 @@
-/* Hellscape interface 3.2.0 — fixed 1024×768 stage. */
+/* Hellscape interface 3.2.1 — fixed 1024×768 stage. */
 html,body{width:100%;height:100%;overflow:hidden;background:#080605}
 #viewport-stage{position:fixed;left:50%;top:50%;width:1024px!important;height:768px;transform-origin:center center;margin:0;overflow:hidden;background:#1a0b08;box-shadow:0 0 70px #000}
 #orientation-note{display:none!important}
@@ -81,3 +81,9 @@ dialog .scoreboard{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));ga
 .player-card .bonus-list{margin:0;display:grid;gap:6px}.player-card .ammo-item{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:14px}.player-card .ammo-round{width:24px;height:24px}
 .player-card-header .team-symbol.team-vehicle{position:absolute;z-index:0;inset:auto 8px 5px auto;width:180px;height:110px;opacity:.23}
 .player-card.out::after{display:none}
+
+/* Expanded content floats over subsequent cards without moving the stack. */
+.player-sidebar{max-height:none;overflow:visible}
+#viewport-stage main.operational .player-card{position:relative;overflow:visible}
+#viewport-stage main.operational .player-card .player-card-body{position:absolute;top:100%;left:-1px;right:-1px;z-index:2;max-height:225px;background:#17110f;border:1px solid #906346;box-shadow:4px 6px 12px #000a}
+#viewport-stage main.operational .player-card.active .player-card-body{left:-2px;right:-2px;border-color:#ffe044;box-shadow:0 4px 12px #ffe04433,4px 6px 12px #000a}

@@ -2,7 +2,7 @@
 
 Sito: https://rickymusu-bit.github.io/quiz/
 
-**Applicazione 3.2.0 · Motore 2.2.1 · Regolamento 19.2.0 · 26/10/2026**
+**Applicazione 3.2.1 · Motore 2.2.1 · Regolamento 19.2.0 · 26/10/2026**
 
 Hellscape è un quiz di fisica per tre giocatori, pubblicato su GitHub Pages dal ramo `main`. Il gioco carica automaticamente i quesiti dal catalogo `datasets.json`. Le domande appartengono a banche separate, associate a materie e argomenti; non è richiesto un server applicativo.
 
@@ -99,3 +99,5 @@ Il tempo è rappresentato soltanto da una fiala orizzontale di liquido rosso: si
 Al comando Prossima domanda, la fiala si riempie dal livello residuo della domanda precedente fino al pieno in 750 ms. Il conteggio parte soltanto quando si svela la domanda. La preferenza di sistema per il movimento ridotto disattiva il riempimento animato. Gli stemmi non sono mostrati: il riquadro usa come sfondo il veicolo selezionato in scala di grigi. Le icone nei salvataggi precedenti restano soltanto per compatibilità.
 
 Le tre schede sono impilate in ordine ciclico, con il giocatore corrente sempre in cima e illuminato da un contorno giallo. Da chiuse mostrano nome e punteggio numerico; da aperte mostrano soltanto vite e inventario. Apertura e chiusura sono indipendenti e si conservano durante la partita. Rimossi la lista separata dei turni e il comando delle statistiche dalle Opzioni.
+
+L’apertura delle schede espande il contenuto sopra quelle sottostanti senza spostarle. La scheda aperta o selezionata più di recente passa davanti alle altre, anche con la tastiera.

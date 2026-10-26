@@ -33,9 +33,16 @@ const assert = require('node:assert/strict');
         assert(await card.locator('.player-points').isVisible());
       }
       const opened = await cards.first().getAttribute('data-team');
+      const cardTops=await cards.evaluateAll(cs=>cs.map(c=>c.getBoundingClientRect().top));
       await cards.first().locator('summary').click();
+      assert.deepEqual(await cards.evaluateAll(cs=>cs.map(c=>c.getBoundingClientRect().top)),cardTops);
       assert(await cards.first().locator('.lives').isVisible());
       assert(await cards.first().locator('.player-card-inventory').isVisible());
+      await cards.first().locator('summary').press('Enter');
+      assert(!await cards.first().evaluate(e=>e.open));
+      assert.equal(await page.evaluate(()=>game.s.screen),'hidden');
+      await cards.first().locator('summary').press('Enter');
+      assert(await cards.first().evaluate(e=>e.open));
       assert.equal(await page.locator('.turn-order').count(), 0);
       assert.equal(await page.getByRole('button', { name: 'Statistiche degli altri giocatori', exact: true }).count(), 0);
       assert.equal(await cards.first().locator('.team-vehicle').evaluate(e => getComputedStyle(e).filter), 'grayscale(1)');
