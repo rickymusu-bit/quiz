@@ -27,8 +27,24 @@ try:
             errors = []
             page.on("pageerror", lambda e: errors.append(str(e)))
             page.goto(base + "Fool.html?start=1")
-            expect(page.get_by_role("button", name="Inizia partita")).to_be_enabled()
+            # Six visual options, including an Ape in place of the motocross.
+            for i in range(3):
+                expect(page.locator(f"#vehicle{i}")).to_be_visible()
+                assert page.locator(f"#vehicle{i} option").count() == 6
+            expect(page.locator("#vehicle2 option[value='ape']")).to_have_count(1)
+            assert page.locator("#vehicle0 option[value='motorcross']").count() == 0
+            page.locator("#vehicle0").select_option("coupe")
+            page.locator("#vehicle1").select_option("coupe")
             page.get_by_role("button", name="Inizia partita").click()
+            expect(page.locator("#message")).to_contain_text("tre veicoli diversi")
+            page.locator("#vehicle1").select_option("truck")
+            page.locator("#vehicle2").select_option("ape")
+            page.get_by_role("button", name="Inizia partita").click()
+            assert page.evaluate("game.s.config.vehicles") == ["coupe", "truck", "ape"]
+            page.wait_for_function("""() => [...document.styleSheets].length > 0""")
+            for asset in ("vehicles.webp", "demon.webp"):
+                response = page.request.get(base + "assets/hell-race/" + asset)
+                assert response.status == 200 and response.body(), asset
             expect(page.locator(".hell-race canvas")).to_have_count(1)
             page.wait_for_function(
                 "document.querySelector('.hell-race canvas').width > 0"
