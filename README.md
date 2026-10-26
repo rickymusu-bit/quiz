@@ -1,10 +1,10 @@
-# Fool
+# Hellscape - Fuga dall’inferno
 
 Sito: https://rickymusu-bit.github.io/quiz/
 
-**Applicazione 2.3.1 · Motore 2.2.1 · Regolamento 19.2.0 · 26/10/2026**
+**Applicazione 3.0.5 · Motore 2.2.1 · Regolamento 19.2.0 · 26/10/2026**
 
-Fool è un quiz di fisica per tre giocatori, pubblicato su GitHub Pages dal ramo `main`. Il gioco carica automaticamente i quesiti dal catalogo `datasets.json`. Le domande appartengono a banche separate, associate a materie e argomenti; non è richiesto un server applicativo.
+Hellscape è un quiz di fisica per tre giocatori, pubblicato su GitHub Pages dal ramo `main`. Il gioco carica automaticamente i quesiti dal catalogo `datasets.json`. Le domande appartengono a banche separate, associate a materie e argomenti; non è richiesto un server applicativo.
 
 ## Partita ordinaria
 
@@ -22,7 +22,7 @@ Le domande dello spareggio sono estratte fra **tutte quelle nuove del dataset**,
 
 ## Fuga dall'Inferno — scena animata v1.1.0
 
-Durante il quiz compare sotto le alternative (e prima della domanda svelata) una corsa in pixel art: tre piloti su veicoli junkpunk/dieselpunk attraversano un paesaggio di lava inseguiti da un demone horror. Lo sfondo scorre autonomamente; quando i punti cambiano, i veicoli avanzano e possono superarsi. Le posizioni sono una rappresentazione visiva dei punteggi esatti, anche razionali dopo Marx, **non un punteggio parallelo**. I giocatori eliminati perdono terreno.
+Durante il quiz la scena occupa l’intero palco fisso 4:3 (1024×768): tre piloti su veicoli junkpunk/dieselpunk attraversano un paesaggio di lava inseguiti da un demone horror. Lo sfondo scorre autonomamente; quando i punti cambiano, i veicoli avanzano e possono superarsi. Le posizioni sono una rappresentazione visiva dei punteggi esatti, anche razionali dopo Marx, **non un punteggio parallelo**. I giocatori eliminati perdono terreno.
 
 La porta dell'Inferno compare verso il completamento delle domande impostate (33 per impostazione predefinita). Durante lo spareggio i punti restano congelati e la porta rimane vicina. La schermata finale mostra il vincitore che fugge mentre il demone cattura gli altri; con Game Over senza superstiti, li cattura tutti. I finali anticipati per eliminazione funzionano senza attendere l'ultima domanda.
 
@@ -83,3 +83,13 @@ Nei pannelli decisionali si conferma o annulla con i pulsanti, raggiungibili con
 Nella home: **N** nuova partita, **R** riprendi, **G** regole, **I** impostazioni, **F** schermo intero. Le regole supportano frecce, Pagina su/giù, Inizio e Fine. `tests/experience.py` verifica le nuove funzioni e le scorciatoie con Chromium su desktop e smartphone orizzontale.
 
 Il rifiuto delle domande è rimosso dal motore, dai comandi e dal regolamento. Un vecchio salvataggio con una richiesta in corso viene ripreso sulla stessa domanda, senza sostituzione e con timer fermo.
+
+## Interfaccia Hellscape 3.0.5
+
+La scena riempie lo schermo di gioco in rapporto 4:3, centrato e ridimensionato senza ritaglio in entrambe le orientazioni. Le finestre semitrasparenti mostrano soltanto il giocatore attivo (punti, vite e Ammo) e la domanda. Dopo la risposta la domanda scompare per 1,25 secondi, lasciando vedere il movimento, poi appare la correzione con spiegazione; con movimento ridotto l’intervallo è 0,4 secondi. La prossima domanda aggiorna entrambe le finestre. Le statistiche degli altri giocatori si aprono da Opzioni e fermano il timer. Domanda, quattro alternative e spiegazione restano visibili insieme; la finestra cresce in altezza e il pulsante successivo segue il testo senza sovrapposizioni. Vite e spostamenti rappresentano le regole esistenti: un errore ordinario mantiene i punti, una sanzione toglie una vita.
+
+Percorsi `Fool.html`, API del motore e chiavi dei salvataggi conservati per compatibilità. Nessuna modifica a regole, dataset o formato dei salvataggi.
+
+I veicoli scelti sono disabilitati negli altri selettori e tornano disponibili quando vengono liberati. La personalizzazione include nome e veicolo. Le animazioni degli esiti non aggiungono scritte. Il pannello Inventario contiene soltanto oggetti, bersagli e comandi; le spiegazioni sono accessibili da Regole nelle Opzioni. La consultazione del regolamento ferma il timer. Opzioni include Salva e Torna alla home; all’uscita si sceglie Salva ed esci, Esci senza salvare oppure Annulla.
+
+Per ogni modifica all’interfaccia consegnare un’anteprima HTML offline e allegare in chat screenshot aggiornati prima dell’approvazione.

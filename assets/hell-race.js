@@ -2,7 +2,7 @@
    Nessuna modifica al motore, ai punteggi o ai salvataggi. */
 (function (root) {
   'use strict';
-  const H = 156, lanes = [75, 107, 139];
+  const H = 384, lanes = [220, 280, 340];
   const colors = ['#d6ad75', '#be7554', '#b4a08c'];
   const VEHICLES = ['chopper', 'pickup', 'truck', 'coupe', 'offroad', 'ape'];
   const sheets = { vehicles: null, demon: null };
@@ -129,7 +129,8 @@
     }
   }
   function background(c, W, tick, progress) {
-    c.fillStyle = '#2c101b'; c.fillRect(0, 0, W, H);
+    c.save();c.scale(1,H/156);
+    c.fillStyle = '#2c101b'; c.fillRect(0, 0, W, 156);
     r(c, 0, 0, W, 23, '#180b19');
     r(c, 0, 23, W, 17, '#431622');
     r(c, 0, 40, W, 30, '#6a2420');
@@ -157,7 +158,7 @@
       r(c, x, 65, 29, 3, '#fa7533');
       r(c, x + 9, 69, 12, 2, '#e4a143');
     }
-    r(c, 0, 73, W, H - 73, '#1c1c24');
+    r(c, 0, 73, W, 156 - 73, '#1c1c24');
     for (const y of [89, 121]) {
       line(c, 0, y, W, '#4a3839');
       for (let x = -(tick * 92) % 42; x < W; x += 42) r(c, x, y, 21, 2, '#bb6040');
@@ -172,6 +173,7 @@
       const x = W + 65 - enter * 134;
       gate(c, x, 24, tick, false);
     }
+    c.restore();
   }
   function gate(c, x, y, tick, open) {
     // Portale in pietra basalto/ottone, con una luce celeste in contrasto col rosso infernale.
@@ -236,10 +238,10 @@
     background(c, W, motion, final ? 1 : progress);
     const ended = final ? (reduced ? 5.2 : sec) : 0;
     const escape = smooth((ended - .25) / 2.8);
-    if (final) gate(c, W - 112, 18, motion, true);
+    if (final) gate(c, W - 90, 230, motion, true);
     let demonX = 15;
     if (final) demonX = 15 + smooth((ended - 1) / 3.4) * Math.max(70, W * .44);
-    demon(c, motion, demonX);
+    c.save();c.translate(0,130);c.scale(1.3,1.3);demon(c, motion, demonX);c.restore();
     state.groups.forEach((group, i) => {
       const configuredVehicle = state.config.vehicles?.[i] || ['chopper', 'pickup', 'ape'][i];
       const visualGroup = { ...group, vehicle: configuredVehicle };
@@ -281,7 +283,7 @@
     fig.className = 'hell-race' + (final ? ' hell-race-final' : '');
     const canvas = document.createElement('canvas');
     canvas.height = H;
-    canvas.width = 700;
+    canvas.width = 512;
     canvas.setAttribute('aria-hidden', 'true');
     fig.appendChild(canvas);
     const caption = document.createElement('figcaption');
@@ -303,7 +305,7 @@
     let freeze = 0, oldTime = start;
     const draw = now => {
       if (live !== record || !canvas.isConnected) return;
-      const width = Math.max(320, Math.round((canvas.clientWidth || 700) / (canvas.clientHeight || 160) * H));
+      const width = 512;
       if (canvas.width !== width) canvas.width = width;
       ctx.imageSmoothingEnabled = false;
       const elapsed = (now - start) / 1000;
