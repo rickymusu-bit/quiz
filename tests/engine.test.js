@@ -1,6 +1,7 @@
 'use strict';
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
-const root=path.join(__dirname,'..'),html=fs.readFileSync(path.join(root,'Fool.html'),'utf8'),scripts=[...html.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)],script=scripts[1][1];
+const root=path.join(__dirname,'..'),html=fs.readFileSync(path.join(root,'Fool.html'),'utf8'),scripts=[...html.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)],script=scripts.map(m=>m[1]).find(source=>source.includes('/* Fool 1.0.0 — modello'));
+assert(script,'Engine inline non trovato');
 const engine=script.slice(0,script.indexOf("\n'use strict';\nconst F=Fool"));assert(engine.length>10000);
 const context={module:{exports:{}},TextEncoder,performance};vm.runInNewContext(engine,context);const F=context.module.exports;
 const catalogue=JSON.parse(fs.readFileSync(path.join(root,'datasets.json'),'utf8'));
