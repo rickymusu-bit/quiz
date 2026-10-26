@@ -20,7 +20,7 @@ test('Default settings keep 33 questions and Marx at 15 percent',()=>{
 test('Restore an existing 2.1.0 game while retaining chosen probabilities and points',()=>{
  const g=game(33,0);g.s.groups[0].score=F.rational(305);
  const saved=g.snapshot();saved.version='2.1.0';saved.rules='19.1.0';saved.config.bonusWeights.marx=30;
- const restored=F.Game.restore(saved);assert.equal(restored.s.version,'2.2.1');
+ const restored=F.Game.restore(saved);assert.equal(restored.s.version,'2.3.0');
  assert.equal(restored.s.config.bonusWeights.marx,30);assert.equal(F.exact(restored.s.groups[0].score),'305');
 });
 test('Each Ammo type has its own retro pixel-art sprite',()=>{
@@ -53,8 +53,8 @@ test('2.2.0 ordinary saved games restore without resetting their progress',()=>{
 });
 test('Home resumes only an unfinished saved game and exposes both actions',()=>{
  const home=fs.readFileSync(path.join(root,'index.html'),'utf8');
- assert.match(home,/<a id="new-game-link" href="Fool.html\\?start=1">Nuova partita<\\/a>/);
- assert.match(home,/<a id="resume-game-link" href="Fool.html\\?resume=1" hidden>Riprendi partita<\\/a>/);
+ assert(home.includes('<a id="new-game-link" href="Fool.html?start=1">Nuova partita</a>'));
+ assert(home.includes('<a id="resume-game-link" href="Fool.html?resume=1" hidden>Riprendi partita</a>'));
  const a=home.indexOf('function homeResumeAvailable(){'),b=home.indexOf('function refreshResumeLink()',a);
  assert(a>=0&&b>a);
  const source=home.slice(a,b)+';homeResumeAvailable()';
@@ -80,7 +80,7 @@ test('Base points stay constant when a group answers correctly again',()=>{const
 test('Bullo divides only base points',()=>{const g=game(33,0),receiver=g.s.respondent,beneficiary=g.s.order[1],amount=g.s.config.bases[g.s.current.difficulty];g.s.effects.push({id:g.uid(),type:'ruba',source:beneficiary,target:receiver});reply(g,true);assert.equal(F.exact(g.s.groups[receiver].score),F.exact(F.rational(BigInt(amount),2n)));assert.equal(F.exact(g.s.groups[beneficiary].score),F.exact(F.rational(BigInt(amount),2n)))});
 test('Marx redistributes all accumulated points exactly without rounding',()=>{const g=game(33,0);g.s.groups.forEach((team,i)=>team.score=F.rational([101,200,1][i]));const owner=g.s.respondent;const copy={id:g.uid(),type:'marx',target:null,origin:'test'};g.s.groups[owner].inventory.push(copy);g.use(copy.id,null);for(const team of g.s.groups)assert.equal(F.exact(team.score),'302/3');assert.equal(g.s.groups[owner].inventory.length,0);assert(g.s.events.some(e=>e.type==='marx-redistribution'));F.Game.restore(g.snapshot())});
 test('Marx excludes eliminated teams and ignores Aura while keeping history',()=>{const g=game(33,0);g.s.groups[0].score=F.rational(101);g.s.groups[1].score=F.rational(200);g.s.groups[2].score=F.rational(999);g.eliminate(2,'Tre sanzioni');g.s.groups[1].aura=g.s.turn;const copy={id:g.uid(),type:'marx',target:null,origin:'test'};g.s.groups[g.s.respondent].inventory.push(copy);g.use(copy.id,null);assert.equal(F.exact(g.s.groups[0].score),'301/2');assert.equal(F.exact(g.s.groups[1].score),'301/2');assert.equal(F.exact(g.s.groups[2].score),'999');assert.equal(g.s.groups[1].aura,g.s.turn);F.Game.restore(g.snapshot())});
-test('Marx awards at 100% and preserved probability is added to previous save formats',()=>{const g=game(33,100);reply(g,true);assert(g.s.result.bonuses.some(b=>b.type==='marx'));const saved=g.snapshot();saved.version='2.0.0';saved.rules='19.0.0';delete saved.config.bonusWeights.marx;const restored=F.Game.restore(saved);assert.equal(restored.s.config.bonusWeights.marx,15);assert.equal(restored.s.version,'2.2.1');assert.equal(restored.s.rules,'19.2.0')});
+test('Marx awards at 100% and preserved probability is added to previous save formats',()=>{const g=game(33,100);reply(g,true);assert(g.s.result.bonuses.some(b=>b.type==='marx'));const saved=g.snapshot();saved.version='2.0.0';saved.rules='19.0.0';delete saved.config.bonusWeights.marx;const restored=F.Game.restore(saved);assert.equal(restored.s.config.bonusWeights.marx,15);assert.equal(restored.s.version,'2.3.0');assert.equal(restored.s.rules,'19.2.0')});
 test('Independent bonus awards',()=>{for(const chance of [0,100]){const g=game(33,chance);reply(g,true);assert.equal(g.s.result.bonuses.length,chance===100?6:0);F.Game.restore(g.snapshot())}});
 test('At the end of ordinary questions a single score leader wins without a tie',()=>{const g=game(3,0);reply(g,true);g.next();reply(g,false);g.next();reply(g,false);assert.equal(g.s.phase,'conclusa');assert.equal(g.s.winner,g.s.order[0])});
 test('Only the top-score tied groups enter the elimination tie-break',()=>{const cfg=settings(3,0);cfg.bases={facile:100,media:100,difficile:100};const g=game(3,0,'misto',cfg);reply(g,true);g.next();reply(g,true);g.next();reply(g,false);assert.equal(g.s.phase,'pareggio');assert.equal(g.s.tieOrder.length,2);assert.equal(g.s.groups[g.s.order[2]].out,true);g.next();reply(g,false);assert.equal(g.s.phase,'pareggio');g.next();reply(g,true);assert.equal(g.s.phase,'conclusa');assert.equal(g.s.winner,g.s.order[1])});
