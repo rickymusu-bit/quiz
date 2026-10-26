@@ -5,7 +5,7 @@
   const H = 156, lanes = [75, 107, 139];
   const colors = ['#5fe3e2', '#f5c661', '#bc9cf5'];
   const reduce = root.matchMedia('(prefers-reduced-motion: reduce)');
-  let live = null, last = null;
+  let live = null, last = null, roadPhase = 0, roadLastTime = null;
   const clamp = (n, a, b) => Math.min(b, Math.max(a, n));
   const smooth = x => { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); };
   const r = (c, x, y, w, h, color) => {
@@ -189,10 +189,10 @@
     c.fillStyle = '#f6ead3';
     c.fillText(tag, lx + 6, y - 21);
   }
-  function scene(c, W, state, sec, final, previous, reduced) {
+  function scene(c, W, state, sec, final, previous, reduced, roadTime) {
     const total = Math.max(1, Number(state.config.questionCount || 33));
     const progress = state.phase === 'pareggio' || state.phase === 'conclusa' ? 1 : clamp(state.valid / total, 0, 1);
-    const motion = reduced || state.paused || state.suspended ? 0 : sec;
+    const motion = reduced ? 0 : roadTime;
     background(c, W, motion, final ? 1 : progress);
     const ended = final ? (reduced ? 5.2 : sec) : 0;
     const escape = smooth((ended - .25) / 2.8);
@@ -268,7 +268,9 @@
       const stop = state.paused || state.suspended || document.hidden;
       if (stop) freeze += Math.max(0, (now - oldTime) / 1000);
       oldTime = now;
-      scene(ctx, width, state, Math.max(0, elapsed - freeze), final, previous, reduced);
+      if (roadLastTime !== null && !stop && !reduced) roadPhase += clamp((now - roadLastTime) / 1000, 0, .06);
+      roadLastTime = now;
+      scene(ctx, width, state, Math.max(0, elapsed - freeze), final, previous, reduced, final ? elapsed : roadPhase);
       if (!reduced && (!final || elapsed < 5.8)) record.frame = root.requestAnimationFrame(draw);
     };
     record.frame = root.requestAnimationFrame(draw);
