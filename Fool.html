@@ -634,7 +634,15 @@ function changed(){persist();renderGame()}
 function command(fn){return()=>{const before=feedbackState();fn();changed();return animateOutcome(before)}}
 function localSave(){try{return localStorage.getItem('fool-v1')}catch(e){return null}}
 function offerResume(parent){const raw=localSave();if(!raw)return;parent.append(btn('Riprendi partita',()=>restoreGame(localSave())));try{const saved=JSON.parse(raw),count=saved?.config?.questionCount??33;if(count<33)parent.append(node('p','La partita salvata prevede soltanto '+count+' domande. Per iniziare una nuova partita da 33, scegli Inizia partita.','help'))}catch(e){}}
-function goHome(){persist();configurationLoad++;location.assign(new URL('./',location.href).href)}
+function leaveForHome(){cancelFeedback();if(game)game.stop();game=null;ui='home';configurationLoad++;closeDialog();if(window.hellscapePreviewHome){window.hellscapePreviewHome();return}location.assign(new URL('./',location.href).href)}
+function goHome(){
+ if(!game||game.s.phase==='conclusa'){leaveForHome();return}
+ const wasRunning=game.running;if(wasRunning)game.pause('uscita');
+ dialog('Salvare la partita prima di uscire?',d=>{
+  d.append(btn('Salva ed esci',()=>{if(persist())leaveForHome()},'primary'),btn('Esci senza salvare',()=>{try{localStorage.removeItem('fool-v1')}catch(e){message('Impossibile rimuovere il salvataggio.');return}leaveForHome()}),btn('Annulla',()=>{closeDialog();if(wasRunning)game.resume();changed()}));
+ });
+}
+document.querySelector('header .brand').addEventListener('click',e=>{e.preventDefault();act(goHome)});
 function defaultSettings(){return {seconds:45,bonusWeights:{...F.DEFAULT_BONUS_WEIGHTS},difficulty:'misto',questionCount:33,bases:{facile:100,media:200,difficile:300},quotas:balancedQuotas('misto',33)}}
 function balancedQuotas(filter,total=33){
  const topics=[...new Set(bank.bank.map(q=>q.topic))],counts=topics.map(t=>bank.bank.filter(q=>q.topic===t&&(filter==='misto'||q.difficulty===filter)).length),values=topics.map(()=>0);let remaining=total;
@@ -657,14 +665,14 @@ async function configure(){
 }
 function renderConfiguration(){
  main.replaceChildren();const editing=setupMode==='settings',value=settingsDraft?.source===bank.source?settingsDraft.value:savedSettings();
- const p=heading(editing?'Impostazioni':'Prepara Hellscape',editing?'I parametri si applicano alle nuove partite e si conservano in questo browser. Salva prima di cambiare argomento.':'Scegli nomi, simboli e argomento delle domande.');if(!editing)offerResume(p);
+ const p=heading(editing?'Impostazioni':'Prepara Hellscape',editing?'I parametri si applicano alle nuove partite e si conservano in questo browser. Salva prima di cambiare argomento.':'Scegli nomi, veicoli e argomento delle domande.');if(!editing)offerResume(p);
  const choice=select('Argomento delle domande','bank-choice',catalog.map(x=>[x.id,x.nome]),selectedBankId);choice.querySelector('select').onchange=()=>act(async()=>{rememberTeams();selectedBankId=$('bank-choice').value;bank=null;prepared=null;settingsDraft=null;await configure()});p.append(choice);
  if(!editing){
-  const grid=node('div',undefined,'columns setup-teams');for(let i=0;i<3;i++){const card=node('section',undefined,'panel');const name=input('Nome','name'+i,teamDraft.names[i]);name.querySelector('input').setAttribute('aria-label','Nome del giocatore '+(i+1));const symbol=select('Stemma','icon'+i,Object.entries(SYMBOLS).map(([key,[glyph,label]])=>[key,glyph+' '+label]),teamDraft.icons[i]);symbol.querySelector('select').setAttribute('aria-label','Simbolo del giocatore '+(i+1));const vehicle=select('Veicolo','vehicle'+i,Object.entries(VEHICLE_LABELS),teamDraft.vehicles[i]);vehicle.querySelector('select').setAttribute('aria-label','Veicolo del giocatore '+(i+1));
+  const grid=node('div',undefined,'columns setup-teams');for(let i=0;i<3;i++){const card=node('section',undefined,'panel');const name=input('Nome','name'+i,teamDraft.names[i]);name.querySelector('input').setAttribute('aria-label','Nome del giocatore '+(i+1));const vehicle=select('Veicolo','vehicle'+i,Object.entries(VEHICLE_LABELS),teamDraft.vehicles[i]);vehicle.querySelector('select').setAttribute('aria-label','Veicolo del giocatore '+(i+1));
     const visual=vehiclePreview(teamDraft.vehicles[i]);visual.id='vehicle-preview-'+i;
     vehicle.querySelector('select').addEventListener('change',()=>{const id=vehicle.querySelector('select').value;const [px,py]=VEHICLE_POSITIONS[id];visual.style.backgroundPosition=px+' '+py;visual.setAttribute('aria-label',VEHICLE_LABELS[id]);});
     const previewRow=node('div',undefined,'vehicle-chooser');previewRow.append(vehicle,visual);
-    card.append(node('h3','Giocatore '+(i+1)),name,symbol,previewRow);grid.append(card)}p.append(grid);
+    card.append(node('h3','Giocatore '+(i+1)),name,previewRow);grid.append(card)}p.append(grid);
   const currentSettings=savedSettings();const count=currentSettings.questionCount??33;
    p.append(node('p','Partita ordinaria: '+count+' domande. Lo spareggio si apre soltanto alla fine, in caso di parità al primo posto.','help'));
    const row=node('div',undefined,'row');row.append(btn('Inizia partita ('+count+' domande)',()=>{rememberTeams();const chosen=savedSettings();prepared=F.prepare(bank.bank,settingsConfig(chosen));start()},'primary'),btn('Torna alla schermata iniziale',goHome));p.append(row);return;
@@ -734,10 +742,10 @@ function cancelFeedback(){feedbackEpoch++;main.classList.remove('showing-movemen
 async function animateOutcome(before){
  const r=game?.s.result;if(!before||before.game!==game||!r||r.id===before.result)return;
  const epoch=feedbackEpoch;main.classList.add('showing-movement');
- const cue=node('div',r.correct?'AVANTI!':game.s.groups[r.respondent].out?'CATTURATO':'POSIZIONE MANTENUTA','movement-cue');cue.setAttribute('role','status');main.append(cue);
+ 
  await new Promise(resolve=>setTimeout(resolve,matchMedia('(prefers-reduced-motion: reduce)').matches?400:1250));
  if(epoch!==feedbackEpoch||before.game!==game||game.s.result?.id!==r.id)return;
- main.classList.remove('showing-movement');cue.remove();main.querySelector('[data-game-action="next"]')?.focus({preventScroll:true});
+ main.classList.remove('showing-movement');main.querySelector('[data-game-action="next"]')?.focus({preventScroll:true});
 }
 
 function questionPoints(){return node('p',game.s.phase==='ordinaria'?game.s.config.bases[game.s.current.difficulty]+' punti':'Spareggio a eliminazione','question-points')}
@@ -761,7 +769,7 @@ function gameBody(){const s=game.s,revision=s.revision,b=node('section',undefine
 function renderGame(){cancelFeedback();if(!game)return;ui='game';const s=game.s,revision=s.revision;document.body.classList.add('playing');document.body.classList.toggle('finished',s.phase==='conclusa');if(s.phase==='conclusa'){closeDialog();fitBlocked=false;$('fit-warning').hidden=true;main.className='final-screen';main.replaceChildren(endScreen());if(lastFinalGame!==s.id){lastFinalGame=s.id;requestAnimationFrame(()=>{main.querySelector('.final-title')?.focus({preventScroll:true})})}return}main.className='operational';main.replaceChildren(FoolHellRace.createStage(s));main.append(scoreboard());const status=node('div',undefined,'statusline');status.append(node('div',(s.phase==='pareggio'?'Spareggio · Giro '+s.tieRound+' · '+s.tieOrder.map(i=>s.groups[i].name).join(' → '):'Rotazione '+s.order.map(i=>s.groups[i].name).join(' → ')),'turn'),node('div',timerText(),'timer'));status.lastChild.id='timer';main.append(status);if(s.phase!=='conclusa'&&s.owner!==s.respondent)main.append(node('div','Titolare: '+s.groups[s.owner].name+' · risponde: '+s.groups[s.respondent].name,'muted'));main.append(gameBody());
  const options=node('details',undefined,'game-options');options.open=optionsOpen;const summary=node('summary','Opzioni');options.append(summary);options.ontoggle=()=>{optionsOpen=options.open};
  const bar=node('nav',undefined,'toolbar');bar.setAttribute('aria-label','Opzioni della partita');if(!s.suspended){if(s.screen==='answer')bar.append(btn(s.paused?'Riprendi timer':'Pausa',command(()=>{if(s.paused){if(fitBlocked)throw Error('Correggere prima le dimensioni della finestra.');game.resume(revision)}else game.pause()})));bar.append(btn('Sanzioni',command(()=>{game.openSanctions();showSanctions()})),btn('Riassegna punti',showScoreAdjustment,'',s.phase!=='ordinaria'));bar.append(btn('Campanella / sospendi',command(()=>game.bell())))}
- bar.append(btn('Domanda precedente',showPreviousQuestion,'',!reviewEntries().length),btn('Scorciatoie da tastiera',showShortcuts),btn('Salva nel browser',saveBrowser),fullscreenButton());bar.append(btn('Statistiche degli altri giocatori',showOtherPlayers));options.append(bar);main.append(options);
+ bar.append(btn('Domanda precedente',showPreviousQuestion,'',!reviewEntries().length),btn('Scorciatoie da tastiera',showShortcuts),btn('Salva nel browser',saveBrowser),fullscreenButton());bar.append(btn('Statistiche degli altri giocatori',showOtherPlayers),btn('Torna alla home',goHome));options.append(bar);main.append(options);
  if(s.suspendAfter)main.append(node('p','Campanella: concludere questa domanda, poi sospensione.','muted'));
  if(s.draftBonus&&!$('dialog').open){inventoryCanResume=false;const c=s.groups[s.owner].inventory.find(c=>c.id===s.draftBonus.copyId);if(c)selectBonus(c)}
  if(s.panel?.type==='sanctions'&&!$('dialog').open)showSanctions();
