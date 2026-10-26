@@ -2,7 +2,7 @@
 
 Sito: https://rickymusu-bit.github.io/quiz/
 
-**Applicazione 3.1.2 · Motore 2.2.1 · Regolamento 19.2.0 · 26/10/2026**
+**Applicazione 3.2.0 · Motore 2.2.1 · Regolamento 19.2.0 · 26/10/2026**
 
 Hellscape è un quiz di fisica per tre giocatori, pubblicato su GitHub Pages dal ramo `main`. Il gioco carica automaticamente i quesiti dal catalogo `datasets.json`. Le domande appartengono a banche separate, associate a materie e argomenti; non è richiesto un server applicativo.
 
@@ -84,9 +84,9 @@ Nella home: **N** nuova partita, **R** riprendi, **G** regole, **I** impostazion
 
 Il rifiuto delle domande è rimosso dal motore, dai comandi e dal regolamento. Un vecchio salvataggio con una richiesta in corso viene ripreso sulla stessa domanda, senza sostituzione e con timer fermo.
 
-## Interfaccia Hellscape 3.1.0
+## Interfaccia Hellscape 3.2.0
 
-La scena riempie lo schermo di gioco in rapporto 4:3, centrato e ridimensionato senza ritaglio in entrambe le orientazioni. Le finestre semitrasparenti mostrano soltanto il giocatore attivo (punti, vite e Ammo) e la domanda. Dopo la risposta la domanda scompare per 1,25 secondi, lasciando vedere il movimento, poi appare la correzione con spiegazione; con movimento ridotto l’intervallo è 0,4 secondi. La prossima domanda aggiorna entrambe le finestre. Le statistiche degli altri giocatori si aprono da Opzioni e fermano il timer. Domanda, quattro alternative e spiegazione restano visibili insieme; la finestra cresce in altezza e il pulsante successivo segue il testo senza sovrapposizioni. Vite e spostamenti rappresentano le regole esistenti: un errore ordinario mantiene i punti, una sanzione toglie una vita.
+La scena riempie lo schermo di gioco in rapporto 4:3, centrato e ridimensionato senza ritaglio in entrambe le orientazioni. La colonna sinistra contiene le tre schede collassabili dei giocatori; la finestra a destra contiene la domanda. Dopo la risposta la domanda scompare per 1,25 secondi, lasciando vedere il movimento, poi appare la correzione con spiegazione; con movimento ridotto l’intervallo è 0,4 secondi. La prossima domanda aggiorna entrambe le finestre. Le tre schede restano consultabili durante il turno, senza fermare il timer. Domanda, quattro alternative e spiegazione restano visibili insieme; la finestra cresce in altezza e il pulsante successivo segue il testo senza sovrapposizioni. Vite e spostamenti rappresentano le regole esistenti: un errore ordinario mantiene i punti, una sanzione toglie una vita.
 
 Percorsi `Fool.html`, API del motore e chiavi dei salvataggi conservati per compatibilità. Nessuna modifica a regole, dataset o formato dei salvataggi.
 
@@ -94,8 +94,8 @@ I veicoli scelti sono disabilitati negli altri selettori e tornano disponibili q
 
 Per ogni modifica all’interfaccia consegnare un’anteprima HTML offline e allegare in chat screenshot aggiornati prima dell’approvazione.
 
-Il tempo è rappresentato soltanto da una fiala orizzontale di liquido rosso: si svuota secondo il tempo residuo del motore, si ferma in pausa e si riempie alla domanda successiva. Nessun conto alla rovescia numerico. L’ordine dei turni è una lista sotto la scheda del giocatore, con il rispondente attuale evidenziato.
+Il tempo è rappresentato soltanto da una fiala orizzontale di liquido rosso: si svuota secondo il tempo residuo del motore, si ferma in pausa e si riempie alla domanda successiva. Nessun conto alla rovescia numerico. L’ordine delle schede segue i turni, con il rispondente attuale in cima.
 
 Al comando Prossima domanda, la fiala si riempie dal livello residuo della domanda precedente fino al pieno in 750 ms. Il conteggio parte soltanto quando si svela la domanda. La preferenza di sistema per il movimento ridotto disattiva il riempimento animato. Gli stemmi non sono mostrati: il riquadro usa come sfondo il veicolo selezionato in scala di grigi. Le icone nei salvataggi precedenti restano soltanto per compatibilità.
 
-La lista dei turni parte sempre dal giocatore corrente e prosegue nell’ordine ciclico, senza numerazione e con frecce verso il basso tra i nomi. I giocatori già eliminati sono esclusi dai turni successivi.
+Le tre schede sono impilate in ordine ciclico, con il giocatore corrente sempre in cima e illuminato da un contorno giallo. Da chiuse mostrano nome e punteggio numerico; da aperte mostrano soltanto vite e inventario. Apertura e chiusura sono indipendenti e si conservano durante la partita. Rimossi la lista separata dei turni e il comando delle statistiche dalle Opzioni.
