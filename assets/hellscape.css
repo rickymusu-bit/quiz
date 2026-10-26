@@ -1,4 +1,4 @@
-/* Hellscape interface 3.0.5 — fixed 1024×768 stage. */
+/* Hellscape interface 3.2.1 — fixed 1024×768 stage. */
 html,body{width:100%;height:100%;overflow:hidden;background:#080605}
 #viewport-stage{position:fixed;left:50%;top:50%;width:1024px!important;height:768px;transform-origin:center center;margin:0;overflow:hidden;background:#1a0b08;box-shadow:0 0 70px #000}
 #orientation-note{display:none!important}
@@ -44,3 +44,46 @@ dialog .scoreboard{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));ga
 #viewport-stage .operation-body .solution p{margin:8px 0}
 
 .rules-content{max-height:55dvh;overflow:auto;padding:4px 10px 12px 0}.rules-page{font-size:17px;line-height:1.4}.rules-page h2{font-size:30px}
+
+/* Player card and ordered turns share the left sidebar. */
+.player-sidebar{position:absolute;left:18px;top:18px;width:260px;max-height:680px;display:flex;flex-direction:column;gap:14px;z-index:2}
+.player-sidebar>.scoreboard{display:block;max-height:445px;overflow:auto;flex:0 1 auto}
+
+#viewport-stage main.operational>.statusline{padding:0;background:none;border:0;min-height:34px;display:block;box-shadow:none}
+.time-vial{position:relative;height:34px;width:100%;border-radius:18px;border:2px solid #ae9784;background:linear-gradient(#efddc536,#160d0ae6 38%,#0b0607);box-shadow:0 2px 0 #100504,0 0 0 2px #241710,inset 0 2px 3px #fff6,inset 0 -3px 4px #000;--level:1}
+.time-vial::before,.time-vial::after{content:'';position:absolute;top:-4px;bottom:-4px;width:12px;border:2px solid #6c5143;background:linear-gradient(90deg,#39261c,#b2926c 40%,#453126);z-index:3}.time-vial::before{left:-3px;border-radius:7px 2px 2px 7px}.time-vial::after{right:-3px;border-radius:2px 7px 7px 2px}
+.vial-interior{position:absolute;inset:3px 8px;border-radius:12px;overflow:hidden;background:#10080d99;box-shadow:inset 0 2px 3px #000}
+.vial-interior::after{content:'';position:absolute;inset:2px 0 55%;border-radius:10px;background:linear-gradient(#fff5,#fff0);pointer-events:none}
+.vial-liquid{height:100%;width:calc(var(--level)*100%);min-width:0;border-radius:10px 3px 3px 10px;position:relative;background:radial-gradient(circle at 17px 9px,#ff967f88 0 2px,transparent 3px),linear-gradient(#ff543c,#c30c25 45%,#670418 90%);background-size:49px 24px,100% 100%;box-shadow:inset 0 2px #ff9a7888,inset 0 -3px #420317,3px 0 5px #ff493d66;transition:width .1s linear;animation:vial-drift 2.5s linear infinite}
+.vial-liquid::after{content:'';position:absolute;right:0;top:0;bottom:0;width:3px;background:#ff7763bb;border-radius:50%}
+.time-vial[data-paused=true] .vial-liquid{animation-play-state:paused}
+@keyframes vial-drift{to{background-position:49px 0,0 0}}
+@media(prefers-reduced-motion:reduce){.vial-liquid{animation:none;transition:none}}
+
+/* The selected vehicle replaces the former player emblem. */
+.team-symbol.team-vehicle{inset:auto 8px 8px auto;width:216px;height:132px;display:block;border:0;background-color:transparent;filter:grayscale(1);opacity:.27;pointer-events:none}
+
+
+/* Three collapsible player cards follow the current turn order. */
+.player-sidebar{max-height:680px;overflow:auto;padding:3px;margin:-3px;scrollbar-width:thin}
+.player-sidebar>.scoreboard.player-stack{display:flex;flex-direction:column;gap:12px;max-height:none;overflow:visible;width:100%}
+#viewport-stage main.operational .player-card{padding:0;border:1px solid #906346;box-shadow:3px 3px #08040380;background:#120e0bdb;flex:0 0 auto}
+#viewport-stage main.operational .player-card.active{border:2px solid #ffe044;box-shadow:0 0 13px #ffe04466,inset 0 0 12px #ffe04412;background:#211708e0}
+#viewport-stage .player-card-header{position:relative;isolation:isolate;display:block;cursor:pointer;padding:13px 30px 13px 14px;min-height:94px;list-style:none;overflow:hidden}
+.player-card-header::-webkit-details-marker{display:none}
+.player-card-header::after{content:'▾';position:absolute;right:12px;top:15px;color:#c7a27d;font-size:20px;line-height:1}
+.player-card[open]>.player-card-header::after{content:'▴'}
+#viewport-stage main.operational .player-card h3{font:27px/1.1 FoolTerminal,monospace;margin:0 0 7px;color:#f6ddbb;position:relative;z-index:1}
+#viewport-stage main.operational .player-card .player-points{font:30px/1.05 FoolTerminal,monospace;color:#fff0cb;position:relative;z-index:1}
+#viewport-stage main.operational .player-card .team-label{font:14px/1.1 FoolTerminal,monospace;margin:7px 0 0;color:#ffe044;position:relative;z-index:1}
+#viewport-stage main.operational .player-card .player-card-body{padding:10px 14px 14px;border-top:1px solid #725038;max-height:185px;overflow:auto;position:relative;z-index:1}
+.player-card-inventory h4{font:22px/1 FoolTerminal,monospace;margin:10px 0 8px;color:#d7b084}.player-card-inventory p{margin:0}
+.player-card .bonus-list{margin:0;display:grid;gap:6px}.player-card .ammo-item{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:14px}.player-card .ammo-round{width:24px;height:24px}
+.player-card-header .team-symbol.team-vehicle{position:absolute;z-index:0;inset:auto 8px 5px auto;width:180px;height:110px;opacity:.23}
+.player-card.out::after{display:none}
+
+/* Expanded content floats over subsequent cards without moving the stack. */
+.player-sidebar{max-height:none;overflow:visible}
+#viewport-stage main.operational .player-card{position:relative;overflow:visible}
+#viewport-stage main.operational .player-card .player-card-body{position:absolute;top:100%;left:-1px;right:-1px;z-index:2;max-height:225px;background:#17110f;border:1px solid #906346;box-shadow:4px 6px 12px #000a}
+#viewport-stage main.operational .player-card.active .player-card-body{left:-2px;right:-2px;border-color:#ffe044;box-shadow:0 4px 12px #ffe04433,4px 6px 12px #000a}
