@@ -65,6 +65,28 @@ test('Home resumes only an unfinished saved game and exposes both actions',()=>{
  assert.equal(run(JSON.stringify(saved)),true);
  assert.equal(run(JSON.stringify({...saved,phase:'pareggio'})),true);
  assert.equal(run(JSON.stringify({...saved,phase:'conclusa'})),false);
+ const old={...saved,config:{}};assert.equal(run(JSON.stringify(old)),true);
+});
+test('Direct resume route skips configuration only when a valid active save exists',()=>{
+ const a=script.indexOf("const launchParams=new URL(location.href).searchParams");
+ const b=script.indexOf("/* Fit a landscape stage",a);
+ assert(a>=0&&b>a);
+ const source=script.slice(a,b);
+ function run(raw){
+  const calls=[];
+  vm.runInNewContext(source,{
+   URL,location:{href:'http://localhost/Fool.html?resume=1',pathname:'/Fool.html'},
+   history:{replaceState:()=>calls.push('query-cleared')},
+   localSave:()=>raw,F,restoreGame:()=>calls.push('resumed'),
+   configure:()=>calls.push('configured'),act:fn=>fn(),message:()=>calls.push('error')
+  });
+  return calls.join(',');
+ }
+ const g=game(33,0),raw=JSON.stringify(g.snapshot());
+ assert.equal(run(raw),'query-cleared,resumed');
+ assert.equal(run(null),'query-cleared,configured,error');
+ g.complete(null);
+ assert.equal(run(JSON.stringify(g.snapshot())),'query-cleared,configured,error');
 });
 test('Saved 2.2.1 games resume in 2.3.0 without altering turn and score',()=>{
  const g=game(33,0);reply(g,true);const before=g.s.groups.map(x=>F.exact(x.score)).join(',');
