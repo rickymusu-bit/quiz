@@ -242,22 +242,21 @@ dialog .columns { margin: 1rem 0; }
 .bonus-inventory-list .bonus-group { display: list-item; }
 .bonus-inventory-list .bonus-group button { margin: .4rem 0 .2rem .6rem; }
 
-/* Ammo: ogni cartuccia rappresenta un'unità; l'etichetta distingue i tipi anche senza colore. */
-.ammo-item { --ammo-color: #a0a0a0; display: flex; align-items: center; flex-wrap: wrap; gap: .3rem .48rem; margin: .2rem 0; min-width: 0; }
-.ammo-label { white-space: normal; }
-.ammo-heading { display: flex; flex-wrap: wrap; align-items: center; gap: .35rem .55rem; flex: 1 1 auto; min-width: 0; }
-.ammo-rounds { display: inline-flex; align-items: center; flex-wrap: wrap; gap: .2rem; max-width: 100%; }
-.ammo-round { display: inline-block; flex: 0 0 auto; width: .52rem; height: 1.07rem; border: 1px solid #0009; border-radius: 45% 45% 15% 15% / 24% 24% 7% 7%; background: linear-gradient(90deg,#0006,transparent 25%,#fff4 42%,transparent 67%,#0006),var(--ammo-color); box-shadow: inset 0 -.17rem 0 #211a1680, 0 0 .3rem color-mix(in srgb,var(--ammo-color),transparent 50%); }
-[data-bonus="salta"],[data-ammo="salta"] { --ammo-color: #fa5959; }
-[data-bonus="ruba"],[data-ammo="ruba"] { --ammo-color: #ffac45; }
-[data-bonus="svela"],[data-ammo="svela"] { --ammo-color: #b98cff; }
-[data-bonus="aura"],[data-ammo="aura"] { --ammo-color: #55dad0; }
-[data-bonus="karma"],[data-ammo="karma"] { --ammo-color: #62a5ff; }
-[data-bonus="marx"],[data-ammo="marx"] { --ammo-color: #b7ee67; }
-.bonus-list { display: flex; flex-direction: column; align-items: flex-start; }
-.bonus-inventory-list .bonus-group { --ammo-color: #a0a0a0; }
-.bonus-inventory-list .ammo-heading { min-width: 0; }
-@media (max-width: 650px) { .ammo-round { width: .46rem; height: .96rem; } }
+/* Six distinct pixel-art pickups; each icon is one owned Ammo unit. */
+.ammo-item { display:flex; align-items:center; flex-wrap:wrap; gap:.3rem .48rem; margin:.2rem 0; min-width:0; }
+.ammo-label { white-space:normal; }
+.ammo-heading { display:flex; flex-wrap:wrap; align-items:center; gap:.35rem .55rem; flex:1 1 auto; min-width:0; }
+.ammo-rounds { display:inline-flex; align-items:center; flex-wrap:wrap; gap:.1rem; max-width:100%; }
+.ammo-round { display:inline-block; flex:0 0 auto; width:1.55rem; height:1.55rem; background-image:url('assets/ammo-sprites-48.png'); background-repeat:no-repeat; background-size:600% 100%; background-position:var(--ammo-position,0%) center; image-rendering:pixelated; }
+[data-ammo="salta"] { --ammo-position:0%; }   /* Nope: corde */
+[data-ammo="ruba"]  { --ammo-position:20%; }  /* Bullo: cartuccia da fucile */
+[data-ammo="svela"] { --ammo-position:40%; }  /* Spoiler: mirino */
+[data-ammo="aura"]  { --ammo-position:60%; }  /* Aura: giubbotto antiproiettile */
+[data-ammo="karma"] { --ammo-position:80%; }  /* Karma: granata */
+[data-ammo="marx"]  { --ammo-position:100%; } /* Marx: bomba */
+.bonus-list { display:flex; flex-direction:column; align-items:flex-start; }
+.bonus-inventory-list .ammo-heading { min-width:0; }
+@media(max-width:650px) { .ammo-round { width:1.4rem; height:1.4rem; } }
 .team.out { position: relative; }
 .team.out::after { content: ''; position: absolute; inset: .3rem; background: url('assets/eliminated-x.png') center / contain no-repeat; opacity: .9; pointer-events: none; }
 
@@ -388,7 +387,7 @@ SOFTWARE.
 (function(root){
 'use strict';
 const RULES='19.2.0', VERSION='2.2.0', TYPES=['salta','ruba','svela','aura','karma','marx'];
-const LABELS={salta:'Nope',ruba:'Tasse',svela:'Spoiler',aura:'Aura',karma:'Karma',marx:'Marx'};
+const LABELS={salta:'Nope',ruba:'Bullo',svela:'Spoiler',aura:'Aura',karma:'Karma',marx:'Marx'};
 const DEFAULT_BONUS_WEIGHTS=Object.fromEntries(TYPES.map(type=>[type,type==='marx'?15:30]));
 const clone=x=>JSON.parse(JSON.stringify(x));
 function need(v,m){if(!v)throw Error(m)}
