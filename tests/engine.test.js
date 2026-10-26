@@ -94,3 +94,18 @@ test('Answered questions retain their displayed option order for read-only revie
 test('Scientific notation uses fractions and subscripts without altering saved question strings',()=>{
  const value='ΔT = Q/(mc), Q1 + Q2 = 0, L0 e V0';const parts=F.scienceParts(value);assert(parts.some(p=>p.math===String.raw`\Delta T=\frac{Q}{m\,c}`));assert(parts.some(p=>p.math==='Q_1+Q_2=0'));assert.equal(value,'ΔT = Q/(mc), Q1 + Q2 = 0, L0 e V0');
 });
+test('Tie-break participants each have one life regardless of prior sanctions',()=>{
+ const g=game(3,0);g.s.groups.forEach((team,i)=>team.sanctions=i);finishOrdinary(g);
+ assert.deepEqual(g.s.groups.map((team,i)=>F.remainingLives(g.s,i)),[1,1,1]);assert.deepEqual(copy(g.s.groups.map(team=>team.sanctions)),[0,1,2]);
+ g.next();const loser=g.s.respondent;reply(g,false);assert.equal(F.remainingLives(g.s,loser),0);
+ const restored=F.Game.restore(g.snapshot());for(const i of restored.active())assert.equal(F.remainingLives(restored.s,i),1);
+});
+test('Only tied leaders retain their single tie-break heart',()=>{
+ const cfg=settings(3,0);cfg.bases={facile:100,media:100,difficile:100};const g=game(3,0,'misto',cfg);reply(g,true);g.next();reply(g,true);g.next();reply(g,false);
+ assert.equal(g.s.phase,'pareggio');for(const i of g.s.order)assert.equal(F.remainingLives(g.s,i),g.s.tieOrder.includes(i)?1:0);
+});
+test('Removed refusal methods are unavailable and pending legacy requests restore the same question',()=>{
+ const g=game();assert.equal(g.refuse,undefined);assert.equal(g.decideRefusal,undefined);g.reveal();const saved=g.snapshot(),id=saved.current.id,remaining=saved.remaining;
+ saved.panel={type:'refusal',from:'answer',wasRunning:true,reason:'non svolto'};const r=F.Game.restore(saved);
+ assert.equal(r.s.panel,null);assert.equal(r.s.current.id,id);assert.equal(r.s.remaining,remaining);assert.equal(r.s.paused,true);assert.equal(r.running,false);assert.equal(r.s.valid,0);
+});
