@@ -18,11 +18,11 @@ with sync_playwright() as p:
  for bank,width,height in [('termologia',1440,900),('introduzione-fisica-misura',844,390)]:
   page=b.new_page(viewport={'width':width,'height':height});page.on('pageerror',lambda e:errors.append(str(e)))
   page.goto(base+'Fool.html?settings=1');expect(page.get_by_role('heading',name='Impostazioni',exact=True)).to_be_visible();expect(page.locator('#question-count')).to_be_visible()
-  page.locator('#bank-choice').select_option(bank);expect(page.locator('#question-count')).to_be_visible();fits(page)
+  page.locator('#bank-choice').select_option(bank);expect(page.locator('#question-count')).to_have_value('33');expect(page.locator('#weight-marx')).to_have_value('15');fits(page)
   for count in [3,6,99]:
    page.locator('#question-count').fill(str(count));page.locator('#seconds').click()
    assert sum(page.locator('#quotas input').evaluate_all('(els)=>els.map(e=>Number(e.value))'))==count
-   for kind in ['salta','ruba','svela','aura','karma']:page.locator('#weight-'+kind).fill('100')
+   for kind in ['salta','ruba','svela','aura','karma','marx']:page.locator('#weight-'+kind).fill('100')
    page.get_by_role('button',name='Salva impostazioni').click();expect(page.locator('#message')).to_contain_text('Impostazioni salvate');fits(page)
    page.get_by_role('button',name='Anteprima',exact=True).click();page.get_by_role('button',name='Prepara anteprima').click()
    expect(page.get_by_role('heading',name='Anteprima docente')).to_be_visible();assert page.evaluate('prepared.chosen.length')==count
@@ -32,25 +32,32 @@ with sync_playwright() as p:
   page.locator('#question-count').fill('3');page.locator('#seconds').click();page.get_by_role('button',name='Salva impostazioni').click()
   page.goto(base+'Fool.html');page.locator('#bank-choice').select_option(bank);expect(page.get_by_role('button',name='Inizia partita')).to_be_enabled();page.get_by_role('button',name='Inizia partita').click()
   assert page.evaluate('game.s.config.questionCount')==3 and page.evaluate('game.s.queue.length')==2
-  page.get_by_role('button',name='Svela e avvia il tempo').click();assert page.get_by_role('button',name='Bonus e inventari',exact=True).count()==0
+  page.get_by_role('button',name='Svela e avvia il tempo').click();assert page.get_by_role('button',name='Inventario Ammo',exact=True).count()==0
   page.locator('.answer').nth(page.evaluate('game.s.current.correct')).click();assert page.evaluate('game.s.result.bonuses.length')==6
   for name in ['Nope','Tasse','Spoiler','Aura','Karma']:expect(page.locator('.solution')).to_contain_text(name)
   expect(page.locator('.answer-feedback')).to_have_count(0)
   assert page.locator('.multiplier-value').count()==0
   team=page.evaluate('game.s.result.respondent')
-  for kind in ['salta','ruba','svela','aura','karma']:assert page.locator(f'.team[data-team="{team}"] [data-bonus="{kind}"]').evaluate('e=>e.getAnimations().length')==1
+  assert page.locator(f'.team[data-team="{team}"] .ammo-item').count()==6
+  assert page.locator(f'.team[data-team="{team}"] .ammo-round').count()==6
+  assert page.locator(f'.team[data-team="{team}"] [data-bonus="marx"] .ammo-round').count()==1
+  assert not any('Ammo 0' in t for t in page.locator('.team').all_text_contents())
+  for kind in ['salta','ruba','svela','aura','karma','marx']:assert page.locator(f'.team[data-team="{team}"] [data-bonus="{kind}"]').evaluate('e=>e.getAnimations().length')==1
   page.get_by_role('button',name='Prossima domanda',exact=True).click()
   page.evaluate('()=>{for(let n=0;n<2;n++)game.s.groups[game.s.owner].inventory.push({id:game.uid(),type:"aura",target:null,origin:"test"});changed()}')
+  assert page.locator(f'.team[data-team="{team}"] [data-bonus="aura"] .ammo-round').count()==3
   for _ in range(2):
-   page.get_by_role('button',name='Bonus e inventari',exact=True).click();page.locator('.bonus-group').filter(has_text='Aura').get_by_role('button',name='Usa',exact=True).click();page.get_by_role('button',name='Conferma uso').click()
+   page.get_by_role('button',name='Inventario Ammo',exact=True).click()
+   assert page.locator('.bonus-inventory-list .bonus-group').filter(has_text='Aura').locator('.ammo-round').count()>=1
+   page.locator('.bonus-group').filter(has_text='Aura').get_by_role('button',name='Usa',exact=True).click();page.get_by_role('button',name='Conferma uso').click()
   assert page.evaluate('game.s.usedBonus')
   page.reload();page.get_by_role('button',name='Riprendi partita',exact=True).click();assert page.evaluate('game.s.valid')==1;fits(page)
   # A legacy settings profile with one probability still opens and starts with defaults.
   page.evaluate('()=>{const data=JSON.parse(localStorage.getItem("fool-settings-v1"));for(const v of Object.values(data.profiles)){delete v.questionCount;delete v.bonusWeights;v.probability=90;v.seconds=60;v.quotas=Object.fromEntries(Object.keys(v.quotas).map(t=>[t,0]));let left=33;while(left)for(const t in v.quotas)if(left){v.quotas[t]++;left--}}localStorage.setItem("fool-settings-v1",JSON.stringify(data))}')
   page.goto(base+'Fool.html?settings=1');page.locator('#bank-choice').select_option(bank);expect(page.locator('#seconds')).to_have_value('60');expect(page.locator('#question-count')).to_have_value('33')
-  for kind in ['salta','ruba','svela','aura','karma']:expect(page.locator('#weight-'+kind)).to_have_value('30')
+  for kind in ['salta','ruba','svela','aura','karma','marx']:expect(page.locator('#weight-'+kind)).to_have_value('30')
   page.goto(base+'Fool_regole.html')
-  for section in range(21):page.locator('#section').select_option(str(section));fits(page)
-  checks.append({'bank':bank,'size':[width,height],'counts':[3,6,99],'awards':5,'uses':2});page.close()
+  for section in range(22):page.locator('#section').select_option(str(section));fits(page)
+  checks.append({'bank':bank,'size':[width,height],'counts':[3,6,99],'awards':6,'uses':2});page.close()
  assert not errors,errors;b.close();print(json.dumps({'configurable':checks,'errors':errors}))
 if 'server' in globals():server.shutdown()
