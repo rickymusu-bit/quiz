@@ -42,10 +42,13 @@ with sync_playwright() as p:
   assert page.locator(f'.team[data-team="{team}"] .ammo-round').count()==6
   assert page.locator(f'.team[data-team="{team}"] [data-bonus="marx"] .ammo-round').count()==1
   assert not any('Ammo 0' in t for t in page.locator('.team').all_text_contents())
+  next_team=page.evaluate('game.s.order[1]')
+  assert page.locator(f'.team[data-team="{next_team}"] .ammo-item').count()==0
   for kind in ['salta','ruba','svela','aura','karma','marx']:assert page.locator(f'.team[data-team="{team}"] [data-bonus="{kind}"]').evaluate('e=>e.getAnimations().length')==1
   page.get_by_role('button',name='Prossima domanda',exact=True).click()
   page.evaluate('()=>{for(let n=0;n<2;n++)game.s.groups[game.s.owner].inventory.push({id:game.uid(),type:"aura",target:null,origin:"test"});changed()}')
-  assert page.locator(f'.team[data-team="{team}"] [data-bonus="aura"] .ammo-round').count()==3
+  current=page.evaluate('game.s.owner')
+  assert page.locator(f'.team[data-team="{current}"] [data-bonus="aura"] .ammo-round').count()==2
   for _ in range(2):
    page.get_by_role('button',name='Inventario Ammo',exact=True).click()
    assert page.locator('.bonus-inventory-list .bonus-group').filter(has_text='Aura').locator('.ammo-round').count()>=1
