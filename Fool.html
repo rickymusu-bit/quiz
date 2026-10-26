@@ -590,7 +590,7 @@ function persist(){if(!game)return;try{localStorage.setItem('fool-v1',JSON.strin
 function changed(){persist();renderGame()}
 function command(fn){return()=>{const before=feedbackState();fn();changed();return animateOutcome(before)}}
 function localSave(){try{return localStorage.getItem('fool-v1')}catch(e){return null}}
-function offerResume(parent){if(localSave())parent.append(btn('Riprendi partita',()=>restoreGame(localSave())))}
+function offerResume(parent){const raw=localSave();if(!raw)return;parent.append(btn('Riprendi partita',()=>restoreGame(localSave())));try{const saved=JSON.parse(raw),count=saved?.config?.questionCount??33;if(count<33)parent.append(node('p','La partita salvata prevede soltanto '+count+' domande. Per iniziare una nuova partita da 33, scegli Inizia partita.','help'))}catch(e){}}
 function goHome(){persist();configurationLoad++;location.assign(new URL('./',location.href).href)}
 function defaultSettings(){return {seconds:45,bonusWeights:{...F.DEFAULT_BONUS_WEIGHTS},difficulty:'misto',questionCount:33,bases:{facile:100,media:200,difficile:300},quotas:balancedQuotas('misto',33)}}
 function balancedQuotas(filter,total=33){
