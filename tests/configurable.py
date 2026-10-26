@@ -30,7 +30,7 @@ with sync_playwright() as p:
    page.get_by_role('button',name='Torna alle impostazioni').click();page.get_by_role('button',name='Generali',exact=True).click()
   stored=page.evaluate('localStorage.getItem("fool-settings-v1")');page.locator('#question-count').fill('4');page.locator('#seconds').click();page.get_by_role('button',name='Salva impostazioni').click();assert page.evaluate('localStorage.getItem("fool-settings-v1")')==stored
   page.locator('#question-count').fill('3');page.locator('#seconds').click();page.get_by_role('button',name='Salva impostazioni').click()
-  page.goto(base+'Fool.html');page.locator('#bank-choice').select_option(bank);expect(page.get_by_role('button',name='Inizia partita')).to_be_enabled();page.get_by_role('button',name='Inizia partita').click()
+  page.goto(base+'Fool.html');page.locator('#bank-choice').select_option(bank);expect(page.get_by_role('button',name='Inizia partita (3 domande)',exact=True)).to_be_enabled();page.get_by_role('button',name='Inizia partita (3 domande)',exact=True).click()
   assert page.evaluate('game.s.config.questionCount')==3 and page.evaluate('game.s.queue.length')==2
   page.get_by_role('button',name='Svela e avvia il tempo').click();assert page.get_by_role('button',name='Inventario Ammo',exact=True).count()==0
   page.locator('.answer').nth(page.evaluate('game.s.current.correct')).click();assert page.evaluate('game.s.result.bonuses.length')==6
@@ -58,10 +58,18 @@ with sync_playwright() as p:
    page.locator('.bonus-group').filter(has_text='Aura').get_by_role('button',name='Usa',exact=True).click();page.get_by_role('button',name='Conferma uso').click()
   assert page.evaluate('game.s.usedBonus')
   page.reload();page.get_by_role('button',name='Riprendi partita',exact=True).click();assert page.evaluate('game.s.valid')==1;fits(page)
+  # A legacy short match without an explicit confirmation must restart at 33.
+  page.evaluate('''()=>{const data=JSON.parse(localStorage.getItem("fool-settings-v1"));for(const v of Object.values(data.profiles)){v.questionCount=3;delete v.questionCountConfirmed;const keys=Object.keys(v.quotas);v.quotas=Object.fromEntries(keys.map((key,i)=>[key,i===0?3:0]));}localStorage.setItem("fool-settings-v1",JSON.stringify(data))}''')
+  page.goto(base+'Fool.html?start=1');page.locator('#bank-choice').select_option(bank)
+  expect(page.get_by_role('button',name='Inizia partita (33 domande)',exact=True)).to_be_visible()
+  page.get_by_role('button',name='Inizia partita (33 domande)',exact=True).click()
+  assert page.evaluate('game.s.phase')=='ordinaria' and page.evaluate('game.s.valid')==0
+  assert page.evaluate('game.s.config.questionCount')==33 and page.evaluate('game.s.queue.length')==32
   # A legacy settings profile with one probability still opens and starts with defaults.
   page.evaluate('()=>{const data=JSON.parse(localStorage.getItem("fool-settings-v1"));for(const v of Object.values(data.profiles)){delete v.questionCount;delete v.bonusWeights;v.probability=90;v.seconds=60;v.quotas=Object.fromEntries(Object.keys(v.quotas).map(t=>[t,0]));let left=33;while(left)for(const t in v.quotas)if(left){v.quotas[t]++;left--}}localStorage.setItem("fool-settings-v1",JSON.stringify(data))}')
   page.goto(base+'Fool.html?settings=1');page.locator('#bank-choice').select_option(bank);expect(page.locator('#seconds')).to_have_value('60');expect(page.locator('#question-count')).to_have_value('33')
-  for kind in ['salta','ruba','svela','aura','karma','marx']:expect(page.locator('#weight-'+kind)).to_have_value('30')
+  for kind in ['salta','ruba','svela','aura','karma']:expect(page.locator('#weight-'+kind)).to_have_value('30')
+  expect(page.locator('#weight-marx')).to_have_value('15')
   page.goto(base+'Fool_regole.html')
   for section in range(22):page.locator('#section').select_option(str(section));fits(page)
   checks.append({'bank':bank,'size':[width,height],'counts':[3,6,99],'awards':6,'uses':2});page.close()
