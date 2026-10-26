@@ -40,3 +40,37 @@ La partita viene salvata automaticamente in `localStorage` nello stesso browser.
 - `tests/verify_datasets.py`: controlli di conformità delle banche.
 
 Eseguire `node --test tests/engine.test.js` e `python3 tests/verify_datasets.py` per i test senza browser.
+
+## Comandi e lettura delle domande
+
+Ogni giocatore sceglie uno stemma con un personaggio pixel art abbinato: Spettro (teschio), Volt (fulmine), Nova (stella), Duellante (spade), Guardiano (scudo), Monarca (corona). I tre personaggi compaiono sotto le domande. Le tre vite sono rappresentate da cuori: ogni sanzione spegne un cuore; a zero il giocatore è eliminato.
+
+Dopo l’esito restano evidenti la risposta scelta e quella corretta. **Domanda precedente** permette di consultare gli esiti già registrati senza cambiare punti, turni o Ammo; ferma il timer, che si riprende esplicitamente. L’ordine delle alternative viene conservato nei nuovi esiti salvati. Per i vecchi salvataggi si recupera la domanda corrente, mentre gli esiti più vecchi privi dell’ordine delle alternative non sono ricostruibili.
+
+Le formule note sono presentate con frazioni e pedici matematici. Nelle soluzioni, **Grandezze e simboli** spiega che una grandezza fisica è una proprietà misurabile ed elenca significati e unità dei simboli dell’argomento. La legenda appare dopo la risposta per non anticipare risposte a quesiti sulle unità. Le banche e i testi dei salvataggi restano coerenti.
+
+**Karma:** ogni attacco non bloccato trasforma una sola copia; le altre restano Karma per attacchi successivi. La copia trasformata si usa solo contro l’attaccante. **Marx:** non è un attacco; Aura non lo blocca e Karma non si trasforma, anche con più copie in inventario.
+
+| Tasti nel gioco | Comando |
+| --- | --- |
+| Invio | Svela / prossima domanda |
+| A, B, C, D | Scegli risposta |
+| P | Pausa / riprendi timer |
+| I | Inventario |
+| S | Sanzioni |
+| V | Riassegna punti |
+| R | Richiedi rifiuto |
+| L | Sospendi / riprendi sessione |
+| ← | Consulta domanda precedente |
+| O | Apri / chiudi Opzioni |
+| K | Salva |
+| F | Schermo intero |
+| H | Schermata iniziale |
+| F1, ? | Guida completa |
+| Tab, Maiusc+Tab | Naviga tra i comandi |
+| Invio, Spazio | Attiva il comando selezionato |
+| Esc | Chiudi inventario, guida o consultazione |
+
+Nei pannelli decisionali si conferma o annulla con i pulsanti, raggiungibili con Tab e Invio. Le scorciatoie non intervengono durante la scrittura e rispettano pause e blocchi del gioco.
+
+Nella home: **N** nuova partita, **R** riprendi, **G** regole, **I** impostazioni, **F** schermo intero. Le regole supportano frecce, Pagina su/giù, Inizio e Fine. `tests/experience.py` verifica le nuove funzioni e le scorciatoie con Chromium su desktop e smartphone orizzontale.

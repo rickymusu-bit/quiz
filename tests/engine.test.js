@@ -68,3 +68,29 @@ test('Ninety-nine questions transition to tie-break only at 99',()=>{const g=gam
 test('Save and resume during tie-break preserves elimination and timer',()=>{const g=game(3,0);finishOrdinary(g);g.next();reply(g,false);const s=g.snapshot(),r=F.Game.restore(s);assert.equal(r.s.phase,'pareggio');assert.equal(r.s.tieIndex,0);assert.equal(r.s.groups[g.s.order[0]].out,true);r.next();assert.equal(r.s.respondent,g.s.order[1]);F.Game.restore(r.snapshot())});
 test('Previous ordinary saves can be migrated without changing scores',()=>{const g=game(33,0);reply(g,true);const s=g.snapshot();s.version='1.2.0';s.rules='18.2.0';s.groups[0].streak=1;s.drawWins=[0,0,0];const r=F.Game.restore(s);assert.equal(r.s.phase,'ordinaria');assert.equal(r.s.version,'2.2.1');assert.equal(r.s.groups[0].streak,undefined);assert.equal(F.exact(r.s.groups[g.s.respondent].score),F.exact(g.s.groups[g.s.respondent].score))});
 test('Two disciplinary eliminations immediately award the remaining team',()=>{const g=game();g.openSanctions();g.s.panel.counts=[3,3,0];g.closeSanctions(true);assert.equal(g.s.phase,'conclusa');assert.equal(g.s.winner,2)});
+test('One unblocked attack transforms one Karma only, preserving the remaining copies',()=>{
+ const g=game(),target=g.s.order[1],source=g.s.owner,items=[0,1,2].map(()=>({id:g.uid(),type:'karma',target:null,origin:'test'}));
+ g.s.groups[target].inventory.push(...items);g.attack('ruba',source,target,g.uid());
+ assert.equal(g.s.groups[target].inventory.filter(c=>c.type==='karma').length,2);
+ assert.equal(items[0].type,'ruba');assert.equal(items[0].target,source);
+ g.attack('salta',source,target,g.uid());assert.equal(items[1].type,'salta');assert.equal(items[2].type,'karma');
+ F.Game.restore(g.snapshot());
+});
+test('An Aura-blocked attack leaves every Karma unchanged',()=>{
+ const g=game(),target=g.s.order[1];g.s.groups[target].aura=g.s.turn;
+ const karma={id:g.uid(),type:'karma',target:null,origin:'test'};g.s.groups[target].inventory.push(karma);
+ assert.equal(g.attack('ruba',g.s.owner,target,g.uid()),false);assert.equal(karma.type,'karma');assert.equal(g.s.effects.length,0);
+});
+test('Marx changes points while leaving other players Aura and Karma untouched',()=>{
+ const g=game(),owner=g.s.owner,target=g.s.order[1];g.s.groups[owner].score=F.rational(90);g.s.groups[target].aura=g.s.turn;
+ g.s.groups[target].inventory.push({id:g.uid(),type:'karma',target:null,origin:'test'},{id:g.uid(),type:'karma',target:null,origin:'test'});
+ const marx={id:g.uid(),type:'marx',target:null,origin:'test'};g.s.groups[owner].inventory.push(marx);g.use(marx.id,null);
+ assert(g.s.groups.every(team=>F.exact(team.score)==='30'));assert.equal(g.s.groups[target].aura,g.s.turn);assert(g.s.groups[target].inventory.every(c=>c.type==='karma'));F.Game.restore(g.snapshot());
+});
+test('Answered questions retain their displayed option order for read-only review and restore',()=>{
+ const g=game(),q=copy(g.s.current);reply(g,false);const e=g.s.events.find(e=>e.outcome);assert.deepEqual(copy(e.question),q);
+ assert.equal(e.question.options[e.outcome.option],q.options[(q.correct+1)%4]);g.next();const r=F.Game.restore(g.snapshot());assert.deepEqual(copy(r.s.events.find(e=>e.outcome).question),q);
+});
+test('Scientific notation uses fractions and subscripts without altering saved question strings',()=>{
+ const value='ΔT = Q/(mc), Q1 + Q2 = 0, L0 e V0';const parts=F.scienceParts(value);assert(parts.some(p=>p.math===String.raw`\Delta T=\frac{Q}{m\,c}`));assert(parts.some(p=>p.math==='Q_1+Q_2=0'));assert.equal(value,'ΔT = Q/(mc), Q1 + Q2 = 0, L0 e V0');
+});

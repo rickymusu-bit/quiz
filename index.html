@@ -27,6 +27,7 @@ h1{width:100%;margin:0;line-height:0}
 @media(max-height:500px){.home-content{gap:8px}.home-logo{max-height:32svh}.subtitle{font-size:clamp(20px,4vh,29px)}.menu{gap:8px;margin-top:0;width:min(290px,78%)}.menu a,.menu button{min-height:44px;font-size:clamp(24px,7vw,32px);padding-block:4px}}
 @media(prefers-reduced-motion:reduce){.menu a:active,.menu button:active{transform:none}}
 #orientation-note{display:none}body.portrait #viewport-stage{display:none}body.portrait #orientation-note{position:fixed;inset:0;display:grid;align-content:center;justify-items:center;text-align:center;padding:1rem;background:#090809}#orientation-note h2{font:400 3rem FoolTerminal,monospace;color:#efb36e}#viewport-stage main{min-height:0}.menu{gap:8px}.menu a,.menu button{cursor:pointer}.menu button{width:100%}#play-frame{position:fixed;inset:0;width:100%;height:100dvh;border:0;background:#090809}#fullscreen-status{font:14px system-ui,sans-serif;color:#f4e9cc}[hidden]{display:none!important}
+.home-keys{max-width:34rem;font:14px/1.5 system-ui,sans-serif;color:#ddd0bb;margin:0;text-shadow:1px 1px #000}
 </style>
 </head>
 <body>
@@ -37,13 +38,14 @@ h1{width:100%;margin:0;line-height:0}
 <h1><img class="home-logo" src="assets/fool-logo.png" alt="Fool" width="2171" height="724" fetchpriority="high"></h1>
 <p class="subtitle">Solo uno sciocco pensa di vincere</p>
 <nav class="menu" aria-label="Menu principale">
-<a href="Fool.html?start=1">Nuova partita</a>
-<a id="resume-game" href="Fool.html?resume=1" hidden>Riprendi partita</a>
-<a href="Fool_regole.html">Regole</a>
-<a href="Fool.html?settings=1">Impostazioni</a>
-<button id="home-fullscreen" type="button">Schermo intero</button>
+<a href="Fool.html?start=1" aria-keyshortcuts="N">Nuova partita</a>
+<a id="resume-game" href="Fool.html?resume=1" aria-keyshortcuts="R" hidden>Riprendi partita</a>
+<a href="Fool_regole.html" aria-keyshortcuts="G">Regole</a>
+<a href="Fool.html?settings=1" aria-keyshortcuts="I">Impostazioni</a>
+<button id="home-fullscreen" type="button" aria-keyshortcuts="F">Schermo intero</button>
 <p id="fullscreen-status" role="status" hidden></p>
 </nav>
+<p class="home-keys">N Nuova · R Riprendi · G Regole · I Impostazioni · F Schermo intero</p>
 </div>
 </main></div>
 <script>
@@ -55,6 +57,11 @@ function updateResumeLink(){
  window.fitFoolViewport?.();
 }
 updateResumeLink();
+document.addEventListener('keydown',event=>{
+ if(event.defaultPrevented||event.repeat||event.isComposing||event.ctrlKey||event.altKey||event.metaKey||document.getElementById('play-frame')||event.target.closest?.('input,select,textarea,[contenteditable="true"]'))return;
+ const keys={n:'.menu a[href="Fool.html?start=1"]',r:'#resume-game',g:'.menu a[href="Fool_regole.html"]',i:'.menu a[href="Fool.html?settings=1"]',f:'#home-fullscreen'},selector=keys[event.key.toLowerCase()],control=selector&&document.querySelector(selector);
+ if(control&&!control.hidden){event.preventDefault();control.click()}
+});
 window.addEventListener('pageshow',updateResumeLink);
 window.addEventListener('storage',updateResumeLink);
 window.foolToggleFullscreen=async()=>{try{if(document.fullscreenElement){await document.exitFullscreen()}else if(document.documentElement.requestFullscreen){await document.documentElement.requestFullscreen()}else throw Error('Lo schermo intero non è disponibile in questo browser.')}catch(error){fullscreenStatus.textContent='Il browser non consente lo schermo intero. Puoi continuare in questa finestra.';fullscreenStatus.hidden=false}};
