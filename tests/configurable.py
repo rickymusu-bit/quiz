@@ -34,13 +34,16 @@ with sync_playwright() as p:
   assert page.evaluate('game.s.config.questionCount')==3 and page.evaluate('game.s.queue.length')==2
   page.get_by_role('button',name='Svela e avvia il tempo').click();assert page.get_by_role('button',name='Inventario Ammo',exact=True).count()==0
   page.locator('.answer').nth(page.evaluate('game.s.current.correct')).click();assert page.evaluate('game.s.result.bonuses.length')==6
-  for name in ['Nope','Tasse','Spoiler','Aura','Karma']:expect(page.locator('.solution')).to_contain_text(name)
+  for name in ['Nope','Bullo','Spoiler','Aura','Karma']:expect(page.locator('.solution')).to_contain_text(name)
   expect(page.locator('.answer-feedback')).to_have_count(0)
   assert page.locator('.multiplier-value').count()==0
   team=page.evaluate('game.s.result.respondent')
   assert page.locator(f'.team[data-team="{team}"] .ammo-item').count()==6
   assert page.locator(f'.team[data-team="{team}"] .ammo-round').count()==6
   assert page.locator(f'.team[data-team="{team}"] [data-bonus="marx"] .ammo-round').count()==1
+  assert 'ammo-sprites-48.png' in page.locator(f'.team[data-team="{team}"] .ammo-round').first.evaluate('(el)=>getComputedStyle(el).backgroundImage')
+  for kind in ['salta','ruba','svela','aura','karma','marx']:
+   assert page.locator(f'.team[data-team="{team}"] [data-ammo="{kind}"]').count()==1
   assert not any('Ammo 0' in t for t in page.locator('.team').all_text_contents())
   next_team=page.evaluate('game.s.order[1]')
   assert page.locator(f'.team[data-team="{next_team}"] .ammo-item').count()==0
