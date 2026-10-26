@@ -1,9 +1,21 @@
-/* Fool — Fuga dall'Inferno v1.0.0 (2026-10-26): scena pixel-art illustrativa.
+/* Fool — Fuga dall'Inferno v1.1.0 (2026-10-26): scena pixel-art illustrativa.
    Nessuna modifica al motore, ai punteggi o ai salvataggi. */
 (function (root) {
   'use strict';
   const H = 156, lanes = [75, 107, 139];
-  const colors = ['#5fe3e2', '#f5c661', '#bc9cf5'];
+  const colors = ['#d6ad75', '#be7554', '#b4a08c'];
+  const VEHICLES = ['chopper', 'pickup', 'truck', 'coupe', 'offroad', 'ape'];
+  const sheets = { vehicles: null, demon: null };
+  // These are deliberately two atlases, not six independent network requests.
+  if (typeof root.Image === 'function') {
+    for (const key of Object.keys(sheets)) {
+      const img = new root.Image();
+      img.decoding = 'async';
+      img.src = 'assets/hell-race/' + key + '.webp';
+      sheets[key] = img;
+    }
+  }
+  const imageReady = img => !!img && img.complete && img.naturalWidth > 0;
   const reduce = root.matchMedia('(prefers-reduced-motion: reduce)');
   let live = null, last = null, roadPhase = 0, roadLastTime = null;
   const clamp = (n, a, b) => Math.min(b, Math.max(a, n));
@@ -69,10 +81,31 @@
   function racer(c, x, y, i, tick, g, scale = 2) {
     if (scale <= 0) return;
     const unit = Math.max(1, Math.round(scale));
-    const vehicle = vehicles[i];
+    const vehicle = vehicles[i % vehicles.length];
     const palette = { '1': '#312b34', '2': colors[i], '3': '#74584c',
       '4': '#e8a750', '5': '#d7b89a', '6': '#141117' };
     const left = Math.round(x - 25 * unit), top = Math.round(y - 8 * unit);
+    // Fumo, polvere e calore continuano a muoversi anche con i PNG statici.
+    if (imageReady(sheets.vehicles)) {
+      const chosen = VEHICLES.indexOf(g.vehicle || ''); 
+      const id = chosen < 0 ? i % VEHICLES.length : chosen;
+      const col = id % 3, row = Math.floor(id / 3);
+      const destW = scale < 2 ? 47 : 64, destH = scale < 2 ? 28 : 38;
+      const destX = Math.round(x - destW * .50);
+      const destY = Math.round(y - destH * .68 + Math.sin(tick * 13 + i) * .8);
+      for (let j = 0; j < 3; j++) {
+        const dist = (tick * 27 + j * 13) % 38;
+        r(c, destX - 5 - dist, destY + destH * .58 + j * 2, 4 + j, 2 + j, j % 2 ? '#4e3830' : '#9d4830');
+      }
+      c.drawImage(sheets.vehicles, col * 72, row * 44, 72, 44, destX, destY, destW, destH);
+      if (g.out) {
+        c.fillStyle = '#0b0908aa';
+        c.fillRect(destX, destY, destW, destH);
+        r(c, destX + destW * .47, destY + 4, 4, 4, '#da572b');
+      }
+      return;
+    }
+    // Fallback minimale se la rete impedisce il caricamento degli asset.
     // Tubature incandescenti e fumo.
     for (let j = 0; j < 3; j++) {
       const dist = (tick * 24 + j * 13) % 31;
@@ -142,8 +175,8 @@
   function gate(c, x, y, tick, open) {
     // Portale in pietra basalto/ottone, con una luce celeste in contrasto col rosso infernale.
     r(c, x - 6, y + 8, 70, 128, '#100f1e');
-    r(c, x + 5, y + 18, 46, 118, open ? '#a2ffff' : '#63c3cd');
-    r(c, x + 12, y + 24, 31, 110, open ? '#f4ffff' : '#b4f0eb');
+    r(c, x + 5, y + 18, 46, 118, open ? '#fff0b1' : '#d5632c');
+    r(c, x + 12, y + 24, 31, 110, open ? '#fff6d6' : '#ef9a43');
     r(c, x - 13, y + 9, 16, 127, '#706968');
     r(c, x + 53, y + 9, 16, 127, '#706968');
     r(c, x - 15, y + 3, 83, 15, '#928573');
@@ -153,10 +186,16 @@
       line(c, x + 53, y + 22 + j * 23, 15, '#352c36');
     }
     if (open || Math.sin(tick * 5) > .5) {
-      r(c, x + 20, y + 37, 6, 64, '#ffffff');
+      r(c, x + 20, y + 37, 6, 64, '#ffe6aa');
     }
   }
   function demon(c, tick, x = 32, shade = '#9b2831') {
+    if (imageReady(sheets.demon)) {
+      const bounce = Math.sin(tick * 4.5) * 2.5;
+      const stretch = Math.sin(tick * 5.5) * 2;
+      c.drawImage(sheets.demon, Math.round(x - 27), Math.round(13 + bounce), 147, 117 + stretch);
+      return;
+    }
     const y = 12 + Math.round(Math.sin(tick * 4) * 2);
     // Sagoma di un demone enorme, con corna, artigli e fauci animate.
     r(c, x + 5, y + 33, 45, 103, '#210d1b');
@@ -201,6 +240,8 @@
     if (final) demonX = 15 + smooth((ended - 1) / 3.4) * Math.max(70, W * .44);
     demon(c, motion, demonX);
     state.groups.forEach((group, i) => {
+      const configuredVehicle = state.config.vehicles?.[i] || ['chopper', 'pickup', 'ape'][i];
+      const visualGroup = { ...group, vehicle: configuredVehicle };
       const ratio = positionScore(state, i);
       const dest = W * (.36 + .22 * ratio) + 12 * progress;
       const start = previous ? W * (.36 + .22 * previous[i]) + 12 * progress : dest;
@@ -222,8 +263,8 @@
         }
       }
       if (visible) {
-        racer(c, x, lanes[i], i, motion, group, unit);
-        nameTag(c, W, x, lanes[i], group.name, colors[i]);
+        racer(c, x, lanes[i], i, motion, visualGroup, unit);
+        nameTag(c, W, x, lanes[i] - 13, group.name, colors[i]);
       }
     });
     if (final && ended > 3.6) {
