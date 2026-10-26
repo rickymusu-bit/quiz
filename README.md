@@ -30,7 +30,7 @@ npm ci
 python3 -m pip install -r requirements-test.txt
 npm run dev             # http://127.0.0.1:8000
 npm test                # motore, persistenza e 200 domande delle due banche
-npm run test:frames     # 48 fotogrammi veicoli + 12 demone
+npm run test:frames     # 48 fotogrammi veicoli + 12 demone, proporzioni e nomi
 npm run test:browser    # regressioni interfaccia e Canvas
 npm run build           # dist/site, pubblicabile su hosting statico
 npm run test:offline    # genera e verifica dist/Hellscape-offline.html
@@ -44,7 +44,7 @@ L’anteprima include home, gioco, regole, entrambi i dataset, script, CSS, imma
 
 `tests/offline.py` carica gli esatti byte dell’HTML in un contesto Chromium senza rete, controlla entrambe le banche, risposte, regole, ripresa, isolamento dei salvataggi, assenza di richieste esterne ed errori JavaScript a 1440×900, 390×844 e 844×390. Il browser gestito di questa sessione blocca gli URL `file://`: il test usa una sola risposta locale intercettata per fornire il documento e non certifica l’apertura diretta da file in quel browser. Gli screenshot vengono scritti in `artifacts/`.
 
-Per confrontare la grafica con la base della PR #17, preparare un checkout e indicarlo a `HELLSCAPE_BASELINE=/percorso/base python3 tests/visual_parity.py` (richiede Pillow). Il test confronta pixel per pixel tre screenshot con movimento ridotto e riprende una partita salvata dal codice della base. La base non viene usata dal sito o dalla build.
+Per confrontare la grafica con la base della PR #17, preparare un checkout e indicarlo a `HELLSCAPE_BASELINE=/percorso/base python3 tests/visual_parity.py` (richiede Pillow). Il test confronta pixel per pixel tre screenshot con movimento ridotto e riprende una partita salvata dal codice della base. È una verifica del solo refactoring: la successiva correzione approvata delle proporzioni dei mezzi e della posizione dei nomi produce differenze visive intenzionali rispetto alla PR #17. La base non viene usata dal sito o dalla build.
 
 ## Partita ordinaria
 

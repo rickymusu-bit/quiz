@@ -1,10 +1,12 @@
-/* Fool — Fuga dall'Inferno v1.2.2 (2026-10-26): scena pixel-art illustrativa.
+/* Fool — Fuga dall'Inferno v1.2.3 (2026-10-26): scena pixel-art illustrativa.
    Nessuna modifica al motore, ai punteggi o ai salvataggi. */
 (function (root) {
   'use strict';
-  const H = 384, lanes = [220, 280, 340];
+  const H = 384, lanes = [188, 268, 348];
   const colors = ['#d6ad75', '#be7554', '#b4a08c'];
   const VEHICLES = ['chopper', 'pickup', 'truck', 'coupe', 'offroad', 'ape'];
+  // Widths in logical race pixels; preserve each complete silhouette's aspect ratio.
+  const vehicleWidths = [44, 58, 62, 54, 56, 40];
   const sheets = { vehicles: null, demon: null, world: null, portal: null };
   const files = { vehicles: 'vehicles-drive-v1.webp', demon: 'demon-actions-v1.webp', world: 'infernal-world-v1.webp', portal: 'portal-flames-v1.webp' };
   // Shared atlases are decoded once; every state uses the same images.
@@ -91,9 +93,23 @@
     const w=rect[2]*scale,h=rect[3]*scale;
     c.drawImage(image,...rect,Math.round(x+(width-w)/2),Math.round(y+height-h),Math.round(w),Math.round(h));return true;
   }
+  function vehicleSize(row, scale = 2) {
+    const frame = vehicleRow(row)[0];
+    const width = vehicleWidths[row] * (scale < 2 ? .65 : 1);
+    return { width, height: width * frame.height / frame.width };
+  }
+  function drawVehicle(c, row, frame, x, ground, scale = 2) {
+    const size = vehicleSize(row, scale);
+    const bounds = { x: Math.round(x - size.width / 2), y: Math.round(ground - size.height),
+      width: Math.round(size.width), height: Math.round(size.height) };
+    sprite(c, 'vehicles', 8, 6, row, frame, bounds.x, bounds.y, bounds.width, bounds.height);
+    return bounds;
+  }
   function vehiclePreview(id){
     const canvas=document.createElement('canvas');canvas.width=160;canvas.height=90;
-    const paint=()=>{const c=canvas.getContext('2d');c.imageSmoothingEnabled=false;c.clearRect(0,0,160,90);sprite(c,'vehicles',8,6,Math.max(0,VEHICLES.indexOf(id)),0,0,0,160,90)};
+    const paint=()=>{const c=canvas.getContext('2d');c.imageSmoothingEnabled=false;c.clearRect(0,0,160,90);const row=Math.max(0,VEHICLES.indexOf(id)),size=vehicleSize(row);
+      // One common preview scale retains the same relative sizes as the race.
+      const zoom=1.35; sprite(c,'vehicles',8,6,row,0,80-size.width*zoom/2,86-size.height*zoom,size.width*zoom,size.height*zoom)};
     if(imageReady(sheets.vehicles))paint();else sheets.vehicles?.addEventListener('load',paint,{once:true});
     return canvas;
   }
@@ -170,7 +186,8 @@
     if (imageReady(sheets.vehicles)) {
       const chosen = VEHICLES.indexOf(g.vehicle || ''); 
       const id = chosen < 0 ? i % VEHICLES.length : chosen;
-      const destW = scale < 2 ? 52 : 80, destH = scale < 2 ? 32 : 50;
+      const size = vehicleSize(id, scale);
+      const destW = size.width, destH = size.height;
       const destX = Math.round(x - destW * .50);
       const destY = Math.round(y - destH);
       for (let j = 0; j < 5; j++) {
@@ -178,13 +195,13 @@
         const puff=Math.max(1,Math.round(5*(1-dist/48)));
         r(c, destX - dist, y - 4 - j % 3, puff*2, puff, j % 2 ? '#5a4133' : '#a16c45');
       }
-      sprite(c,'vehicles',8,6,id,Math.floor(tick*10+i*2)%8,destX,destY,destW,destH);
+      const bounds = drawVehicle(c,id,Math.floor(tick*10+i*2)%8,x,y,scale);
       if (g.out) {
         c.fillStyle = '#0b0908aa';
         c.fillRect(destX, destY, destW, destH);
         r(c, destX + destW * .47, destY + 4, 4, 4, '#da572b');
       }
-      return;
+      return bounds;
     }
     // Fallback minimale se la rete impedisce il caricamento degli asset.
     // Tubature incandescenti e fumo.
@@ -207,6 +224,7 @@
       r(c, left + 6 * unit, top + 3 * unit, 12 * unit, 3 * unit, '#211a20');
       r(c, left + 10 * unit, top, 3 * unit, 3 * unit, '#ff663e');
     }
+    return { x: left, y: top - 4 * unit, width: 50 * unit, height: 24 * unit };
   }
   function background(c, W, tick, progress) {
     if(imageReady(sheets.world)){
@@ -315,15 +333,16 @@
       r(c, x + 49 + i * 6, y + 116, 5, 13, '#d58a55');
     }
   }
-  function nameTag(c, W, x, y, name, color) {
+  function nameTag(c, W, x, spriteTop, name, color) {
     const tag = String(name).slice(0, 16);
     c.font = 'bold 10px monospace';
     const width = Math.min(W - 6, c.measureText(tag).width + 9);
     const lx = clamp(x - width / 2, 2, W - width - 2);
-    r(c, lx, y - 31, width, 13, '#0c0e19');
-    r(c, lx, y - 31, 3, 13, color);
+    const top = spriteTop - 18; // 13px tag plus a 5px clear gap above the sprite.
+    r(c, lx, top, width, 13, '#0c0e19');
+    r(c, lx, top, 3, 13, color);
     c.fillStyle = '#f6ead3';
-    c.fillText(tag, lx + 6, y - 21);
+    c.fillText(tag, lx + 6, top + 10);
   }
   function scene(c, W, state, sec, final, previous, reduced, roadTime) {
     const total = Math.max(1, Number(state.config.questionCount || 33));
@@ -361,8 +380,8 @@
         }
       }
       if (visible) {
-        racer(c, x, y, i, motion, visualGroup, unit);
-        nameTag(c, W, x, y - 13, group.name, colors[i]);
+        const bounds = racer(c, x, y, i, motion, visualGroup, unit);
+        nameTag(c, W, x, bounds.y, group.name, colors[i]);
       }
     });
     c.save();c.translate(0,130);c.scale(1.3,1.3);demon(c, motion, demonX, '#9b2831', !final||ended<1?'chase':ended<1.65?'attack':'devour', ended<1.65?Math.max(0,ended-1):Math.max(0,(ended-1.65)%1.1));c.restore();

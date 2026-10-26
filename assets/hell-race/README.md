@@ -1,6 +1,6 @@
 # Asset della corsa infernale
 
-Versione grafica **1.2.2** — 26/10/2026.
+Versione grafica **1.2.3** — 26/10/2026.
 
 Pixel art infernale dal riferimento approvato: ferro annerito, ruggine, cuoio, emblemi distintivi e luce di lava. Asset raster generati con lo strumento integrato imagegen, convertiti in WebP mantenendo il canale alfa. Specifiche in [PROMPTS-v1.md](PROMPTS-v1.md).
 
@@ -16,3 +16,7 @@ Pixel art infernale dal riferimento approvato: ferro annerito, ruggine, cuoio, e
 Il demone passa dalla corsa all'attacco e al morso nel finale. Il portale compare nella parte conclusiva della partita; nel finale ne viene disegnato uno solo. Polvere e braci completano il movimento. Pausa e sospensione fermano la scena; la preferenza di sistema per il movimento ridotto mostra pose ferme. La grafica non modifica punteggi, turni o salvataggi.
 
 I due asset statici `vehicles.webp` e `demon.webp` della v1.1.0 sono conservati come versione precedente, ma non vengono caricati dalla nuova scena.
+
+I nomi sono ancorati sopra il bordo superiore effettivo degli sprite, con almeno 5 pixel logici di spazio. Le corsie distano 80 pixel per separare nomi e veicoli anche a pari punteggio. Le larghezze logiche sono: camion 62, pick-up 58, fuoristrada 56, coupé 54, chopper 44, Ape 40. Ogni mezzo conserva le proporzioni della propria sagoma; le anteprime usano un fattore comune, senza ingrandire separatamente i mezzi piccoli. `tests/vehicle_layout.cjs` controlla le dimensioni realmente disegnate su tutti i fotogrammi, nella cattura e nelle anteprime, e genera `artifacts/vehicle-proportions.png`.
+
+Anche nelle schede giocatore il nome occupa una riga separata sopra l’anteprima del veicolo; punteggio e stato restano a sinistra. Il test browser verifica che i rettangoli di nome e sprite non si sovrappongano in entrambe le orientazioni.
