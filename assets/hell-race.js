@@ -1,4 +1,4 @@
-/* Fool — Fuga dall'Inferno v1.2.1 (2026-10-26): scena pixel-art illustrativa.
+/* Fool — Fuga dall'Inferno v1.2.2 (2026-10-26): scena pixel-art illustrativa.
    Nessuna modifica al motore, ai punteggi o ai salvataggi. */
 (function (root) {
   'use strict';
@@ -36,13 +36,17 @@
     }
     const [x,y,w,h]=frameBounds.get(cacheKey);return [frame*cw+x,rowTop+y,w,h];
   }
-  const vehicleRows=new Map();
+  const animationRows=new Map();
   // Generated artwork is not a uniform grid. Identify whole silhouettes before
   // sampling animation frames, rather than slicing through wheels and bumpers.
-  function vehicleRow(row){
-    if(vehicleRows.has(row))return vehicleRows.get(row);
-    const img=sheets.vehicles, bands=[[70,245],[255,435],[440,625],[650,790],[800,960],[985,1165]];
-    const top=Math.floor(bands[row][0]*img.naturalHeight/1254),height=Math.ceil((bands[row][1]-bands[row][0])*img.naturalHeight/1254),width=img.naturalWidth;
+  function vehicleRow(row){return atlasRow('vehicles',row)}
+  function atlasRow(key,row){
+    const cacheKey=key+':'+row;
+    if(animationRows.has(cacheKey))return animationRows.get(cacheKey);
+    const img=sheets[key],isVehicle=key==='vehicles',columns=isVehicle?8:4;
+    const bands=isVehicle?[[70,245],[255,435],[440,625],[650,790],[800,960],[985,1165]]:[[35,337],[350,660],[675,985]];
+    const referenceHeight=isVehicle?1254:1024;
+    const top=Math.floor(bands[row][0]*img.naturalHeight/referenceHeight),height=Math.ceil((bands[row][1]-bands[row][0])*img.naturalHeight/referenceHeight),width=img.naturalWidth;
     const work=document.createElement('canvas');work.width=width;work.height=height;
     const ctx=work.getContext('2d',{willReadFrequently:true});ctx.drawImage(img,0,-top);
     const raw=ctx.getImageData(0,0,width,height),labels=new Int32Array(width*height),components=[];
@@ -56,10 +60,10 @@
       if(count>1000)components.push({id,left,right});
     }
     const pieces=components.sort((a,b)=>a.left-b.left).flatMap(part=>{
-      const count=Math.max(1,Math.round((part.right-part.left+1)/(width/8)));
+      const count=Math.max(1,Math.round((part.right-part.left+1)/(width/columns)));
       return Array.from({length:count},(_,i)=>({...part,min:part.left+i*(part.right-part.left+1)/count,max:part.left+(i+1)*(part.right-part.left+1)/count}));
     });
-    if(pieces.length!==8)throw Error('Vehicle atlas: expected eight silhouettes for row '+row);
+    if(pieces.length!==columns)throw Error(key+' atlas: unexpected silhouette count for row '+row);
     const frames=pieces.map(part=>{
       const pixels=[];let l=width,t=height,r=0,b=0;
       for(let at=0;at<labels.length;at++){const x=at%width,y=Math.floor(at/width);
@@ -76,12 +80,13 @@
       for(const at of frame.pixels){const x=at%width-frame.l+dx,y=Math.floor(at/width)-frame.t+dy;out.data.set(raw.data.subarray(at*4,at*4+4),(y*frameWidth+x)*4)}
       c.putImageData(out,0,0);return canvas;
     });
-    vehicleRows.set(row,result);return result;
+    animationRows.set(cacheKey,result);return result;
   }
   function sprite(c,key,columns,rows,row,frame,x,y,width,height){
     if(!imageReady(sheets[key]))return false;
-    const image=key==='vehicles'?vehicleRow(row)[frame]:sheets[key];
-    const rect=key==='vehicles'?[0,0,image.width,image.height]:frameRect(key,columns,rows,row,frame),scale=Math.min(width/rect[2],height/rect[3]);
+    const animated=key==='vehicles'||key==='demon';
+    const image=animated?atlasRow(key,row)[frame]:sheets[key];
+    const rect=animated?[0,0,image.width,image.height]:frameRect(key,columns,rows,row,frame),scale=Math.min(width/rect[2],height/rect[3]);
     const w=rect[2]*scale,h=rect[3]*scale;
     c.drawImage(image,...rect,Math.round(x+(width-w)/2),Math.round(y+height-h),Math.round(w),Math.round(h));return true;
   }
