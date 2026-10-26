@@ -33,7 +33,7 @@ with sync_playwright() as p:
   page.goto(base+'Fool.html');page.locator('#bank-choice').select_option(bank);expect(page.get_by_role('button',name='Inizia partita')).to_be_enabled();page.get_by_role('button',name='Inizia partita').click()
   assert page.evaluate('game.s.config.questionCount')==3 and page.evaluate('game.s.queue.length')==2
   page.get_by_role('button',name='Svela e avvia il tempo').click();assert page.get_by_role('button',name='Bonus e inventari',exact=True).count()==0
-  page.locator('.answer').nth(page.evaluate('game.s.current.correct')).click();assert page.evaluate('game.s.result.bonuses.length')==5
+  page.locator('.answer').nth(page.evaluate('game.s.current.correct')).click();assert page.evaluate('game.s.result.bonuses.length')==6
   for name in ['Nope','Tasse','Spoiler','Aura','Karma']:expect(page.locator('.solution')).to_contain_text(name)
   expect(page.locator('.answer-feedback')).to_have_count(0)
   assert page.locator('.multiplier-value').count()==0
