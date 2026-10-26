@@ -12,7 +12,8 @@
     for (const key of Object.keys(sheets)) {
       const img = new root.Image();
       img.decoding = 'async';
-      img.src = 'assets/hell-race/' + files[key];
+      const assetPath = 'assets/hell-race/' + files[key];
+      img.src = root.HellscapeOffline?.assets?.[assetPath] || assetPath;
       img.addEventListener('load', () => live?.redraw?.(), { once: true });
       sheets[key] = img;
     }

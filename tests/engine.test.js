@@ -1,9 +1,7 @@
 'use strict';
-const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
-const root=path.join(__dirname,'..'),html=fs.readFileSync(path.join(root,'Fool.html'),'utf8'),scripts=[...html.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)],script=scripts.map(m=>m[1]).find(source=>source.includes('/* Fool 1.0.0 — modello'));
-assert(script,'Engine inline non trovato');
-const engine=script.slice(0,script.indexOf("\n'use strict';\nconst F=Fool"));assert(engine.length>10000);
-const context={module:{exports:{}},TextEncoder,performance};vm.runInNewContext(engine,context);const F=context.module.exports;
+const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
+const root=path.join(__dirname,'..'),html=fs.readFileSync(path.join(root,'Fool.html'),'utf8')+fs.readFileSync(path.join(root,'assets/css/game.css'),'utf8')+fs.readFileSync(path.join(root,'assets/js/ui.js'),'utf8');
+const F=require('../assets/js/engine.js');
 const catalogue=JSON.parse(fs.readFileSync(path.join(root,'datasets.json'),'utf8'));
 const thermal=catalogue.banche.find(x=>x.id==='termologia');assert(thermal);
 const bank=F.parseDataset(fs.readFileSync(path.join(root,thermal.url),'utf8')).bank,copy=x=>JSON.parse(JSON.stringify(x));
@@ -36,7 +34,7 @@ test('Restore an existing 2.1.0 game while retaining chosen probabilities and po
  assert.equal(restored.s.config.bonusWeights.marx,30);assert.equal(F.exact(restored.s.groups[0].score),'305');
 });
 test('Each Ammo type has its own retro pixel-art sprite',()=>{
- assert.match(html,/assets\/ammo-sprites-48\.png/);
+ assert.match(html,/ammo-sprites-48\.png/);
  for(const kind of F.TYPES)assert.match(html,new RegExp('\\[data-ammo="'+kind+'"\\]'));
 });
 test('New ordinary game starts with 33 questions even when all scores are zero',()=>{
@@ -120,4 +118,15 @@ test('Removed refusal methods are unavailable and pending legacy requests restor
  const g=game();assert.equal(g.refuse,undefined);assert.equal(g.decideRefusal,undefined);g.reveal();const saved=g.snapshot(),id=saved.current.id,remaining=saved.remaining;
  saved.panel={type:'refusal',from:'answer',wasRunning:true,reason:'non svolto'};const r=F.Game.restore(saved);
  assert.equal(r.s.panel,null);assert.equal(r.s.current.id,id);assert.equal(r.s.remaining,remaining);assert.equal(r.s.paused,true);assert.equal(r.running,false);assert.equal(r.s.valid,0);
+});
+
+test('Timer preserves exact remaining time across pause and restored games, then expires once',()=>{
+ let now=100;const g=game(33,0);g.now=()=>now;g.reveal();
+ now+=1234;g.pause();assert.equal(g.left(),45000-1234);
+ now+=9000;assert.equal(g.left(),45000-1234);
+ const saved=g.snapshot(),restored=F.Game.restore(saved,{now:()=>now});
+ assert.equal(restored.running,false);assert.equal(restored.left(),45000-1234);
+ restored.resume();now+=45000-1234;restored.tick();
+ assert.equal(restored.s.screen,'result');assert.equal(restored.s.result.option,null);
+ assert.equal(restored.s.valid,1);restored.tick();assert.equal(restored.s.valid,1);
 });
