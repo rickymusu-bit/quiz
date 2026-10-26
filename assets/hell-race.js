@@ -1,4 +1,4 @@
-/* Fool — Fuga dall'Inferno v1.2.0 (2026-10-26): scena pixel-art illustrativa.
+/* Fool — Fuga dall'Inferno v1.2.1 (2026-10-26): scena pixel-art illustrativa.
    Nessuna modifica al motore, ai punteggi o ai salvataggi. */
 (function (root) {
   'use strict';
@@ -21,10 +21,7 @@
   const frameBounds = new Map();
   // One shared crop for each animation row prevents jitter between poses.
   function frameRect(key, columns, rows, row, frame) {
-    const img = sheets[key], cw = img.naturalWidth / columns;
-    const bands=key==='vehicles'?[[70,245],[255,435],[440,625],[650,790],[800,960],[985,1165]]:null;
-    const rowTop=bands?bands[row][0]*img.naturalHeight/1280:row*img.naturalHeight/rows;
-    const ch=bands?(bands[row][1]-bands[row][0])*img.naturalHeight/1280:img.naturalHeight/rows;
+    const img=sheets[key],cw=img.naturalWidth/columns,ch=img.naturalHeight/rows,rowTop=row*ch;
     const cacheKey = key + ':' + row;
     if (!frameBounds.has(cacheKey)) {
       const work = document.createElement('canvas');work.width=img.naturalWidth;work.height=img.naturalHeight;
@@ -39,11 +36,54 @@
     }
     const [x,y,w,h]=frameBounds.get(cacheKey);return [frame*cw+x,rowTop+y,w,h];
   }
+  const vehicleRows=new Map();
+  // Generated artwork is not a uniform grid. Identify whole silhouettes before
+  // sampling animation frames, rather than slicing through wheels and bumpers.
+  function vehicleRow(row){
+    if(vehicleRows.has(row))return vehicleRows.get(row);
+    const img=sheets.vehicles, bands=[[70,245],[255,435],[440,625],[650,790],[800,960],[985,1165]];
+    const top=Math.floor(bands[row][0]*img.naturalHeight/1254),height=Math.ceil((bands[row][1]-bands[row][0])*img.naturalHeight/1254),width=img.naturalWidth;
+    const work=document.createElement('canvas');work.width=width;work.height=height;
+    const ctx=work.getContext('2d',{willReadFrequently:true});ctx.drawImage(img,0,-top);
+    const raw=ctx.getImageData(0,0,width,height),labels=new Int32Array(width*height),components=[];
+    let id=0;
+    for(let start=0;start<labels.length;start++){
+      if(labels[start]||raw.data[start*4+3]<32)continue;
+      id++;const stack=[start];labels[start]=id;let count=0,left=width,right=0;
+      while(stack.length){const at=stack.pop(),x=at%width;count++;left=Math.min(left,x);right=Math.max(right,x);
+        for(const next of [at-1,at+1,at-width,at+width])if(next>=0&&next<labels.length&&!labels[next]&&Math.abs(next%width-x)<=1&&raw.data[next*4+3]>=32){labels[next]=id;stack.push(next)}
+      }
+      if(count>1000)components.push({id,left,right});
+    }
+    const pieces=components.sort((a,b)=>a.left-b.left).flatMap(part=>{
+      const count=Math.max(1,Math.round((part.right-part.left+1)/(width/8)));
+      return Array.from({length:count},(_,i)=>({...part,min:part.left+i*(part.right-part.left+1)/count,max:part.left+(i+1)*(part.right-part.left+1)/count}));
+    });
+    if(pieces.length!==8)throw Error('Vehicle atlas: expected eight silhouettes for row '+row);
+    const frames=pieces.map(part=>{
+      const pixels=[];let l=width,t=height,r=0,b=0;
+      for(let at=0;at<labels.length;at++){const x=at%width,y=Math.floor(at/width);
+        if(labels[at]===part.id&&x>=part.min&&x<part.max){pixels.push(at);l=Math.min(l,x);r=Math.max(r,x);t=Math.min(t,y);b=Math.max(b,y)}
+      }
+      return {pixels,l,t,r,b};
+    });
+    // An outer-edge pose is truncated in the source art: reuse a complete pose.
+    frames.forEach((frame,i)=>{if(frame.r>=width-1)frames[i]=frames[Math.max(0,i-1)]});
+    const frameWidth=Math.max(...frames.map(f=>f.r-f.l+1))+8,frameHeight=Math.max(...frames.map(f=>f.b-f.t+1))+8;
+    const result=frames.map(frame=>{
+      const canvas=document.createElement('canvas');canvas.width=frameWidth;canvas.height=frameHeight;
+      const c=canvas.getContext('2d'),out=c.createImageData(frameWidth,frameHeight),dx=Math.floor((frameWidth-(frame.r-frame.l+1))/2),dy=frameHeight-4-(frame.b-frame.t+1);
+      for(const at of frame.pixels){const x=at%width-frame.l+dx,y=Math.floor(at/width)-frame.t+dy;out.data.set(raw.data.subarray(at*4,at*4+4),(y*frameWidth+x)*4)}
+      c.putImageData(out,0,0);return canvas;
+    });
+    vehicleRows.set(row,result);return result;
+  }
   function sprite(c,key,columns,rows,row,frame,x,y,width,height){
     if(!imageReady(sheets[key]))return false;
-    const rect=frameRect(key,columns,rows,row,frame),scale=Math.min(width/rect[2],height/rect[3]);
+    const image=key==='vehicles'?vehicleRow(row)[frame]:sheets[key];
+    const rect=key==='vehicles'?[0,0,image.width,image.height]:frameRect(key,columns,rows,row,frame),scale=Math.min(width/rect[2],height/rect[3]);
     const w=rect[2]*scale,h=rect[3]*scale;
-    c.drawImage(sheets[key],...rect,Math.round(x+(width-w)/2),Math.round(y+height-h),Math.round(w),Math.round(h));return true;
+    c.drawImage(image,...rect,Math.round(x+(width-w)/2),Math.round(y+height-h),Math.round(w),Math.round(h));return true;
   }
   function vehiclePreview(id){
     const canvas=document.createElement('canvas');canvas.width=160;canvas.height=90;
@@ -170,6 +210,7 @@
         const tw=W*2,offset=(tick*speed)%tw;
         for(let x=-offset;x<W;x+=tw)c.drawImage(img,0,img.naturalHeight*sy,img.naturalWidth,img.naturalHeight*sh,Math.floor(x),dy,tw,dh);
       }
+      c.fillStyle='#080909bd';c.fillRect(0,190,W,175);
       if(progress>.7){const enter=smooth((progress-.7)/.3);gate(c,W+65-enter*134,90,tick,false)}
       return;
     }
@@ -288,13 +329,13 @@
     if (final) gate(c, W - 90, 180, motion, true);
     let demonX = 15;
     if (final) demonX = 15 + smooth((ended - 1) / 3.4) * Math.max(70, W * .44);
-    c.save();c.translate(0,130);c.scale(1.3,1.3);demon(c, motion, demonX, '#9b2831', !final||ended<1?'chase':ended<1.65?'attack':'devour', ended<1.65?Math.max(0,ended-1):Math.max(0,(ended-1.65)%1.1));c.restore();
+
     state.groups.forEach((group, i) => {
       const configuredVehicle = state.config.vehicles?.[i] || ['chopper', 'pickup', 'ape'][i];
       const visualGroup = { ...group, vehicle: configuredVehicle };
       const ratio = positionScore(state, i);
-      const dest = W * (.36 + .22 * ratio) + 12 * progress;
-      const start = previous ? W * (.36 + .22 * previous[i]) + 12 * progress : dest;
+      const dest = W * (.49 + .22 * ratio) + 12 * progress;
+      const start = previous ? W * (.49 + .22 * previous[i]) + 12 * progress : dest;
       let x = start + (dest - start) * smooth(sec / .9);
       let unit = 2, y = lanes[i];
       let visible = true;
@@ -318,6 +359,7 @@
         nameTag(c, W, x, y - 13, group.name, colors[i]);
       }
     });
+    c.save();c.translate(0,130);c.scale(1.3,1.3);demon(c, motion, demonX, '#9b2831', !final||ended<1?'chase':ended<1.65?'attack':'devour', ended<1.65?Math.max(0,ended-1):Math.max(0,(ended-1.65)%1.1));c.restore();
     if (final && ended > 3.6) {
       c.font = 'bold 17px monospace';
       c.fillStyle = '#f7e2af';

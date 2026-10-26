@@ -1,6 +1,6 @@
 # Asset della corsa infernale
 
-Versione grafica **1.2.0** — 26/10/2026.
+Versione grafica **1.2.1** — 26/10/2026.
 
 Pixel art infernale dal riferimento approvato: ferro annerito, ruggine, cuoio, emblemi distintivi e luce di lava. Asset raster generati con lo strumento integrato imagegen, convertiti in WebP mantenendo il canale alfa. Specifiche in [PROMPTS-v1.md](PROMPTS-v1.md).
 
@@ -11,7 +11,7 @@ Pixel art infernale dal riferimento approvato: ferro annerito, ruggine, cuoio, e
 | `portal-flames-v1.webp` | 8 | Portale gotico con fiamme arancioni |
 | `infernal-world-v1.webp` | Panorama | Fortezze, strada e lava con velocità di scorrimento diverse |
 
-`assets/hell-race.js` contiene le bande di origine effettive degli atlanti: le righe della tavola veicoli hanno spaziatura irregolare. Il ritaglio comune ai fotogrammi della stessa riga evita variazioni di scala fra le pose. Le anteprime e i riquadri dei giocatori usano gli stessi sprite della corsa.
+`assets/hell-race.js` contiene le bande di origine effettive degli atlanti: le righe della tavola veicoli hanno spaziatura irregolare. Il renderer separa le sagome connesse e normalizza gli otto fotogrammi della stessa riga su tele trasparenti con scala comune. Questo evita tagli e frammenti delle celle vicine; le pose troncate sul bordo destro della sorgente sono sostituite da una posa completa. La strada ha un velo carbone, mentre lava e cielo mantengono i colori originali. I veicoli attivi partono davanti al demone; in caso di cattura la creatura viene disegnata in primo piano. Le anteprime e i riquadri dei giocatori usano gli stessi sprite della corsa.
 
 Il demone passa dalla corsa all'attacco e al morso nel finale. Il portale compare nella parte conclusiva della partita; nel finale ne viene disegnato uno solo. Polvere e braci completano il movimento. Pausa e sospensione fermano la scena; la preferenza di sistema per il movimento ridotto mostra pose ferme. La grafica non modifica punteggi, turni o salvataggi.
 
