@@ -12,6 +12,7 @@
       const img = new root.Image();
       img.decoding = 'async';
       img.src = 'assets/hell-race/' + key + '.webp';
+      img.addEventListener('load', () => live?.redraw?.(), { once: true });
       sheets[key] = img;
     }
   }
@@ -313,6 +314,11 @@
       roadLastTime = now;
       scene(ctx, width, state, Math.max(0, elapsed - freeze), final, previous, reduced, final ? elapsed : roadPhase);
       if (!reduced && (!final || elapsed < 5.8)) record.frame = root.requestAnimationFrame(draw);
+    };
+    record.redraw = () => {
+      if (live !== record || !canvas.isConnected) return;
+      root.cancelAnimationFrame(record.frame);
+      record.frame = root.requestAnimationFrame(draw);
     };
     record.frame = root.requestAnimationFrame(draw);
     return fig;
