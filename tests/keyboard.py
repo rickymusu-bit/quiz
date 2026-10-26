@@ -18,7 +18,7 @@ with sync_playwright() as p:
   if fullscreen:page.get_by_role('button',name='Schermo intero',exact=True).click();page.wait_for_function('!!document.fullscreenElement')
   page.get_by_role('link',name='Nuova partita',exact=True).click();view=page.frame_locator('#play-frame') if fullscreen else page
   expect(view.get_by_role('button',name='Inizia partita')).to_be_enabled();view.locator('#bank-choice').select_option(bank);expect(view.get_by_role('button',name='Inizia partita')).to_be_enabled()
-  view.locator('#name0').fill('Giocatore A');view.locator('#name0').press('a');expect(view.locator('#name0')).to_have_value('Giocatore Aa')
+  view.locator('#name0').fill('Gruppo A');view.locator('#name0').press('a');expect(view.locator('#name0')).to_have_value('Gruppo Aa')
   view.get_by_role('button',name='Inizia partita').click();frame=next(f for f in page.frames if 'Fool.html' in f.url)
   def option(name):
    if view.locator('.game-options').get_attribute('open') is None:view.get_by_text('Opzioni',exact=True).click()
@@ -51,7 +51,7 @@ with sync_playwright() as p:
   # Keep native Enter activation for other focused controls.
   option('Sanzioni').focus();page.keyboard.press('Enter');expect(view.locator('#dialog')).to_be_visible();view.get_by_role('button',name='Chiudi senza sanzionare').click()
   view.locator('.question-points').click();page.keyboard.press('Enter');assert frame.evaluate('game.s.screen')=='hidden'
-  frame.goto(base+'Fool.html?resume=1');page.keyboard.press('Enter');assert frame.evaluate('game.s.screen')=='answer' and frame.evaluate('game.running');page.keyboard.press('d');assert frame.evaluate('game.s.valid')==6
+  frame.goto(frame.url);view.get_by_role('button',name='Riprendi partita',exact=True).click();page.keyboard.press('Enter');assert frame.evaluate('game.s.screen')=='answer' and frame.evaluate('game.running');page.keyboard.press('d');assert frame.evaluate('game.s.valid')==6
   page.keyboard.press('Enter');frame.evaluate('()=>{game.bell();changed()}');page.keyboard.press('a');page.keyboard.press('Enter');assert frame.evaluate('game.s.suspended')
   frame.evaluate('()=>{game.continueSession();game.openSanctions();game.s.panel.counts=[3,3,3];game.closeSanctions(true);changed()}');page.keyboard.press('a');page.keyboard.press('Enter');assert frame.evaluate('game.s.phase')=='conclusa'
   frame.evaluate('fitFoolViewport()');assert frame.evaluate('document.documentElement.scrollHeight<=innerHeight+1')

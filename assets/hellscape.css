@@ -1,0 +1,89 @@
+/* Hellscape interface 3.2.1 — fixed 1024×768 stage. */
+html,body{width:100%;height:100%;overflow:hidden;background:#080605}
+#viewport-stage{position:fixed;left:50%;top:50%;width:1024px!important;height:768px;transform-origin:center center;margin:0;overflow:hidden;background:#1a0b08;box-shadow:0 0 70px #000}
+#orientation-note{display:none!important}
+.hellscape-wordmark{display:block;font:400 100px/.95 FoolTerminal,monospace;letter-spacing:.055em;color:#ffb46a;text-shadow:3px 3px #5c170c,6px 6px #090504;line-height:1}
+header .hellscape-wordmark{font-size:32px;letter-spacing:.04em}header .brand{line-height:1;text-decoration:none}
+#viewport-stage main{height:720px;min-height:0!important;max-width:none;overflow:auto;padding:18px}
+#viewport-stage .home-content{gap:24px;width:100%}#viewport-stage .home-content h1{line-height:1}#viewport-stage .home-content .hellscape-wordmark{font-size:145px}#viewport-stage .subtitle{font-size:44px}#viewport-stage .menu{width:330px;gap:12px}#viewport-stage .menu a,#viewport-stage .menu button{font-size:38px;min-height:60px}
+#viewport-stage:has(.home-content) main{height:768px}
+body.playing #viewport-stage>header{display:none}
+#viewport-stage main.operational,#viewport-stage main.final-screen{position:relative;height:768px;min-height:768px!important;padding:0;overflow:hidden;display:block;isolation:isolate;background:#26110c}
+main.operational>.hell-race,main.final-screen .hell-race-final{position:absolute;inset:0;width:100%;height:100%;margin:0;border:0;z-index:-1}
+main.operational>.hell-race canvas,main.final-screen .hell-race canvas{width:100%;height:100%;object-fit:fill}
+main.operational>.scoreboard{position:absolute;top:18px;left:18px;width:260px;max-height:430px;display:block;overflow:auto;z-index:2}
+main.operational>.scoreboard>.team:not(.active){display:none}
+main.operational .team{background:#120e0bd6;border:1px solid #bd835c;box-shadow:4px 4px #08040380;padding:16px;backdrop-filter:blur(2px)}
+main.operational .team h3{font:28px/1.05 FoolTerminal,monospace;margin:0 0 10px;color:#ffe0a5}.team-label{font-size:14px}
+main.operational .team strong{font:34px/1 FoolTerminal,monospace;color:#ffcc76}.team-info{font-size:14px}.bonus-list{margin:10px 0 0;padding:0;list-style:none}.ammo-rounds{flex-wrap:wrap}
+#viewport-stage main.operational>.statusline{position:absolute;left:300px;right:18px;top:18px;min-height:38px;display:flex;justify-content:space-between;align-items:center;background:#130d0bd6;border:1px solid #906346;padding:6px 12px;font-size:14px;z-index:2}.statusline .timer{font:26px/1 FoolTerminal,monospace}
+#viewport-stage main.operational>.operation-body{position:absolute;top:68px;left:300px;right:18px;max-height:620px;min-height:0;display:block;padding:18px;background:#130d0bd6;border:1px solid #bd835c;box-shadow:4px 4px #08040380;backdrop-filter:blur(2px);overflow:auto;z-index:2;text-align:left}
+#viewport-stage .operation-body.hidden-question{min-height:0;align-content:initial;text-align:left}
+#viewport-stage .operation-body .question{font-size:21px;line-height:1.28;margin:6px 0 14px}#viewport-stage .operation-body h2{font-size:34px}#viewport-stage .operation-body .question-points{font-size:23px;margin:0 0 8px}
+#viewport-stage .operation-body .answers{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0}
+#viewport-stage .operation-body .answer{width:100%;min-height:58px;font-size:17px;padding:9px;gap:10px;background:#201911d9;justify-content:flex-start;text-align:left}
+#viewport-stage .operation-body .answer.correct{border-color:#edcd63;background:#665019dd}#viewport-stage .operation-body .answer.selected:not(.correct){border-color:#ed5e3e;background:#5c211cdd}
+#viewport-stage .operation-body .letter{font-size:25px;flex:0 0 22px}#viewport-stage .operation-body .solution{font-size:17px;line-height:1.3;padding:10px 0;border:0;margin:10px 0}.operation-body .keyboard-hint{display:none}
+#viewport-stage main.operational>.game-options{position:absolute;bottom:14px;left:18px;right:18px;z-index:5;margin:0;padding:0;border:1px solid #906346;background:#120e0be8;box-shadow:3px 3px #08040380}
+#viewport-stage main.operational>.game-options summary{font-size:26px;padding:8px 12px;min-height:44px;width:100%}
+#viewport-stage main.operational>.game-options .toolbar{display:flex;flex-wrap:wrap;gap:8px;padding:10px;border-top:1px solid #765038}#viewport-stage .game-options button{font-size:16px;min-height:44px}
+#viewport-stage main.showing-movement>.operation-body{visibility:hidden;pointer-events:none}main.showing-movement>.statusline{visibility:hidden}.movement-cue{position:absolute;top:30%;left:30%;right:5%;text-align:center;font:46px/1 FoolTerminal,monospace;color:#ffe0a5;text-shadow:3px 3px #000;pointer-events:none}
+#viewport-stage main.final-screen .ending{height:100%;position:relative;isolation:isolate;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:20px;background:none}#viewport-stage .ending .final-answer{max-width:800px;background:#130d0bd9;padding:12px;font-size:16px}#viewport-stage .ending .game-options{background:#130d0be8;padding:6px}.ending .final-title{margin:0}.ending .end-wordmark{max-height:110px}
+dialog .scoreboard{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}dialog .team{background:#1b1714;padding:12px}dialog{overscroll-behavior:contain}dialog button{min-height:44px}
+/* Keep the question and all four alternatives above the explanation. */
+#viewport-stage .operation-body .solution{max-height:none;overflow:visible;margin:12px 0 10px}
+#viewport-stage .operation-body>[data-game-action=next]{position:static;min-height:46px}
+
+/* Opaque feedback colors remain vivid when answer controls are disabled. */
+#viewport-stage .operation-body .answer:disabled{opacity:1}
+#viewport-stage .operation-body .answer.correct{background:#ffe044;border-color:#fff3a0 #c6a018 #a78308 #fff3a0;color:#241a00;text-shadow:none}
+#viewport-stage .operation-body .answer.selected:not(.correct){background:#b51f36;border-color:#ff6981 #700b1b #570615 #ff6981;color:#fff;text-shadow:none}
+#viewport-stage .operation-body .answer.correct .letter{color:#241a00}
+#viewport-stage .operation-body .answer.selected:not(.correct) .letter{color:#fff}
+#viewport-stage .operation-body:has(.solution){padding:16px}
+#viewport-stage .operation-body .solution p{margin:8px 0}
+
+.rules-content{max-height:55dvh;overflow:auto;padding:4px 10px 12px 0}.rules-page{font-size:17px;line-height:1.4}.rules-page h2{font-size:30px}
+
+/* Player card and ordered turns share the left sidebar. */
+.player-sidebar{position:absolute;left:18px;top:18px;width:260px;max-height:680px;display:flex;flex-direction:column;gap:14px;z-index:2}
+.player-sidebar>.scoreboard{display:block;max-height:445px;overflow:auto;flex:0 1 auto}
+
+#viewport-stage main.operational>.statusline{padding:0;background:none;border:0;min-height:34px;display:block;box-shadow:none}
+.time-vial{position:relative;height:34px;width:100%;border-radius:18px;border:2px solid #ae9784;background:linear-gradient(#efddc536,#160d0ae6 38%,#0b0607);box-shadow:0 2px 0 #100504,0 0 0 2px #241710,inset 0 2px 3px #fff6,inset 0 -3px 4px #000;--level:1}
+.time-vial::before,.time-vial::after{content:'';position:absolute;top:-4px;bottom:-4px;width:12px;border:2px solid #6c5143;background:linear-gradient(90deg,#39261c,#b2926c 40%,#453126);z-index:3}.time-vial::before{left:-3px;border-radius:7px 2px 2px 7px}.time-vial::after{right:-3px;border-radius:2px 7px 7px 2px}
+.vial-interior{position:absolute;inset:3px 8px;border-radius:12px;overflow:hidden;background:#10080d99;box-shadow:inset 0 2px 3px #000}
+.vial-interior::after{content:'';position:absolute;inset:2px 0 55%;border-radius:10px;background:linear-gradient(#fff5,#fff0);pointer-events:none}
+.vial-liquid{height:100%;width:calc(var(--level)*100%);min-width:0;border-radius:10px 3px 3px 10px;position:relative;background:radial-gradient(circle at 17px 9px,#ff967f88 0 2px,transparent 3px),linear-gradient(#ff543c,#c30c25 45%,#670418 90%);background-size:49px 24px,100% 100%;box-shadow:inset 0 2px #ff9a7888,inset 0 -3px #420317,3px 0 5px #ff493d66;transition:width .1s linear;animation:vial-drift 2.5s linear infinite}
+.vial-liquid::after{content:'';position:absolute;right:0;top:0;bottom:0;width:3px;background:#ff7763bb;border-radius:50%}
+.time-vial[data-paused=true] .vial-liquid{animation-play-state:paused}
+@keyframes vial-drift{to{background-position:49px 0,0 0}}
+@media(prefers-reduced-motion:reduce){.vial-liquid{animation:none;transition:none}}
+
+/* The selected vehicle replaces the former player emblem. */
+.team-symbol.team-vehicle{inset:auto 8px 8px auto;width:216px;height:132px;display:block;border:0;background-color:transparent;filter:grayscale(1);opacity:.27;pointer-events:none}
+
+
+/* Three collapsible player cards follow the current turn order. */
+.player-sidebar{max-height:680px;overflow:auto;padding:3px;margin:-3px;scrollbar-width:thin}
+.player-sidebar>.scoreboard.player-stack{display:flex;flex-direction:column;gap:12px;max-height:none;overflow:visible;width:100%}
+#viewport-stage main.operational .player-card{padding:0;border:1px solid #906346;box-shadow:3px 3px #08040380;background:#120e0bdb;flex:0 0 auto}
+#viewport-stage main.operational .player-card.active{border:2px solid #ffe044;box-shadow:0 0 13px #ffe04466,inset 0 0 12px #ffe04412;background:#211708e0}
+#viewport-stage .player-card-header{position:relative;isolation:isolate;display:block;cursor:pointer;padding:13px 30px 13px 14px;min-height:94px;list-style:none;overflow:hidden}
+.player-card-header::-webkit-details-marker{display:none}
+.player-card-header::after{content:'▾';position:absolute;right:12px;top:15px;color:#c7a27d;font-size:20px;line-height:1}
+.player-card[open]>.player-card-header::after{content:'▴'}
+#viewport-stage main.operational .player-card h3{font:27px/1.1 FoolTerminal,monospace;margin:0 0 7px;color:#f6ddbb;position:relative;z-index:1}
+#viewport-stage main.operational .player-card .player-points{font:30px/1.05 FoolTerminal,monospace;color:#fff0cb;position:relative;z-index:1}
+#viewport-stage main.operational .player-card .team-label{font:14px/1.1 FoolTerminal,monospace;margin:7px 0 0;color:#ffe044;position:relative;z-index:1}
+#viewport-stage main.operational .player-card .player-card-body{padding:10px 14px 14px;border-top:1px solid #725038;max-height:185px;overflow:auto;position:relative;z-index:1}
+.player-card-inventory h4{font:22px/1 FoolTerminal,monospace;margin:10px 0 8px;color:#d7b084}.player-card-inventory p{margin:0}
+.player-card .bonus-list{margin:0;display:grid;gap:6px}.player-card .ammo-item{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:14px}.player-card .ammo-round{width:24px;height:24px}
+.player-card-header .team-symbol.team-vehicle{position:absolute;z-index:0;inset:auto 8px 5px auto;width:180px;height:110px;opacity:.23}
+.player-card.out::after{display:none}
+
+/* Expanded content floats over subsequent cards without moving the stack. */
+.player-sidebar{max-height:none;overflow:visible}
+#viewport-stage main.operational .player-card{position:relative;overflow:visible}
+#viewport-stage main.operational .player-card .player-card-body{position:absolute;top:100%;left:-1px;right:-1px;z-index:2;max-height:225px;background:#17110f;border:1px solid #906346;box-shadow:4px 6px 12px #000a}
+#viewport-stage main.operational .player-card.active .player-card-body{left:-2px;right:-2px;border-color:#ffe044;box-shadow:0 4px 12px #ffe04433,4px 6px 12px #000a}

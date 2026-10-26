@@ -1,4 +1,4 @@
-"""Verify New Game and conditional direct Resume through homepage, including fullscreen."""
+"""Homepage new/resume flows, saved progress, unavailable storage and script syntax."""
 from pathlib import Path
 from http.server import ThreadingHTTPServer,SimpleHTTPRequestHandler
 from functools import partial
@@ -18,15 +18,16 @@ with sync_playwright() as p:
  browser=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox']);errors=[];checks=[]
  for fullscreen in [False,True]:
   for bank in ['termologia','introduzione-fisica-misura']:
-   page=browser.new_page(viewport={'width':1440,'height':900});page.on('pageerror',lambda e:errors.append(str(e)))
+   page=browser.new_page(viewport={'width':844 if fullscreen else 1440,'height':390 if fullscreen else 900});page.on('pageerror',lambda e:errors.append(str(e)))
    page.goto(base)
+   expect(page.get_by_role('link',name='Riprendi partita',exact=True)).to_be_hidden()
    if fullscreen:
     page.get_by_role('button',name='Schermo intero',exact=True).click();page.wait_for_function('!!document.fullscreenElement')
-   expect(page.get_by_role('link',name='Nuova partita',exact=True)).to_be_visible()
-   expect(page.locator('#resume-game-link')).to_be_hidden()
    page.get_by_role('link',name='Nuova partita',exact=True).click()
    view=page.frame_locator('#play-frame') if fullscreen else page
    expect(view.get_by_role('heading',name='Prepara Fool')).to_be_visible()
+   for i in range(3):
+    expect(view.get_by_role('textbox',name=f'Nome del giocatore {i+1}',exact=True)).to_have_value(f'Giocatore {i+1}')
    expect(view.get_by_role('button',name='Inizia partita')).to_be_enabled()
    view.locator('#bank-choice').select_option(bank);expect(view.get_by_role('button',name='Inizia partita')).to_be_enabled()
    view.get_by_role('button',name='Inizia partita').click();expect(view.get_by_role('button',name='Svela e avvia il tempo')).to_be_visible()
@@ -35,20 +36,56 @@ with sync_playwright() as p:
    view.get_by_role('button',name='Svela e avvia il tempo').click();view.locator('.answer').nth(frame.evaluate('game.s.current.correct')).click()
    assert frame.evaluate('game.s.valid')==1
    question=frame.evaluate('game.s.current.id')
-   page.goto(base)
-   expect(page.locator('#resume-game-link')).to_be_visible()
-   if fullscreen:
-    page.get_by_role('button',name='Schermo intero',exact=True).click();page.wait_for_function('!!document.fullscreenElement')
-   page.get_by_role('link',name='Riprendi partita',exact=True).click()
-   view=page.frame_locator('#play-frame') if fullscreen else page
+   saved=frame.evaluate('localStorage.getItem("fool-v1")')
+   def home():
+    if fullscreen:
+     frame.evaluate('goHome()');expect(page.locator('#play-frame')).to_have_count(0)
+    else:page.goto(base)
+    expect(page.get_by_role('link',name='Nuova partita',exact=True)).to_be_visible()
+    expect(page.get_by_role('link',name='Riprendi partita',exact=True)).to_be_visible()
+   home()
+   # Opening new-game setup must leave the previous match available.
+   page.get_by_role('link',name='Nuova partita',exact=True).click()
+   expect(view.get_by_role('heading',name='Prepara Fool')).to_be_visible()
    frame=next(f for f in page.frames if 'Fool.html' in f.url)
-   assert frame.evaluate('game.s.phase')=='ordinaria'
+   assert frame.evaluate('localStorage.getItem("fool-v1")')==saved
+   view.get_by_role('button',name='Torna alla schermata iniziale',exact=True).click()
+   expect(page.get_by_role('link',name='Riprendi partita',exact=True)).to_be_visible()
+   page.get_by_role('link',name='Riprendi partita',exact=True).click()
+   expect(view.get_by_role('button',name='Prossima domanda',exact=True)).to_be_visible()
+   frame=next(f for f in page.frames if 'Fool.html' in f.url)
    assert frame.evaluate('game.s.current.id')==question
+   assert frame.evaluate('game.s.valid')==1
+   assert frame.evaluate('game.s.groups.map(g=>g.score)')==[g['score'] for g in json.loads(saved)['groups']]
    view.get_by_role('button',name='Prossima domanda',exact=True).click();expect(view.get_by_role('button',name='Svela e avvia il tempo')).to_be_visible()
-   frame.evaluate('()=>{game.complete(null);changed()}')
-   page.goto(base)
-   expect(page.locator('#resume-game-link')).to_be_hidden()
+   view.get_by_role('button',name='Svela e avvia il tempo').click()
+   question=frame.evaluate('game.s.current.id')
+   home();page.get_by_role('link',name='Riprendi partita',exact=True).click()
+   expect(view.locator('.good')).to_contain_text('IN PAUSA')
+   frame=next(f for f in page.frames if 'Fool.html' in f.url)
+   expect(view.get_by_role('button',name='Prossima domanda',exact=True)).to_be_hidden()
+   assert frame.evaluate('game.s.current.id')==question
+   assert frame.evaluate('game.s.paused && !game.running')
+   remaining=frame.evaluate('game.s.remaining');page.wait_for_timeout(150);assert frame.evaluate('game.s.remaining')==remaining
+   frame.evaluate('fitFoolViewport()');assert frame.evaluate('document.documentElement.scrollHeight<=innerHeight+1 && document.documentElement.scrollWidth<=innerWidth+1')
    checks.append({'fullscreen':fullscreen,'bank':bank});page.close()
+ # Empty, malformed and finished saves are never offered on the homepage.
+ page=browser.new_page(viewport={'width':1440,'height':900});page.on('pageerror',lambda e:errors.append(str(e)));page.goto(base)
+ for value in ['not-json','null','{}',json.dumps({'phase':'conclusa','groups':[{}, {}, {}]})]:
+  page.evaluate('(value)=>localStorage.setItem("fool-v1",value)',value);page.reload()
+  expect(page.get_by_role('link',name='Riprendi partita',exact=True)).to_be_hidden()
+ # A stale resume URL falls back to setup without destroying a corrupt save.
+ page.evaluate('localStorage.setItem("fool-v1","not-json")');page.goto(base+'Fool.html?resume=1')
+ expect(page.get_by_role('heading',name='Prepara Fool')).to_be_visible();expect(page.locator('#message')).to_contain_text('Impossibile riprendere')
+ assert page.evaluate('localStorage.getItem("fool-v1")')=='not-json'
+ page.evaluate('localStorage.removeItem("fool-v1")');page.goto(base+'Fool.html?resume=1')
+ expect(page.get_by_role('heading',name='Prepara Fool')).to_be_visible();expect(page.locator('#message')).to_contain_text('Nessuna partita salvata')
+ page.close()
+ # Privacy restrictions on localStorage must still allow starting a new game.
+ page=browser.new_page(viewport={'width':1440,'height':900});page.on('pageerror',lambda e:errors.append(str(e)))
+ page.add_init_script("Object.defineProperty(window,'localStorage',{get(){throw new DOMException('Blocked','SecurityError')}})")
+ page.goto(base);expect(page.get_by_role('link',name='Riprendi partita',exact=True)).to_be_hidden()
+ page.get_by_role('link',name='Nuova partita',exact=True).click();expect(page.get_by_role('button',name='Inizia partita')).to_be_enabled();page.close()
  assert not errors,errors
  browser.close();print(json.dumps({'start_answer_resume':checks,'errors':errors}))
 server.shutdown()

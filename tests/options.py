@@ -23,10 +23,10 @@ with sync_playwright() as p:
   def option(name):
    if v.locator('.game-options').get_attribute('open') is None:v.locator('.game-options summary').click()
    return v.get_by_role('button',name=name,exact=True)
+  expect(v.get_by_role('button',name='Riassegna punti',exact=True)).not_to_be_visible()
   assert option('Esci da schermo intero' if full else 'Schermo intero').is_visible()
   fits();page.screenshot(path=f'/tmp/options-hidden-{w}.png');a=v.locator('.question-actions .bonus-action').bounding_box();b=v.locator('.question-actions [data-game-action=reveal]').bounding_box();assert abs(a['y']-b['y'])<2
   assert v.get_by_role('button',name='Inventario Ammo',exact=True).count()==1
-  expect(v.get_by_role('button',name='Riassegna punti',exact=True)).not_to_be_visible()
   q=frame.evaluate('game.s.current.id');v.get_by_role('button',name='Inventario Ammo',exact=True).click();v.get_by_role('button',name='Chiudi',exact=True).click()
   original=frame.evaluate('JSON.stringify({valid:game.s.valid,groups:game.s.groups.map(g=>({inventory:g.inventory,sanctions:g.sanctions}))})')
   option('Riassegna punti').click();v.locator('#score-team').select_option('0')
@@ -41,7 +41,7 @@ with sync_playwright() as p:
   option('Riassegna punti').click();v.locator('#score-team').select_option('0');v.locator('#score-total').fill('120,5');v.get_by_role('button',name='Conferma modifica').click();assert frame.evaluate('F.exact(game.s.groups[0].score)')=='241/2'
   option('Riassegna punti').click();v.locator('#score-team').select_option('0');v.locator('#score-total').fill('-1');v.get_by_role('button',name='Conferma modifica').click();expect(v.locator('#dialog')).to_be_visible();assert frame.evaluate('F.exact(game.s.groups[0].score)')=='241/2'
   v.locator('#score-total').fill('');v.get_by_role('button',name='Conferma modifica').click();expect(v.locator('#dialog')).to_be_visible();v.locator('#score-total').fill('250');v.get_by_role('button',name='Annulla',exact=True).click();assert frame.evaluate('F.exact(game.s.groups[0].score)')=='241/2'
-  frame.goto(base+'Fool.html?resume=1');assert frame.evaluate('F.exact(game.s.groups[0].score)')=='241/2';assert frame.evaluate('game.s.events.filter(e=>e.type==="score-adjustment").length')==3
+  frame.goto(frame.url);v.get_by_role('button',name='Riprendi partita',exact=True).click();assert frame.evaluate('F.exact(game.s.groups[0].score)')=='241/2';assert frame.evaluate('game.s.events.filter(e=>e.type==="score-adjustment").length')==3
   v.get_by_role('button',name='Svela e avvia il tempo').click();assert frame.evaluate('game.running');expect(v.locator('#dialog')).not_to_be_visible();assert frame.evaluate('game.s.seen.length')==1
   option('Riassegna punti').click();assert not frame.evaluate('game.running') and frame.evaluate('game.s.paused');before=frame.evaluate('game.left()');page.wait_for_timeout(100);assert frame.evaluate('game.left()')==before;fits()
   v.locator('#score-team').select_option('1');v.locator('#score-total').fill('25');v.get_by_role('button',name='Conferma modifica').click();assert frame.evaluate('game.s.paused') and frame.evaluate('F.exact(game.s.groups[1].score)')=='25'

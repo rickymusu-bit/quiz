@@ -1,6 +1,7 @@
 'use strict';
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
-const root=path.join(__dirname,'..'),html=fs.readFileSync(path.join(root,'Fool.html'),'utf8'),scripts=[...html.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)],script=scripts[1][1];
+const root=path.join(__dirname,'..'),html=fs.readFileSync(path.join(root,'Fool.html'),'utf8'),scripts=[...html.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)],script=scripts.map(m=>m[1]).find(source=>source.includes('/* Fool 1.0.0 — modello'));
+assert(script,'Engine inline non trovato');
 const engine=script.slice(0,script.indexOf("\n'use strict';\nconst F=Fool"));assert(engine.length>10000);
 const context={module:{exports:{}},TextEncoder,performance};vm.runInNewContext(engine,context);const F=context.module.exports;
 const catalogue=JSON.parse(fs.readFileSync(path.join(root,'datasets.json'),'utf8'));
@@ -10,7 +11,18 @@ function settings(total=33,weights=30,difficulty='misto'){const topics=[...new S
 function game(total=33,weights=30,difficulty='misto',custom){return F.Game.start(F.prepare(bank,custom||settings(total,weights,difficulty),()=>.25),{random:()=>.25,now:()=>100})}
 function reply(g,correct){g.reveal();g.answer(correct?g.s.current.correct:(g.s.current.correct+1)%4)}
 function finishOrdinary(g,correct=false){const n=g.s.config.questionCount;for(let i=0;i<n;i++){reply(g,correct);if(i<n-1)g.next()}}
-test('Rules and names: Bullo, Marx and no multiplier',()=>{assert.equal(F.RULES,'19.2.0');assert.equal(F.LABELS.ruba,'Bullo');assert.equal(F.LABELS.marx,'Marx');assert.equal(F.TYPES.length,6);assert.equal(F.VERSION,'2.3.0')});
+test('Rules and names: Bullo, Marx and no multiplier',()=>{assert.equal(F.RULES,'19.2.0');assert.equal(F.LABELS.ruba,'Bullo');assert.equal(F.LABELS.marx,'Marx');assert.equal(F.TYPES.length,6);assert.equal(F.VERSION,'2.2.1')});
+test('Six unique junkpunk vehicles and backward-compatible legacy games',()=>{
+ const cfg=settings();
+ const selected=['ape','chopper','truck'];
+ assert.deepEqual(Array.from(F.config({...cfg,vehicles:selected}).vehicles),selected);
+ assert.throws(()=>F.config({...cfg,vehicles:['ape','ape','truck']}),/tre veicoli diversi/);
+ assert.throws(()=>F.config({...cfg,vehicles:['motorcross','chopper','truck']}),/tre veicoli diversi/);
+ assert.equal(F.config(cfg).vehicles,undefined);
+ assert.match(html,/assets\/hell-race\/vehicles\.webp/);
+ assert.match(html,/vehicle-chooser/);
+});
+
 test('Default settings keep 33 questions and Marx at 15 percent',()=>{
  const cfg=settings();delete cfg.questionCount;delete cfg.bonusWeights.marx;
  const validated=F.config(cfg);assert.equal(validated.questionCount,33);
@@ -20,7 +32,7 @@ test('Default settings keep 33 questions and Marx at 15 percent',()=>{
 test('Restore an existing 2.1.0 game while retaining chosen probabilities and points',()=>{
  const g=game(33,0);g.s.groups[0].score=F.rational(305);
  const saved=g.snapshot();saved.version='2.1.0';saved.rules='19.1.0';saved.config.bonusWeights.marx=30;
- const restored=F.Game.restore(saved);assert.equal(restored.s.version,'2.3.0');
+ const restored=F.Game.restore(saved);assert.equal(restored.s.version,'2.2.1');
  assert.equal(restored.s.config.bonusWeights.marx,30);assert.equal(F.exact(restored.s.groups[0].score),'305');
 });
 test('Each Ammo type has its own retro pixel-art sprite',()=>{
@@ -49,52 +61,7 @@ test('2.2.0 ordinary saved games restore without resetting their progress',()=>{
  const g=game(33,0);reply(g,true);const saved=g.snapshot();
  saved.version='2.2.0';saved.rules='19.2.0';
  const resumed=F.Game.restore(saved);assert.equal(resumed.s.phase,'ordinaria');
- assert.equal(resumed.s.config.questionCount,33);assert.equal(resumed.s.valid,1);assert.equal(resumed.s.version,'2.3.0');
-});
-test('Home resumes only an unfinished saved game and exposes both actions',()=>{
- const home=fs.readFileSync(path.join(root,'index.html'),'utf8');
- assert(home.includes('<a id="new-game-link" href="Fool.html?start=1">Nuova partita</a>'));
- assert(home.includes('<a id="resume-game-link" href="Fool.html?resume=1" hidden>Riprendi partita</a>'));
- const a=home.indexOf('function homeResumeAvailable(){'),b=home.indexOf('function refreshResumeLink()',a);
- assert(a>=0&&b>a);
- const source=home.slice(a,b)+';homeResumeAvailable()';
- const run=raw=>vm.runInNewContext(source,{localStorage:{getItem:()=>raw}});
- const saved={format:1,phase:'ordinaria',groups:[{},{},{}],config:{questionCount:33}};
- assert.equal(run(null),false);
- assert.equal(run('invalid json'),false);
- assert.equal(run(JSON.stringify(saved)),true);
- assert.equal(run(JSON.stringify({...saved,phase:'pareggio'})),true);
- assert.equal(run(JSON.stringify({...saved,phase:'conclusa'})),false);
- const old={...saved,config:{}};assert.equal(run(JSON.stringify(old)),true);
-});
-test('Direct resume route skips configuration only when a valid active save exists',()=>{
- const a=script.indexOf("const launchParams=new URL(location.href).searchParams");
- const b=script.indexOf("/* Fit a landscape stage",a);
- assert(a>=0&&b>a);
- const source=script.slice(a,b);
- function run(raw){
-  const calls=[];
-  vm.runInNewContext(source,{
-   URL,location:{href:'http://localhost/Fool.html?resume=1',pathname:'/Fool.html'},
-   history:{replaceState:()=>calls.push('query-cleared')},
-   localSave:()=>raw,F,restoreGame:()=>calls.push('resumed'),
-   configure:()=>calls.push('configured'),act:fn=>fn(),message:()=>calls.push('error')
-  });
-  return calls.join(',');
- }
- const g=game(33,0),raw=JSON.stringify(g.snapshot());
- assert.equal(run(raw),'query-cleared,resumed');
- assert.equal(run(null),'query-cleared,configured,error');
- g.complete(null);
- assert.equal(run(JSON.stringify(g.snapshot())),'query-cleared,configured,error');
-});
-test('Saved 2.2.1 games resume in 2.3.0 without altering turn and score',()=>{
- const g=game(33,0);reply(g,true);const before=g.s.groups.map(x=>F.exact(x.score)).join(',');
- const legacy=g.snapshot();legacy.version='2.2.1';legacy.rules='19.2.0';
- const resumed=F.Game.restore(legacy);
- assert.equal(resumed.s.version,'2.3.0');
- assert.equal(resumed.s.valid,1);assert.equal(resumed.s.phase,'ordinaria');
- assert.equal(resumed.s.groups.map(x=>F.exact(x.score)).join(','),before);
+ assert.equal(resumed.s.config.questionCount,33);assert.equal(resumed.s.valid,1);assert.equal(resumed.s.version,'2.2.1');
 });
 test('3–99 questions: multiples of 3, unique, exact topic quotas',()=>{for(let n=3;n<=99;n+=3){const p=F.prepare(bank,settings(n));assert.equal(p.chosen.length,n);assert.equal(new Set(p.chosen.map(q=>q.id)).size,n);for(const [t,c]of Object.entries(p.config.quotas))assert.equal(p.chosen.filter(q=>q.topic===t).length,c)}});
 test('Invalid counts and probabilities are rejected',()=>{for(const n of [0,1,4,100,102,3.5])assert.throws(()=>F.prepare(bank,settings(n)));for(const v of [-1,101,NaN,'30']){const cfg=settings();cfg.bonusWeights.aura=v;assert.throws(()=>F.prepare(bank,cfg))}});
@@ -102,7 +69,7 @@ test('Base points stay constant when a group answers correctly again',()=>{const
 test('Bullo divides only base points',()=>{const g=game(33,0),receiver=g.s.respondent,beneficiary=g.s.order[1],amount=g.s.config.bases[g.s.current.difficulty];g.s.effects.push({id:g.uid(),type:'ruba',source:beneficiary,target:receiver});reply(g,true);assert.equal(F.exact(g.s.groups[receiver].score),F.exact(F.rational(BigInt(amount),2n)));assert.equal(F.exact(g.s.groups[beneficiary].score),F.exact(F.rational(BigInt(amount),2n)))});
 test('Marx redistributes all accumulated points exactly without rounding',()=>{const g=game(33,0);g.s.groups.forEach((team,i)=>team.score=F.rational([101,200,1][i]));const owner=g.s.respondent;const copy={id:g.uid(),type:'marx',target:null,origin:'test'};g.s.groups[owner].inventory.push(copy);g.use(copy.id,null);for(const team of g.s.groups)assert.equal(F.exact(team.score),'302/3');assert.equal(g.s.groups[owner].inventory.length,0);assert(g.s.events.some(e=>e.type==='marx-redistribution'));F.Game.restore(g.snapshot())});
 test('Marx excludes eliminated teams and ignores Aura while keeping history',()=>{const g=game(33,0);g.s.groups[0].score=F.rational(101);g.s.groups[1].score=F.rational(200);g.s.groups[2].score=F.rational(999);g.eliminate(2,'Tre sanzioni');g.s.groups[1].aura=g.s.turn;const copy={id:g.uid(),type:'marx',target:null,origin:'test'};g.s.groups[g.s.respondent].inventory.push(copy);g.use(copy.id,null);assert.equal(F.exact(g.s.groups[0].score),'301/2');assert.equal(F.exact(g.s.groups[1].score),'301/2');assert.equal(F.exact(g.s.groups[2].score),'999');assert.equal(g.s.groups[1].aura,g.s.turn);F.Game.restore(g.snapshot())});
-test('Marx awards at 100% and preserved probability is added to previous save formats',()=>{const g=game(33,100);reply(g,true);assert(g.s.result.bonuses.some(b=>b.type==='marx'));const saved=g.snapshot();saved.version='2.0.0';saved.rules='19.0.0';delete saved.config.bonusWeights.marx;const restored=F.Game.restore(saved);assert.equal(restored.s.config.bonusWeights.marx,15);assert.equal(restored.s.version,'2.3.0');assert.equal(restored.s.rules,'19.2.0')});
+test('Marx awards at 100% and preserved probability is added to previous save formats',()=>{const g=game(33,100);reply(g,true);assert(g.s.result.bonuses.some(b=>b.type==='marx'));const saved=g.snapshot();saved.version='2.0.0';saved.rules='19.0.0';delete saved.config.bonusWeights.marx;const restored=F.Game.restore(saved);assert.equal(restored.s.config.bonusWeights.marx,15);assert.equal(restored.s.version,'2.2.1');assert.equal(restored.s.rules,'19.2.0')});
 test('Independent bonus awards',()=>{for(const chance of [0,100]){const g=game(33,chance);reply(g,true);assert.equal(g.s.result.bonuses.length,chance===100?6:0);F.Game.restore(g.snapshot())}});
 test('At the end of ordinary questions a single score leader wins without a tie',()=>{const g=game(3,0);reply(g,true);g.next();reply(g,false);g.next();reply(g,false);assert.equal(g.s.phase,'conclusa');assert.equal(g.s.winner,g.s.order[0])});
 test('Only the top-score tied groups enter the elimination tie-break',()=>{const cfg=settings(3,0);cfg.bases={facile:100,media:100,difficile:100};const g=game(3,0,'misto',cfg);reply(g,true);g.next();reply(g,true);g.next();reply(g,false);assert.equal(g.s.phase,'pareggio');assert.equal(g.s.tieOrder.length,2);assert.equal(g.s.groups[g.s.order[2]].out,true);g.next();reply(g,false);assert.equal(g.s.phase,'pareggio');g.next();reply(g,true);assert.equal(g.s.phase,'conclusa');assert.equal(g.s.winner,g.s.order[1])});
@@ -111,5 +78,46 @@ test('All groups wrong in tie-break yields Game Over only after last answer',()=
 test('A complete successful tie round repeats with no duplicated questions or difficulty restriction',()=>{const cfg=settings(3,0,'facile');const g=game(3,0,'facile',cfg);finishOrdinary(g);const original=new Set(g.s.seen);assert(g.available().some(q=>q.difficulty!=='facile'));for(let i=0;i<3;i++){g.next();assert(!original.has(g.s.current.id));const id=g.s.current.id;reply(g,true);original.add(id)}assert.equal(g.s.phase,'pareggio');assert.equal(g.s.tieRound,2);assert.equal(g.s.tieIndex,-1);F.Game.restore(g.snapshot())});
 test('Ninety-nine questions transition to tie-break only at 99',()=>{const g=game(99,0);for(let i=0;i<99;i++){reply(g,false);if(i<98){assert.equal(g.s.phase,'ordinaria');g.next()}}assert.equal(g.s.valid,99);assert.equal(g.s.phase,'pareggio');F.Game.restore(g.snapshot())});
 test('Save and resume during tie-break preserves elimination and timer',()=>{const g=game(3,0);finishOrdinary(g);g.next();reply(g,false);const s=g.snapshot(),r=F.Game.restore(s);assert.equal(r.s.phase,'pareggio');assert.equal(r.s.tieIndex,0);assert.equal(r.s.groups[g.s.order[0]].out,true);r.next();assert.equal(r.s.respondent,g.s.order[1]);F.Game.restore(r.snapshot())});
-test('Previous ordinary saves can be migrated without changing scores',()=>{const g=game(33,0);reply(g,true);const s=g.snapshot();s.version='1.2.0';s.rules='18.2.0';s.groups[0].streak=1;s.drawWins=[0,0,0];const r=F.Game.restore(s);assert.equal(r.s.phase,'ordinaria');assert.equal(r.s.version,'2.3.0');assert.equal(r.s.groups[0].streak,undefined);assert.equal(F.exact(r.s.groups[g.s.respondent].score),F.exact(g.s.groups[g.s.respondent].score))});
+test('Previous ordinary saves can be migrated without changing scores',()=>{const g=game(33,0);reply(g,true);const s=g.snapshot();s.version='1.2.0';s.rules='18.2.0';s.groups[0].streak=1;s.drawWins=[0,0,0];const r=F.Game.restore(s);assert.equal(r.s.phase,'ordinaria');assert.equal(r.s.version,'2.2.1');assert.equal(r.s.groups[0].streak,undefined);assert.equal(F.exact(r.s.groups[g.s.respondent].score),F.exact(g.s.groups[g.s.respondent].score))});
 test('Two disciplinary eliminations immediately award the remaining team',()=>{const g=game();g.openSanctions();g.s.panel.counts=[3,3,0];g.closeSanctions(true);assert.equal(g.s.phase,'conclusa');assert.equal(g.s.winner,2)});
+test('One unblocked attack transforms one Karma only, preserving the remaining copies',()=>{
+ const g=game(),target=g.s.order[1],source=g.s.owner,items=[0,1,2].map(()=>({id:g.uid(),type:'karma',target:null,origin:'test'}));
+ g.s.groups[target].inventory.push(...items);g.attack('ruba',source,target,g.uid());
+ assert.equal(g.s.groups[target].inventory.filter(c=>c.type==='karma').length,2);
+ assert.equal(items[0].type,'ruba');assert.equal(items[0].target,source);
+ g.attack('salta',source,target,g.uid());assert.equal(items[1].type,'salta');assert.equal(items[2].type,'karma');
+ F.Game.restore(g.snapshot());
+});
+test('An Aura-blocked attack leaves every Karma unchanged',()=>{
+ const g=game(),target=g.s.order[1];g.s.groups[target].aura=g.s.turn;
+ const karma={id:g.uid(),type:'karma',target:null,origin:'test'};g.s.groups[target].inventory.push(karma);
+ assert.equal(g.attack('ruba',g.s.owner,target,g.uid()),false);assert.equal(karma.type,'karma');assert.equal(g.s.effects.length,0);
+});
+test('Marx changes points while leaving other players Aura and Karma untouched',()=>{
+ const g=game(),owner=g.s.owner,target=g.s.order[1];g.s.groups[owner].score=F.rational(90);g.s.groups[target].aura=g.s.turn;
+ g.s.groups[target].inventory.push({id:g.uid(),type:'karma',target:null,origin:'test'},{id:g.uid(),type:'karma',target:null,origin:'test'});
+ const marx={id:g.uid(),type:'marx',target:null,origin:'test'};g.s.groups[owner].inventory.push(marx);g.use(marx.id,null);
+ assert(g.s.groups.every(team=>F.exact(team.score)==='30'));assert.equal(g.s.groups[target].aura,g.s.turn);assert(g.s.groups[target].inventory.every(c=>c.type==='karma'));F.Game.restore(g.snapshot());
+});
+test('Answered questions retain their displayed option order for read-only review and restore',()=>{
+ const g=game(),q=copy(g.s.current);reply(g,false);const e=g.s.events.find(e=>e.outcome);assert.deepEqual(copy(e.question),q);
+ assert.equal(e.question.options[e.outcome.option],q.options[(q.correct+1)%4]);g.next();const r=F.Game.restore(g.snapshot());assert.deepEqual(copy(r.s.events.find(e=>e.outcome).question),q);
+});
+test('Scientific notation uses fractions and subscripts without altering saved question strings',()=>{
+ const value='ΔT = Q/(mc), Q1 + Q2 = 0, L0 e V0';const parts=F.scienceParts(value);assert(parts.some(p=>p.math===String.raw`\Delta T=\frac{Q}{m\,c}`));assert(parts.some(p=>p.math==='Q_1+Q_2=0'));assert.equal(value,'ΔT = Q/(mc), Q1 + Q2 = 0, L0 e V0');
+});
+test('Tie-break participants each have one life regardless of prior sanctions',()=>{
+ const g=game(3,0);g.s.groups.forEach((team,i)=>team.sanctions=i);finishOrdinary(g);
+ assert.deepEqual(g.s.groups.map((team,i)=>F.remainingLives(g.s,i)),[1,1,1]);assert.deepEqual(copy(g.s.groups.map(team=>team.sanctions)),[0,1,2]);
+ g.next();const loser=g.s.respondent;reply(g,false);assert.equal(F.remainingLives(g.s,loser),0);
+ const restored=F.Game.restore(g.snapshot());for(const i of restored.active())assert.equal(F.remainingLives(restored.s,i),1);
+});
+test('Only tied leaders retain their single tie-break heart',()=>{
+ const cfg=settings(3,0);cfg.bases={facile:100,media:100,difficile:100};const g=game(3,0,'misto',cfg);reply(g,true);g.next();reply(g,true);g.next();reply(g,false);
+ assert.equal(g.s.phase,'pareggio');for(const i of g.s.order)assert.equal(F.remainingLives(g.s,i),g.s.tieOrder.includes(i)?1:0);
+});
+test('Removed refusal methods are unavailable and pending legacy requests restore the same question',()=>{
+ const g=game();assert.equal(g.refuse,undefined);assert.equal(g.decideRefusal,undefined);g.reveal();const saved=g.snapshot(),id=saved.current.id,remaining=saved.remaining;
+ saved.panel={type:'refusal',from:'answer',wasRunning:true,reason:'non svolto'};const r=F.Game.restore(saved);
+ assert.equal(r.s.panel,null);assert.equal(r.s.current.id,id);assert.equal(r.s.remaining,remaining);assert.equal(r.s.paused,true);assert.equal(r.running,false);assert.equal(r.s.valid,0);
+});
