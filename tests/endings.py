@@ -15,8 +15,8 @@ server=ThreadingHTTPServer(('127.0.0.1',0),partial(Quiet,directory=str(ROOT)))
 threading.Thread(target=server.serve_forever,daemon=True).start();base=f'http://127.0.0.1:{server.server_port}/Fool.html?start=1'
 with sync_playwright() as p:
  browser=p.chromium.launch(executable_path=os.environ.get('CHROMIUM_PATH','/usr/bin/chromium'),args=['--no-sandbox']);errors=[];checks=[]
- def start(reduced=False):
-  page=browser.new_page(viewport={'width':1024,'height':768},reduced_motion='reduce' if reduced else 'no-preference');page.on('pageerror',lambda e:errors.append(str(e)));page.goto(base);page.get_by_role('button',name='Inizia partita').click();page.wait_for_function('FoolEnding.prepare(FoolEnding.load(()=>{}))!==null');page.evaluate('document.fonts.ready')
+ def start(reduced=False,viewport=None):
+  page=browser.new_page(viewport=viewport or {'width':1024,'height':768},reduced_motion='reduce' if reduced else 'no-preference');page.on('pageerror',lambda e:errors.append(str(e)));page.goto(base);page.get_by_role('button',name='Inizia partita').click();page.wait_for_function('FoolEnding.prepare(FoolEnding.load(()=>{}))!==null');page.evaluate('document.fonts.ready')
   page.clock.install();page.clock.pause_at(page.evaluate('Date.now()+1000'))
   page.evaluate('''()=>{const render=FoolEnding.render;FoolEnding.render=(...args)=>{window.__endingPlan=args[3];return render(...args)}}''')
   return page
@@ -51,5 +51,11 @@ with sync_playwright() as p:
  page.evaluate("Object.defineProperty(document,'hidden',{configurable:true,get:()=>true})");page.clock.run_for(100);hidden=raw(page);page.clock.run_for(500);assert raw(page)==hidden;page.close()
  for winner in [0,None]:
   page=start(True);finish(page,winner);page.clock.run_for(200);assert page.locator('.hell-race-final').get_attribute('data-ending-phase')=='done';a=raw(page);page.clock.run_for(500);assert raw(page)==a;expect(page.locator('.final-title')).to_be_visible();page.close()
+ for width,height in [(390,844),(844,390)]:
+  for winner in [0,None]:
+   page=start(viewport={'width':width,'height':height});finish(page,winner);page.clock.run_for(9000)
+   assert page.locator('.hell-race-final').get_attribute('data-ending-phase')=='done'
+   assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+1 && document.documentElement.scrollHeight<=innerHeight+1')
+   page.screenshot(path=str(ART/f'ending-{width}x{height}-{"win" if winner==0 else "over"}.png'));page.close()
  assert not errors,errors;browser.close();print(json.dumps({'endings':checks,'pause_hidden_reduced':'PASS','errors':errors},indent=2))
 server.shutdown()
