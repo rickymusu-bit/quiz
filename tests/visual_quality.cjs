@@ -34,7 +34,7 @@ const {chromium}=require("playwright"),fs=require("node:fs"),assert=require("nod
    await frame.evaluate(()=>{
     const canvas=document.createElement("canvas");canvas.id="quality-scene";
     canvas.width=1536;canvas.height=1152;
-    canvas.style.cssText="position:fixed;inset:0;width:100%;height:100%;z-index:1000";
+    canvas.style.cssText="position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(100vw,133.333vh);height:min(100vh,75vw);z-index:1000";
     document.body.append(canvas);
    });
    const stateBefore=await frame.evaluate(()=>JSON.stringify(HellscapeUI.game.s));
@@ -58,7 +58,7 @@ const {chromium}=require("playwright"),fs=require("node:fs"),assert=require("nod
    await page.waitForTimeout(350);
    assert.equal(await frame.evaluate(()=>JSON.stringify(HellscapeUI.game.s.groups)),paused);
    await page.emulateMedia({reducedMotion:"reduce"});
-   await frame.evaluate(()=>HellscapeUI.changed());await page.waitForTimeout(250);
+   await frame.evaluate(()=>{HellscapeUI.game.s.suspended=false;HellscapeUI.changed();});await page.waitForTimeout(250);
    const still=await frame.locator(".hell-race canvas").evaluate(c=>c.toDataURL());
    await page.waitForTimeout(200);
    assert.equal(await frame.locator(".hell-race canvas").evaluate(c=>c.toDataURL()),still);
