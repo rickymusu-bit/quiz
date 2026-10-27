@@ -14,11 +14,11 @@ with sync_playwright() as p:
  for width,height,touch in [(1440,900,False),(390,844,True),(844,390,True)]:
   page=browser.new_page(viewport={'width':width,'height':height},has_touch=touch,reduced_motion='reduce');page.on('pageerror',lambda e:errors.append(str(e)))
   page.goto(base+'Fool.html?settings=1');expect(page.locator('#weight-ira')).to_have_value('5');expect(page.locator('.ammo-setting')).to_have_count(7)
-  expect(page.locator('.ammo-setting').filter(has_text='Ira divina')).to_have_count(0)
-  icon=page.locator('.ammo-setting [data-ammo="ira"]');expect(icon).to_have_attribute('title','Ira divina')
+  expect(page.locator('.ammo-setting').filter(has_text='Flagello')).to_have_count(0)
+  icon=page.locator('.ammo-setting [data-ammo="ira"]');expect(icon).to_have_attribute('title','Flagello')
   if touch:icon.tap()
   else:icon.hover();icon.click()
-  expect(page.locator('#ammo-info h2')).to_have_text('Ira divina');expect(page.locator('#ammo-info .ammo-description')).to_contain_text('compreso chi la usa')
+  expect(page.locator('#ammo-info h2')).to_have_text('Flagello');expect(page.locator('#ammo-info .ammo-description')).to_contain_text('compreso chi lo evoca')
   page.locator('#ammo-info').get_by_role('button',name='Chiudi',exact=True).click()
   page.goto(base+'Fool.html?start=1');page.get_by_role('button',name='Inizia partita').click()
   page.evaluate('''()=>{const g=HellscapeUI.game;for(const type of Fool.TYPES)g.s.groups[g.s.owner].inventory.push({id:g.uid(),type,target:null,origin:'test'});for(let n=0;n<2;n++)g.s.groups[g.s.owner].inventory.push({id:g.uid(),type:'ira',target:null,origin:'test'});HellscapeUI.changed()}''')
@@ -32,7 +32,7 @@ with sync_playwright() as p:
    if touch:item.tap()
    else:item.click()
    before=page.evaluate('JSON.stringify(HellscapeUI.game.snapshot())')
-   expect(page.locator('#ammo-info h2')).to_have_text('Ira divina')
+   expect(page.locator('#ammo-info h2')).to_have_text('Flagello')
    if use==0:
     page.screenshot(path=str(ART/f'ammo-divine-info-{width}.png'))
     page.keyboard.press('a');assert page.evaluate('JSON.stringify(HellscapeUI.game.snapshot())')==before
@@ -40,7 +40,7 @@ with sync_playwright() as p:
     assert page.evaluate('JSON.stringify(HellscapeUI.game.snapshot())')==before
     page.locator('#dialog [data-ammo="ira"]').first.click()
    page.locator('#ammo-info').get_by_role('button',name='Usa',exact=True).click()
-   expect(page.locator('#dialog h2')).to_have_text('Attiva Ira divina');expect(page.locator('.divine-targets li')).to_have_count(3)
+   expect(page.locator('#dialog h2')).to_have_text('Attiva Flagello');expect(page.locator('.divine-targets li')).to_have_count(3)
    page.locator('#dialog').get_by_role('button',name='Conferma uso',exact=True).click()
    assert page.evaluate('HellscapeUI.game.s.groups.map(g=>g.sanctions)')==[0,0,0]
    assert page.evaluate('HellscapeUI.game.s.groups.map((g,i)=>Fool.remainingLives(HellscapeUI.game.s,i))')==[2-use]*3
