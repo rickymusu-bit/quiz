@@ -41,6 +41,7 @@ npm run test:terrain    # progressione del terreno su desktop e Android
 npm run build           # dist/site, pubblicabile su hosting statico
 npm run test:offline    # genera e verifica dist/Hellscape-offline.html
 npm run test:quality    # audit offline di dieci schermate, cinque viewport, DPR 1/2
+npm run test:layout     # testo e controlli nativi, 4:3, orientamento e fullscreen
 ```
 
 I test riutilizzano Chromium in `/usr/bin/chromium`; per un altro eseguibile impostare `CHROMIUM_PATH`. Se non è presente un browser, installarlo con `npx playwright install --with-deps chromium` e impostare `CHROMIUM_PATH` al percorso restituito da `node -p "require('playwright').chromium.executablePath()"`. La generazione dell’export usa soltanto librerie standard di Node.
@@ -55,6 +56,12 @@ anche `dist/Hellscape-review.html`: un export autonomo con un pannello per
 aprire direttamente gli scenari di revisione, compresi spareggio e finali.
 Gli scenari sostituiscono la partita dell'anteprima, nelle sole chiavi offline.
 La UI del sito e il regolamento non includono quel pannello.
+
+Il [contratto di layout condiviso](docs/HELLSCAPE_LAYOUT.md) conserva il palco
+1024 × 768 e la scena 4:3. Quando il palco dovrebbe essere rimpicciolito, i
+pannelli passano al layout responsive con testo leggibile e scorrimento interno,
+mentre il Canvas mantiene geometria e proporzioni. Home, preparazione e regole
+usano lo stesso adattamento. Questo intervento precede le nuove cinematiche.
 
 L’anteprima include home, gioco, regole, entrambi i dataset, script, CSS, immagini e font in **un solo HTML**. Le pagine sono incorporate in un iframe che viene ricreato alla navigazione, così timer ed eventi della pagina precedente vengono chiusi. La chiave delle partite esportate è `hellscape-offline-v1:fool-v1`; quella dei profili è `hellscape-offline-v1:fool-settings-v1`. Non legge o sovrascrive i salvataggi del sito. Il meta `hellscape-revision` e `dist/revision.json` identificano il commit generatore; gli output sono ignorati da Git e vanno rigenerati dopo ogni modifica, senza correggerli a mano.
 

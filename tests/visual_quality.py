@@ -18,7 +18,7 @@ ART.mkdir(parents=True, exist_ok=True)
 HTML = (ROOT / 'dist/Hellscape-review.html').read_text()
 VIEWPORTS = [(1920, 1080), (1366, 768), (1024, 768), (844, 390), (390, 844)]
 if '--quick' in sys.argv:
-    VIEWPORTS = [(1366, 768), (390, 844)]
+    VIEWPORTS = [(1366, 768), (390, 844), (844, 390)]
 
 METRICS = """() => [...document.querySelectorAll('img,canvas,button,a,h1,h2,.ammo-round,.heart,.time-vial,.question,.subtitle')].filter(el => {
   const r=el.getBoundingClientRect(),s=getComputedStyle(el);
@@ -92,6 +92,9 @@ with sync_playwright() as p:
                     assert f.locator('.hell-race-final').get_attribute('data-ending-phase') == 'done'
                     assert f.locator('.final-title').is_visible()
                     assert f.locator('.end-wordmark').evaluate('(i)=>i.complete && i.naturalWidth>0')
+                    if f.evaluate('document.body.dataset.layout') == 'compact':
+                        title = f.locator('.final-title').bounding_box()
+                        assert title['y'] >= -1 and title['y'] + title['height'] <= height + 1
                 page.screenshot(path=str(ART/f'{scenario}-{prefix}.png'),animations='allow')
                 report['renders'].append({'scenario':scenario,'viewport':[width,height],'dpr':dpr,
                                           'metrics':f.evaluate(METRICS)})
@@ -102,13 +105,15 @@ with sync_playwright() as p:
             f = page.frames[1]
             page.set_viewport_size({'width':height,'height':width})
             page.wait_for_timeout(150)
-            r = f.locator('#viewport-stage').bounding_box()
+            subject = '.home-heading' if f.evaluate('document.body.dataset.layout') == 'compact' else '#viewport-stage'
+            r = f.locator(subject).bounding_box()
             assert abs(r['width']/r['height'] - 4/3) < .001
             page.set_viewport_size({'width':width,'height':height})
             f.get_by_role('button',name='Schermo intero',exact=True).click()
             page.wait_for_timeout(150)
             assert f.evaluate('!!document.fullscreenElement')
-            r = f.locator('#viewport-stage').bounding_box()
+            subject = '.home-heading' if f.evaluate('document.body.dataset.layout') == 'compact' else '#viewport-stage'
+            r = f.locator(subject).bounding_box()
             assert abs(r['width']/r['height'] - 4/3) < .001
             f.evaluate('document.exitFullscreen()')
             (ART/'measurements.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))

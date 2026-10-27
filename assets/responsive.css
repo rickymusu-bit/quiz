@@ -1,0 +1,105 @@
+/* UI reflows at native CSS size; only the illustrated race remains 4:3.
+   Dimensions and mode are provided by hell-layout.js on every page. */
+body[data-layout="compact"] #viewport-stage {
+  position:fixed;inset:0;left:0;top:0;width:100%!important;height:100%;
+  transform:none;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+body[data-layout="compact"] #viewport-stage main {
+  height:auto;min-height:0!important;overflow:visible;padding:16px;
+}
+body[data-layout="compact"] #viewport-stage>header { min-height:48px; }
+body[data-layout="compact"] #viewport-stage main.operational,
+body[data-layout="compact"] #viewport-stage main.final-screen {
+  display:flex;flex-direction:column;height:auto;min-height:100%!important;padding:0;overflow:visible;
+}
+body[data-layout="compact"] main.operational>.hell-race,
+body[data-layout="compact"] main.final-screen .hell-race-final {
+  position:relative;inset:auto;order:0;flex:none;align-self:center;
+  width:min(100%,var(--scene-max-width));height:auto;aspect-ratio:var(--stage-ratio);
+  margin:0;z-index:0;
+}
+body[data-layout="compact"] main.operational>.hell-race canvas,
+body[data-layout="compact"] main.final-screen .hell-race canvas { display:block;width:100%;height:100%;object-fit:contain; }
+body[data-layout="compact"] #viewport-stage main.operational>.statusline {
+  position:static;order:1;min-height:28px;margin:14px 18px 10px;flex:none;
+}
+body[data-layout="compact"] #viewport-stage main.operational>.operation-body {
+  position:static;order:2;flex:none;margin:0 12px;padding:16px;
+  width:auto;max-height:none;overflow:visible;
+}
+body[data-layout="compact"] #viewport-stage .operation-body .question { font-size:19px;line-height:1.4; }
+body[data-layout="compact"] #viewport-stage .operation-body .answers { grid-template-columns:1fr; }
+body[data-layout="compact"] #viewport-stage .operation-body .answer { min-height:48px;font-size:17px;padding:10px; }
+body[data-layout="compact"] #viewport-stage .operation-body .solution { font-size:16px;line-height:1.5; }
+body[data-layout="compact"] #viewport-stage .question-actions button { min-height:48px; }
+body[data-layout="compact"] #viewport-stage .turn-order {
+  position:static;order:3;flex:none;width:auto;max-height:none;overflow:visible;margin:12px;padding:8px;
+}
+body[data-layout="compact"] .turn-order ol { grid-template-columns:repeat(3,minmax(0,1fr));gap:6px; }
+body[data-layout="compact"] .turn-order button { min-height:48px;font-size:20px;padding:8px 6px; }
+body[data-layout="compact"] .turn-order .player-points { font-size:18px; }
+body[data-layout="compact"] .turn-order .heart { width:14px;height:14px;flex-basis:14px; }
+body[data-layout="compact"] #viewport-stage .options-toggle {
+  position:static;order:4;align-self:flex-start;flex:none;margin:0 12px 16px;min-height:48px;
+}
+body[data-layout="compact"] #viewport-stage main.operational>.movement-cue {
+  top:16px;left:6%;right:6%;font-size:clamp(28px,6vw,48px);padding:10px;
+}
+body[data-layout="compact"].showing-cinematic #viewport-stage { overflow-y:hidden; }
+body[data-layout="compact"].showing-cinematic main.operational>.hell-race,
+body[data-layout="compact"].showing-cinematic main.final-screen .hell-race-final {
+  position:fixed;left:calc((100% + env(safe-area-inset-left) - env(safe-area-inset-right))/2);
+  top:calc((100% + env(safe-area-inset-top) - env(safe-area-inset-bottom))/2);transform:translate(-50%,-50%);
+}
+body[data-layout="compact"].showing-cinematic #viewport-stage main.operational>.movement-cue {
+  position:fixed;top:calc((100% + env(safe-area-inset-top) - env(safe-area-inset-bottom) - var(--scene-max-height))/2 + 16px);
+}
+body[data-layout="compact"] #viewport-stage main.final-screen .ending {
+  display:flex;flex-direction:column;gap:16px;width:100%;height:auto;min-height:100%;padding:0 0 16px;
+}
+body[data-layout="compact"] .ending .final-title { order:1;padding:12px; }
+body[data-layout="compact"] #viewport-stage .ending .final-answer { order:2;margin:0 12px; }
+body[data-layout="compact"] .ending>.row { order:3;padding:0 12px; }
+body[data-layout="compact"] .ending .winner-name { font-size:42px; }
+body[data-layout="compact"] #viewport-stage .ending .end-wordmark { max-width:100%;max-height:110px; }
+body[data-layout="compact"] #viewport-stage #slides { min-height:calc(100% - 48px)!important;gap:24px;padding:20px 16px; }
+body[data-layout="compact"] .slide p,
+body[data-layout="compact"] .slide li { font-size:18px;line-height:1.5; }
+body[data-layout="compact"] .slide h2 { font-size:36px; }
+body[data-layout="compact"] dialog { font-size:16px; }
+body[data-layout="compact"] dialog button,
+body[data-layout="compact"] dialog input,
+body[data-layout="compact"] dialog select { min-height:44px; }
+body[data-layout="compact"] .rules-content { max-height:60dvh; }
+@media (min-width:700px) {
+  body[data-layout="compact"] .setup-teams { grid-template-columns:repeat(3,minmax(0,1fr)); }
+  body[data-layout="compact"] #viewport-stage .operation-body .answers { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+
+/* The home illustration keeps its geometry while its actions stay touch-sized. */
+.home-heading { display:contents; }
+body[data-layout="compact"] #viewport-stage .home-screen { height:auto;min-height:100%!important;padding:0;overflow:hidden; }
+body[data-layout="compact"] .home-illustration {
+  top:0;width:100%;height:auto;aspect-ratio:var(--stage-ratio);
+}
+body[data-layout="compact"] #viewport-stage .home-content {
+  height:auto;min-height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));padding:12px;justify-content:center;
+}
+body[data-layout="compact"] .home-heading {
+  display:flex;flex-direction:column;align-items:center;position:relative;isolation:isolate;
+  width:min(100%,var(--scene-max-width),max(240px,calc((100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 180px)*var(--stage-aspect))));
+  aspect-ratio:var(--stage-ratio);flex:none;
+}
+body[data-layout="compact"] .home-heading::before {
+  content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:linear-gradient(#08040566,transparent 35%,transparent 75%,#08040588);
+}
+body[data-layout="compact"] #viewport-stage .home-content .subtitle { font-size:22px;letter-spacing:.12em;margin:6px 0 0; }
+body[data-layout="compact"] #viewport-stage .home-content h1 { width:96%;height:auto; }
+body[data-layout="compact"] .home-wordmark { transform:translateY(-12px); }
+body[data-layout="compact"] #viewport-stage .home-content .menu { width:min(100%,740px);margin:0;padding:12px;gap:8px; }
+body[data-layout="compact"] #viewport-stage .menu a,
+body[data-layout="compact"] #viewport-stage .menu button { font-size:22px;min-height:48px;line-height:1.1; }
+body[data-layout="compact"] #viewport-stage .menu .home-primary { font-size:28px;min-height:52px; }
+body[data-layout="compact"] .home-keys { display:none; }

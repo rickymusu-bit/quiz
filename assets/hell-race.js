@@ -2,7 +2,8 @@
    Nessuna modifica al motore, ai punteggi o ai salvataggi. */
 (function (root) {
   'use strict';
-  const H = 384, lanes = [282, 316, 350];
+  const {rasterWidth: RACE_WIDTH, rasterHeight: H} = root.FoolLayout.reference;
+  const lanes = [282, 316, 350];
   const colors = ['#d6ad75', '#be7554', '#b4a08c'];
   const VEHICLES = ['chopper', 'pickup', 'truck', 'coupe', 'offroad', 'ape'];
   // Widths in logical race pixels; preserve each complete silhouette's aspect ratio.
@@ -484,9 +485,9 @@
     for (const [dx, dy] of [[-2,0],[2,0],[0,-2],[0,2],[-1,-1],[-1,1],[1,-1],[1,1]])
       c.drawImage(mask, left + dx, top + dy, w, h);
   }
-  function packPosition(state, index, progress, previous, sec, W = 512) {
+  function packPosition(state, index, progress, previous, sec, W = RACE_WIDTH) {
     // No per-lane horizontal offset: tied players have the exact same x.
-    const scale = W / 512, ratio = positionScore(state, index);
+    const scale = W / RACE_WIDTH, ratio = positionScore(state, index);
     const dest = (RACE_START_X + RACE_SPAN_X * ratio) * scale;
     const start = previous
       ? (RACE_START_X + RACE_SPAN_X * previous[index]) * scale
@@ -561,7 +562,7 @@
     if(final)fig.dataset.endingPhase='loading';
     const canvas = document.createElement('canvas');
     canvas.height = H;
-    canvas.width = 512;
+    canvas.width = RACE_WIDTH;
     canvas.setAttribute('aria-hidden', 'true');
     fig.appendChild(canvas);
     const caption = document.createElement('figcaption');
@@ -590,7 +591,7 @@
     let freeze = 0, oldTime = start,lastEndingTime=start;
     const draw = now => {
       if (live !== record || !canvas.isConnected) return;
-      const width = 512;
+      const width = RACE_WIDTH;
       if (canvas.width !== width) canvas.width = width;
       ctx.imageSmoothingEnabled = false;
       const elapsed = (now - start) / 1000;

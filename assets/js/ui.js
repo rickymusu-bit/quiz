@@ -2537,42 +2537,6 @@
     }
   } else act(configure);
 
-  /* Fixed 4:3 logical viewport: contain in both orientations. */
-  (function () {
-    const stage = $("viewport-stage");
-    let queued = false;
-    function fit() {
-      queued = false;
-      const v = window.visualViewport,
-        w = v?.width || innerWidth,
-        h = v?.height || innerHeight;
-      const scale = Math.min(w / 1024, h / 768);
-      stage.style.transform = "translate(-50%,-50%) scale(" + scale + ")";
-      stage.dataset.fitScale = String(scale);
-      document.body.classList.remove("portrait");
-      for (const d of document.querySelectorAll("dialog[open]")) {
-        d.style.maxHeight = Math.max(100, h - 24) + "px";
-        d.style.maxWidth = Math.max(100, w - 24) + "px";
-        d.style.overflow = "auto";
-      }
-    }
-    function schedule() {
-      if (!queued) {
-        queued = true;
-        requestAnimationFrame(fit);
-      }
-    }
-    window.fitFoolViewport = fit;
-    new MutationObserver(schedule).observe(stage, {
-      childList: true,
-      subtree: true,
-    });
-    window.addEventListener("resize", schedule);
-    window.visualViewport?.addEventListener("resize", schedule);
-    document.addEventListener("fullscreenchange", schedule);
-    fit();
-  })();
-
   window.HellscapeUI = {
     get game() {
       return game;
