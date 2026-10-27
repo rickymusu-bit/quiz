@@ -1,8 +1,8 @@
-/* Fool — Fuga dall'Inferno v1.2.4 (2026-10-27): scena pixel-art illustrativa.
+/* Fool — Fuga dall'Inferno v1.5.0 (2026-10-27): scena pixel-art illustrativa.
    Nessuna modifica al motore, ai punteggi o ai salvataggi. */
 (function (root) {
   'use strict';
-  const H = 384, lanes = [188, 268, 348];
+  const H = 384, lanes = [282, 316, 350];
   const colors = ['#d6ad75', '#be7554', '#b4a08c'];
   const VEHICLES = ['chopper', 'pickup', 'truck', 'coupe', 'offroad', 'ape'];
   // Widths in logical race pixels; preserve each complete silhouette's aspect ratio.
@@ -115,6 +115,24 @@
   }
   const reduce = root.matchMedia('(prefers-reduced-motion: reduce)');
   let live = null, last = null, roadPhase = 0, roadLastTime = null;
+  let visualState = null;
+  function syncVisual(state, final) {
+    if (!visualState || visualState.id !== state.id) {
+      const consumed = state.groups.map((g,i)=>g.out&&!(final&&state.winner===null&&i===state.respondent)?i:null).filter(i=>i!==null);
+      visualState={id:state.id,outs:state.groups.map(g=>g.out),consumed:new Set(consumed),queue:[],plan:null,elapsed:0,key:null};
+    }
+    state.groups.forEach((g,i)=>{if(g.out&&!visualState.outs[i]&&!visualState.consumed.has(i))visualState.queue.push({index:i,start:null});});
+    visualState.outs=state.groups.map(g=>g.out);
+    const key=final?state.id+':'+state.winner:null;
+    if(final&&visualState.key!==key){visualState.plan=root.FoolEnding.plan(state,[...visualState.consumed],visualState.queue.map(q=>q.index));visualState.elapsed=0;visualState.key=key;}
+    return visualState;
+  }
+  function endingHelpers(state) {
+    return {vehicleIndex:(s,i)=>Math.max(0,VEHICLES.indexOf(s.config.vehicles?.[i]||['chopper','pickup','ape'][i])),
+      vehicleSize:row=>imageReady(sheets.vehicles)?vehicleSize(row):{width:50,height:40},
+      drawVehicle:(...args)=>{if(imageReady(sheets.vehicles))return drawVehicle(...args)},gate,demonDust,
+      demon:(c,t)=>{c.save();c.translate(50,130);c.scale(1.3,1.3);demon(c,t);c.restore()}};
+  }
   const clamp = (n, a, b) => Math.min(b, Math.max(a, n));
   const smooth = x => { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); };
   const r = (c, x, y, w, h, color) => {
@@ -289,16 +307,16 @@
     }
     return { x: left, y: top - 4 * unit, width: 50 * unit, height: 24 * unit };
   }
-  function background(c, W, tick, progress) {
+  function background(c, W, tick, progress, effectTime=tick) {
     if(imageReady(sheets.world)){
       const img=sheets.world;
       // Distant architecture and foreground scroll at different velocities.
-      for(const [sy,sh,dy,dh,speed] of [[0,.63,0,190,5],[.63,.11,190,175,48],[.74,.26,365,19,48]]){
+      for(const [sy,sh,dy,dh,speed] of [[0,.63,0,190,5],[.74,.26,365,19,48]]){
         const tw=W*2,offset=(tick*speed)%tw;
         for(let x=-offset;x<W;x+=tw)c.drawImage(img,0,img.naturalHeight*sy,img.naturalWidth,img.naturalHeight*sh,Math.floor(x),dy,tw,dh);
       }
-      c.fillStyle='#080909bd';c.fillRect(0,190,W,175);
-      if(progress>.7){const enter=smooth((progress-.7)/.3);gate(c,W+65-enter*134,90,tick,false)}
+      if(root.FoolTerrain)root.FoolTerrain.draw(c,W,tick,progress,img,effectTime);
+      else{c.fillStyle='#161614';c.fillRect(0,184,W,181);}
       return;
     }
 
@@ -332,21 +350,8 @@
       r(c, x + 9, 69, 12, 2, '#e4a143');
     }
     r(c, 0, 73, W, 156 - 73, '#1c1c24');
-    for (const y of [89, 121]) {
-      line(c, 0, y, W, '#4a3839');
-      for (let x = -(tick * 92) % 42; x < W; x += 42) r(c, x, y, 21, 2, '#bb6040');
-    }
-    for (let x = -(tick * 74) % 46; x < W; x += 46) {
-      r(c, x, 151, 22, 2, '#7d4540');
-      r(c, x + 14, 143, 3, 2, '#413039');
-    }
-    // La porta appare solo nell'ultima parte della partita.
-    if (progress > .7) {
-      const enter = smooth((progress - .7) / .3);
-      const x = W + 65 - enter * 134;
-      gate(c, x, 24, tick, false);
-    }
     c.restore();
+    if(root.FoolTerrain)root.FoolTerrain.draw(c,W,tick,progress,null,effectTime);
   }
   function gate(c, x, y, tick, open) {
     if(sprite(c,'portal',8,1,0,Math.floor(tick*10)%8,x-15,y-8,85,open?190:145))return;
@@ -397,69 +402,84 @@
       r(c, x + 49 + i * 6, y + 116, 5, 13, '#d58a55');
     }
   }
-  function nameTag(c, W, x, spriteTop, name, color) {
-    const tag = String(name).slice(0, 16);
-    c.font = 'bold 10px monospace';
-    const width = Math.min(W - 6, c.measureText(tag).width + 9);
-    const lx = clamp(x - width / 2, 2, W - width - 2);
-    const top = spriteTop - 18; // 13px tag plus a 5px clear gap above the sprite.
-    r(c, lx, top, width, 13, '#0c0e19');
-    r(c, lx, top, 3, 13, color);
-    c.fillStyle = '#f6ead3';
-    c.fillText(tag, lx + 6, top + 10);
+  const outlineFrames = new Map();
+  function vehicleOutline(c, row, frame, x, ground) {
+    if (!imageReady(sheets.vehicles)) return;
+    const source = vehicleRow(row)[frame], key = row + ':' + frame;
+    let mask = outlineFrames.get(key);
+    if (!mask) {
+      mask = document.createElement('canvas');
+      mask.width = source.width; mask.height = source.height;
+      const ctx = mask.getContext('2d');
+      ctx.drawImage(source, 0, 0);
+      ctx.globalCompositeOperation = 'source-in';
+      ctx.fillStyle = '#ffe044';
+      ctx.fillRect(0, 0, mask.width, mask.height);
+      outlineFrames.set(key, mask);
+    }
+    const size = vehicleSize(row), left = Math.round(x - size.width / 2),
+      top = Math.round(ground - size.height), w = Math.round(size.width), h = Math.round(size.height);
+    for (const [dx, dy] of [[-2,0],[2,0],[0,-2],[0,2],[-1,-1],[-1,1],[1,-1],[1,1]])
+      c.drawImage(mask, left + dx, top + dy, w, h);
+  }
+  function packPosition(state, index, progress, previous, sec, W = 512) {
+    const ratio = positionScore(state, index), offset = [-18,32,-5][index];
+    const dest = W * (.47 + .10 * ratio) + 8 * progress + offset;
+    const start = previous ? W * (.47 + .10 * previous[index]) + 8 * progress + offset : dest;
+    return { x: start + (dest - start) * smooth(sec / .9), y: lanes[index] };
   }
   function scene(c, W, state, sec, final, previous, reduced, roadTime) {
     const total = Math.max(1, Number(state.config.questionCount || 33));
-    const progress = state.phase === 'pareggio' || state.phase === 'conclusa' ? 1 : clamp(state.valid / total, 0, 1);
+    const progress = root.FoolTerrain?root.FoolTerrain.progress(state):clamp(state.valid / total, 0, 1);
     const motion = reduced ? 0 : roadTime;
-    background(c, W, motion, final ? 0 : progress);
-    const ended = final ? (reduced ? 5.2 : sec) : 0;
-    const escape = smooth((ended - .25) / 2.8);
-    if (final) gate(c, W - 90, 180, motion, true);
-    let demonX = 15;
-    if (final) demonX = 15 + smooth((ended - 1) / 3.4) * Math.max(70, W * .44);
-
-    state.groups.forEach((group, i) => {
-      const configuredVehicle = state.config.vehicles?.[i] || ['chopper', 'pickup', 'ape'][i];
-      const visualGroup = { ...group, vehicle: configuredVehicle };
-      const ratio = positionScore(state, i);
-      const dest = W * (.49 + .22 * ratio) + 12 * progress;
-      const start = previous ? W * (.49 + .22 * previous[i]) + 12 * progress : dest;
-      let x = start + (dest - start) * smooth(sec / .9);
-      let unit = 2, y = lanes[i];
-      let visible = true;
-      if (!final && group.out) x = Math.min(x, 125);
-      if (final) {
-        if (i === state.winner) {
-          x += escape * (W - x - 55);
-          if (ended >= 3.1) visible = false;
-        } else {
-          const victims = state.groups.map((g, j) => j).filter(j => j !== state.winner);
-          const order = victims.indexOf(i);
-          const consumed = smooth((ended - 1.65 - order * 1.1) / .7);
-          x += (1.3 * demonX + 100 - x) * consumed;
-          y += (245 - y) * consumed;
-          if (consumed > .85) unit = 1;
-          if (consumed >= 1) visible = false;
-        }
-      }
-      if (visible) {
-        const bounds = racer(c, x, y, i, motion, visualGroup, unit);
-        nameTag(c, W, x, bounds.y, group.name, colors[i]);
-      }
-    });
-    c.save();c.translate(0,130);c.scale(1.3,1.3);demon(c, motion, demonX, '#9b2831', !final||ended<1?'chase':ended<1.65?'attack':'devour', ended<1.65?Math.max(0,ended-1):Math.max(0,(ended-1.65)%1.1));c.restore();
-    if (final && ended > 3.6) {
-      c.font = 'bold 17px monospace';
-      c.fillStyle = '#f7e2af';
-      const message = state.winner === null ? 'NESSUNO È FUGGITO' : 'FUGA RIUSCITA';
-      c.fillText(message, clamp((W - c.measureText(message).width) / 2, 7, W - 170), 27);
+    background(c, W, motion, progress, reduced?0:motion+(final?visualState.elapsed:0));
+    if(final&&root.FoolEnding&&!imageReady(root.FoolEnding.load(()=>live?.redraw?.()))){endingHelpers(state).demon(c,0);return root.FoolEnding.load(()=>{})?.failed?'done':'loading';}
+    if(final&&root.FoolEnding)return root.FoolEnding.render(c,W,state,visualState.plan,reduced?visualState.plan.duration:visualState.elapsed,endingHelpers(state));
+    // Keep a compact chasing pack; paint the current pilot last so its outline stays visible.
+    const positions = state.groups.map((g, i) => packPosition(state, i, progress, previous, sec, W));
+    const order = state.groups.map((g, i) => i).filter(i => i !== state.respondent);
+    order.push(state.respondent);
+    for (const i of order) {
+      const group = state.groups[i];
+      if (group.out) continue;
+      const configuredVehicle = state.config.vehicles?.[i] || ['chopper','pickup','ape'][i];
+      const visualGroup = { ...group, vehicle: configuredVehicle }, p = positions[i],
+        row = Math.max(0, VEHICLES.indexOf(configuredVehicle));
+      if (i === state.respondent)
+        vehicleOutline(c, row, Math.floor(motion * 10 + i * 2) % 8, p.x, p.y);
+      racer(c, p.x, p.y, i, motion, visualGroup, 2);
     }
+    const current = state.respondent, active = positions[current],
+      row = Math.max(0, VEHICLES.indexOf(state.config.vehicles?.[current] || ['chopper','pickup','ape'][current]));
+    const size = imageReady(sheets.vehicles) ? vehicleSize(row) : { width: 50, height: 40 };
+    const front = Math.max(...positions.filter((p, i) => !state.groups[i].out).map(p => p.x + 34));
+    if (live?.canvas === c.canvas) {
+      live.figure.style.setProperty('--player-x', (Math.min(W - 144, front + 8) / W * 100) + '%');
+      live.figure.style.setProperty('--player-y', ((active.y - size.height * .5) / H * 100) + '%');
+      live.figure.dataset.activeVisible = String(!state.groups[current].out);
+      live.figure.dataset.activeTeam = String(current);
+    }
+    const queue=visualState?.queue||[];
+    if(reduced){for(const item of queue)visualState.consumed.add(item.index);queue.length=0;}
+    if(queue.length&&root.FoolEnding&&!imageReady(root.FoolEnding.load(()=>live?.redraw?.()))){
+      if(root.FoolEnding.load(()=>{})?.failed){for(const item of queue)visualState.consumed.add(item.index);queue.length=0;}
+      endingHelpers(state).demon(c,motion);return 'race';
+    }
+    if(queue.length&&root.FoolEnding){
+      const item=queue[0];if(item.start===null)item.start=roadTime;
+      const age=Math.max(0,roadTime-item.start);
+      if(age>=root.FoolEnding.CAPTURE){visualState.consumed.add(item.index);queue.shift();}
+      else root.FoolEnding.capture(c,W,state,item.index,age,endingHelpers(state));
+    }else{c.save();c.translate(0,130);c.scale(1.3,1.3);demon(c,motion,15);c.restore();}
+    return 'race';
   }
+
   function createStage(state, final = false) {
     if (live) root.cancelAnimationFrame(live.frame);
+    if(root.FoolEnding){syncVisual(state,final);root.FoolEnding.load(()=>live?.redraw?.());}
     const fig = document.createElement('figure');
     fig.className = 'hell-race' + (final ? ' hell-race-final' : '');
+    if(final)fig.dataset.endingPhase='loading';
     const canvas = document.createElement('canvas');
     canvas.height = H;
     canvas.width = 512;
@@ -468,7 +488,7 @@
     const caption = document.createElement('figcaption');
     caption.className = 'hell-race-caption';
     caption.textContent = final
-      ? (state.winner === null ? 'Nessun giocatore è riuscito a fuggire dall’Inferno.' : state.groups[state.winner].name + ' fugge dall’Inferno. Gli altri vengono catturati dal demone.')
+      ? (state.winner === null ? 'Il demone inghiotte l’ultimo veicolo, sputa fuoco verso l’alto e danza vittorioso. Nessun giocatore è fuggito.' : state.groups[state.winner].name + ' attraversa il portale che emerge dal terreno. Il varco sprofonda; il demone ruggisce, lo investe di fuoco, poi salta e batte i pugni a terra.')
       : 'Fuga dall’Inferno: le posizioni dei tre veicoli seguono i punteggi. La porta si avvicina con il procedere delle domande.';
     fig.appendChild(caption);
     const ctx = canvas.getContext('2d', { alpha: false });
@@ -478,10 +498,10 @@
     const old = last?.key === state.id && !final ? last.x : null;
     const previous = old;
     last = { key: state.id, x: next };
-    const record = { frame: 0, canvas };
+    const record = { frame: 0, canvas, figure:fig };
     live = record;
     const start = performance.now(), reduced = reduce.matches;
-    let freeze = 0, oldTime = start;
+    let freeze = 0, oldTime = start,lastEndingTime=start;
     const draw = now => {
       if (live !== record || !canvas.isConnected) return;
       const width = 512;
@@ -491,10 +511,13 @@
       const stop = state.paused || state.suspended || document.hidden;
       if (stop) freeze += Math.max(0, (now - oldTime) / 1000);
       oldTime = now;
-      if (roadLastTime !== null && !stop && !reduced) roadPhase += clamp((now - roadLastTime) / 1000, 0, .06);
+      if (roadLastTime !== null && !stop && !reduced && !final) roadPhase += clamp((now - roadLastTime) / 1000, 0, .06);
       roadLastTime = now;
-      scene(ctx, width, state, Math.max(0, elapsed - freeze), final, previous, reduced, final ? Math.max(0,elapsed-freeze) : roadPhase);
-      if (!reduced && (!final || Math.max(0,elapsed-freeze) < 5.8)) record.frame = root.requestAnimationFrame(draw);
+      if(final&&visualState?.plan&&!stop&&imageReady(root.FoolEnding.load(()=>live?.redraw?.())))visualState.elapsed+=Math.min(.1,Math.max(0,(now-lastEndingTime)/1000));
+      lastEndingTime=now;
+      const phase=scene(ctx, width, state, Math.max(0, elapsed - freeze), final, previous, reduced, roadPhase);
+      if(final&&fig.dataset.endingPhase!==phase){fig.dataset.endingPhase=phase;if(phase==='done')fig.dispatchEvent(new CustomEvent('foolendingcomplete',{bubbles:true}));}
+      if (!reduced && (!final || phase!=='done')) record.frame = root.requestAnimationFrame(draw);
     };
     record.redraw = () => {
       if (live !== record || !canvas.isConnected) return;

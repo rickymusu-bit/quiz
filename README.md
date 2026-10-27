@@ -2,7 +2,7 @@
 
 Sito: https://rickymusu-bit.github.io/quiz/
 
-**Applicazione 3.3.0 · Motore 2.2.1 · Regolamento 19.2.0 · 26/10/2026**
+**Applicazione 3.4.0 · Motore 2.2.1 · Regolamento 19.2.0 · 27/10/2026**
 
 Hellscape è un quiz di fisica per tre giocatori, pubblicato su GitHub Pages dal ramo `main`. Il gioco carica automaticamente i quesiti dal catalogo `datasets.json`. Le domande appartengono a banche separate, associate a materie e argomenti; non è richiesto un server applicativo.
 
@@ -18,7 +18,9 @@ Il sito funziona direttamente come archivio statico, senza compilazione obbligat
 - `assets/js/loader.js`: catalogo e caricamento dal sito o dalle risorse incorporate nell’export.
 - `assets/js/persistence.js`: accesso iniettato a storage, lettura/scrittura dei profili e ripresa attraverso il motore. Il sito conserva `fool-v1`, `fool-settings-v1` e il JSON esistente.
 - `assets/js/ui.js`: configurazione, impostazioni, schermate, dialoghi, comandi e adattamento del palco. Lo stato dell’interfaccia è racchiuso nel modulo; `HellscapeUI` è la facciata esplicita usata dalle regressioni browser.
-- `assets/css/game.css` e `assets/hellscape.css`: stili di base estratti e stili della grafica esistente, nello stesso ordine di cascata.
+- `assets/css/game.css` e `assets/hellscape.css`: stili di base estratti e stili della grafica esistente, nello stesso ordine di cascata. `assets/home.css` contiene la schermata iniziale illustrata.
+- `assets/hell-terrain.js`: basalto continuo, degradazione per domande completate, ossa, teschi umani e demoniaci, rottami di veicoli e geyser di lava, senza corsie visibili.
+- `assets/hell-ending.js`: timeline e pose per presa, inghiottimento del veicolo, fiammata, portale, ruggito e danza, senza modificare il modello.
 - `assets/hell-race.js`: componente Canvas separato; legge lo stato senza applicare transizioni al motore.
 - `assets/vendor/katex.js` e `katex.css`: KaTeX 0.16.22 e font incorporati estratti senza riscrittura; licenza in `assets/vendor/README.md` e nell’HTML.
 - `scripts/build.cjs`: copia statica e generazione dell’unico HTML offline dagli stessi sorgenti.
@@ -30,8 +32,10 @@ npm ci
 python3 -m pip install -r requirements-test.txt
 npm run dev             # http://127.0.0.1:8000
 npm test                # motore, persistenza e 200 domande delle due banche
-npm run test:frames     # 48 fotogrammi veicoli + 12 demone, proporzioni e nomi
+npm run test:frames     # 48 fotogrammi veicoli + 12 demone, proporzioni, gruppo compatto e contorno giallo
 npm run test:browser    # regressioni interfaccia e Canvas
+npm run test:endings    # presa, morso, fiammata e i due finali
+npm run test:terrain    # progressione del terreno su desktop e Android
 npm run build           # dist/site, pubblicabile su hosting statico
 npm run test:offline    # genera e verifica dist/Hellscape-offline.html
 ```
@@ -60,17 +64,17 @@ Lo spareggio si apre **solo in caso di parità al primo posto dopo tutte le doma
 
 Le domande dello spareggio sono estratte fra **tutte quelle nuove del dataset**, senza vincoli di difficoltà, mantenendo il tempo della partita. Non si ripetono quesiti già mostrati; se la banca non basta, la partita attende l'aggiunta di nuovi quesiti. Durante lo spareggio il tabellone segnala che i punteggi sono congelati; non si assegnano punti né Ammo e l'esito dipende esclusivamente da risposte corrette o eliminazioni; si disattivano tutti gli effetti delle Ammo della fase ordinaria. Sanzioni, timer e sospensione restano disponibili.
 
-## Fuga dall'Inferno — scena animata v1.2.0
+## Fuga dall'Inferno — scena animata v1.5.0
 
-Durante il quiz la scena occupa l’intero palco fisso 4:3 (1024×768): tre piloti su veicoli junkpunk/dieselpunk attraversano un paesaggio di lava inseguiti da un demone horror. Lo sfondo scorre autonomamente; quando i punti cambiano, i veicoli avanzano e possono superarsi. Le posizioni sono una rappresentazione visiva dei punteggi esatti, anche razionali dopo Marx, **non un punteggio parallelo**. I giocatori eliminati perdono terreno.
+Durante il quiz la scena occupa l’intero palco fisso 4:3 (1024×768): tre piloti su veicoli junkpunk/dieselpunk attraversano un paesaggio di lava inseguiti da un demone horror. Lo sfondo scorre autonomamente; quando i punti cambiano, i veicoli avanzano e possono superarsi. Le posizioni sono una rappresentazione visiva dei punteggi esatti, anche razionali dopo Marx, **non un punteggio parallelo**. I veicoli dei giocatori eliminati vengono afferrati e inghiottiti dal demone, seguiti da una fiammata verso l’alto.
 
-La porta dell'Inferno compare verso il completamento delle domande impostate (33 per impostazione predefinita). Durante lo spareggio i punti restano congelati e la porta rimane vicina. La schermata finale mostra il vincitore che fugge mentre il demone cattura gli altri; con Game Over senza superstiti, li cattura tutti. I finali anticipati per eliminazione funzionano senza attendere l'ultima domanda.
+Il portale emerge dal terreno quando il vincitore è l’unico veicolo rimasto: lo attraversa, poi il varco sprofonda. Il demone ruggisce, spara un getto di fuoco verso il portale ancora in discesa e, quando è sparito, salta e batte i pugni a terra. Se il motore decreta una vittoria per punteggio lasciando altri giocatori attivi, il demone li rimuove prima di aprire il portale. Con Game Over inghiotte l’ultimo mezzo, sputa fuoco e fa una danza di vittoria. I giocatori già mangiati durante la partita non ricompaiono. I finali anticipati per eliminazione funzionano senza attendere l’ultima domanda.
 
 Il modulo `assets/hell-race.js` è un Canvas pixel-art senza dipendenze, privo di influenza sulle regole, sul timer e sui salvataggi. La grafica si interrompe quando la pagina non è visibile e rispetta la preferenza di sistema per la riduzione del movimento. L'indicazione testuale accessibile integra le figure. I sei veicoli selezionabili sono chopper (con pilota), pick-up, camion, coupé, fuoristrada e Ape a tre ruote. Sono riconoscibili per sagoma e simbolo, non per colori vistosi. Le nuove sprite map animate, il portale e il panorama sono descritti in [assets/hell-race/README.md](assets/hell-race/README.md). Ogni mezzo ha otto pose; il demone ha sequenze distinte di corsa, attacco e morso. I punteggi, le regole e i salvataggi esistenti non vengono modificati.
 
 ## Interfaccia e salvataggi
 
-La home, la schermata di gioco e le regole sono responsive per desktop, tablet e smartphone. Il riepilogo di ciascun giocatore e il suo inventario mostrano **solo i tipi di Ammo effettivamente posseduti**, con una **icona pixel-art per ogni unità posseduta**, diversa per forma e materiale (Nope: corde; Bullo: cartuccia da fucile; Spoiler: mirino; Aura: giubbotto antiproiettile; Karma: granata; Marx: bomba). Nessuna cifra sostituisce le icone; restano visibili i nomi dei tipi e le etichette accessibili. Il comando per il fullscreen mostra **Schermo intero** o **Esci da schermo intero** in funzione dello stato del browser, anche quando il gioco è aperto in un iframe dalla home.
+La home, la schermata di gioco e le regole sono responsive per desktop, tablet e smartphone. Gli inventari dei giocatori mostrano **solo i tipi di Ammo effettivamente posseduti**, con una **icona pixel-art per ogni unità posseduta**, diversa per forma e materiale (Nope: corde; Bullo: cartuccia da fucile; Spoiler: mirino; Aura: giubbotto antiproiettile; Karma: granata; Marx: bomba). Nessuna cifra sostituisce le icone; restano visibili i nomi dei tipi e le etichette accessibili. Il comando per il fullscreen mostra **Schermo intero** o **Esci da schermo intero** in funzione dello stato del browser, anche quando il gioco è aperto in un iframe dalla home.
 
 La schermata iniziale offre **Nuova partita** e mostra **Riprendi partita** quando in questo browser è presente una partita salvata ancora in corso. La ripresa apre direttamente il gioco, mantenendo il timer fermo. Preparare una nuova partita conserva il salvataggio precedente fino alla conferma di **Inizia partita**.
 
@@ -124,20 +128,20 @@ Nella home: **N** nuova partita, **R** riprendi, **G** regole, **I** impostazion
 
 Il rifiuto delle domande è rimosso dal motore, dai comandi e dal regolamento. Un vecchio salvataggio con una richiesta in corso viene ripreso sulla stessa domanda, senza sostituzione e con timer fermo.
 
-## Interfaccia Hellscape 3.2.0
+## Interfaccia Hellscape 3.4.0
 
-La scena riempie lo schermo di gioco in rapporto 4:3, centrato e ridimensionato senza ritaglio in entrambe le orientazioni. La colonna sinistra contiene le tre schede collassabili dei giocatori; la finestra a destra contiene la domanda. Dopo la risposta la domanda scompare per 1,25 secondi, lasciando vedere il movimento, poi appare la correzione con spiegazione; con movimento ridotto l’intervallo è 0,4 secondi. La prossima domanda aggiorna entrambe le finestre. Le tre schede restano consultabili durante il turno, senza fermare il timer. Domanda, quattro alternative e spiegazione restano visibili insieme; la finestra cresce in altezza e il pulsante successivo segue il testo senza sovrapposizioni. Vite e spostamenti rappresentano le regole esistenti: un errore ordinario mantiene i punti, una sanzione toglie una vita.
+La scena riempie il palco 4:3, centrato e ridimensionato senza ritaglio su desktop e smartphone in entrambe le orientazioni. I tre veicoli corrono ravvicinati; nessun nome è disegnato sopra i mezzi. Una sagoma gialla segue ogni fotogramma del veicolo di turno. Davanti al gruppo, all’altezza di quel veicolo, un solo riquadro riporta nome, punti esatti e vite del rispondente. I dati scompaiono quando viene eliminato e nei finali animati.
 
-Percorsi `Fool.html`, API del motore e chiavi dei salvataggi conservati per compatibilità. Nessuna modifica a regole, dataset o formato dei salvataggi.
+Il pannello in alto al centro offre **Inventario** e **Svela e avvia il tempo**. Dopo la risposta scompare per 1,25 secondi, lasciando vedere il movimento, poi mostra domanda, alternative e correzione con spiegazione e comando successivo. Con movimento ridotto l’intervallo è 0,4 secondi. Le domande lunghe scorrono all’interno del pannello, che resta sopra i veicoli.
 
-I veicoli scelti sono disabilitati negli altri selettori e tornano disponibili quando vengono liberati. La personalizzazione include nome e veicolo. Le animazioni degli esiti non aggiungono scritte. Il pannello Inventario contiene soltanto oggetti, bersagli e comandi; le spiegazioni sono accessibili da Regole nelle Opzioni. La consultazione del regolamento ferma il timer. Opzioni include Salva e Torna alla home; all’uscita si sceglie Salva ed esci, Esci senza salvare oppure Annulla.
+In basso a destra, **Turnazione** contiene soltanto i tre nomi: il rispondente attuale è sempre il primo. Cliccando un nome si apre il suo inventario; le Ammo degli altri giocatori restano consultabili e non utilizzabili. Chiudi o Esc tornano al gioco. La consultazione ferma temporaneamente il timer e lo riprende alla chiusura soltanto se prima era in corsa, conservando le pause manuali.
+
+In basso a sinistra rimane soltanto **Opzioni**, che apre una finestra con pausa/ripresa, sanzioni, riassegnazione punti, campanella/sospensione, consultazione delle domande precedenti, scorciatoie, salvataggio, schermo intero, regole e ritorno alla home. Anche questa finestra conserva lo stato precedente del timer. La scelta **Pausa** mantiene il timer fermo dopo la chiusura. I pannelli decisionali e il regolamento mantengono la pausa fino alla ripresa esplicita.
+
+Il tempo è rappresentato da una fiala orizzontale di liquido rosso: si svuota secondo il tempo residuo, si ferma in pausa e si riempie dal livello residuo al pieno in 750 ms alla domanda successiva. Il conteggio parte soltanto quando si svela la domanda. La preferenza di sistema per il movimento ridotto disattiva il riempimento animato. Le icone dei giocatori nei salvataggi precedenti restano per compatibilità.
+
+Percorsi pubblici, API del motore e chiavi dei salvataggi sono conservati. Nessuna modifica a regole, dataset o formato dei salvataggi. I veicoli già scelti sono disabilitati negli altri selettori e tornano disponibili quando vengono liberati. All’uscita si sceglie Salva ed esci, Esci senza salvare oppure Annulla.
 
 Per ogni modifica all’interfaccia consegnare un’anteprima HTML offline e allegare in chat screenshot aggiornati prima dell’approvazione.
 
-Il tempo è rappresentato soltanto da una fiala orizzontale di liquido rosso: si svuota secondo il tempo residuo del motore, si ferma in pausa e si riempie alla domanda successiva. Nessun conto alla rovescia numerico. L’ordine delle schede segue i turni, con il rispondente attuale in cima.
-
-Al comando Prossima domanda, la fiala si riempie dal livello residuo della domanda precedente fino al pieno in 750 ms. Il conteggio parte soltanto quando si svela la domanda. La preferenza di sistema per il movimento ridotto disattiva il riempimento animato. Gli stemmi non sono mostrati: il riquadro usa come sfondo il veicolo selezionato in scala di grigi. Le icone nei salvataggi precedenti restano soltanto per compatibilità.
-
-Le tre schede sono impilate in ordine ciclico, con il giocatore corrente sempre in cima e illuminato da un contorno giallo. Da chiuse mostrano nome e punteggio numerico; da aperte mostrano soltanto vite e inventario. Apertura e chiusura sono indipendenti e si conservano durante la partita. Rimossi la lista separata dei turni e il comando delle statistiche dalle Opzioni.
-
-L’apertura delle schede espande il contenuto sopra quelle sottostanti senza spostarle. La scheda aperta o selezionata più di recente passa davanti alle altre, anche con la tastiera.
+La schermata iniziale usa `assets/hellscape-chase.webp`: i sei veicoli selezionabili sono visti frontalmente mentre fuggono verso chi guarda, con il demone alle loro spalle e proporzioni e sagome distinte. `assets/hellscape-logo.webp` è il titolo HELLSCAPE in metallo scolpito e incandescente, nello stile Doom del precedente logo FOOL, con sfondo trasparente. Lo stesso titolo compare nelle intestazioni di preparazione e regolamento. Illustrazione e logo sono generati dai riferimenti del gioco e convertiti in WebP senza perdita; gli originali sono conservati nell’ambiente di lavoro. Il sottotitolo «fuggi dall'inferno» è centrato sopra HELLSCAPE. I comandi della home rimangono sotto la scena, compreso Riprendi quando è disponibile un salvataggio. Tutte le immagini e il font del menu sono incorporati nell’HTML offline dagli stessi sorgenti.

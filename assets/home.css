@@ -1,0 +1,24 @@
+/* Title screen: one contained 4:3 illustration, full wordmark and compact menu. */
+@font-face{font-family:FoolTerminal;src:url('vt323-regular.ttf') format('truetype');font-style:normal;font-weight:400;font-display:swap}
+:root{color-scheme:dark;background:#080605;color:#f4e9cc;font-family:system-ui,sans-serif}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:#080605}
+[hidden]{display:none!important}
+#viewport-stage .home-screen{position:relative;isolation:isolate;height:768px;padding:0;overflow:hidden;display:block;background:#140806}
+.home-illustration{position:absolute;top:25px;left:50%;width:826.67px;height:620px;transform:translateX(-50%);object-fit:contain;object-position:center;mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);z-index:-2}
+.home-screen::before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(#080405b3,transparent 31%,transparent 69%,#080405cc 83%,#080405f5),radial-gradient(ellipse at 50% 45%,transparent 45%,#08040580);z-index:-1}
+#viewport-stage .home-content{position:relative;height:100%;width:100%;display:flex;flex-direction:column;align-items:center;gap:0;padding:18px 58px 18px;text-align:center}
+#viewport-stage .home-content h1{width:720px;max-width:100%;height:180px;margin:0;line-height:0}
+.home-wordmark{display:block;width:100%;height:auto;object-fit:contain;transform:translateY(-35px);filter:drop-shadow(0 5px 2px #000b) drop-shadow(0 0 18px #000)}
+#viewport-stage .home-content .subtitle{align-self:center;margin:0 0 6px;color:#ffd19a;font:28px/1 FoolTerminal,monospace;letter-spacing:.18em;text-transform:uppercase;text-shadow:2px 3px #000,0 0 14px #000}
+#viewport-stage .home-content .menu{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:9px;width:740px;max-width:100%;margin:auto 0 0;padding:14px 18px;background:linear-gradient(135deg,#190d0bde,#100d0bee);border:1px solid #6d4935;border-top-color:#bf8850;box-shadow:0 8px 28px #000b,inset 0 1px #efaa5b22}
+#viewport-stage .menu a,#viewport-stage .menu button{display:flex;align-items:center;justify-content:center;grid-column:span 2;min-height:42px;padding:7px 10px;border:2px solid;border-color:#8f7961 #34241c #291a15 #71533b;background:linear-gradient(#372b24,#1c1512);color:#e7c19b;text-decoration:none;font:26px/1 FoolTerminal,monospace;text-shadow:2px 2px #100700;box-shadow:2px 3px #0009;cursor:pointer}
+#viewport-stage .menu .home-primary{grid-column:span 3;min-height:53px;font-size:36px;color:#ffe2a5;border-color:#e7ad62 #7c351b #552013 #b96c36;background:linear-gradient(#682818,#37170e)}
+#viewport-stage .menu:not(:has(#resume-game:not([hidden]))) .home-primary{grid-column:1 / -1}
+#viewport-stage .menu a:hover,#viewport-stage .menu button:hover{color:#fff0bc;background:linear-gradient(#6a3923,#332016);border-top-color:#ffce85}
+#viewport-stage .menu a:active,#viewport-stage .menu button:active{transform:translate(1px,2px);box-shadow:1px 1px #0009}
+#viewport-stage .menu a:focus-visible,#viewport-stage .menu button:focus-visible{outline:3px solid #ffe4ac;outline-offset:3px}
+.home-keys{margin:11px 0 0;font:17px/1 FoolTerminal,monospace;color:#c5a88c;text-shadow:1px 2px #000}
+#fullscreen-status{grid-column:1 / -1;font:18px/1.2 FoolTerminal,monospace;color:#ffdda4;margin:4px 0}
+#play-frame{position:fixed;inset:0;width:100%;height:100dvh;border:0;background:#080605}
+@media(prefers-reduced-motion:reduce){#viewport-stage .menu a:active,#viewport-stage .menu button:active{transform:none}}

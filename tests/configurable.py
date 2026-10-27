@@ -39,20 +39,17 @@ with sync_playwright() as p:
   expect(page.locator('.answer-feedback')).to_have_count(0)
   assert page.locator('.multiplier-value').count()==0
   team=page.evaluate('HellscapeUI.game.s.result.respondent')
-  assert page.locator(f'.team[data-team="{team}"] .ammo-item').count()==6
-  assert page.locator(f'.team[data-team="{team}"] .ammo-round').count()==6
-  assert page.locator(f'.team[data-team="{team}"] [data-bonus="marx"] .ammo-round').count()==1
-  assert 'ammo-sprites-48.png' in page.locator(f'.team[data-team="{team}"] .ammo-round').first.evaluate('(el)=>getComputedStyle(el).backgroundImage')
-  for kind in ['salta','ruba','svela','aura','karma','marx']:
-   assert page.locator(f'.team[data-team="{team}"] [data-ammo="{kind}"]').count()==1
-  assert not any('Ammo 0' in t for t in page.locator('.team').all_text_contents())
-  next_team=page.evaluate('HellscapeUI.game.s.order[1]')
-  assert page.locator(f'.team[data-team="{next_team}"] .ammo-item').count()==0
-  # Ammo counts are model state; card animations are covered by hellscape.cjs.
+  page.locator(f'.turn-order [data-team="{team}"]').click()
+  assert page.locator('.bonus-inventory-list .bonus-group').count()==5
+  assert 'ammo-sprites-48.png' in page.locator('.ammo-round').first.evaluate('(el)=>getComputedStyle(el).backgroundImage')
+  assert page.evaluate('HellscapeUI.game.s.groups[HellscapeUI.game.s.result.respondent].inventory.length')==6
+  page.get_by_role('button',name='Successivi',exact=True).click()
+  assert page.locator('.bonus-inventory-list .bonus-group').count()==1
+  page.get_by_role('button',name='Chiudi',exact=True).click()
   page.get_by_role('button',name='Prossima domanda',exact=True).click()
   page.evaluate('()=>{for(let n=0;n<2;n++)HellscapeUI.game.s.groups[HellscapeUI.game.s.owner].inventory.push({id:HellscapeUI.game.uid(),type:"aura",target:null,origin:"test"});HellscapeUI.changed()}')
   current=page.evaluate('HellscapeUI.game.s.owner')
-  assert page.locator(f'.team[data-team="{current}"] [data-bonus="aura"] .ammo-round').count()==2
+  assert page.evaluate('HellscapeUI.game.s.groups[HellscapeUI.game.s.owner].inventory.filter(c=>c.type==="aura").length')==2
   for _ in range(2):
    page.get_by_role('button',name='Inventario',exact=True).click()
    assert page.locator('.bonus-inventory-list .bonus-group').filter(has_text='Aura').locator('.ammo-round').count()>=1

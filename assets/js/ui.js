@@ -64,7 +64,7 @@
     crown: ["♛", "Corona"],
   };
   let settingsTab = "general",
-    optionsOpen = false,
+    passiveReturn = null,
     vialRefillFrom = null;
   const node = (tag, text, cls) => {
     const n = document.createElement(tag);
@@ -74,6 +74,7 @@
   };
   const SHORTCUTS = {
     Inventario: "I",
+    Opzioni: "O",
     Sanzioni: "S",
     "Riassegna punti": "V",
     "Campanella / sospendi": "L",
@@ -1077,96 +1078,89 @@
       );
     });
   }
-  let playerCardsGameId = null,
-    playerCardLayer = 1;
-  const expandedPlayerCards = new Set(),
-    playerCardLayers = new Map();
-  function scoreboard() {
-    const s = game.s;
-    if (playerCardsGameId !== s.id) {
-      playerCardsGameId = s.id;
-      expandedPlayerCards.clear();
-      playerCardLayers.clear();
-      playerCardLayer = 1;
-    }
-    const grid = node("div", undefined, "scoreboard player-stack");
-    grid.setAttribute("aria-label", "Giocatori in ordine di turno");
-    const pos = s.order.indexOf(s.respondent),
-      order = [...s.order.slice(pos), ...s.order.slice(0, pos)];
+  function turnOrder() {
+    const s = game.s,
+      grid = node("nav", undefined, "turn-order");
+    grid.setAttribute("aria-label", "Turnazione");
+    const pos = Math.max(0, s.order.indexOf(s.respondent));
+    const order = [...new Set([
+      s.respondent,
+      ...s.order.slice(pos),
+      ...s.order.slice(0, pos),
+      ...s.groups.map((_, i) => i),
+    ])];
+    const list = node("ol");
     for (const i of order) {
-      const g = s.groups[i],
-        current = i === s.respondent,
-        card = node(
-          "details",
-          undefined,
-          "team player-card" +
-            (current ? " active" : "") +
-            (g.out ? " out" : ""),
-        );
-      card.dataset.team = String(i);
-      card.open = expandedPlayerCards.has(i);
-      card.style.zIndex = String(card.open ? playerCardLayers.get(i) || 2 : 1);
-      if (current) card.setAttribute("aria-current", "true");
-      const summary = node("summary", undefined, "player-card-header");
-      const vehicle = vehiclePreview(
-        s.config.vehicles?.[i] || teamDraft.vehicles[i],
-      );
-      vehicle.classList.add("team-symbol", "team-vehicle");
-      vehicle.setAttribute("aria-hidden", "true");
-      summary.append(
-        vehicle,
-        node("h3", g.name),
-        node("strong", F.exact(g.score) + " pt", "player-points"),
-      );
-      if (current) summary.append(node("span", "TURNO CORRENTE", "team-label"));
-      else if (g.out) summary.append(node("span", "ELIMINATO", "team-label"));
-      const body = node("div", undefined, "player-card-body");
-      body.append(lives(g));
-      const inventory = node("div", undefined, "player-card-inventory");
-      inventory.append(node("h4", "Inventario"));
-      if (!g.inventory.length) inventory.append(node("p", "Vuoto", "muted"));
-      else {
-        const list = node("ul", undefined, "bonus-list");
-        for (const copies of groupsOfInventory(g)) {
-          const c = copies[0],
-            item = node("li", undefined, "ammo-item");
-          item.dataset.bonus = c.type;
-          item.append(
-            node(
-              "span",
-              F.LABELS[c.type] +
-                (c.target === null ? "" : " → " + s.groups[c.target].name),
-              "ammo-label",
-            ),
-            ammoRounds(c.type, copies.length),
-          );
-          list.append(item);
-        }
-        inventory.append(list);
-      }
-      body.append(inventory);
-      card.append(summary, body);
-      const front = () => {
-        const layer = ++playerCardLayer;
-        playerCardLayers.set(i, layer);
-        card.style.zIndex = String(layer);
-      };
-      card.addEventListener("pointerdown", front);
-      card.addEventListener("focusin", front);
-      card.ontoggle = () => {
-        if (!card.isConnected || playerCardsGameId !== s.id) return;
-        if (card.open) {
-          expandedPlayerCards.add(i);
-          if (!playerCardLayers.has(i)) front();
-        } else {
-          expandedPlayerCards.delete(i);
-          playerCardLayers.delete(i);
-          card.style.zIndex = "1";
-        }
-      };
-      grid.append(card);
+      const item = node("li"),
+        button = btn(s.groups[i].name, () => showInventory(i));
+      button.dataset.team = String(i);
+      if (i === s.respondent) button.setAttribute("aria-current", "step");
+      if (s.groups[i].out)
+        button.setAttribute("aria-label", s.groups[i].name + " · eliminato · inventario");
+      item.append(button);
+      list.append(item);
     }
+    grid.append(list);
     return grid;
+  }
+  function currentPlayerBadge() {
+    const s = game.s,
+      g = s.groups[s.respondent],
+      badge = node("div", undefined, "current-player");
+    badge.dataset.team = String(s.respondent);
+    badge.setAttribute("aria-label", "Giocatore di turno");
+    badge.append(
+      node("h3", g.name),
+      node("strong", F.exact(g.score) + " pt", "player-points"),
+      lives(g),
+    );
+    return badge;
+  }
+  function optionsToggle() {
+    return btn("Opzioni", showOptions, "options-toggle");
+  }
+  function showOptions() {
+    const s = game.s,
+      wasRunning = game.running;
+    if (wasRunning) game.pause("opzioni");
+    persist();
+    dialog("Opzioni", (d) => {
+      d.dataset.passive = "options";
+      const bar = node("div", undefined, "options-grid");
+      if (s.phase !== "conclusa" && !s.suspended) {
+        if (s.screen === "answer")
+          bar.append(btn(wasRunning ? "Pausa" : "Riprendi timer", () => {
+            closeDialog();
+            if (!wasRunning && !fitBlocked) game.resume(s.revision);
+            changed();
+          }));
+        bar.append(
+          btn("Sanzioni", command(() => {
+            game.openSanctions();
+            showSanctions();
+          })),
+          btn("Riassegna punti", showScoreAdjustment, "", s.phase !== "ordinaria"),
+          btn("Campanella / sospendi", command(() => {
+            closeDialog();
+            game.bell();
+          })),
+        );
+      } else if (s.suspended)
+        bar.append(btn("Riprendi la sessione", command(() => {
+          closeDialog();
+          game.continueSession();
+        })));
+      bar.append(
+        btn("Domanda precedente", showPreviousQuestion, "", !reviewEntries().length),
+        btn("Scorciatoie da tastiera", showShortcuts),
+        btn("Salva", saveBrowser),
+        fullscreenButton(),
+        btn("Regole", showRules),
+        btn("Torna alla home", goHome),
+      );
+      d.append(bar, btn("Chiudi", closePassiveDialog, "primary"));
+    });
+    passiveReturn = resumeAfterModal(wasRunning);
   }
 
   const POSITIVE = "#ffe600";
@@ -1245,7 +1239,9 @@
     if (s.winner !== null)
       title.append(node("span", s.groups[s.winner].name, "winner-name"));
     title.append(art);
-    b.append(title, FoolHellRace.createStage(s, true));
+    const stage = FoolHellRace.createStage(s, true);
+    stage.addEventListener("foolendingcomplete", () => title.focus({ preventScroll: true }));
+    b.append(title, stage);
     if (s.result && s.current && s.result.question === s.current.id) {
       const r = s.result,
         summary = node("div", undefined, "final-answer");
@@ -1276,20 +1272,7 @@
     }
     const controls = node("div", undefined, "row");
     controls.append(btn("Torna alla schermata iniziale", goHome, "primary"));
-    const options = node("details", undefined, "game-options"),
-      bar = node("div", undefined, "row");
-    options.append(node("summary", "Opzioni"));
-    bar.append(
-      btn(
-        "Domanda precedente",
-        showPreviousQuestion,
-        "",
-        !reviewEntries().length,
-      ),
-      btn("Scorciatoie da tastiera", showShortcuts),
-    );
-    options.append(bar);
-    b.append(controls, options);
+    b.append(controls, optionsToggle());
     return b;
   }
   function gameBody() {
@@ -1343,21 +1326,7 @@
                 (s.config.questionCount ?? 33),
           "eyebrow",
         ),
-        node("h2", "Tocca a " + s.groups[s.respondent].name),
-        questionPoints(),
-        node(
-          "p",
-          s.phase === "pareggio"
-            ? "Una domanda per giocatore a rotazione. Un errore elimina. Nessuna Ammo."
-            : "Puoi usare più Ammo durante il turno.",
-          "muted",
-        ),
         questionActions(),
-        node(
-          "p",
-          "Tastiera: Invio svela · I inventario · ← precedente · F1 guida.",
-          "muted keyboard-hint",
-        ),
       );
       return b;
     }
@@ -1519,10 +1488,9 @@
       return;
     }
     main.className = "operational";
-    main.replaceChildren(FoolHellRace.createStage(s));
-    const sidebar = node("aside", undefined, "player-sidebar");
-    sidebar.append(scoreboard());
-    main.append(sidebar);
+    const stage = FoolHellRace.createStage(s);
+    stage.append(currentPlayerBadge());
+    main.replaceChildren(stage, turnOrder());
     const status = node("div", undefined, "statusline");
     status.append(timeVial());
     main.append(status);
@@ -1532,79 +1500,16 @@
       vialRefillFrom = null;
       animateVialRefill(from);
     }
-    if (s.phase !== "conclusa" && s.owner !== s.respondent)
-      main.append(
-        node(
-          "div",
-          "Titolare: " +
-            s.groups[s.owner].name +
-            " · risponde: " +
-            s.groups[s.respondent].name,
-          "muted",
-        ),
-      );
-    main.append(gameBody());
-    const options = node("details", undefined, "game-options");
-    options.open = optionsOpen;
-    const summary = node("summary", "Opzioni");
-    options.append(summary);
-    options.ontoggle = () => {
-      optionsOpen = options.open;
-    };
-    const bar = node("nav", undefined, "toolbar");
-    bar.setAttribute("aria-label", "Opzioni della partita");
-    if (!s.suspended) {
-      if (s.screen === "answer")
-        bar.append(
-          btn(
-            s.paused ? "Riprendi timer" : "Pausa",
-            command(() => {
-              if (s.paused) {
-                if (fitBlocked)
-                  throw Error("Correggere prima le dimensioni della finestra.");
-                game.resume(revision);
-              } else game.pause();
-            }),
-          ),
-        );
-      bar.append(
-        btn(
-          "Sanzioni",
-          command(() => {
-            game.openSanctions();
-            showSanctions();
-          }),
-        ),
-        btn(
-          "Riassegna punti",
-          showScoreAdjustment,
-          "",
-          s.phase !== "ordinaria",
-        ),
-      );
-    }
-    bar.append(
-      btn(
-        "Domanda precedente",
-        showPreviousQuestion,
-        "",
-        !reviewEntries().length,
-      ),
-      btn("Scorciatoie da tastiera", showShortcuts),
-      btn("Salva", saveBrowser),
-      fullscreenButton(),
-    );
-    bar.append(btn("Regole", showRules), btn("Torna alla home", goHome));
-    options.append(bar);
-    main.append(options);
+    const body = gameBody();
+    if (s.owner !== s.respondent)
+      body.prepend(node(
+        "p",
+        "Titolare: " + s.groups[s.owner].name + " · risponde: " + s.groups[s.respondent].name,
+        "owner-status",
+      ));
     if (s.suspendAfter)
-      main.append(
-        node(
-          "p",
-          "Campanella: concludere questa domanda, poi sospensione.",
-          "muted",
-        ),
-      );
+      body.append(node("p", "Campanella: sospensione al termine della domanda.", "muted"));
+    main.append(body, optionsToggle());
     if (s.draftBonus && !$("dialog").open) {
       inventoryCanResume = false;
       const c = s.groups[s.owner].inventory.find(
@@ -1905,6 +1810,7 @@
 
   function dialog(title, build) {
     const d = $("dialog");
+    passiveReturn = null;
     delete d.dataset.passive;
     d.replaceChildren(node("h2", title));
     build(d);
@@ -1913,12 +1819,29 @@
     return d;
   }
   function closeDialog() {
+    passiveReturn = null;
     const d = $("dialog");
     if (d.open) {
       d.close();
       main.tabIndex = -1;
       main.focus({ preventScroll: true });
     }
+  }
+  function resumeAfterModal(wasRunning) {
+    const original = game;
+    return () => {
+      if (
+        wasRunning && game === original && game.s.screen === "answer" &&
+        game.s.paused && !game.s.panel && !game.s.draftBonus &&
+        !game.s.suspended && !fitBlocked
+      ) game.resume(game.s.revision);
+    };
+  }
+  function closePassiveDialog() {
+    const resume = passiveReturn;
+    closeDialog();
+    resume?.();
+    if (game) changed();
   }
   function groupsOfInventory(g) {
     const groups = new Map();
@@ -1930,7 +1853,7 @@
     }
     return [...groups.values()];
   }
-  function showInventory() {
+  function showInventory(selectedTeam = game.s.respondent) {
     const s = game.s;
     const wasRunning = game.running;
     inventoryCanResume = wasRunning;
@@ -1942,7 +1865,7 @@
         "Giocatore",
         "inventory-team",
         s.groups.map((g, i) => [i, g.name]),
-        s.respondent,
+        selectedTeam,
       );
       d.append(choose);
       const list = node("div", undefined, "inventory-list");
@@ -2020,12 +1943,10 @@
       };
       draw();
       d.append(
-        btn("Chiudi", () => {
-          closeDialog();
-          changed();
-        }),
+        btn("Chiudi", closePassiveDialog),
       );
     });
+    passiveReturn = resumeAfterModal(wasRunning);
   }
   function selectBonus(copy) {
     const s = game.s,
@@ -2350,23 +2271,7 @@
       bonus: { type: "svela" },
     };
     main.className = "operational";
-    main.replaceChildren(scoreboard());
-    const status = node(
-      "div",
-      "Fool · controllo completo domanda e spiegazione",
-      "statusline",
-    );
-    main.append(status, gameBody());
-    const bar = node("nav", undefined, "toolbar");
-    for (const label of [
-      "Prossima domanda",
-      "Inventario",
-      "Sanzioni",
-      "Salva",
-      "Schermo intero",
-    ])
-      bar.append(btn(label, () => {}));
-    main.append(bar);
+    main.replaceChildren(turnOrder(), gameBody(), optionsToggle());
     const fits = !hasOverflow(main);
     game.s.screen = oldScreen;
     game.s.current = oldQ;
@@ -2404,6 +2309,7 @@
   }
   function checkFit() {
     if (!game || fitting || ui !== "game" || $("dialog").open) return;
+    window.fitFoolViewport?.();
     for (const el of main.querySelectorAll(".math-scroll")) {
       if (el.scrollWidth > el.clientWidth + 1) el.tabIndex = 0;
       else el.removeAttribute("tabindex");
@@ -2434,8 +2340,7 @@
   $("dialog").addEventListener("cancel", (e) => {
     e.preventDefault();
     if ($("dialog").dataset.passive) {
-      closeDialog();
-      if (game) changed();
+      closePassiveDialog();
       return;
     }
     message(
@@ -2467,6 +2372,11 @@
       dialogOpen = $("dialog").open;
     if (target?.closest("summary") && (key === "enter" || key === " ")) return;
     if (dialogOpen) {
+      if (key === "o" && $("dialog").dataset.passive === "options") {
+        event.preventDefault();
+        if (!event.repeat) closePassiveDialog();
+        return;
+      }
       if (event.repeat && event.key === "Enter") event.preventDefault();
       if (
         $("dialog").dataset.passive === "review" &&
@@ -2521,6 +2431,11 @@
       if (!s.panel && !s.draftBonus) act(showPreviousQuestion);
       return;
     }
+    if (key === "o" && !s.panel && !s.draftBonus) {
+      event.preventDefault();
+      act(showOptions);
+      return;
+    }
     if (s.phase === "conclusa" || s.panel || s.draftBonus || fitBlocked) return;
     if (key === "l") {
       event.preventDefault();
@@ -2528,12 +2443,6 @@
       return;
     }
     if (s.suspended) return;
-    if (key === "o") {
-      event.preventDefault();
-      optionsOpen = !optionsOpen;
-      renderGame();
-      return;
-    }
     if (key === "p") {
       event.preventDefault();
       if (s.screen === "answer")
@@ -2650,7 +2559,7 @@
     window.addEventListener("resize", schedule);
     window.visualViewport?.addEventListener("resize", schedule);
     document.addEventListener("fullscreenchange", schedule);
-    schedule();
+    fit();
   })();
 
   window.HellscapeUI = {

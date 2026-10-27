@@ -22,7 +22,7 @@ with sync_playwright() as p:
   view.locator('#name0').fill('Gruppo A');view.locator('#name0').press('a');expect(view.locator('#name0')).to_have_value('Gruppo Aa')
   view.get_by_role('button',name='Inizia partita').click();frame=next(f for f in page.frames if 'Fool.html' in f.url)
   def option(name):
-   if view.locator('.game-options').get_attribute('open') is None:view.get_by_text('Opzioni',exact=True).click()
+   if not view.locator('#dialog[data-passive=options][open]').count():view.get_by_role('button',name='Opzioni',exact=True).click()
    return view.get_by_role('button',name=name,exact=True)
   for i,key in enumerate(['a','B','c','D']):
    page.keyboard.press(key);assert frame.evaluate('HellscapeUI.game.s.screen')=='hidden'

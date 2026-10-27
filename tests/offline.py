@@ -31,6 +31,10 @@ with sync_playwright() as p:
    context.route('**/*',route);page.goto('http://offline.test/preview')
   def frame():return page.frames[1]
   expect(frame().get_by_role('link',name='Nuova partita',exact=True)).to_be_visible()
+  frame().locator('.home-illustration').evaluate('img=>img.decode()')
+  frame().locator('.home-wordmark').evaluate('img=>img.decode()')
+  frame().evaluate('document.fonts.ready')
+  page.screenshot(path=str(ART/f'home-offline-{width}x{height}.png'))
   # Seed a site save; the export must leave it untouched and offer no resume.
   page.evaluate('localStorage.setItem("fool-v1","site-save-sentinel")')
   for bank in ['termologia','introduzione-fisica-misura']:

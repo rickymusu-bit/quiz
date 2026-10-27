@@ -17,10 +17,15 @@ threading.Thread(target=server.serve_forever,daemon=True).start()
 base=f'http://127.0.0.1:{server.server_port}/'
 with sync_playwright() as p:
  browser=p.chromium.launch(executable_path=os.environ.get('CHROMIUM_PATH','/usr/bin/chromium'),args=['--no-sandbox']);errors=[];checks=[]
- for fullscreen in [False,True]:
+ for fullscreen,home_width,home_height in [(False,1440,900),(False,390,844),(True,844,390)]:
   for bank in ['termologia','introduzione-fisica-misura']:
-   page=browser.new_page(viewport={'width':844 if fullscreen else 1440,'height':390 if fullscreen else 900});page.on('pageerror',lambda e:errors.append(str(e)))
+   page=browser.new_page(viewport={'width':home_width,'height':home_height});page.on('pageerror',lambda e:errors.append(str(e)))
    page.goto(base)
+   page.locator('.home-illustration').evaluate('img=>img.decode()')
+   page.locator('.home-wordmark').evaluate('img=>img.decode()')
+   page.evaluate('document.fonts.ready')
+   assert page.locator('.home-screen').evaluate('el=>el.scrollHeight<=el.clientHeight+1')
+   if bank=='termologia':page.screenshot(path=str(ROOT/f'artifacts/home-{home_width}x{home_height}.png'))
    expect(page.get_by_role('link',name='Riprendi partita',exact=True)).to_be_hidden()
    if fullscreen:
     page.get_by_role('button',name='Schermo intero',exact=True).click();page.wait_for_function('!!document.fullscreenElement')
@@ -44,6 +49,7 @@ with sync_playwright() as p:
     else:page.goto(base)
     expect(page.get_by_role('link',name='Nuova partita',exact=True)).to_be_visible()
     expect(page.get_by_role('link',name='Riprendi partita',exact=True)).to_be_visible()
+    if bank=='termologia':page.screenshot(path=str(ROOT/f'artifacts/home-resume-{home_width}x{home_height}.png'))
    home()
    # Opening new-game setup must leave the previous match available.
    page.get_by_role('link',name='Nuova partita',exact=True).click()
@@ -57,6 +63,7 @@ with sync_playwright() as p:
    frame=next(f for f in page.frames if 'Fool.html' in f.url)
    assert frame.evaluate('HellscapeUI.game.s.current.id')==question
    assert frame.evaluate('HellscapeUI.game.s.valid')==1
+   expect(view.locator('#fit-warning')).to_be_hidden()
    assert frame.evaluate('HellscapeUI.game.s.groups.map(g=>g.score)')==[g['score'] for g in json.loads(saved)['groups']]
    view.get_by_role('button',name='Prossima domanda',exact=True).click();expect(view.get_by_role('button',name='Svela e avvia il tempo')).to_be_visible()
    view.get_by_role('button',name='Svela e avvia il tempo').click()
@@ -69,7 +76,7 @@ with sync_playwright() as p:
    assert frame.evaluate('HellscapeUI.game.s.paused && !HellscapeUI.game.running')
    remaining=frame.evaluate('HellscapeUI.game.s.remaining');page.wait_for_timeout(150);assert frame.evaluate('HellscapeUI.game.s.remaining')==remaining
    frame.evaluate('fitFoolViewport()');assert frame.evaluate('document.documentElement.scrollHeight<=innerHeight+1 && document.documentElement.scrollWidth<=innerWidth+1')
-   checks.append({'fullscreen':fullscreen,'bank':bank});page.close()
+   checks.append({'fullscreen':fullscreen,'bank':bank,'viewport':[home_width,home_height]});page.close()
  # Empty, malformed and finished saves are never offered on the homepage.
  page=browser.new_page(viewport={'width':1440,'height':900});page.on('pageerror',lambda e:errors.append(str(e)));page.goto(base)
  for value in ['not-json','null','{}',json.dumps({'phase':'conclusa','groups':[{}, {}, {}]})]:

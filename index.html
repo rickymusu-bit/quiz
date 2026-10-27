@@ -3,43 +3,22 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="Hellscape - Fuga dall’inferno. Il quiz di fisica per la classe.">
+<meta name="description" content="Hellscape - Fuggi dall’inferno. Il quiz di fisica per la classe.">
 <meta name="theme-color" content="#090809">
-<title>Hellscape - Fuga dall’inferno</title>
+<title>Hellscape - Fuggi dall’inferno</title>
 
 
-<style>
-@font-face{font-family:FoolTerminal;src:url('assets/vt323-regular.ttf') format('truetype');font-style:normal;font-weight:400;font-display:swap}
-:root{color-scheme:dark;background:#090809;color:#f4e9cc;font-family:system-ui,sans-serif}
-*{box-sizing:border-box;min-width:0}
-body{margin:0;min-width:0;min-height:100svh;background:#090809 url('assets/doom-background.png') center center/cover no-repeat}
-body::before{content:"";position:fixed;inset:0;pointer-events:none;background:linear-gradient(180deg,#0005,transparent 45%,#0007),radial-gradient(ellipse at center,#0000 35%,#0009 100%)}
-main{position:relative;min-height:100svh;display:flex;align-items:center;justify-content:center;padding:max(18px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));text-align:center}
-.home-content{width:min(1120px,100%);display:flex;flex-direction:column;align-items:center;gap:clamp(12px,2.2vh,24px)}
-h1{width:100%;margin:0;line-height:0}
-.home-logo{display:block;width:100%;height:auto;max-height:42svh;object-fit:contain;filter:url(#fool-logo-key)}
-.subtitle{margin:0;padding:0 6px;font:400 clamp(25px,3.1vw,43px)/1.08 FoolTerminal,ui-monospace,monospace;color:#f4e9cc;text-shadow:2px 2px #000,0 2px 8px #000;overflow-wrap:anywhere}
-.menu{display:grid;grid-template-columns:1fr;gap:12px;width:min(340px,88%);margin-top:clamp(3px,1.5vh,14px)}
-.menu a,.menu button{display:flex;align-items:center;justify-content:center;min-height:clamp(54px,7vh,76px);padding:8px clamp(6px,2vw,24px);border:3px solid;border-color:#80766b #251e1c #171314 #625a53;background:linear-gradient(#333132,#1c1a1d);color:#ed4a32;text-decoration:none;font:400 clamp(24px,8vw,49px)/1 FoolTerminal,ui-monospace,monospace;text-shadow:2px 2px #260000,0 -1px #ffad6a;box-shadow:3px 4px 0 #000b,inset 0 0 0 2px #0e0d0d}
-.menu a:hover,.menu button:hover{color:#ffb66f;border-top-color:#b98b63;background:linear-gradient(#49302e,#24191b)}
-.menu a:active,.menu button:active{transform:translate(1px,2px);box-shadow:1px 2px #000b,inset 0 0 0 2px #0e0d0d}
-.menu a:focus-visible,.menu button:focus-visible{outline:3px solid #ffe4ac;outline-offset:5px}
-@media(max-height:500px){.home-content{gap:8px}.home-logo{max-height:32svh}.subtitle{font-size:clamp(20px,4vh,29px)}.menu{gap:8px;margin-top:0;width:min(290px,78%)}.menu a,.menu button{min-height:44px;font-size:clamp(24px,7vw,32px);padding-block:4px}}
-@media(prefers-reduced-motion:reduce){.menu a:active,.menu button:active{transform:none}}
-#orientation-note{display:none}body.portrait #viewport-stage{display:none}body.portrait #orientation-note{position:fixed;inset:0;display:grid;align-content:center;justify-items:center;text-align:center;padding:1rem;background:#090809}#orientation-note h2{font:400 3rem FoolTerminal,monospace;color:#efb36e}#viewport-stage main{min-height:0}.menu{gap:8px}.menu a,.menu button{cursor:pointer}.menu button{width:100%}#play-frame{position:fixed;inset:0;width:100%;height:100dvh;border:0;background:#090809}#fullscreen-status{font:14px system-ui,sans-serif;color:#f4e9cc}[hidden]{display:none!important}
-.home-keys{max-width:34rem;font:14px/1.5 system-ui,sans-serif;color:#ddd0bb;margin:0;text-shadow:1px 1px #000}
-</style>
-<link rel="stylesheet" href="assets/hellscape.css"></head>
+<link rel="stylesheet" href="assets/hellscape.css">
+<link rel="stylesheet" href="assets/home.css"></head>
 <body>
-<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute;pointer-events:none"><defs><filter id="fool-logo-key" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  1 1 1 0 0"/><feComponentTransfer><feFuncA type="discrete" tableValues="0 1 1 1 1 1 1 1"/></feComponentTransfer></filter></defs></svg>
-
-<div id="viewport-stage"><main>
+<div id="viewport-stage"><main class="home-screen">
+<img class="home-illustration" src="assets/hellscape-chase.webp" width="1448" height="1086" fetchpriority="high" alt="Vista frontale di sei veicoli che fuggono verso di noi, con il demone alle loro spalle: chopper, pick-up, camion, coupé, fuoristrada e Ape.">
 <div class="home-content">
-<h1><span class="hellscape-wordmark">HELLSCAPE</span></h1>
-<p class="subtitle">Fuga dall’inferno</p>
+<p class="subtitle">fuggi dall'inferno</p>
+<h1><img class="home-wordmark" src="assets/hellscape-logo.webp" width="2172" height="724" fetchpriority="high" alt="HELLSCAPE"></h1>
 <nav class="menu" aria-label="Menu principale">
-<a href="Fool.html?start=1" aria-keyshortcuts="N">Nuova partita</a>
-<a id="resume-game" href="Fool.html?resume=1" aria-keyshortcuts="R" hidden>Riprendi partita</a>
+<a class="home-primary" href="Fool.html?start=1" aria-keyshortcuts="N">Nuova partita</a>
+<a class="home-primary" id="resume-game" href="Fool.html?resume=1" aria-keyshortcuts="R" hidden>Riprendi partita</a>
 <a href="Fool_regole.html" aria-keyshortcuts="G">Regole</a>
 <a href="Fool.html?settings=1" aria-keyshortcuts="I">Impostazioni</a>
 <button id="home-fullscreen" type="button" aria-keyshortcuts="F">Schermo intero</button>

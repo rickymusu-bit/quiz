@@ -22,10 +22,11 @@ with sync_playwright() as p:
   def fits():
    frame.evaluate('fitFoolViewport()');assert frame.evaluate('document.documentElement.scrollHeight<=innerHeight+1 && document.documentElement.scrollWidth<=innerWidth+1')
   def option(name):
-   if v.locator('.game-options').get_attribute('open') is None:v.locator('.game-options summary').click()
+   if not v.locator('#dialog[data-passive=options][open]').count():v.get_by_role('button',name='Opzioni',exact=True).click()
    return v.get_by_role('button',name=name,exact=True)
   expect(v.get_by_role('button',name='Riassegna punti',exact=True)).not_to_be_visible()
   assert option('Esci da schermo intero' if full else 'Schermo intero').is_visible()
+  v.get_by_role('button',name='Chiudi',exact=True).click()
   fits();page.screenshot(path=f'/tmp/options-hidden-{w}.png');a=v.locator('.question-actions .bonus-action').bounding_box();b=v.locator('.question-actions [data-game-action=reveal]').bounding_box();assert abs(a['y']-b['y'])<2
   assert v.get_by_role('button',name='Inventario',exact=True).count()==1
   q=frame.evaluate('HellscapeUI.game.s.current.id');v.get_by_role('button',name='Inventario',exact=True).click();v.get_by_role('button',name='Chiudi',exact=True).click()
