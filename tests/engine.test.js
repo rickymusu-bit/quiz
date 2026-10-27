@@ -63,7 +63,7 @@ test('Restore an existing 2.1.0 game while retaining chosen probabilities and po
  assert.equal(restored.s.config.bonusWeights.marx,30);assert.equal(F.exact(restored.s.groups[0].score),'305');
 });
 test('Each Ammo type has its own retro pixel-art sprite',()=>{
- assert.match(html,/ammo-sprites-48\.png/);
+ assert.match(html,/ammo-hellscape-v1\.png/);
  for(const kind of F.TYPES)assert.match(html,new RegExp('\\[data-ammo="'+kind+'"\\]'));
 });
 test('New ordinary game starts with 33 questions even when all scores are zero',()=>{
