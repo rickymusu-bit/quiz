@@ -106,8 +106,8 @@
     return bounds;
   }
   function vehiclePreview(id){
-    const canvas=document.createElement('canvas');canvas.width=160;canvas.height=90;
-    const paint=()=>{const c=canvas.getContext('2d');c.imageSmoothingEnabled=false;c.clearRect(0,0,160,90);const row=Math.max(0,VEHICLES.indexOf(id)),size=vehicleSize(row);
+    const canvas=document.createElement('canvas');canvas.width=480;canvas.height=270;canvas.style.width='160px';canvas.style.height='90px';
+    const paint=()=>{const c=canvas.getContext('2d');c.setTransform(3,0,0,3,0,0);c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';c.clearRect(0,0,160,90);const row=Math.max(0,VEHICLES.indexOf(id)),size=vehicleSize(row);
       // One common preview scale retains the same relative sizes as the race.
       const zoom=1.35/(root.FoolBridge?.RACE_SCALE ?? .62); sprite(c,'vehicles',8,6,row,0,80-size.width*zoom/2,86-size.height*zoom,size.width*zoom,size.height*zoom)};
     if(imageReady(sheets.vehicles))paint();else sheets.vehicles?.addEventListener('load',paint,{once:true});
@@ -306,24 +306,72 @@
   }
   function flyingDevils(c, W, time) {
     c.save();
-    c.fillStyle = '#10090a';
-    c.globalAlpha = .95;
-    for (let i = 0; i < 8; i++) {
-      const direction = i % 2 ? -1 : 1;
-      const phase = W * (.065 + i * .127) + direction * time * (1.2 + i % 3);
-      const x = ((phase % (W + 48)) + W + 48) % (W + 48) - 24;
-      const y = 32 + (i * 17) % 39 + Math.sin(time * .65 + i * 2) * 2;
-      const size = 2.15 + (i % 3) * .22, flap = Math.sin(time * 2.8 + i * 1.9) * 2.5;
-      c.save(); c.translate(Math.round(x), Math.round(y)); c.scale(size, size);
-      // Large horned silhouettes with slow, asymmetric wingbeats against the red sky.
-      c.fillRect(-1, -1, 2, 5);
-      c.fillRect(-2, -3, 1, 2); c.fillRect(1, -3, 1, 2);
-      c.beginPath(); c.moveTo(-1, 1); c.lineTo(-7, -3 + flap);
-      c.lineTo(-5, 1 + flap * .4); c.lineTo(-3, 0); c.lineTo(-1, 3); c.fill();
-      c.beginPath(); c.moveTo(1, 1); c.lineTo(7, -3 - flap);
-      c.lineTo(5, 1 - flap * .4); c.lineTo(3, 0); c.lineTo(1, 3); c.fill();
-      c.fillRect(0, 4, 1, 2); c.fillRect(direction, 5, 1, 1);
+    c.fillStyle='#10090a';
+    // Bezier silhouettes render directly at display resolution: hooked horns,
+    // articulated bat wings, clawed legs and a long arrow-tipped tail.
+    for(let i=0;i<6;i++){
+      const direction=i%2?-1:1;
+      const x=((W*(.08+i*.18)+direction*time*(1.2+i%3))%(W+60)+W+60)%(W+60)-30;
+      const y=36+(i*19)%38+Math.sin(time*.65+i*2)*2;
+      const size=.64+(i%3)*.07,flap=Math.sin(time*2.8+i*1.9)*7;
+      c.save();c.translate(x,y);c.scale(size*direction,size);c.globalAlpha=.94;
+      for(const side of [-1,1]){
+        c.save();c.scale(side,1);
+        c.beginPath();c.moveTo(2,-1);
+        c.bezierCurveTo(8,-7,17,-13+flap,29,-10+flap);
+        c.quadraticCurveTo(24,-4+flap,26,3+flap*.35);
+        c.quadraticCurveTo(19,-1,17,7+flap*.2);
+        c.quadraticCurveTo(12,2,10,10);
+        c.quadraticCurveTo(7,4,3,6);c.closePath();c.fill();
+        // Horns curve outward, then taper inward to needle tips.
+        c.beginPath();c.moveTo(2,-6);c.quadraticCurveTo(10,-11,7,-18);
+        c.quadraticCurveTo(6,-11,1,-10);c.closePath();c.fill();
+        c.beginPath();c.moveTo(2,5);c.lineTo(5,13);c.lineTo(3,18);
+        c.lineTo(8,17);c.lineTo(7,14);c.lineTo(7,10);
+        c.lineTo(4,3);c.closePath();c.fill();
+        c.restore();
+      }
+      c.beginPath();c.ellipse(0,-6,3.4,4.6,0,0,Math.PI*2);c.fill();
+      c.beginPath();c.moveTo(-3,-3);c.quadraticCurveTo(-5,3,-2,9);
+      c.lineTo(2,9);c.quadraticCurveTo(5,3,3,-3);c.closePath();c.fill();
+      c.strokeStyle='#10090a';c.lineWidth=1.8;c.lineCap='round';
+      c.beginPath();c.moveTo(0,7);c.bezierCurveTo(-1,15,17,13,13,23);c.stroke();
+      c.beginPath();c.moveTo(13,26);c.lineTo(9,20);c.lineTo(16,21);c.closePath();c.fill();
       c.restore();
+    }
+    c.restore();
+  }
+  function chaseAction(time) {
+    const cycle=Math.floor(time/18),local=time-cycle*18;
+    if(local<7||local>=9.4)return {mode:'chase',age:0,blend:0};
+    const age=local-7,duration=2.4;
+    return {mode:cycle%2?'fire':'reach',age,
+      blend:smooth(age/.22)*(1-smooth((age-duration+.32)/.32))};
+  }
+  function chasingDemon(c,time,positions,reduced=false) {
+    const action=reduced?{mode:'chase',blend:0}:chaseAction(time);
+    const base=alpha=>{
+      c.save();c.globalAlpha=alpha;c.translate(0,130);c.scale(1.3,1.3);demon(c,time,15);c.restore();
+    };
+    if(action.mode==='chase'){base(1);return;}
+    const art=root.FoolEnding?.load(()=>live?.redraw?.());
+    if(!imageReady(art)){base(1);return;}
+    base(1-action.blend);
+    // Use the complete illustrated action poses, with the same pause clock as
+    // the road. These near misses never change lives, scores or vehicle positions.
+    const frames=root.FoolEnding.prepare(art),width=221;
+    const frame=action.mode==='reach'?(action.age<.7?0:1):10;
+    const pose=frames[frame],zoom=width/pose.canvas.width;
+    const target=positions.reduce((a,b)=>a.x-a.width/2<b.x-b.width/2?a:b);
+    const handX=pose.hand.x*zoom;
+    const extension=Math.max(0,Math.min(58,target.x-target.width/2-14-(-34+handX)));
+    const lunge=action.mode==='reach'?Math.sin(Math.PI*action.age/2.4)*extension:0;
+    c.save();c.globalAlpha=action.blend;
+    const actor=root.FoolEnding.actor(c,frame,-34+lunge,303,width);
+    if(actor&&action.mode==='fire'){
+      const rear=target.x-target.width/2;
+      root.FoolEnding.fireBreath(c,actor.mouth,action.age-.3,
+        {x:Math.max(actor.mouth.x+12,rear-22),y:target.y-target.height/2},1.65);
     }
     c.restore();
   }
@@ -507,7 +555,7 @@
         break;
       }
     }
-    if(!capturing){c.save();c.translate(0,130);c.scale(1.3,1.3);demon(c,motion,15);c.restore();}
+    if(!capturing)chasingDemon(c,motion,positions.filter((p,i)=>!state.groups[i].out),reduced);
     return queue.length?'capture':'race';
   }
 
@@ -521,8 +569,8 @@
     fig.className = 'hell-race' + (final ? ' hell-race-final' : '');
     if(final)fig.dataset.endingPhase='loading';
     const canvas = document.createElement('canvas');
-    canvas.height = H;
-    canvas.width = 512;
+    canvas.height = H * 3;
+    canvas.width = 512 * 3;
     canvas.setAttribute('aria-hidden', 'true');
     fig.appendChild(canvas);
     const caption = document.createElement('figcaption');
@@ -537,7 +585,8 @@
     fig.appendChild(ammoStatus);
     const ctx = canvas.getContext('2d', { alpha: false });
     if (!ctx) return fig;
-    ctx.imageSmoothingEnabled = false;
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
     const next = state.groups.map((g, i) => positionScore(state, i));
     const old = last?.key === state.id && !final ? last.x : null;
     const previous = old;
@@ -552,8 +601,15 @@
     const draw = now => {
       if (live !== record || !canvas.isConnected) return;
       const width = 512;
-      if (canvas.width !== width) canvas.width = width;
-      ctx.imageSmoothingEnabled = false;
+      // Keep game geometry in 512x384 units, rasterize at screen pixel density.
+      const density=Math.min(4,Math.max(2,Math.ceil(
+        canvas.getBoundingClientRect().width*(root.devicePixelRatio||1)/width)));
+      if(canvas.width!==width*density||canvas.height!==H*density){
+        canvas.width=width*density;canvas.height=H*density;
+      }
+      ctx.setTransform(density,0,0,density,0,0);
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
       const elapsed = (now - start) / 1000;
       const stop = blocked() || document.hidden;
       if (stop) freeze += Math.max(0, (now - oldTime) / 1000);

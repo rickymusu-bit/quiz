@@ -413,7 +413,7 @@
     }
     c.restore();
   }
-  const api = { progress, draw, geyser, TOP, BOTTOM };
+  const api = { progress, draw, geyser, bone, skull, demonSkull, wreck, crack, TOP, BOTTOM };
   if (typeof module !== "undefined") module.exports = api;
   else root.FoolTerrain = api;
 })(globalThis);

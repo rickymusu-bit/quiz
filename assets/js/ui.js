@@ -1021,11 +1021,11 @@
         count = F.remainingLives(s, i);
       button.dataset.team = String(i);
       button.setAttribute("aria-label",
-        g.name + " · " + F.exact(g.score) + " punti · " + count +
+        g.name + " · " + F.formatScore(g.score) + " punti · " + count +
         (count === 1 ? " vita" : " vite") +
         (g.out ? " · eliminato" : "") + " · Apri inventario");
       if (i === s.respondent) button.setAttribute("aria-current", "step");
-      stats.append(node("strong", F.exact(g.score) + " pt", "player-points"), lives(g));
+      stats.append(node("strong", F.formatScore(g.score) + " pt", "player-points"), lives(g));
       button.append(node("span", g.name, "turn-name"), stats);
       const effects = s.effects.filter(e => e.target === i);
       if (effects.length || g.aura !== null) {
@@ -1434,11 +1434,11 @@
         ex.append(
           node(
             "p",
-            F.exact(r.gross) +
+            F.formatScore(r.gross) +
               " pt" +
               (r.beneficiaries.length
                 ? " · quota esatta " +
-                  F.exact(r.share) +
+                  F.formatScore(r.share) +
                   " a " +
                   [r.respondent, ...r.beneficiaries]
                     .map((i) => s.groups[i].name)
@@ -1655,8 +1655,15 @@
       label.htmlFor = field.id;
       const preview = node("p", undefined, "score-preview");
       preview.setAttribute("aria-live", "polite");
+      let originalScore = null, originalText = "";
+      const setField = (score) => {
+        originalScore = F.clone(score);
+        originalText = F.formatScore(score);
+        field.value = originalText;
+      };
       const value = () => {
         const raw = field.value.trim();
+        if (originalScore && raw === originalText) return F.clone(originalScore);
         if (/^\d{1,300}$/.test(raw)) return F.rational(raw);
         if (/^\d{1,300}\/[1-9]\d{0,299}$/.test(raw)) {
           const [n, d] = raw.split("/");
@@ -1674,9 +1681,9 @@
             group = game.s.groups[Number($("score-team").value)];
           preview.textContent =
             "Attuale: " +
-            F.exact(group.score) +
+            F.formatScore(group.score) +
             " punti → Nuovo totale: " +
-            F.exact(score) +
+            F.formatScore(score) +
             " punti";
           minus.disabled = BigInt(score.n) === 0n;
           plus.disabled = false;
@@ -1688,7 +1695,7 @@
       const step = (delta) => {
         const current = value(),
           next = F.add(current, F.rational(delta));
-        field.value = BigInt(next.n) < 0n ? "0" : F.exact(next);
+        setField(BigInt(next.n) < 0n ? F.rational(0) : next);
         draw();
       };
       // A short click changes one point; a sustained pointer press repeats by ten.
@@ -1743,7 +1750,7 @@
       amount.append(label, controls);
       d.append(team, amount, preview);
       const load = () => {
-        field.value = F.exact(
+        setField(
           game.s.groups[Number($("score-team").value)].score,
         );
         draw();
@@ -1977,11 +1984,11 @@
           node(
             "p",
             "Livella redistribuisce immediatamente " +
-              F.exact(total) +
+              F.formatScore(total) +
               " punti fra " +
               active.length +
               " giocatori attivi: " +
-              F.exact(share) +
+              F.formatScore(share) +
               " punti ciascuno. I giocatori eliminati restano esclusi.",
           ),
         );

@@ -50,6 +50,26 @@
       c.fillStyle='#bb491e';c.fillRect(Math.round(x)+2,y+1,3,1);
       if(progress>.6){c.fillStyle='#ff9c3e';c.fillRect(Math.round(x)+3,y-Math.round(2+Math.sin(effectTime*3+i)*2),1,2);}
     }
+    // Accumulating debris follows completed questions and scrolls with the masonry.
+    const terrain=root.FoolTerrain;
+    if(terrain){
+      c.save();c.beginPath();c.rect(0,TOP,width,BOTTOM-TOP);c.clip();
+      const chunk=128,offset=time*48;
+      for(let tile=Math.floor(offset/chunk)-1;tile<=Math.floor((offset+width)/chunk)+1;tile++){
+        for(let i=0;i<6;i++){
+          const seed=tile*71+i*109;
+          const alpha=Math.max(0,Math.min(1,(progress-(.12+i*.12))/.18));
+          if(!alpha)continue;
+          const x=tile*chunk-offset+((seed*17%113)+113)%113;
+          const y=TOP+14+((seed*23%80)+80)%80;
+          c.globalAlpha=alpha*.85;
+          if(i%3===0)terrain.crack(c,x,y,seed,progress,effectTime);
+          else if(i%3===1){terrain.bone(c,x,y,seed);if(i>2)terrain.skull(c,x+10,y-2);}
+          else terrain.wreck(c,x,y,seed);
+        }
+      }
+      c.restore();
+    }
     c.restore();
   }
   const api={TOP,BOTTOM,GAP,RACE_SCALE,grounds,draw,load};

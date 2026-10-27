@@ -11,7 +11,7 @@ const {chromium}=require('playwright'),fs=require('fs'),http=require('http'),pat
    page.on('pageerror',e=>{errors.push(e.message);console.error(e.message)});
    await page.goto(`http://127.0.0.1:${server.address().port}/Fool.html?start=1`);
    await page.getByRole('button',{name:/Inizia partita/}).waitFor({timeout:7000}).catch(async e=>{console.log((await page.locator('body').innerText()).slice(-1800));await page.screenshot({path:'/tmp/infernal-debug.png'});throw e});
-   await page.waitForFunction(()=>[...document.querySelectorAll('.vehicle-preview canvas')].length===3&&[...document.querySelectorAll('.vehicle-preview canvas')].every(c=>c.getContext('2d').getImageData(0,0,160,90).data.some((v,i)=>i%4===3&&v>0)));
+   await page.waitForFunction(()=>[...document.querySelectorAll('.vehicle-preview canvas')].length===3&&[...document.querySelectorAll('.vehicle-preview canvas')].every(c=>c.getContext('2d').getImageData(0,0,c.width,c.height).data.some((v,i)=>i%4===3&&v>0)));
    await page.getByRole('button',{name:/Inizia partita/}).click();
    await page.locator('.hell-race canvas').waitFor();
    await page.waitForTimeout(300);

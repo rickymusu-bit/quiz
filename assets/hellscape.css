@@ -102,3 +102,6 @@ body.showing-cinematic dialog::backdrop{background:transparent!important;box-sha
 #viewport-stage .turn-order .ammo-impact { margin-top: 8px; border-top: 1px solid #906346; padding: 7px 2px 1px; font: 15px/1.05 FoolTerminal, monospace; color: #ffdba0; }
 #viewport-stage .turn-order .ammo-impact strong { display: block; font-size: 15px; color: #ffe044; }
 #viewport-stage .turn-order .ammo-impact p { margin: 4px 0 0; overflow-wrap: anywhere; }
+
+/* Preserve the display-resolution backing stores of illustrated race assets. */
+.hell-race canvas,.vehicle-preview canvas{image-rendering:auto}
