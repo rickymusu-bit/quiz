@@ -1,11 +1,11 @@
 {
   "name": "hellscape",
-  "version": "3.4.0",
+  "version": "3.5.0",
   "private": true,
   "scripts": {
     "dev": "python3 -m http.server 8000 --bind 127.0.0.1",
     "test": "node --test tests/*.test.js && python3 tests/verify_datasets.py",
-    "test:browser": "node tests/hellscape.cjs && node tests/infernal_assets.cjs && python3 tests/hell_race.py && python3 tests/start.py && python3 tests/experience.py && python3 tests/keyboard.py && python3 tests/options.py && python3 tests/configurable.py",
+    "test:browser": "node tests/hellscape.cjs && node tests/infernal_assets.cjs && python3 tests/hell_race.py && python3 tests/start.py && python3 tests/experience.py && python3 tests/keyboard.py && python3 tests/options.py && python3 tests/configurable.py && python3 tests/ammo.py",
     "test:frames": "node tests/vehicle_frames.cjs && node tests/demon_frames.cjs && node tests/vehicle_layout.cjs && node tests/hell_dust.cjs && node tests/ending_frames.cjs && node tests/terrain_frames.cjs",
     "build": "node scripts/build.cjs",
     "preview:offline": "node scripts/build.cjs --offline",

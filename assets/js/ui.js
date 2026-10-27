@@ -520,19 +520,18 @@
       node("h3", "Probabilità delle Ammo"),
       node(
         "p",
-        "Ogni Ammo viene estratta indipendentemente dalle altre dopo una risposta corretta. Puoi ottenere da zero a sei Ammo. Probabilità predefinita: 30% per tipo, 15% per Marx; non devono sommare al 100%.",
+        "Ogni Ammo viene estratta indipendentemente dalle altre dopo una risposta corretta. Puoi ottenere da zero a sette Ammo. Le probabilità sono indipendenti e non devono sommare al 100%. Tocca un’icona per conoscerne il funzionamento.",
         "muted",
       ),
     );
-    for (const type of F.TYPES)
-      bonusPanel.append(
-        input(
-          F.LABELS[type] + " (%)",
-          "weight-" + type,
-          (value.bonusWeights ?? {})[type] ?? F.DEFAULT_BONUS_WEIGHTS[type],
-          "number",
-        ),
-      );
+    for (const type of F.TYPES) {
+      const row = node("div", undefined, "ammo-setting"),
+        field = input("Probabilità (%)", "weight-" + type,
+          (value.bonusWeights ?? {})[type] ?? F.DEFAULT_BONUS_WEIGHTS[type], "number");
+      field.querySelector("input").setAttribute("aria-label", F.LABELS[type] + " (%)");
+      row.append(ammoRounds(type, 1), field);
+      bonusPanel.append(row);
+    }
     grid.append(bonusPanel);
     const bases = node("section", undefined, "panel");
     bases.append(node("h3", "Punti base"));
@@ -712,7 +711,7 @@
     row.title =
       max === 1
         ? "Spareggio: un errore o il tempo scaduto eliminano."
-        : count + " vite su 3 · ogni sanzione toglie un cuore";
+        : count + " vite su 3 · ogni sanzione o Ira divina toglie un cuore";
     for (let i = 0; i < max; i++) {
       const heart = node(
         "span",
@@ -1055,20 +1054,59 @@
 
   const POSITIVE = "#ffe600";
 
-  function ammoRounds(type, count) {
+  function ammoRounds(type, count, onSelect = null) {
     const rounds = node("span", undefined, "ammo-rounds");
-    rounds.setAttribute("role", "img");
-    rounds.setAttribute(
-      "aria-label",
-      F.LABELS[type] + ": " + count + " munizioni",
-    );
+    rounds.setAttribute("role", "group");
+    rounds.setAttribute("aria-label", F.LABELS[type] + ": " + count + " munizioni");
     for (let n = 0; n < count; n++) {
-      const round = node("span", undefined, "ammo-round");
+      const round = btn("", () => onSelect ? onSelect(n) : showAmmoInfo(type), "ammo-round");
       round.dataset.ammo = type;
-      round.setAttribute("aria-hidden", "true");
+      round.title = F.LABELS[type];
+      round.setAttribute("aria-label", F.LABELS[type]);
+      round.setAttribute("aria-haspopup", "dialog");
       rounds.append(round);
     }
     return rounds;
+  }
+  function canUseAmmo(copy, team) {
+    if (!game || !copy) return false;
+    const s = game.s;
+    return team === s.owner && team === s.respondent && !s.groups[team].out &&
+      s.phase === "ordinaria" && ["hidden", "answer"].includes(s.screen) &&
+      !(s.screen === "answer" && s.paused && !inventoryCanResume) &&
+      copy.type !== "karma" && !(copy.type === "svela" && s.screen !== "hidden") &&
+      (copy.target === null || !s.groups[copy.target].out) &&
+      s.groups[team].inventory.some(c => c.id === copy.id);
+  }
+  function showAmmoInfo(type, copy = null, team = null) {
+    $("ammo-info")?.remove();
+    const source = document.activeElement,
+      d = node("dialog", undefined, "ammo-info"),
+      title = node("h2", F.LABELS[type]),
+      icon = node("span", undefined, "ammo-round ammo-detail-art");
+    d.id = "ammo-info";
+    title.id = "ammo-info-title";
+    d.setAttribute("aria-labelledby", title.id);
+    icon.dataset.ammo = type;
+    icon.setAttribute("aria-hidden", "true");
+    const close = () => { d.close(); d.remove(); if (source?.isConnected) source.focus({preventScroll:true}); };
+    d.append(icon, title, node("p", F.AMMO_HELP[type], "ammo-description"),
+      node("p", "Probabilità predefinita: " + F.DEFAULT_BONUS_WEIGHTS[type] + "%", "muted"));
+    if (copy?.target !== null && copy?.target !== undefined)
+      d.append(node("p", "Vincolata contro " + game.s.groups[copy.target].name +
+        (game.s.groups[copy.target].out ? " (eliminato)" : ""), "muted"));
+    const controls = node("div", undefined, "row");
+    if (copy) controls.append(btn("Usa", () => {
+      if (!canUseAmmo(copy, team)) return;
+      close();
+      selectBonus(copy);
+    }, "primary", !canUseAmmo(copy, team)));
+    controls.append(btn("Chiudi", close));
+    d.append(controls);
+    d.addEventListener("cancel", e => { e.preventDefault(); close(); });
+    document.body.append(d);
+    d.showModal();
+    d.querySelector("button:not(:disabled)")?.focus();
   }
   function awardedBonuses(result) {
     return result.bonuses ?? (result.bonus ? [result.bonus] : []);
@@ -1323,16 +1361,12 @@
           ),
         );
       const won = awardedBonuses(r);
-      if (won.length)
-        ex.append(
-          node(
-            "p",
-            "Ammo ottenute: " +
-              won.map((bonus) => F.LABELS[bonus.type]).join(", ") +
-              " — conservate nell’inventario.",
-            "good",
-          ),
-        );
+      if (won.length) {
+        const rewards = node("p", undefined, "ammo-rewards");
+        rewards.append(node("span", "Ammo ottenute:", "good"));
+        for (const copy of won) rewards.append(ammoRounds(copy.type, 1));
+        ex.append(rewards);
+      }
       b.append(
         ex,
         btn(
@@ -1765,43 +1799,18 @@
         const i = Number($("inventory-team").value),
           g = s.groups[i],
           sets = groupsOfInventory(g);
-        const start = page * 5,
+        const start = page * 7,
           entries = node("ul", undefined, "bonus-inventory-list");
         if (sets.length) list.append(entries);
-        for (const copies of sets.slice(start, start + 5)) {
+        for (const copies of sets.slice(start, start + 7)) {
           const c = copies[0],
             r = node("li", undefined, "bonus-group");
-          const label = node("span", undefined, "ammo-heading");
-          label.append(
-            node(
-              "span",
-              F.LABELS[c.type] +
-                (c.target === null
-                  ? ""
-                  : " · solo contro " +
-                    s.groups[c.target].name +
-                    (s.groups[c.target].out ? " (eliminato)" : "")),
-              "ammo-label",
-            ),
-            ammoRounds(c.type, copies.length),
-          );
           r.dataset.bonus = c.type;
-          r.append(label);
-          const disabled =
-            i !== s.owner ||
-            i !== s.respondent ||
-            g.out ||
-            s.phase !== "ordinaria" ||
-            !["hidden", "answer"].includes(s.screen) ||
-            (s.screen === "answer" && s.paused && !inventoryCanResume) ||
-            c.type === "karma" ||
-            (c.type === "svela" && s.screen !== "hidden") ||
-            (c.target !== null && s.groups[c.target].out);
-          r.append(btn("Usa", () => selectBonus(c), "", disabled));
+          r.append(ammoRounds(c.type, copies.length, index => showAmmoInfo(c.type, copies[index], i)));
           entries.append(r);
         }
         if (!sets.length) list.append(node("p", "Nessuna Ammo posseduta."));
-        if (sets.length > 5) {
+        if (sets.length > 7) {
           const nav = node("div", undefined, "row");
           nav.append(
             btn(
@@ -1820,7 +1829,7 @@
                 draw();
               },
               "",
-              start + 5 >= sets.length,
+              start + 7 >= sets.length,
             ),
           );
           list.append(nav);
@@ -1843,6 +1852,7 @@
     s.draftBonus = s.draftBonus || { copyId: copy.id, target: null };
     persist();
     dialog("Attiva " + F.LABELS[copy.type], (d) => {
+      d.append(node("p", F.AMMO_HELP[copy.type]));
       let target = null;
       if (["salta", "ruba"].includes(copy.type)) {
         const candidates = s.groups
@@ -1887,13 +1897,16 @@
               " punti ciascuno. I giocatori eliminati restano esclusi.",
           ),
         );
-      } else
-        d.append(
-          node(
-            "p",
-            "La conferma consuma una munizione, anche se Aura blocca l’attacco.",
-          ),
-        );
+      } else if (copy.type === "ira") {
+        const affected = node("ul", undefined, "divine-targets");
+        for (const i of game.active()) {
+          const before = F.remainingLives(s, i), after = Math.max(0, before - 1);
+          affected.append(node("li", s.groups[i].name + ": " + before + " → " + after +
+            (after === 0 ? " · eliminazione" : " vite")));
+        }
+        d.append(affected);
+      }
+      d.append(node("p", "La conferma consuma una munizione.", "muted"));
       d.append(
         btn(
           "Conferma uso",
@@ -1944,7 +1957,7 @@
         p.append(node("h3", g.name + " · " + g.sanctions + "/3"));
         if (g.out) p.append(node("p", "Eliminato"));
         else {
-          const max = 3 - g.sanctions;
+          const max = F.remainingLives(s, i);
           pending.counts[i] = Math.min(pending.counts[i], max);
           p.append(node("p", "Sanzioni da aggiungere", "muted"));
           const stepper = node("div", undefined, "sanction-stepper");
@@ -1968,7 +1981,8 @@
               "Totale dopo conferma: " +
               n +
               "/3" +
-              (n === 3 ? " · Eliminazione" : "");
+              (pending.counts[i] === max ? " · Eliminazione" : "") +
+              " · Vite: " + Math.max(0, max - pending.counts[i]);
           };
           const change = (delta) => {
             pending.counts[i] = Math.max(
@@ -2257,6 +2271,7 @@
       )
     )
       return;
+    if ($("ammo-info")?.open) return;
     const key = event.key.toLowerCase(),
       dialogOpen = $("dialog").open;
     if (target?.closest("summary") && (key === "enter" || key === " ")) return;

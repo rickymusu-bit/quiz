@@ -169,6 +169,7 @@
           name,
           score: rational(0),
           sanctions: 0,
+          damage: 0,
           out: false,
           cause: "",
           inventory: [],
@@ -447,8 +448,8 @@
       }
       if (copy.type === "svela" && copy.target !== null)
         need(!s.groups[copy.target].out, "Il bersaglio vincolato è eliminato");
-      if (copy.type === "marx")
-        need(target == null, "Marx non richiede un bersaglio");
+      if (["marx", "ira"].includes(copy.type))
+        need(target == null, LABELS[copy.type] + " non richiede un bersaglio");
       g.inventory = g.inventory.filter((c) => c.id !== copyId);
       s.usedBonus = true;
       s.draftBonus = null;
@@ -486,6 +487,16 @@
             total: clone(total),
           },
         );
+      } else if (copy.type === "ira") {
+        const active = this.active();
+        // Resolve the shared hit before checking for a winner: the owner is hit too.
+        for (const i of active) s.groups[i].damage = (s.groups[i].damage ?? 0) + 1;
+        for (const i of active)
+          if (remainingLives(s, i) === 0) this.eliminate(i, "Ira divina");
+        this.log("Ira divina: tutti i dannati in gara perdono una vita", {
+          type: "divine-wrath", groups: active,
+        });
+        this.resolveEliminations();
       } else this.attack(copy.type, s.respondent, target, id);
     }
     pass(target, expected) {
@@ -685,6 +696,7 @@
         for (const g of s.groups) {
           g.inventory = [];
           g.aura = null;
+          if (!g.out) g.damage = 0;
         }
         if (s.result) {
           s.result.bonus = null;
@@ -728,11 +740,17 @@
           const n = integer(p.counts[i], 0, 3, "Sanzioni");
           const g = s.groups[i];
           if (g.out || !n) continue;
-          g.sanctions = Math.min(3, g.sanctions + n);
+          const before = remainingLives(s, i), loss = Math.min(n, before);
+          g.sanctions = Math.min(3 - (g.damage ?? 0), g.sanctions + loss);
           this.log("Sanzione a " + g.name + ": " + p.reasons[i]);
-          if (g.sanctions === 3) this.eliminate(i, "Tre sanzioni");
+          if (loss === before)
+            this.eliminate(i, g.sanctions === 3 && !g.damage ? "Tre sanzioni" : "Vite esaurite");
         }
       }
+      this.resolveEliminations();
+    }
+    resolveEliminations() {
+      const s = this.s;
       const interrupted =
         s.groups[s.respondent].out &&
         ["hidden", "answer", "choice", "supply"].includes(s.screen);
@@ -800,7 +818,7 @@
       return s;
     }
     static restore(raw, deps = {}) {
-      const s = clone(raw);
+      const s = clone(raw), legacyDamage = s.version !== VERSION;
       if (
         s.version === "1.2.0" &&
         s.rules === "18.2.0" &&
@@ -824,16 +842,19 @@
       if (
         (s.version === "2.0.0" && s.rules === "19.0.0") ||
         (s.version === "2.1.0" && s.rules === "19.1.0") ||
-        (s.version === "2.2.0" && s.rules === RULES)
+        (["2.2.0", "2.2.1"].includes(s.version) && s.rules === "19.2.0")
       ) {
         s.version = VERSION;
         s.rules = RULES;
       }
-      if (s.version === VERSION && s.rules === RULES)
+      if (s.version === VERSION && s.rules === RULES) {
         s.config.bonusWeights = {
           ...DEFAULT_BONUS_WEIGHTS,
           ...(s.config.bonusWeights ?? {}),
         };
+        if (Array.isArray(s.groups))
+          for (const g of s.groups) if (legacyDamage && g && g.damage === undefined) g.damage = 0;
+      }
       if (s.panel?.type === "refusal") {
         need(
           ["answer", "choice"].includes(s.panel.from),
@@ -904,11 +925,13 @@
     const copyIds = new Set();
     for (const g of s.groups) {
       integer(g.sanctions, 0, 3, "Sanzioni");
+      integer(g.damage, 0, 3, "Vite perse per Ammo");
+      need(g.sanctions + g.damage <= 3, "Perdita di vite non valida");
       need(
         typeof g.out === "boolean" && typeof g.cause === "string",
         "Eliminazione non valida",
       );
-      need(g.sanctions < 3 || g.out, "Terza sanzione senza eliminazione");
+      need(g.sanctions + g.damage < 3 || g.out, "Vite esaurite senza eliminazione");
       need(
         g.score &&
           /^\d{1,300}$/.test(g.score.n) &&

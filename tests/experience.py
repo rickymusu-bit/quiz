@@ -63,7 +63,7 @@ with sync_playwright() as p:
  loser=page.evaluate('HellscapeUI.game.s.respondent');expect(page.locator(f'.turn-order [data-team="{loser}"] .lives')).to_have_attribute('aria-label','0 vite su 1')
  page.goto(base+'Fool.html?resume=1');assert page.evaluate('HellscapeUI.game.s.groups.reduce((n,g,i)=>n+Fool.remainingLives(HellscapeUI.game.s,i),0)')==2;page.close()
  # The rules keep every remaining slide and navigation entry after removing refusal.
- page=browser.new_page(viewport={'width':1440,'height':900});page.goto(base+'Fool_regole.html');expect(page.locator('.slide')).to_have_count(21);expect(page.locator('#section option')).to_have_count(21);expect(page.locator('[data-go]')).to_have_count(21);assert 'rifiut' not in page.locator('body').inner_text().lower();page.close()
+ page=browser.new_page(viewport={'width':1440,'height':900});page.goto(base+'Fool_regole.html');expect(page.locator('.slide')).to_have_count(22);expect(page.locator('#section option')).to_have_count(22);expect(page.locator('[data-go]')).to_have_count(22);assert 'rifiut' not in page.locator('body').inner_text().lower();page.close()
  # Deadline and final-screen outcomes retain an explicit chosen/no-answer label.
  page=browser.new_page(viewport={'width':1440,'height':900});page.on('pageerror',lambda e:errors.append(str(e)));page.goto(base+'Fool.html')
  page.get_by_role('button',name='Inizia partita').click()

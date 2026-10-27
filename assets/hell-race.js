@@ -307,6 +307,29 @@
     }
     return { x: left, y: top - 4 * unit, width: 50 * unit, height: 24 * unit };
   }
+  function flyingDevils(c, W, time) {
+    c.save();
+    c.fillStyle = '#1b0910';
+    c.globalAlpha = .7;
+    for (let i = 0; i < 8; i++) {
+      const direction = i % 2 ? -1 : 1;
+      const phase = W * (.065 + i * .127) + direction * time * (1.2 + i % 3);
+      const x = ((phase % (W + 20)) + W + 20) % (W + 20) - 10;
+      const y = 32 + (i * 17) % 39 + Math.sin(time * .65 + i * 2) * 2;
+      const size = .7 + (i % 3) * .12, flap = Math.sin(time * 2.8 + i * 1.9) * 2.5;
+      c.save(); c.translate(Math.round(x), Math.round(y)); c.scale(size, size);
+      // Tiny horned spectators with slow, asymmetric wingbeats in the distant sky.
+      c.fillRect(-1, -1, 2, 5);
+      c.fillRect(-2, -3, 1, 2); c.fillRect(1, -3, 1, 2);
+      c.beginPath(); c.moveTo(-1, 1); c.lineTo(-7, -3 + flap);
+      c.lineTo(-5, 1 + flap * .4); c.lineTo(-3, 0); c.lineTo(-1, 3); c.fill();
+      c.beginPath(); c.moveTo(1, 1); c.lineTo(7, -3 - flap);
+      c.lineTo(5, 1 - flap * .4); c.lineTo(3, 0); c.lineTo(1, 3); c.fill();
+      c.fillRect(0, 4, 1, 2); c.fillRect(direction, 5, 1, 1);
+      c.restore();
+    }
+    c.restore();
+  }
   function background(c, W, tick, progress, effectTime=tick) {
     if(imageReady(sheets.world)){
       const img=sheets.world;
@@ -315,6 +338,7 @@
         const tw=W*2,offset=(tick*speed)%tw;
         for(let x=-offset;x<W;x+=tw)c.drawImage(img,0,img.naturalHeight*sy,img.naturalWidth,img.naturalHeight*sh,Math.floor(x),dy,tw,dh);
       }
+      flyingDevils(c,W,effectTime);
       if(root.FoolTerrain)root.FoolTerrain.draw(c,W,tick,progress,img,effectTime);
       else{c.fillStyle='#161614';c.fillRect(0,184,W,181);}
       return;
@@ -351,6 +375,7 @@
     }
     r(c, 0, 73, W, 156 - 73, '#1c1c24');
     c.restore();
+    flyingDevils(c,W,effectTime);
     if(root.FoolTerrain)root.FoolTerrain.draw(c,W,tick,progress,null,effectTime);
   }
   function gate(c, x, y, tick, open) {

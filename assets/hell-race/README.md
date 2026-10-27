@@ -46,3 +46,5 @@ Le etichette dei giocatori sono assenti durante tutte le animazioni di cattura e
 Le fiammate usano un getto continuo simile a un lanciafiamme, con nucleo chiaro, cono turbolento e gocce incandescenti. Dopo un inghiottimento il getto sale verso l’alto; dopo la fuga segue il portale mentre si interra. La timeline ammette una sola attraversata e separa emersione, fuga, ruggito, attacco e rabbia.
 
 Nel finale il suolo resta fermo mentre fiamme e geyser continuano a muoversi con lo stesso orologio della sequenza; pausa e movimento ridotto congelano entrambi.
+
+Otto piccoli diavoli alati in silhouette volano nella fascia alta del cielo. Le sagome sono tracciate sul Canvas, larghe al massimo circa 14 pixel logici: oscillano e battono le ali lentamente, senza particelle accumulate o uso del caso del gioco. L’orologio comune congela anche il loro movimento in pausa, a scheda nascosta e con movimento ridotto. Restano dietro la scena principale e i pannelli.

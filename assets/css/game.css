@@ -359,3 +359,20 @@ body.portrait #orientation-note { position: fixed; inset: 0; display: grid; alig
 .score-stepper button { flex: 0 0 3rem; min-height: 44px; font-size: 1.5rem; }
 .score-stepper input { width: min(18rem,60%); text-align: center; }
 
+
+/* Ammo are interactive icons; names and rules live in the item popup. */
+button.ammo-round{background-image:url('../ammo-sprites-48.png');background-repeat:no-repeat;background-size:600% 100%;background-position:var(--ammo-position) center;width:48px;height:48px;min-width:48px;min-height:48px;padding:0;border:0;background-color:transparent;box-shadow:none;cursor:pointer;image-rendering:pixelated;touch-action:manipulation}
+button.ammo-round:hover{filter:brightness(1.25)}
+button.ammo-round:focus-visible{outline:2px solid #ffe044;outline-offset:2px}
+.ammo-round[data-ammo="ira"]{background-image:url('../ammo-ira-divina.webp');background-size:contain;background-position:center}
+.ammo-rounds{gap:6px}
+.ammo-rewards{display:flex;align-items:center;flex-wrap:wrap;gap:5px 8px}
+.ammo-setting{display:flex;align-items:center;gap:12px;margin:10px 0}.ammo-setting label{flex:1}
+.bonus-inventory-list{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start}
+.bonus-inventory-list .bonus-group{margin:0;padding:6px;border:1px solid #644630;background:#1b1512}
+.bonus-inventory-list .bonus-group button{margin:0}
+.ammo-info{width:480px;max-width:calc(100vw - 24px)}
+.ammo-detail-art{display:block;width:88px;height:88px;margin:0 auto;image-rendering:pixelated}
+.ammo-description{font-size:18px;line-height:1.45}
+
+@media(max-height:500px){.ammo-info .ammo-detail-art{width:48px;height:48px;float:right;margin:0 0 6px 12px}.ammo-info h2{margin:0 0 10px}.ammo-info .ammo-description{font-size:16px;line-height:1.3}.ammo-info p{margin:8px 0}}
