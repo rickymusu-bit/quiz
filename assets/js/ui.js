@@ -39,14 +39,6 @@
     offroad: "Fuoristrada · Sopravvissuto",
     ape: "Ape · Contrabbandiere",
   };
-  const VEHICLE_POSITIONS = {
-    chopper: ["0%", "0%"],
-    pickup: ["50%", "0%"],
-    truck: ["100%", "0%"],
-    coupe: ["0%", "100%"],
-    offroad: ["50%", "100%"],
-    ape: ["100%", "100%"],
-  };
   function vehiclePreview(id) {
     const preview = node("span", undefined, "vehicle-preview");
     preview.setAttribute("role", "img");
