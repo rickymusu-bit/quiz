@@ -306,16 +306,16 @@
   }
   function flyingDevils(c, W, time) {
     c.save();
-    c.fillStyle = '#1b0910';
-    c.globalAlpha = .7;
+    c.fillStyle = '#10090a';
+    c.globalAlpha = .95;
     for (let i = 0; i < 8; i++) {
       const direction = i % 2 ? -1 : 1;
       const phase = W * (.065 + i * .127) + direction * time * (1.2 + i % 3);
-      const x = ((phase % (W + 20)) + W + 20) % (W + 20) - 10;
+      const x = ((phase % (W + 48)) + W + 48) % (W + 48) - 24;
       const y = 32 + (i * 17) % 39 + Math.sin(time * .65 + i * 2) * 2;
-      const size = .7 + (i % 3) * .12, flap = Math.sin(time * 2.8 + i * 1.9) * 2.5;
+      const size = 2.15 + (i % 3) * .22, flap = Math.sin(time * 2.8 + i * 1.9) * 2.5;
       c.save(); c.translate(Math.round(x), Math.round(y)); c.scale(size, size);
-      // Tiny horned spectators with slow, asymmetric wingbeats in the distant sky.
+      // Large horned silhouettes with slow, asymmetric wingbeats against the red sky.
       c.fillRect(-1, -1, 2, 5);
       c.fillRect(-2, -3, 1, 2); c.fillRect(1, -3, 1, 2);
       c.beginPath(); c.moveTo(-1, 1); c.lineTo(-7, -3 + flap);
