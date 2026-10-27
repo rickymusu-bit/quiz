@@ -246,7 +246,7 @@ dialog .columns { margin: 1rem 0; }
 .ammo-label { white-space:normal; }
 .ammo-heading { display:flex; flex-wrap:wrap; align-items:center; gap:.35rem .55rem; flex:1 1 auto; min-width:0; }
 .ammo-rounds { display:inline-flex; align-items:center; flex-wrap:wrap; gap:.1rem; max-width:100%; }
-.ammo-round { display:inline-block; flex:0 0 auto; width:1.55rem; height:1.55rem; background-image:url('../ammo-hellscape-v1.png'); background-repeat:no-repeat; background-size:700% 100%; background-position:var(--ammo-position,0%) center; image-rendering:pixelated; }
+.ammo-round { display:inline-block; flex:0 0 auto; width:1.55rem; height:1.55rem; background-image:url('../ammo-hellscape-v2.png'); background-repeat:no-repeat; background-size:700% 100%; background-position:var(--ammo-position,0%) center; image-rendering:pixelated; }
 [data-ammo="salta"] { --ammo-position:0%; }
 [data-ammo="ruba"]  { --ammo-position:16.66667%; }
 [data-ammo="svela"] { --ammo-position:33.33333%; }
@@ -361,7 +361,7 @@ body.portrait #orientation-note { position: fixed; inset: 0; display: grid; alig
 
 
 /* Ammo are interactive icons; names and rules live in the item popup. */
-button.ammo-round{background-image:url('../ammo-hellscape-v1.png');background-repeat:no-repeat;background-size:700% 100%;background-position:var(--ammo-position) center;width:48px;height:48px;min-width:48px;min-height:48px;padding:0;border:0;background-color:transparent;box-shadow:none;cursor:pointer;image-rendering:pixelated;touch-action:manipulation}
+button.ammo-round{background-image:url('../ammo-hellscape-v2.png');background-repeat:no-repeat;background-size:700% 100%;background-position:var(--ammo-position) center;width:48px;height:48px;min-width:48px;min-height:48px;padding:0;border:0;background-color:transparent;box-shadow:none;cursor:pointer;image-rendering:pixelated;touch-action:manipulation}
 button.ammo-round:hover{filter:brightness(1.25)}
 button.ammo-round:focus-visible{outline:2px solid #ffe044;outline-offset:2px}
 .ammo-round[data-ammo="ira"]{--ammo-position:100%}
