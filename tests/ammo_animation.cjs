@@ -4,6 +4,9 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs'), path = require('node:path'), http = require('node:http');
 const root = path.resolve(__dirname, '..'), offline = process.argv.includes('--offline');
 const types = ['salta','ruba','svela','aura','marx','ira'];
+const selected = process.argv.find(arg=>arg.startsWith('--case='))?.split('=')[1];
+const modes = ['karma','shield','lethal','timer','reduced'];
+assert(!selected||[...types,...modes,'reload'].includes(selected),'Unknown Ammo test case');
 (async () => {
   fs.mkdirSync(path.join(root,'artifacts'), {recursive:true});
   const server = http.createServer((req,res)=>{
@@ -47,7 +50,8 @@ const types = ['salta','ruba','svela','aura','marx','ira'];
       return target;
     },{type,karma,shield,lethal});
     if(answer)await view.getByRole('button',{name:'Svela e avvia il tempo',exact:true}).click();
-    await view.getByRole('button',{name:'Inventario',exact:true}).click();
+    if(answer)await view.locator('body').press('i');
+    else await view.getByRole('button',{name:'Inventario',exact:true}).click();
     await view.locator(`#dialog [data-ammo="${type}"]`).click();
     await view.locator('#ammo-info').getByRole('button',{name:'Usa',exact:true}).click();
     if(await view.locator('#bonus-target').count())await view.locator('#bonus-target').selectOption(String(target));
@@ -55,7 +59,7 @@ const types = ['salta','ruba','svela','aura','marx','ira'];
   }
   try {
     for(const [width,height] of [[1440,900],[390,844],[844,390]]) {
-      for(const type of types){
+      for(const type of types.filter(type=>!selected||selected===type)){
         const {page,view}=await start(width,height);await use(view,type);
         await page.clock.runFor(650);
         assert.equal(await view.locator('.hell-race').getAttribute('data-ammo'),type);
@@ -71,9 +75,9 @@ const types = ['salta','ruba','svela','aura','marx','ira'];
         assert.equal(await view.locator('.hell-race').getAttribute('data-ammo'),'');
         await page.close();
       }
-      checks.push({viewport:[width,height],six_activations:'PASS'});
+      if(!selected||types.includes(selected))checks.push({viewport:[width,height],activations:types.filter(type=>!selected||selected===type),result:'PASS'});
     }
-    for(const mode of ['karma','shield','lethal','timer','reduced']){
+    for(const mode of modes.filter(mode=>!selected||selected===mode)){
       const {page,view}=await start(1440,900,mode==='reduced');
       await use(view,mode==='lethal'?'ira':mode==='timer'||mode==='reduced'?'aura':'salta',
         {karma:mode==='karma',shield:mode==='shield',lethal:mode==='lethal',answer:mode==='timer'});
@@ -105,13 +109,13 @@ const types = ['salta','ruba','svela','aura','marx','ira'];
       await page.close();checks.push({mode,result:'PASS'});
     }
     // A reload during an attack must not consume the Ammo or its effects again.
-    if(!offline){
+    if(!offline&&(!selected||selected==='reload')){
       const {page,view}=await start();await use(view,'salta');await page.clock.runFor(400);
       const saved=await view.evaluate('JSON.stringify(HellscapeUI.game.s.effects)');
       await page.goto(`http://127.0.0.1:${server.address().port}/Fool.html?resume=1`);await page.clock.runFor(100);
       assert.equal(await page.locator('.hell-race').getAttribute('data-ammo'),'');
       assert.equal(await page.evaluate('JSON.stringify(HellscapeUI.game.s.effects)'),saved);
-      await page.close();
+      await page.close();checks.push({mode:'reload',result:'PASS'});
     }
     assert.deepEqual(errors,[]);console.log(JSON.stringify({offline,checks,errors},null,2));
   } finally {await browser.close();server.close();}
