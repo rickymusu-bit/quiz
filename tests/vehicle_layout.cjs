@@ -29,6 +29,26 @@ process.chdir(path.resolve(__dirname,'..'));
  // The shared previews must keep the same physical hierarchy.
  const previews=['chopper','pickup','truck','coupe','offroad','ape'].map(id=>visible(api.vehiclePreview(id)));
  assert(previews[1].width>previews[0].width&&previews[1].width>previews[5].width);assert(previews[2].width>previews[1].width);
+ // Three distinct cars at equal scores must align at exactly the same x,
+ // independent of their lane; positions grow linearly until the shared cap.
+ const state=scores=>({groups:scores.map(n=>({score:{n:String(n),d:'1'}})),
+   config:{bases:{facile:100,media:200,difficile:300},questionCount:33}});
+ const at=(scores,i)=>api.packPosition(state(scores),i,0,null,2).x;
+ const origin=at([0,0,0],0);
+ assert.equal(origin,at([0,0,0],1));
+ assert.equal(at([600,600,600],0),at([600,600,600],2));
+ assert(Math.abs((at([300,600,900],2)-origin)-3*(at([300,600,900],0)-origin))<.02,
+   'The forward gap must be proportional to score');
+ assert(at([300,600,900],2)-at([300,600,900],0)>90,
+   'Different scores must create a visibly large gap');
+ assert.equal(at([1500,1500,1500],0),at([9000,9000,9000],0),
+   'Progress must be clamped at five maximum-value questions');
+ assert(at([9000,9000,9000],0)+31<512,'The leading vehicle must stay on the canvas');
+ const easingState=state([600,600,600]);
+ const old=[0,0,0],start=api.packPosition(easingState,0,0,old,0).x;
+ const halfway=api.packPosition(easingState,0,0,old,.775).x;
+ const finish=api.packPosition(easingState,0,0,old,1.55).x;
+ assert(start<halfway&&halfway<finish,'Vehicles advance over the whole animation');
  const board=createCanvas(720,520),ctx=board.getContext('2d');ctx.fillStyle='#161819';ctx.fillRect(0,0,720,520);ctx.scale(2,2);ctx.imageSmoothingEnabled=false;
  ['Chopper','Pick-up','Camion','Coupé','Fuoristrada','Ape'].forEach((name,row)=>{const x=row%2?270:90,ground=80+Math.floor(row/2)*80;api.drawVehicle(ctx,row,0,x,ground);ctx.fillStyle='#d6ad75';ctx.font='12px monospace';ctx.fillText(name,x-30,ground+18)});
  fs.mkdirSync('artifacts',{recursive:true});fs.writeFileSync('artifacts/vehicle-proportions.png',board.toBuffer('image/png'));
