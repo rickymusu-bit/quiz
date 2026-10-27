@@ -54,12 +54,6 @@ dialog .scoreboard{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));ga
 .ending:has(.hell-race-final:not([data-ending-phase="done"]))>.row,
 .ending:has(.hell-race-final:not([data-ending-phase="done"]))>.options-toggle{visibility:hidden;pointer-events:none}
 
-/* Current player rides with the pack; only their details follow the vehicle. */
-.current-player{position:absolute;left:var(--player-x,70%);top:var(--player-y,75%);transform:translateY(-50%);width:140px;max-height:160px;overflow:auto;padding:8px;background:#140e0de8;border-left:3px solid #ffe044;box-shadow:3px 3px #0008;text-align:left}
-.current-player h3{font:24px/1.05 FoolTerminal,monospace;color:#ffe044;margin:0 0 4px;overflow-wrap:anywhere}
-.current-player .player-points{display:block;max-height:54px;overflow:auto;font:27px/1.05 FoolTerminal,monospace;color:#fff0cb;overflow-wrap:anywhere;margin:0 0 6px}
-.current-player .lives{display:flex;gap:5px}.current-player .heart{width:20px;height:20px}
-.hell-race[data-active-visible=false] .current-player{visibility:hidden}
 #viewport-stage main.operational>.statusline{left:240px;right:240px;top:16px;min-height:28px}
 .statusline .time-vial{height:28px}
 #viewport-stage main.operational>.operation-body{top:56px;left:180px;right:180px;padding:14px 18px}
@@ -72,9 +66,14 @@ dialog .scoreboard{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));ga
 #viewport-stage .operation-body .question-points{font-size:20px;margin-bottom:6px}
 #viewport-stage .operation-body .solution{font-size:16px}
 .owner-status{font-size:14px;margin:0 0 8px;color:#e7bc8c}
-.turn-order{position:absolute;right:18px;bottom:18px;width:124px;padding:7px;background:#140e0deb;border:1px solid #906346;box-shadow:3px 3px #0008;z-index:3}
+.turn-order{position:absolute;right:18px;bottom:18px;width:150px;padding:7px;background:#140e0deb;border:1px solid #906346;box-shadow:3px 3px #0008;z-index:3}
 .turn-order ol{list-style:none;padding:0;margin:0;display:grid;gap:4px}
-.turn-order button{display:block;width:100%;min-height:34px;padding:5px 6px;font:22px/1.05 FoolTerminal,monospace;text-align:left;overflow-wrap:anywhere;background:#241710;border:1px solid #644630}
+.turn-order button{display:block;width:100%;min-height:34px;padding:6px 4px;font:22px/1.05 FoolTerminal,monospace;text-align:left;overflow-wrap:anywhere;background:#241710;border:1px solid #644630}
+.turn-name{display:block;overflow-wrap:anywhere}
+.turn-stats{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px 6px;margin-top:5px}
+.turn-order .player-points{font:20px/1 FoolTerminal,monospace;color:#fff0cb;overflow-wrap:anywhere;max-width:100%}
+.turn-order .lives{display:inline-flex;flex-wrap:nowrap;gap:3px;margin:0}
+.turn-order .heart{width:16px;height:16px;flex:0 0 16px}
 .turn-order [aria-current=step]{color:#ffe044;border-color:#ffe044;background:#392809}
 #viewport-stage .options-toggle{position:absolute;bottom:18px;left:18px;min-height:44px;padding:8px 16px;font:28px/1 FoolTerminal,monospace;background:#140e0deb;border:1px solid #ac8055;box-shadow:3px 3px #0008;z-index:3}
 .options-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0 18px}.options-grid button{font-size:17px;overflow-wrap:anywhere}

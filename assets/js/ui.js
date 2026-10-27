@@ -987,30 +987,24 @@
     ])];
     const list = node("ol");
     for (const i of order) {
-      const item = node("li"),
-        button = btn(s.groups[i].name, () => showInventory(i));
+      const g = s.groups[i],
+        item = node("li"),
+        button = btn("", () => showInventory(i)),
+        stats = node("span", undefined, "turn-stats"),
+        count = F.remainingLives(s, i);
       button.dataset.team = String(i);
+      button.setAttribute("aria-label",
+        g.name + " · " + F.exact(g.score) + " punti · " + count +
+        (count === 1 ? " vita" : " vite") +
+        (g.out ? " · eliminato" : "") + " · Apri inventario");
       if (i === s.respondent) button.setAttribute("aria-current", "step");
-      if (s.groups[i].out)
-        button.setAttribute("aria-label", s.groups[i].name + " · eliminato · inventario");
+      stats.append(node("strong", F.exact(g.score) + " pt", "player-points"), lives(g));
+      button.append(node("span", g.name, "turn-name"), stats);
       item.append(button);
       list.append(item);
     }
     grid.append(list);
     return grid;
-  }
-  function currentPlayerBadge() {
-    const s = game.s,
-      g = s.groups[s.respondent],
-      badge = node("div", undefined, "current-player");
-    badge.dataset.team = String(s.respondent);
-    badge.setAttribute("aria-label", "Giocatore di turno");
-    badge.append(
-      node("h3", g.name),
-      node("strong", F.exact(g.score) + " pt", "player-points"),
-      lives(g),
-    );
-    return badge;
   }
   function optionsToggle() {
     return btn("Opzioni", showOptions, "options-toggle");
@@ -1385,7 +1379,6 @@
     }
     main.className = "operational";
     const stage = FoolHellRace.createStage(s);
-    stage.append(currentPlayerBadge());
     main.replaceChildren(stage, turnOrder());
     const status = node("div", undefined, "statusline");
     status.append(timeVial());

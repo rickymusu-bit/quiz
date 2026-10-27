@@ -17,7 +17,7 @@ Le eliminazioni e i finali sono coordinati da `assets/hell-ending.js`. Il portal
 
 I due asset statici `vehicles.webp` e `demon.webp` della v1.1.0 sono conservati come versione precedente, ma non vengono caricati dalla nuova scena.
 
-I veicoli formano un gruppo compatto: i tre appoggi verticali occupano 68 pixel logici e lo scarto orizzontale dovuto al punteggio è compresso. I nomi non vengono disegnati sul Canvas. Il mezzo del rispondente viene dipinto per ultimo con un contorno giallo ricavato dall’alfa di ciascun fotogramma; una piccola scheda DOM davanti al gruppo mostra soltanto i suoi dati e segue il mezzo durante il movimento. Turnazione e finestre Inventario/Opzioni sono gestite da `assets/js/ui.js`.
+I veicoli formano un gruppo compatto: i tre appoggi verticali occupano 68 pixel logici e lo scarto orizzontale dovuto al punteggio è compresso. I nomi non vengono disegnati sul Canvas. Il mezzo del rispondente viene dipinto per ultimo con un contorno giallo ricavato dall’alfa di ciascun fotogramma; i dati di tutti i giocatori sono mostrati soltanto nel riquadro dei turni, senza finestre accanto ai mezzi. Turnazione e finestre Inventario/Opzioni sono gestite da `assets/js/ui.js`.
 
 Le larghezze logiche sono: camion 62, pick-up 58, fuoristrada 56, coupé 54, chopper 44, Ape 40. Ogni mezzo conserva le proporzioni della propria sagoma; le anteprime usano un fattore comune. `tests/vehicle_layout.cjs` controlla dimensioni, integrità dei fotogrammi, compattezza e contorno; i test browser verificano le finestre, l’ordine di turno e il timer in tre dimensioni di schermo.
 
@@ -39,7 +39,7 @@ Con un vincitore e nessun avversario ancora da rimuovere, il portale sale dal te
 
 Il livello è il rapporto tra domande completate e domande impostate. Crescono ampiezza delle crepe, buche, lava visibile, fiamme, ossa, teschi umani, teschi demoniaci con corna e zanne, e rottami metallici riconoscibili come ruote/assi, portiere, cofani e paraurti. Alcune bocche vulcaniche eruttano getti di lava con ricaduta delle gocce, alternando eruzione e quiete. Le decorazioni scorrono sullo stesso piano, dietro gli attori. Pausa e movimento ridotto rispettano l’orologio della scena; il livello è ricostruibile da qualsiasi salvataggio. Una vittoria anticipata non porta artificialmente il terreno al massimo.
 
-Le etichette dei giocatori sono assenti durante tutte le animazioni di cattura e fuga, compreso il superstite in attesa. Il solo rispondente è identificato davanti al veicolo durante la corsa normale; il nome del vincitore appare nell’interfaccia dell’esito dopo la cinematica.
+Le etichette dei giocatori sono assenti durante tutte le animazioni di cattura e fuga, compreso il superstite in attesa. Durante la corsa i nomi, punti e vite sono nel riquadro dei turni; il nome del vincitore appare nell’interfaccia dell’esito dopo la cinematica.
 
 `npm run test:terrain` verifica inizio/metà/fine su desktop e Android senza alterare il motore; `python3 tests/terrain_browser.py --gifs` produce il confronto `artifacts/terrain-stages.png` e la GIF `artifacts/terrain-evolution.gif`. I test senza browser controllano progressione, determinismo, limiti di disegno ed eruzioni; i test dei finali impediscono regressioni nelle etichette.
 

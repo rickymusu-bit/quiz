@@ -449,16 +449,6 @@
         vehicleOutline(c, row, Math.floor(motion * 10 + i * 2) % 8, p.x, p.y);
       racer(c, p.x, p.y, i, motion, visualGroup, 2);
     }
-    const current = state.respondent, active = positions[current],
-      row = Math.max(0, VEHICLES.indexOf(state.config.vehicles?.[current] || ['chopper','pickup','ape'][current]));
-    const size = imageReady(sheets.vehicles) ? vehicleSize(row) : { width: 50, height: 40 };
-    const front = Math.max(...positions.filter((p, i) => !state.groups[i].out).map(p => p.x + 34));
-    if (live?.canvas === c.canvas) {
-      live.figure.style.setProperty('--player-x', (Math.min(W - 144, front + 8) / W * 100) + '%');
-      live.figure.style.setProperty('--player-y', ((active.y - size.height * .5) / H * 100) + '%');
-      live.figure.dataset.activeVisible = String(!state.groups[current].out);
-      live.figure.dataset.activeTeam = String(current);
-    }
     const queue=visualState?.queue||[];
     if(reduced){for(const item of queue)visualState.consumed.add(item.index);queue.length=0;}
     if(queue.length&&root.FoolEnding&&!imageReady(root.FoolEnding.load(()=>live?.redraw?.()))){
@@ -498,7 +488,7 @@
     const old = last?.key === state.id && !final ? last.x : null;
     const previous = old;
     last = { key: state.id, x: next };
-    const record = { frame: 0, canvas, figure:fig };
+    const record = { frame: 0, canvas };
     live = record;
     const start = performance.now(), reduced = reduce.matches;
     let freeze = 0, oldTime = start,lastEndingTime=start;
