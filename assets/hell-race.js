@@ -114,6 +114,7 @@
     return canvas;
   }
   const reduce = root.matchMedia('(prefers-reduced-motion: reduce)');
+  const ammo = root.FoolAmmo?.createTracker();
   let live = null, last = null, roadPhase = 0, roadLastTime = null;
   let visualState = null;
   function syncVisual(state, final) {
@@ -457,21 +458,28 @@
     const progress = root.FoolTerrain?root.FoolTerrain.progress(state):clamp(state.valid / total, 0, 1);
     const motion = reduced ? 0 : roadTime;
     background(c, W, motion, progress, reduced?0:motion+(final?visualState.elapsed:0));
-    if(final&&root.FoolEnding&&!imageReady(root.FoolEnding.load(()=>live?.redraw?.()))){endingHelpers(state).demon(c,0);return root.FoolEnding.load(()=>{})?.failed?'done':'loading';}
-    if(final&&root.FoolEnding)return root.FoolEnding.render(c,W,state,visualState.plan,reduced?visualState.plan.duration:visualState.elapsed,endingHelpers(state));
+    const shot = ammo?.current();
+    if(!shot&&final&&root.FoolEnding&&!imageReady(root.FoolEnding.load(()=>live?.redraw?.()))){endingHelpers(state).demon(c,0);return root.FoolEnding.load(()=>{})?.failed?'done':'loading';}
+    if(!shot&&final&&root.FoolEnding)return root.FoolEnding.render(c,W,state,visualState.plan,reduced?visualState.plan.duration:visualState.elapsed,endingHelpers(state));
     // Keep a compact chasing pack; paint the current pilot last so its outline stays visible.
     const positions = state.groups.map((g, i) => packPosition(state, i, progress, previous, sec, W));
     const order = state.groups.map((g, i) => i).filter(i => i !== state.respondent);
     order.push(state.respondent);
     for (const i of order) {
       const group = state.groups[i];
-      if (group.out) continue;
+      // A lethal Flagello is shown before its victims are captured.
+      if (group.out && !(shot?.type === 'ira' && shot.targets.includes(i))) continue;
       const configuredVehicle = state.config.vehicles?.[i] || ['chopper','pickup','ape'][i];
       const visualGroup = { ...group, vehicle: configuredVehicle }, p = positions[i],
         row = Math.max(0, VEHICLES.indexOf(configuredVehicle));
       if (i === state.respondent)
         vehicleOutline(c, row, Math.floor(motion * 10 + i * 2) % 8, p.x, p.y);
       racer(c, p.x, p.y, i, motion, visualGroup, 2);
+    }
+    if(shot){
+      c.save();c.translate(0,130);c.scale(1.3,1.3);demon(c,motion,15);c.restore();
+      root.FoolAmmo.render(c,W,state,shot,ammo.sample(reduced),positions,reduced);
+      return 'ammo';
     }
     const queue=visualState?.queue||[];
     if(reduced){for(const item of queue)visualState.consumed.add(item.index);queue.length=0;}
@@ -499,6 +507,7 @@
 
   function createStage(state, final = false) {
     if (live) root.cancelAnimationFrame(live.frame);
+    ammo?.sync(state);
     if(root.FoolEnding){syncVisual(state,final);root.FoolEnding.load(()=>live?.redraw?.());}
     const fig = document.createElement('figure');
     fig.className = 'hell-race' + (final ? ' hell-race-final' : '');
@@ -514,6 +523,10 @@
       ? (state.winner === null ? 'Il demone inghiotte l’ultimo veicolo, sputa fuoco verso l’alto e danza vittorioso. Nessun giocatore è fuggito.' : state.groups[state.winner].name + ' attraversa il portale che emerge dal terreno. Il varco sprofonda; il demone ruggisce, lo investe di fuoco, poi salta e batte i pugni a terra.')
       : 'Fuga dall’Inferno: le posizioni dei tre veicoli seguono i punteggi. La porta si avvicina con il procedere delle domande.';
     fig.appendChild(caption);
+    const ammoStatus = document.createElement('span');
+    ammoStatus.className = 'ammo-status';
+    ammoStatus.setAttribute('role','status');
+    fig.appendChild(ammoStatus);
     const ctx = canvas.getContext('2d', { alpha: false });
     if (!ctx) return fig;
     ctx.imageSmoothingEnabled = false;
@@ -526,7 +539,7 @@
     live = record;
     const start = performance.now(), reduced = reduce.matches;
     const blocked = () => state.suspended || (state.paused && state.pauseReason !== 'animazione');
-    fig.dataset.animationBusy = String(!reduced && !blocked() && (final || visualState?.queue.length > 0 || !!moving));
+    fig.dataset.animationBusy = String(!blocked() && (!!ammo?.current() || (!reduced && (final || visualState?.queue.length > 0 || !!moving))));
     let freeze = 0, oldTime = start,lastEndingTime=start;
     const draw = now => {
       if (live !== record || !canvas.isConnected) return;
@@ -539,16 +552,24 @@
       oldTime = now;
       if (roadLastTime !== null && !stop && !reduced && !final) roadPhase += clamp((now - roadLastTime) / 1000, 0, .06);
       roadLastTime = now;
-      if(final&&visualState?.plan&&!stop&&imageReady(root.FoolEnding.load(()=>live?.redraw?.())))visualState.elapsed+=Math.min(.1,Math.max(0,(now-lastEndingTime)/1000));
+      const delta = Math.min(.1,Math.max(0,(now-lastEndingTime)/1000));
+      if(ammo?.current()&&!stop)ammo.advance(delta,reduced);
+      const shot = ammo?.current();
+      fig.dataset.ammo = shot?.type ?? '';
+      if(ammoStatus.dataset.event !== (shot?.id ?? '')) {
+        ammoStatus.dataset.event = shot?.id ?? '';
+        ammoStatus.textContent = shot ? (shot.blocked ? 'Sigillo: attacco bloccato' : root.FoolAmmo.labels[shot.type]) + ' · ' + shot.targets.map(i=>state.groups[i].name).join(', ') : '';
+      }
+      if(final&&visualState?.plan&&!shot&&!stop&&imageReady(root.FoolEnding.load(()=>live?.redraw?.())))visualState.elapsed+=delta;
       lastEndingTime=now;
       const phase=scene(ctx, width, state, Math.max(0, elapsed - freeze), final, previous, reduced, roadPhase);
       if(final&&fig.dataset.endingPhase!==phase){fig.dataset.endingPhase=phase;if(phase==='done')fig.dispatchEvent(new CustomEvent('foolendingcomplete',{bubbles:true}));}
-      const busy = !reduced && !blocked() && (final ? phase !== 'done' : phase === 'capture' || (moving && elapsed - freeze < ADVANCE_SECONDS));
+      const busy = !blocked() && (phase === 'ammo' || (!reduced && (final ? phase !== 'done' : phase === 'capture' || (moving && elapsed - freeze < ADVANCE_SECONDS))));
       if(fig.dataset.animationBusy !== String(busy)) {
         fig.dataset.animationBusy = String(busy);
         fig.dispatchEvent(new CustomEvent('foolanimationchange',{bubbles:true,detail:{busy,phase}}));
       }
-      if (live === record && !reduced && (!final || phase!=='done')) record.frame = root.requestAnimationFrame(draw);
+      if (live === record && (ammo?.current() || (!reduced && (!final || phase!=='done')))) record.frame = root.requestAnimationFrame(draw);
     };
     record.redraw = () => {
       if (live !== record || !canvas.isConnected) return;

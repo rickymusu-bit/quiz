@@ -7,9 +7,10 @@
     "test": "node --test tests/*.test.js && python3 tests/verify_datasets.py",
     "test:browser": "node tests/hellscape.cjs && node tests/infernal_assets.cjs && python3 tests/hell_race.py && python3 tests/start.py && python3 tests/experience.py && python3 tests/keyboard.py && python3 tests/options.py && python3 tests/configurable.py && python3 tests/ammo.py && python3 tests/cinematic_ui.py && node tests/ux_regressions.cjs",
     "test:frames": "node tests/ammo_icons.cjs && node tests/vehicle_frames.cjs && node tests/demon_frames.cjs && node tests/vehicle_layout.cjs && node tests/hell_dust.cjs && node tests/ending_frames.cjs && node tests/terrain_frames.cjs",
+    "test:ammo": "node tests/ammo_animation.cjs",
     "build": "node scripts/build.cjs",
     "preview:offline": "node scripts/build.cjs --offline",
-    "test:offline": "npm run preview:offline && python3 tests/offline.py",
+    "test:offline": "npm run preview:offline && python3 tests/offline.py && node tests/ammo_animation.cjs --offline",
     "test:endings": "python3 tests/endings.py",
     "test:terrain": "python3 tests/terrain_browser.py"
   },

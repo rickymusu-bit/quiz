@@ -21,6 +21,7 @@ Il sito funziona direttamente come archivio statico, senza compilazione obbligat
 - `assets/css/game.css` e `assets/hellscape.css`: stili di base estratti e stili della grafica esistente, nello stesso ordine di cascata. `assets/home.css` contiene la schermata iniziale illustrata.
 - `assets/hell-terrain.js`: basalto continuo, degradazione per domande completate, ossa, teschi umani e demoniaci, rottami di veicoli e geyser di lava, senza corsie visibili.
 - `assets/hell-ending.js`: timeline e pose per presa, inghiottimento del veicolo, fiammata, portale, ruggito e danza, senza modificare il modello.
+- `assets/hell-ammo.js`: timeline degli eventi Ammo ed effetti Canvas sui veicoli; conserva la coda visiva fra i ridisegni e ignora gli eventi storici alla ripresa di un salvataggio.
 - `assets/hell-race.js`: componente Canvas separato; legge lo stato senza applicare transizioni al motore.
 - `assets/vendor/katex.js` e `katex.css`: KaTeX 0.16.22 e font incorporati estratti senza riscrittura; licenza in `assets/vendor/README.md` e nell’HTML.
 - `scripts/build.cjs`: copia statica e generazione dell’unico HTML offline dagli stessi sorgenti.
@@ -34,6 +35,7 @@ npm run dev             # http://127.0.0.1:8000
 npm test                # motore, persistenza e 200 domande delle due banche
 npm run test:frames     # 48 fotogrammi veicoli + 12 demone, proporzioni, gruppo compatto e contorno giallo
 npm run test:browser    # regressioni interfaccia e Canvas
+npm run test:ammo       # sette effetti Ammo, blocchi, timer, pausa e movimento ridotto
 npm run test:endings    # presa, morso, fiammata e i due finali
 npm run test:terrain    # progressione del terreno su desktop e Android
 npm run build           # dist/site, pubblicabile su hosting statico
@@ -57,6 +59,12 @@ L’arbitro infernale configura nomi, simboli e tre veicoli distinti per i gioca
 Le sette **Ammo** sono **Catene, Tributo, Malocchio, Sigillo, Contrappasso, Livella e Flagello**. La probabilità di estrazione è indipendente per ogni tipo: 30% predefinito per i primi cinque, **15% per Livella e 5% per Flagello**. Le probabilità sono configurabili singolarmente. Tributo mantiene la precedente logica di divisione del guadagno fra il rispondente e i beneficiari; l'identificativo interno `ruba` resta invariato per compatibilità. **Livella** ridistribuisce immediatamente tutti i punti già accumulati in parti identiche fra i giocatori ancora attivi, compreso quello che lo utilizza, senza creare o eliminare punti. I punteggi dei giocatori eliminati rimangono invariati. Quando il totale non è divisibile, il gioco conserva frazioni esatte. Livella non è un attacco: Sigillo non lo blocca e Contrappasso non reagisce. Dopo una risposta corretta possono essere assegnate più Ammo indipendenti; nello stesso turno è possibile usarne più di una.
 
 Alla fine delle domande previste **vince il giocatore attivo con più punti**. Se resta un solo giocatore attivo prima della fine, vince immediatamente; se tutti vengono eliminati, è Game Over.
+
+### Animazioni delle Ammo
+
+Ogni uso confermato mostra un effetto sul veicolo interessato: Catene avvolge il mezzo, Tributo trasferisce monete verso chi lo usa, Malocchio apre un occhio viola, Sigillo crea uno scudo turchese, Contrappasso rimanda una scia verso l'attaccante, Livella raccoglie e ridistribuisce monete, Flagello colpisce tutti i partecipanti attivi. Lo scudo intercetta gli attacchi bloccati. Le eliminazioni da Flagello vengono animate dopo il colpo collettivo.
+
+Durante gli effetti i pannelli lasciano visibile la corsa e il timer resta fermo; `P` permette la pausa manuale durante una domanda aperta. Con movimento ridotto viene mostrata una posa statica per 450 ms. Le animazioni leggono gli eventi già risolti dal motore: non consumano altre munizioni e non vengono ripetute ricaricando un salvataggio. `npm run test:ammo` controlla desktop, Android verticale e orizzontale; `node tests/ammo_animation.cjs --offline` verifica gli stessi effetti nell'HTML esportato senza rete.
 
 ## Spareggio a eliminazione
 

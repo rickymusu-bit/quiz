@@ -67,6 +67,8 @@ const assert = require("node:assert/strict");
         copy:{id:"ux-copy",type:"salta",target:null},source,target,turn:s.turn});
       HellscapeUI.renderGame();
     });
+    // The HUD returns after the new Ammo cinematic finishes.
+    await page.locator(".turn-order").waitFor({state:"visible"});
     assert((await page.locator(".turn-order .effect-chip").innerText()).includes("Catene"));
     assert((await page.locator(".turn-order .ammo-impact").innerText()).includes("Catene"));
     await page.screenshot({path:"artifacts/ammo-effect-hud.png"});
