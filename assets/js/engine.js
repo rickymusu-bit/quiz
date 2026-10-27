@@ -313,7 +313,7 @@
         );
         if (skip >= 0) {
           s.effects.splice(skip, 1);
-          this.log(g.name + " salta un turno");
+          this.log(g.name + " salta un turno", { type: "turn-skipped", target: i, turn: s.turn + 1 });
           continue;
         }
         return i;
@@ -388,7 +388,8 @@
       const s = this.s,
         g = s.groups[target];
       if (g.aura !== null) {
-        this.log(LABELS[type] + " bloccato da Aura di " + g.name);
+        this.log(LABELS[type] + " bloccato da Aura di " + g.name,
+          { type: "aura-block", target, source, ammo: type, turn: s.turn });
         return false;
       }
       if (type !== "svela") s.effects.push({ id, type, source, target });
@@ -404,6 +405,7 @@
             LABELS[type] +
             " solo contro " +
             s.groups[source].name,
+          { type: "karma-trigger", target, source, ammo: type, turn: s.turn },
         );
       }
       return true;
@@ -458,6 +460,8 @@
         activation: id,
         copy: clone(copy),
         target,
+        source: s.respondent,
+        turn: s.turn,
       });
       if (copy.type === "aura") g.aura = s.turn;
       else if (copy.type === "svela") {
@@ -513,8 +517,11 @@
           s.passLock === null || s.passLock === target,
           "Bersaglio Karma vincolato",
         );
-        if (this.attack("svela", s.owner, target, this.uid()))
+        if (this.attack("svela", s.owner, target, this.uid())) {
           s.respondent = target;
+          this.log(s.groups[target].name + " riceve la domanda con Spoiler",
+            { type: "spoiler-pass", source: s.owner, target, turn: s.turn });
+        }
       }
       s.screen = "answer";
       s.remaining = s.config.seconds * 1000;

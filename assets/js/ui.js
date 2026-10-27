@@ -39,14 +39,6 @@
     offroad: "Fuoristrada · Sopravvissuto",
     ape: "Ape · Contrabbandiere",
   };
-  const VEHICLE_POSITIONS = {
-    chopper: ["0%", "0%"],
-    pickup: ["50%", "0%"],
-    truck: ["100%", "0%"],
-    coupe: ["0%", "100%"],
-    offroad: ["50%", "100%"],
-    ape: ["100%", "100%"],
-  };
   function vehiclePreview(id) {
     const preview = node("span", undefined, "vehicle-preview");
     preview.setAttribute("role", "img");
@@ -441,8 +433,9 @@
         visual.id = "vehicle-preview-" + i;
         vehicle.querySelector("select").addEventListener("change", () => {
           const id = vehicle.querySelector("select").value;
-          const [px, py] = VEHICLE_POSITIONS[id];
-          visual.style.backgroundPosition = px + " " + py;
+          teamDraft.vehicles[i] = id;
+          // Un canvas contiene il veicolo: la posizione dello sfondo CSS non lo modifica.
+          visual.replaceChildren(FoolHellRace.vehiclePreview(id));
           visual.setAttribute("aria-label", VEHICLE_LABELS[id]);
           syncVehicleChoices();
         });
@@ -974,6 +967,40 @@
       );
     });
   }
+  function ammoImpact(s) {
+    // Solo gli eventi del turno attuale: nessuna notifica storica ripetuta.
+    const event = [...s.events].reverse().find(e => e.turn === s.turn &&
+      (e.activation || ["aura-block", "karma-trigger", "spoiler-pass", "turn-skipped"].includes(e.type)));
+    if (!event) return null;
+    const name = index => s.groups[index]?.name ?? "Giocatore";
+    const ammo = event.copy?.type;
+    let description = "";
+    if (event.type === "aura-block")
+      description = name(event.target) + ": Aura ha bloccato " + F.LABELS[event.ammo];
+    else if (event.type === "karma-trigger")
+      description = name(event.target) + ": Karma diventa " + F.LABELS[event.ammo];
+    else if (event.type === "spoiler-pass")
+      description = name(event.target) + ": riceve la domanda con Spoiler";
+    else if (event.type === "turn-skipped")
+      description = name(event.target) + ": turno saltato per Nope";
+    else if (ammo === "salta")
+      description = name(event.target) + ": Nope, salterà il prossimo turno";
+    else if (ammo === "ruba")
+      description = name(event.target) + ": Bullo, prossimo guadagno condiviso";
+    else if (ammo === "svela")
+      description = name(event.source) + ": Spoiler, scelta del destinatario";
+    else if (ammo === "aura")
+      description = name(event.source) + ": Aura protettiva attivata";
+    else if (ammo === "marx")
+      description = "Tutti: Marx redistribuisce i punti";
+    else if (ammo === "ira")
+      description = "Tutti: Ira divina toglie una vita";
+    if (!description) return null;
+    const panel = node("section", undefined, "ammo-impact");
+    panel.setAttribute("aria-label", "Ultimo effetto Ammo");
+    panel.append(node("strong", "EFFETTO AMMO"), node("p", description));
+    return panel;
+  }
   function turnOrder() {
     const s = game.s,
       grid = node("nav", undefined, "turn-order");
@@ -1000,10 +1027,27 @@
       if (i === s.respondent) button.setAttribute("aria-current", "step");
       stats.append(node("strong", F.exact(g.score) + " pt", "player-points"), lives(g));
       button.append(node("span", g.name, "turn-name"), stats);
+      const effects = s.effects.filter(e => e.target === i);
+      if (effects.length || g.aura !== null) {
+        const statuses = node("span", undefined, "active-ammo-effects");
+        for (const effect of effects) {
+          const label = effect.type === "salta"
+            ? "Nope: prossimo turno saltato"
+            : "Bullo: prossimi punti condivisi";
+          const status = node("span", label, "effect-chip");
+          status.title = label + " · da " + s.groups[effect.source].name;
+          statuses.append(status);
+        }
+        if (g.aura !== null)
+          statuses.append(node("span", "Aura: attiva", "effect-chip shielded"));
+        button.append(statuses);
+      }
       item.append(button);
       list.append(item);
     }
     grid.append(list);
+    const impact = ammoImpact(s);
+    if (impact) grid.append(impact);
     return grid;
   }
   function optionsToggle() {
@@ -1091,8 +1135,7 @@
     icon.dataset.ammo = type;
     icon.setAttribute("aria-hidden", "true");
     const close = () => { d.close(); d.remove(); if (source?.isConnected) source.focus({preventScroll:true}); };
-    d.append(icon, title, node("p", F.AMMO_HELP[type], "ammo-description"),
-      node("p", "Probabilità predefinita: " + F.DEFAULT_BONUS_WEIGHTS[type] + "%", "muted"));
+    d.append(icon, title, node("p", F.AMMO_HELP[type], "ammo-description"));
     if (copy?.target !== null && copy?.target !== undefined)
       d.append(node("p", "Vincolata contro " + game.s.groups[copy.target].name +
         (game.s.groups[copy.target].out ? " (eliminato)" : ""), "muted"));
