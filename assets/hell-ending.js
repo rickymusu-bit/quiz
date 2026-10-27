@@ -403,7 +403,7 @@
     return {visible:time>=0,offset:340*(1-ease(time/1.4)),rise:ease(time/1.4)};
   }
   function portalGeometry(width) {
-    return {x:width-228,y:28,width:220,height:330,entry:width-101,ground:358};
+    return {x:width-228,y:28,width:220,height:380,entry:width-101,ground:408};
   }
   function worldTravel(p,time) {
     if(p.winner===null)return 0;
@@ -448,6 +448,8 @@
     const g=portalGeometry(width),y=g.y+motion.offset;
     bridgeRupture(c,width,time);
     c.save();
+    // Foundations extend below the bridge and are submerged at the lake surface.
+    c.beginPath();c.rect(0,0,width,376);c.clip();
     if(portal?.complete&&portal.naturalWidth)c.drawImage(portal,g.x,y,g.width,g.height);
     else{
       const glow=c.createLinearGradient(g.x,0,g.x+g.width,0);
@@ -460,8 +462,9 @@
   function drawPortalFront(c,width,time) {
     if(time<0||!portal?.complete||!portal.naturalWidth)return;
     const g=portalGeometry(width),y=g.y+portalMotion(time).offset;
+    c.save();c.beginPath();c.rect(0,0,width,376);c.clip();
     c.drawImage(portal,portal.naturalWidth*.74,0,portal.naturalWidth*.26,portal.naturalHeight,
-      g.x+g.width*.74,y,g.width*.26,g.height);
+      g.x+g.width*.74,y,g.width*.26,g.height);c.restore();
   }
   function vehicleGround(state,index,h) {
     return h.position?.(state,index)?.y??(250+index*28);

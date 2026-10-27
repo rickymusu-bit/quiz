@@ -446,12 +446,29 @@
       r(c, x + 20, y + 37, 6, 64, '#ffe6aa');
     }
   }
+  // Continuous opaque mesh: no held frames or crossfaded double silhouettes.
+  function walkingDemon(c,x,phase) {
+    const image=atlasRow('demon',0)[0],scale=Math.min(170/image.width,125/image.height);
+    const w=image.width*scale,h=image.height*scale,left=x-40+(170-w)/2,top=134-h;
+    const angle=phase*Math.PI*2,cellX=Math.ceil(image.width/24),cellY=Math.ceil(image.height/32);
+    for(let sy=0;sy<image.height;sy+=cellY){
+      const sh=Math.min(cellY,image.height-sy),v=(sy+sh/2)/image.height;
+      for(let sx=0;sx<image.width;sx+=cellX){
+        const sw=Math.min(cellX,image.width-sx),u=(sx+sw/2)/image.width;
+        const leg=Math.max(0,(v-.55)/.45),side=u<.55?1:-1;
+        const swing=Math.sin(angle+(side===1?0:Math.PI));
+        const dx=swing*leg*7,dy=-Math.max(0,Math.cos(angle+(side===1?0:Math.PI)))*leg*4;
+        const bob=-Math.pow(Math.sin(angle),2)*1.3*(1-leg);
+        c.drawImage(image,sx,sy,sw,sh,left+sx*scale+dx,top+sy*scale+dy+bob,sw*scale+.6,sh*scale+.6);
+      }
+    }
+  }
   function demon(c, tick, x = 32, shade = '#9b2831', mode = 'chase', actionTime = 0) {
     const walk=walkSample(tick);
     demonDust(c, x, tick, mode, actionTime,mode==='chase'?walk.stepsPerSecond:4.5);
     if (imageReady(sheets.demon)) {
       if(mode==='chase'){
-        sprite(c,'demon',4,3,0,walk.frame,x-40,9,170,125);
+        walkingDemon(c,x,walk.phase);
         return;
       }
       const row=mode==='attack'?1:mode==='devour'?2:0;
