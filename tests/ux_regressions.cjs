@@ -8,7 +8,8 @@ const assert = require("node:assert/strict");
   const root = path.resolve(__dirname, "..");
   fs.mkdirSync(path.join(root, "artifacts"), { recursive: true });
   const server = http.createServer((req, res) => {
-    const file = path.resolve(root, "." + decodeURIComponent(req.url.split("?")[0]).replace(/^\/+/, "/"));
+    const pathname = decodeURIComponent(req.url.split("?")[0]);
+    const file = path.resolve(root, "." + (pathname === "/" ? "/index.html" : pathname));
     if (!file.startsWith(root + path.sep)) { res.writeHead(403).end(); return; }
     try {
       const ext = path.extname(file);
