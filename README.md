@@ -18,7 +18,7 @@ Il sito funziona direttamente come archivio statico, senza compilazione obbligat
 - `assets/js/loader.js`: catalogo e caricamento dal sito o dalle risorse incorporate nell’export.
 - `assets/js/persistence.js`: accesso iniettato a storage, lettura/scrittura dei profili e ripresa attraverso il motore. Il sito conserva `fool-v1`, `fool-settings-v1` e il JSON esistente.
 - `assets/js/ui.js`: configurazione, impostazioni, schermate, dialoghi, comandi e adattamento del palco. Lo stato dell’interfaccia è racchiuso nel modulo; `HellscapeUI` è la facciata esplicita usata dalle regressioni browser.
-- `assets/css/game.css` e `assets/hellscape.css`: stili di base estratti e stili della grafica esistente, nello stesso ordine di cascata.
+- `assets/css/game.css` e `assets/hellscape.css`: stili di base estratti e stili della grafica esistente, nello stesso ordine di cascata. `assets/home.css` contiene la schermata iniziale illustrata.
 - `assets/hell-terrain.js`: basalto continuo, degradazione per domande completate, ossa, teschi umani e demoniaci, rottami di veicoli e geyser di lava, senza corsie visibili.
 - `assets/hell-ending.js`: timeline e pose per presa, inghiottimento del veicolo, fiammata, portale, ruggito e danza, senza modificare il modello.
 - `assets/hell-race.js`: componente Canvas separato; legge lo stato senza applicare transizioni al motore.
@@ -143,3 +143,5 @@ Il tempo è rappresentato da una fiala orizzontale di liquido rosso: si svuota s
 Percorsi pubblici, API del motore e chiavi dei salvataggi sono conservati. Nessuna modifica a regole, dataset o formato dei salvataggi. I veicoli già scelti sono disabilitati negli altri selettori e tornano disponibili quando vengono liberati. All’uscita si sceglie Salva ed esci, Esci senza salvare oppure Annulla.
 
 Per ogni modifica all’interfaccia consegnare un’anteprima HTML offline e allegare in chat screenshot aggiornati prima dell’approvazione.
+
+La schermata iniziale usa `assets/hellscape-chase.webp`: il demone insegue un convoglio composto da tutti e sei i veicoli selezionabili, con proporzioni e sagome distinte. `assets/hellscape-logo.webp` è il titolo HELLSCAPE in metallo scolpito e incandescente, nello stile Doom del precedente logo FOOL, con sfondo trasparente. Lo stesso titolo compare nelle intestazioni di preparazione e regolamento. Illustrazione e logo sono generati dai riferimenti del gioco e convertiti in WebP senza perdita; gli originali sono conservati nell’ambiente di lavoro. I comandi della home rimangono sotto la scena, compreso Riprendi quando è disponibile un salvataggio. Tutte le immagini e il font del menu sono incorporati nell’HTML offline dagli stessi sorgenti.

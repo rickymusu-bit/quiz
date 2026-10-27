@@ -1,8 +1,12 @@
 # Risorse visive di Fool
 
-- `fool-logo.png`: versione corrente del logo, con le superfici blu portate a grigio antracite/nero su richiesta del responsabile. Revisione realizzata tramite editing dell’immagine di riferimento, conservando lettering e accenti arancioni/dorati. È usata in schermata iniziale, intestazioni e icona.
+- `fool-logo.png`: versione corrente del logo, con le superfici blu portate a grigio antracite/nero su richiesta del responsabile. Revisione realizzata tramite editing dell’immagine di riferimento, conservando lettering e accenti arancioni/dorati. È conservata come riferimento per il nuovo titolo Hellscape e per compatibilità con gli asset precedenti.
 - `fool-logo.jpg`: riferimento originale fornito da Riccardo Musumarra nella richiesta del 21/10/2026, allegato `15033.jpg`. I byte dell'immagine originale sono conservati. Un filtro SVG del sito rende trasparente il fondo quasi nero in fase di visualizzazione e mantiene i colori della grafica; il riferimento JPEG originale non viene riscritto.
 - `doom-background.png`: sfondo generato a partire dal riferimento `15034.jpg`, con cielo rosso e pavimento di pietra, estetica pixel ispirata a Doom del 1993. Non contiene scritte o loghi del riferimento. L'originale generato è stato conservato nell'ambiente di lavoro e copiato nel progetto.
 - `vt323-regular.ttf`: carattere VT323 di Peter Hull, Google Fonts, distribuito con SIL Open Font License 1.1. La licenza completa è in `vt323-license.txt`. Origine: `google/fonts/ofl/vt323/VT323-Regular.ttf`, blob `afa69098f15bf64849d397f133d9467486904053`.
 
 Le risorse sono servite dal sito stesso, senza richieste a CDN o servizi di caratteri esterni. Il filtro del logo è in `src/logo-filter.svg`; home, gioco e presentazione usano la stessa identità visiva.
+
+- `hellscape-chase.webp`: illustrazione della home con demone e tutti i sei veicoli (chopper, pick-up, camion, coupé, fuoristrada, Ape). Generata dai riferimenti `hell-race/demon.webp` e `hell-race/vehicles.webp`; originale conservato in `/workspace/generated_images/exec-7a70b224-2e9d-421a-999d-73ca4595471f.png`. Conversione WebP senza perdita, 1448×1086.
+- `hellscape-logo.webp`: lettering HELLSCAPE nello stesso stile Doom del logo FOOL, metallo antracite, biselli argentati e bordi incandescenti; trasparenza nativa. Originale conservato in `/workspace/generated_images/exec-89462bb3-db03-45be-bff6-fdd2c7b7a5b3.png`. Conversione WebP senza perdita, 2172×724. Usato nella home e nelle intestazioni.
+- `home.css`: impaginazione della schermata iniziale 4:3, senza ritaglio dei veicoli o sovrapposizione dei comandi al convoglio. Conserva nomi accessibili, focus, scorciatoie e schermo intero.
