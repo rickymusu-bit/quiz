@@ -30,6 +30,7 @@ jobs:
           echo "CHROMIUM_PATH=$browser_path" >> "$GITHUB_ENV"
       - run: npm test
       - run: npm run test:frames
+      - run: npm run test:layout
       - run: npm run test:browser
       - run: npm run test:ammo
       - run: npm run test:endings
@@ -47,3 +48,4 @@ jobs:
             dist/revision.json
             artifacts/*.png
             artifacts/quality/
+            artifacts/layout/

@@ -102,13 +102,15 @@ with sync_playwright() as p:
             f = page.frames[1]
             page.set_viewport_size({'width':height,'height':width})
             page.wait_for_timeout(150)
-            r = f.locator('#viewport-stage').bounding_box()
+            subject = '.home-heading' if f.evaluate('document.body.dataset.layout') == 'compact' else '#viewport-stage'
+            r = f.locator(subject).bounding_box()
             assert abs(r['width']/r['height'] - 4/3) < .001
             page.set_viewport_size({'width':width,'height':height})
             f.get_by_role('button',name='Schermo intero',exact=True).click()
             page.wait_for_timeout(150)
             assert f.evaluate('!!document.fullscreenElement')
-            r = f.locator('#viewport-stage').bounding_box()
+            subject = '.home-heading' if f.evaluate('document.body.dataset.layout') == 'compact' else '#viewport-stage'
+            r = f.locator(subject).bounding_box()
             assert abs(r['width']/r['height'] - 4/3) < .001
             f.evaluate('document.exitFullscreen()')
             (ART/'measurements.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))

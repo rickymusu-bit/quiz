@@ -14,7 +14,8 @@
     "test:offline": "npm run preview:offline && python3 tests/offline.py && node tests/ammo_animation.cjs --offline",
     "test:endings": "python3 tests/endings.py",
     "test:terrain": "python3 tests/terrain_browser.py",
-    "test:quality": "node scripts/build.cjs --quality-preview && python3 tests/visual_quality.py"
+    "test:quality": "node scripts/build.cjs --quality-preview && python3 tests/visual_quality.py",
+    "test:layout": "python3 tests/responsive.py"
   },
   "devDependencies": {
     "@napi-rs/canvas": "0.1.100",

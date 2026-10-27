@@ -1,6 +1,6 @@
 'use strict';
 const {createCanvas}=require('@napi-rs/canvas'),vm=require('node:vm'),fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
-const root={matchMedia:()=>({matches:false})};
+const root={FoolLayout:require('../assets/hell-layout.js'),matchMedia:()=>({matches:false})};
 const source=fs.readFileSync(path.join(__dirname,'../assets/hell-race.js'),'utf8').replace('root.FoolHellRace = { createStage, vehiclePreview };','root.FoolHellRace = { vehicleDust, demonDust, dustPuff, dirtChip, flyingDevils };');
 const math=Object.create(Math);math.random=()=>{throw Error('Dust must not consume game RNG')};
 vm.runInNewContext(source,{window:root,Math:math,document:{createElement:()=>createCanvas(1,1)}});const dust=root.FoolHellRace;

@@ -9,13 +9,13 @@
 
 
 <link rel="stylesheet" href="assets/hellscape.css">
-<link rel="stylesheet" href="assets/home.css"></head>
+<link rel="stylesheet" href="assets/home.css"><link rel="stylesheet" href="assets/responsive.css"></head>
 <body>
 <div id="viewport-stage"><main class="home-screen">
-<img class="home-illustration" src="assets/hellscape-chase.webp" width="1448" height="1086" fetchpriority="high" alt="Vista frontale di sei veicoli che fuggono verso di noi, con il demone alle loro spalle: chopper, pick-up, camion, coupé, fuoristrada e Ape.">
+
 <div class="home-content">
-<p class="subtitle">fuggi dall'inferno</p>
-<h1><img class="home-wordmark" src="assets/hellscape-logo.webp" width="2172" height="724" fetchpriority="high" alt="HELLSCAPE"></h1>
+<div class="home-heading"><img class="home-illustration" src="assets/hellscape-chase.webp" width="1448" height="1086" fetchpriority="high" alt="Vista frontale di sei veicoli che fuggono verso di noi, con il demone alle loro spalle: chopper, pick-up, camion, coupé, fuoristrada e Ape."><p class="subtitle">fuggi dall'inferno</p>
+<h1><img class="home-wordmark" src="assets/hellscape-logo.webp" width="2172" height="724" fetchpriority="high" alt="HELLSCAPE"></h1></div>
 <nav class="menu" aria-label="Menu principale">
 <a class="home-primary" href="Fool.html?start=1" aria-keyshortcuts="N">Nuova partita</a>
 <a class="home-primary" id="resume-game" href="Fool.html?resume=1" aria-keyshortcuts="R" hidden>Riprendi partita</a>
@@ -50,7 +50,4 @@ window.foolReturnHome=()=>{document.getElementById('play-frame')?.remove();docum
 for(const link of document.querySelectorAll('.menu a'))link.addEventListener('click',event=>{if(!document.fullscreenElement)return;event.preventDefault();const frame=document.createElement('iframe');frame.id='play-frame';frame.title=link.textContent==='Regole'?'Regole di Hellscape':'Hellscape';frame.allow='fullscreen';frame.src=link.href;document.getElementById('viewport-stage').hidden=true;document.body.append(frame)});
 try{if(window.parent!==window&&window.parent.location.origin===location.origin&&window.parent.foolReturnHome)window.parent.foolReturnHome()}catch(error){}
 </script>
-<script>
-window.fitFoolViewport=()=>{const v=window.visualViewport,scale=Math.min((v?.width||innerWidth)/1024,(v?.height||innerHeight)/768);document.getElementById('viewport-stage').style.transform='translate(-50%,-50%) scale('+scale+')'};
-window.addEventListener('resize',fitFoolViewport);window.visualViewport?.addEventListener('resize',fitFoolViewport);document.addEventListener('fullscreenchange',fitFoolViewport);fitFoolViewport();
-</script></body></html>
+<script src="assets/hell-layout.js"></script></body></html>
