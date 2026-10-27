@@ -1,7 +1,8 @@
 /* Narrow suspension deck. Geometry is shared by the race and its layout tests. */
 (function(root){
   'use strict';
-  const TOP=208,BOTTOM=338,GAP=4,RACE_SCALE=.62;
+  const TOP=208,BOTTOM=338,GAP=4,RACE_SCALE=.62,SPEED=48;
+  const distance=time=>time*SPEED;
   const TOP_MARGIN=4,BOTTOM_MARGIN=18;
   let art=null,lake=null;
   function load(redraw=()=>{}){
@@ -24,7 +25,7 @@
   }
   const PIER_SPAN = 144;
   function pillars(c, width, time, image) {
-    const offset = time * 48;
+    const offset = distance(time);
     c.save();
     for (let index = Math.floor(offset / PIER_SPAN) - 1;
          index <= Math.floor((offset + width) / PIER_SPAN) + 1; index++) {
@@ -74,7 +75,7 @@
     const image=load();
     pillars(c,width,time,image);
     if(image?.complete&&image.naturalWidth){
-      const tile=768,offset=(time*48)%tile,s=image.naturalHeight/672;
+      const tile=768,offset=(distance(time))%tile,s=image.naturalHeight/672;
       for(let x=-offset;x<width;x+=tile){
         // Keep the deck and masonry fascia; neither edge has a railing.
         for(const [sy,sh,dy,dh] of [[214,123,TOP,BOTTOM-TOP],[337,260,BOTTOM,20]])
@@ -83,7 +84,7 @@
     }else{c.fillStyle='#292722';c.fillRect(0,TOP,width,BOTTOM-TOP);}
     // Heat eats through the deck as questions progress, retaining terrain progression.
     for(let i=0;i<12;i++)if(progress>i/15){
-      const x=((i*97-time*48)%width+width)%width,y=TOP+10+(i*23)%86;
+      const x=((i*97-distance(time))%width+width)%width,y=TOP+10+(i*23)%86;
       c.fillStyle='#100e0c';c.fillRect(Math.round(x),y,9,2);
       c.fillStyle='#bb491e';c.fillRect(Math.round(x)+2,y+1,3,1);
       if(progress>.6){c.fillStyle='#ff9c3e';c.fillRect(Math.round(x)+3,y-Math.round(2+Math.sin(effectTime*3+i)*2),1,2);}
@@ -92,7 +93,7 @@
     const terrain=root.FoolTerrain;
     if(terrain){
       c.save();c.beginPath();c.rect(0,TOP,width,BOTTOM-TOP);c.clip();
-      const chunk=128,offset=time*48;
+      const chunk=128,offset=distance(time);
       for(let tile=Math.floor(offset/chunk)-1;tile<=Math.floor((offset+width)/chunk)+1;tile++){
         for(let i=0;i<6;i++){
           const seed=tile*71+i*109;
@@ -110,6 +111,6 @@
     }
     c.restore();
   }
-  const api={TOP,BOTTOM,GAP,RACE_SCALE,grounds,draw,load,TOP_MARGIN,BOTTOM_MARGIN};
+  const api={TOP,BOTTOM,GAP,RACE_SCALE,grounds,draw,load,TOP_MARGIN,BOTTOM_MARGIN,SPEED,distance};
   if(typeof module!=='undefined')module.exports=api;else root.FoolBridge=api;
 })(globalThis);

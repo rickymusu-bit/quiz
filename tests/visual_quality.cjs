@@ -30,7 +30,7 @@ const {chromium}=require("playwright"),fs=require("node:fs"),assert=require("nod
    await page.screenshot({path:`artifacts/quality-integer-${width}.png`});
    const source=fs.readFileSync("assets/hell-race.js","utf8").replace(
     "root.FoolHellRace = { createStage, vehiclePreview };",
-    "root.QualityRace = { scene, chaseAction, ready:()=>Object.values(sheets).every(imageReady) };");
+    "root.QualityRace = { scene, walkSample, ready:()=>Object.values(sheets).every(imageReady) };");
    await frame.addScriptTag({content:source});
    await frame.waitForFunction(()=>QualityRace.ready()&&FoolBridge.load()?.complete&&FoolEnding.load(()=>{})?.complete);
    await frame.evaluate(()=>{
@@ -40,15 +40,15 @@ const {chromium}=require("playwright"),fs=require("node:fs"),assert=require("nod
     document.body.append(canvas);
    });
    const stateBefore=await frame.evaluate(()=>JSON.stringify(HellscapeUI.game.s));
-   for(const [name,progress,time] of [["start",0,0],["ruins",1,0],["closed-mouth",.5,2.5],["wind-up",.5,7.4],["reach",.5,8.9],["recovery",.5,11.4],["fire",.5,26.9]]){
+   for(const [name,progress,time] of [["start",0,0],["ruins",1,0],["walk-0",.5,0],["walk-1",.5,.4375],["walk-2",.5,.875],["walk-3",.5,1.3125],["walk-late",.5,26.9]]){
     const result=await frame.evaluate(({progress,time})=>{
      const s=Fool.clone(HellscapeUI.game.s);s.valid=progress*s.config.questionCount;
      const c=document.querySelector("#quality-scene").getContext("2d");
      c.setTransform(3,0,0,3,0,0);c.imageSmoothingEnabled=true;c.imageSmoothingQuality="high";
      QualityRace.scene(c,512,s,2,false,null,false,time);
-     return QualityRace.chaseAction(time).mode;
+     return QualityRace.walkSample(time).frame;
     },{progress,time});
-    if(name==="reach"||name==="fire")assert.equal(result,name);
+    if(/^walk-[0-3]$/.test(name))assert.equal(result,Number(name.slice(-1)));
     await page.screenshot({path:`artifacts/quality-${name}-${width}.png`});
    }
    assert.equal(await frame.evaluate(()=>JSON.stringify(HellscapeUI.game.s)),stateBefore,"Scenery cannot change game state");

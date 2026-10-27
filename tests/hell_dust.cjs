@@ -26,3 +26,7 @@ fs.mkdirSync(path.join(__dirname,'../artifacts'),{recursive:true});fs.writeFileS
 console.log('PASS: evolving dust, deterministic freeze, bounded particles, lifetime and isolated canvas state; no game RNG');
 
 const sky=render(c=>dust.flyingDevils(c,360,4)),sd=pixels(sky);for(let y=174;y<180;y++)assert(!sd.slice(y*360*4,(y+1)*360*4).some(v=>v),'Flying devils stay in the distant sky');
+
+const alpha=pixels(render(c=>dust.flyingDevils(c,360,4))).filter((v,i)=>i%4===3);
+assert(alpha.some(v=>v===255),'Flying devil bodies must be opaque, even if the parent context was translucent');
+render(c=>{const draw=c.drawImage.bind(c);c.drawImage=(...args)=>{assert.equal(c.globalAlpha,1,'Each background devil is painted without an opacity reduction');draw(...args)};dust.flyingDevils(c,360,4)});

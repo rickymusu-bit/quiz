@@ -2,7 +2,6 @@
 (function (root) {
   "use strict";
   const CAPTURE = 5.2,
-    ESCAPE = 2.2,
     REACTION = 3.2;
   const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x)),
     ease = (x) => {
@@ -11,48 +10,32 @@
     },
     lerp = (a, b, t) => a + (b - a) * t;
   function plan(state, consumed = [], pending = []) {
-    const eaten = new Set(consumed),
-      winner = state.winner;
-    const victims = [
-      ...new Set([
-        ...pending,
-        ...state.groups
-          .map((g, i) => (!g.out && i !== winner ? i : null))
-          .filter((i) => i !== null),
-      ]),
-    ].filter((i) => i !== winner && !eaten.has(i));
-    if (winner === null && !victims.length && !eaten.has(state.respondent))
-      victims.push(state.respondent);
-    const captureEnd = victims.length * CAPTURE,
-      reactionStart = captureEnd + (winner === null ? 0 : ESCAPE);
-    return {
-      winner,
-      victims,
-      captureEnd,
-      reactionStart,
-      duration: captureEnd + (winner === null ? REACTION : 8.4),
-    };
-  }
-  function sample(p, time) {
-    const t = Math.max(0, time);
-    if (t < p.captureEnd) {
-      const slot = Math.floor(t / CAPTURE);
-      return {
-        phase: "capture",
-        victim: p.victims[slot],
-        local: t - slot * CAPTURE,
-        slot,
-      };
+    const eaten=new Set(consumed),winner=state.winner;
+    const victims=[...new Set([...pending,...state.groups
+      .map((g,i)=>(!g.out&&i!==winner?i:null)).filter(i=>i!==null)])]
+      .filter(i=>i!==winner&&!eaten.has(i));
+    if(winner===null&&!victims.length&&!eaten.has(state.respondent))victims.push(state.respondent);
+    if(winner===null){
+      const captureEnd=victims.length*CAPTURE;
+      return {winner,victims,captureStart:0,captureEach:CAPTURE,captureEnd,duration:captureEnd+REACTION};
     }
-    const elapsed = t - p.captureEnd;
-    if (p.winner !== null) {
-      if (elapsed < 0.55) return { phase: "rise", local: elapsed };
-      if (elapsed < 2.2) return { phase: "escape", local: elapsed - 0.55 };
-      if (elapsed < 2.95) return { phase: "roar", local: elapsed - 2.2 };
-      if (elapsed < 4.8) return { phase: "fire", local: elapsed - 2.95 };
-      if (elapsed < 8.4) return { phase: "rage", local: elapsed - 4.8 };
-    } else if (t < p.duration) return { phase: "dance", local: elapsed };
-    return { phase: "done", local: p.winner === null ? REACTION : 3.6 };
+    const captureStart=1.1,captureEach=3.4,captureEnd=captureStart+victims.length*captureEach;
+    const portalStart=Math.max(.55,captureEnd-.65),entryStart=Math.max(captureEnd,portalStart+1.55);
+    const escapeEnd=entryStart+1.55;
+    return {winner,victims,captureStart,captureEach,captureEnd,portalStart,entryStart,escapeEnd,duration:escapeEnd+.6};
+  }
+  function sample(p,time) {
+    const t=Math.max(0,time);
+    if(p.winner!==null&&t<p.captureStart)return {phase:'breakout',local:t};
+    if(t<p.captureEnd){
+      const slot=Math.floor((t-p.captureStart)/p.captureEach);
+      return {phase:'capture',victim:p.victims[slot],slot,local:t-p.captureStart-slot*p.captureEach};
+    }
+    if(p.winner===null)return t<p.duration?{phase:'dance',local:t-p.captureEnd}:{phase:'done',local:REACTION};
+    if(t<p.entryStart)return {phase:'rise',local:t-p.portalStart};
+    if(t<p.escapeEnd)return {phase:'escape',local:t-p.entryStart};
+    if(t<p.duration)return {phase:'arrival',local:t-p.escapeEnd};
+    return {phase:'done',local:0};
   }
   // Coordinates in the generated source atlas, mapped into normalized frames.
   const anchors = [
@@ -74,7 +57,8 @@
     [0, 0, 1401, 829],
   ];
   let atlas = null,
-    art = null;
+    art = null,
+    portal = null;
   function prepare(image) {
     if (atlas) return atlas;
     if (!image?.complete || !image.naturalWidth) return null;
@@ -204,6 +188,13 @@
         },
         { once: true },
       );
+    }
+    if(!portal&&typeof root.Image==='function'){
+      portal=new root.Image();portal.decoding='async';
+      const path='assets/hell-race/celestial-portal-v1.webp';
+      portal.src=root.HellscapeOffline?.assets?.[path]||path;
+      portal.addEventListener('load',redraw,{once:true});
+      portal.addEventListener('error',()=>{portal.failed=true;redraw();},{once:true});
     }
     return art;
   }
@@ -360,11 +351,11 @@
     }
     c.restore();
   }
-  function capture(c, W, state, index, t, helpers) {
+  function capture(c, W, state, index, t, helpers, options = {}) {
     const ground = 332,
       row = helpers.vehicleIndex(state, index),
       size = helpers.vehicleSize(row),
-      pose = actor(c, captureFrame(t), W * 0.12, ground);
+      pose = actor(c, captureFrame(t), options.actorX ?? W * 0.12, ground);
     if (!pose) {
       helpers.demon(c, 0);
       return;
@@ -379,8 +370,8 @@
         tilt = lerp(-0.12, -0.65, feeding);
       if (t < 0.5) {
         const reach = ease(t / 0.5);
-        p.x = lerp(W * 0.575, pose.hand.x, reach);
-        p.y = lerp(ground - size.height / 2, pose.hand.y, reach);
+        p.x = lerp(options.start?.x ?? W * 0.575, pose.hand.x, reach);
+        p.y = lerp(options.start ? options.start.y-size.height/2 : ground-size.height/2, pose.hand.y, reach);
         zoom = lerp(1, 0.88, reach);
       }
       c.save();
@@ -406,163 +397,136 @@
           c.fillRect(Math.round(p.x - 6 + j * 5), Math.round(p.y - 3), 2, 7);
       }
     }
-    fireBreath(c, pose.mouth, t - 3.65);
+    if(options.breath!==false)fireBreath(c, pose.mouth, t - 3.65);
   }
   function portalMotion(time) {
-    return {
-      visible: time >= 0 && time < 4.8,
-      offset: 190 * (1 - ease(time / 0.55) + ease((time - 2.2) / 2.6)),
-      passed: time >= 2.2,
-    };
+    return {visible:time>=0,offset:340*(1-ease(time/1.4)),rise:ease(time/1.4)};
   }
-  function rageMotion(time) {
-    const cycle = time % 1.2,
-      air = cycle >= 0.15 && cycle < 0.52;
-    const impact = Math.max(
-      0,
-      1 - Math.abs(cycle - 0.57) / 0.085,
-      1 - Math.abs(cycle - 0.84) / 0.085,
-    );
-    return {
-      frame: air ? 12 : cycle < 0.15 || (cycle > 0.68 && cycle < 0.78) ? 11 : 7,
-      lift: air
-        ? Math.sin(((cycle - 0.15) / 0.37) * Math.PI) * 28
-        : -impact * 3,
-      impact,
-      cycle,
-    };
+  function portalGeometry(width) {
+    return {x:width-228,y:28,width:220,height:330,entry:width-101,ground:358};
   }
-  function drawPortal(c, W, time, ground, h) {
-    const motion = portalMotion(time);
-    if (!motion.visible) return;
+  function worldTravel(p,time) {
+    if(p.winner===null)return 0;
+    const t=clamp(time,0,p.duration),brake=Math.max(1.2,p.portalStart);
+    const accelerate=x=>x<1.2?48*x+20*x*x:86.4+(x-1.2)*96;
+    if(t<=brake)return accelerate(t);
+    const q=Math.min(1.1,t-brake);
+    return accelerate(brake)+96*(q-q*q/2.2);
+  }
+  function winnerMotion(p,time,width,size={width:40}) {
+    const t=Math.max(0,time),g=portalGeometry(width);
+    let x;
+    if(t<p.captureStart)x=lerp(width*.5,width*.65,Math.pow(clamp(t/p.captureStart),2));
+    else if(t<p.entryStart)x=lerp(width*.65,width*.70,clamp((t-p.captureStart)/(p.entryStart-p.captureStart)));
+    else x=lerp(width*.70,g.entry+size.width*.65+6,Math.pow(clamp((t-p.entryStart)/1.55),1.6));
+    return {x,visible:t<p.escapeEnd,passed:t>=p.escapeEnd,entry:g.entry};
+  }
+  function bridgeRupture(c,width,time) {
+    if(time<0)return;
+    const g=portalGeometry(width),power=ease(time/.75),cx=g.x+g.width*.51;
+    const half=g.width*.48*power,top=205,bottom=350;
     c.save();
-    c.beginPath();
-    c.rect(0, 0, W, ground + 1);
-    c.clip();
-    c.translate(0, motion.offset);
-    h.gate(c, W - 82, ground - 182, time, true);
+    const lava=c.createLinearGradient(0,top,0,bottom);
+    lava.addColorStop(0,'#1b100c');lava.addColorStop(.65,'#541708');lava.addColorStop(1,'#c5470b');
+    c.fillStyle=lava;c.strokeStyle='#a0eaff';c.lineWidth=1.2;
+    c.beginPath();c.moveTo(cx-half,top);
+    for(let i=0;i<10;i++)c.lineTo(cx-half+Math.sin(i*5)*6,top+i*(bottom-top)/9);
+    for(let i=9;i>=0;i--)c.lineTo(cx+half+Math.sin(i*7)*6,top+i*(bottom-top)/9);
+    c.closePath();c.fill();c.stroke();
+    for(let i=0;i<18;i++){
+      const age=time-i*.035;if(age<0||age>1.9)continue;
+      const side=i%2?1:-1,start=cx+side*(25+(i%4)*14);
+      const x=start+side*(22+i%5*9)*age,y=310-(35+i%6*9)*age+70*age*age;
+      c.save();c.translate(x,y);c.rotate(side*age*(1+i%3));
+      c.fillStyle=i%2?'#675744':'#38322c';c.strokeStyle='#8fbac0';c.lineWidth=.7;
+      c.beginPath();c.moveTo(-7,-4);c.lineTo(4,-7);c.lineTo(9,0);c.lineTo(1,7);c.lineTo(-8,3);c.closePath();c.fill();c.stroke();c.restore();
+    }
     c.restore();
-    // Rock fragments at the base make the vertical rise and descent explicit.
-    if (time < 0.7 || time > 2.2) {
-      c.save();
-      c.fillStyle = "#806044";
-      for (let i = 0; i < 8; i++) {
-        const x = W - 95 + i * 10,
-          y = ground - 2 - Math.abs(Math.sin(time * 16 + i * 3)) * 3;
-        c.fillRect(Math.round(x), Math.round(y), 3 + (i % 3), 2);
-      }
-      c.restore();
-    }
   }
-  function render(c, W, state, p, time, h) {
-    const s = sample(p, time),
-      ground = 332,
-      winner = p.winner,
-      seq = Math.max(0, time - p.captureEnd);
-    if (s.phase === "capture") {
-      if (winner !== null)
-        h.drawVehicle(
-          c,
-          h.vehicleIndex(state, winner),
-          Math.floor(time * 10) % 8,
-          W * 0.72,
-          ground,
-        );
-      capture(c, W, state, s.victim, s.local, h);
-      return s.phase;
+  function drawPortal(c,width,time) {
+    const motion=portalMotion(time);if(!motion.visible)return;
+    const g=portalGeometry(width),y=g.y+motion.offset;
+    bridgeRupture(c,width,time);
+    c.save();
+    if(portal?.complete&&portal.naturalWidth)c.drawImage(portal,g.x,y,g.width,g.height);
+    else{
+      const glow=c.createLinearGradient(g.x,0,g.x+g.width,0);
+      glow.addColorStop(0,'#0a3fa5');glow.addColorStop(.5,'#d9ffff');glow.addColorStop(1,'#0875e4');
+      c.fillStyle=glow;c.beginPath();c.ellipse(g.x+110,y+180,83,145,0,0,Math.PI*2);c.fill();
+      c.strokeStyle='#ffe2a0';c.lineWidth=12;c.stroke();
     }
-    if (winner !== null) {
-      drawPortal(c, W, seq, ground, h);
-      // Exactly one configured vehicle can enter: the declared winner.
-      if (seq < 2.2) {
-        const center = lerp(W * 0.72, W + 45, ease((seq - 0.55) / 1.5));
-        c.save();
-        c.beginPath();
-        c.rect(0, 0, W - 55, 384);
-        c.clip();
-        h.drawVehicle(
-          c,
-          h.vehicleIndex(state, winner),
-          Math.floor(time * 10) % 8,
-          center,
-          ground,
-        );
-        c.restore();
-      }
-      const x = lerp(W * 0.12, W * 0.22, ease((seq - 2.2) / 0.6));
-      if (s.phase === "rise" || s.phase === "escape") actor(c, 8, x, ground);
-      else if (s.phase === "roar")
-        actor(c, s.local < 0.15 ? 8 : s.local < 0.4 ? 9 : 10, x, ground);
-      else if (s.phase === "fire") {
-        const pose = actor(c, 0, x, ground),
-          portal = portalMotion(seq);
-        if (pose && portal.visible)
-          fireBreath(
-            c,
-            pose.mouth,
-            s.local,
-            { x: W - 55, y: ground - Math.max(3, (190 - portal.offset) * 0.5) },
-            1.85,
-          );
-      } else {
-        const motion =
-          s.phase === "done"
-            ? { frame: 7, lift: 0, impact: 0, cycle: 1.1 }
-            : rageMotion(s.local);
-        const pose = actor(c, motion.frame, x, ground - motion.lift);
-        if (pose && s.phase === "rage") {
-          c.save();
-          c.translate(0, ground - 133);
-          h.demonDust(
-            c,
-            pose.hand.x - 76,
-            time,
-            "attack",
-            Math.max(-1, motion.cycle - 0.42),
-          );
-          c.restore();
-          if (motion.impact > 0) {
-            c.save();
-            c.globalAlpha = motion.impact * 0.65;
-            c.fillStyle = "#9b7552";
-            for (let j = 0; j < 8; j++) {
-              const side = j % 2 ? -1 : 1;
-              c.fillRect(
-                Math.round(
-                  pose.hand.x + side * (5 + j * 3) * (1 - motion.impact),
-                ),
-                Math.round(ground - 3 - (j % 3) * motion.impact * 5),
-                2 + (j % 2),
-                2,
-              );
-            }
-            c.restore();
-          }
-        }
-      }
-    } else {
-      const frame =
-          s.phase === "done" ? 15 : 12 + (Math.floor(s.local * 5) % 4),
-        bounce =
-          s.phase === "done"
-            ? 0
-            : Math.abs(Math.sin(s.local * Math.PI * 5)) * 7;
-      actor(
-        c,
-        frame,
-        lerp(W * 0.12, W * 0.3, ease(s.local / 0.6)),
-        ground - bounce,
-      );
-      if (s.phase === "dance") h.demonDust(c, W * 0.3, time, "chase", 0);
+    c.restore();
+  }
+  function drawPortalFront(c,width,time) {
+    if(time<0||!portal?.complete||!portal.naturalWidth)return;
+    const g=portalGeometry(width),y=g.y+portalMotion(time).offset;
+    c.drawImage(portal,portal.naturalWidth*.74,0,portal.naturalWidth*.26,portal.naturalHeight,
+      g.x+g.width*.74,y,g.width*.26,g.height);
+  }
+  function vehicleGround(state,index,h) {
+    return h.position?.(state,index)?.y??(250+index*28);
+  }
+  function trailingPosition(p,time,width,state,index,h) {
+    return {x:width*.5-ease(time/p.captureStart)*35-Math.min(20,Math.max(0,time-p.captureStart)*2),
+      y:vehicleGround(state,index,h)};
+  }
+  function renderVictory(c,width,state,p,time,h) {
+    const s=sample(p,time),portalTime=time-p.portalStart;
+    drawPortal(c,width,portalTime);
+    // Each unconsumed opponent stays behind the accelerating winner until its capture.
+    for(let slot=0;slot<p.victims.length;slot++){
+      const index=p.victims[slot],start=p.captureStart+slot*p.captureEach;
+      if(time>=start)continue;
+      const point=trailingPosition(p,time,width,state,index,h);
+      h.drawVehicle(c,h.vehicleIndex(state,index),Math.floor(time*10)%8,point.x,point.y);
     }
+    const row=h.vehicleIndex(state,p.winner),size=h.vehicleSize(row),winner=winnerMotion(p,time,width,size);
+    if(winner.visible){
+      const ground=vehicleGround(state,p.winner,h);
+      c.save();
+      if(time>=p.entryStart){c.beginPath();c.rect(0,0,winner.entry,384);c.clip();}
+      // Speed streaks make the initial separation and final acceleration readable.
+      c.strokeStyle=time>=p.entryStart?'#c4f7ff':'#d8b983';c.lineWidth=1;
+      for(let i=0;i<4;i++){
+        const length=8+i*4+Math.min(25,time*8),y=ground-size.height*.35+i*2;
+        c.beginPath();c.moveTo(winner.x-size.width/2-5,y);c.lineTo(winner.x-size.width/2-5-length,y);c.stroke();
+      }
+      h.drawVehicle(c,row,Math.floor(time*12)%8,winner.x,ground);c.restore();
+    }
+    if(s.phase==='capture'){
+      const start=p.captureStart+s.slot*p.captureEach;
+      const initial=trailingPosition(p,start,width,state,s.victim,h);
+      capture(c,width,state,s.victim,s.local,h,{start:initial,breath:false,actorX:8});
+    }else if(time<p.captureEnd)h.demon(c,time);
+    else actor(c,7,8,332,260);
+    drawPortalFront(c,width,portalTime);
     return s.phase;
+  }
+  function render(c,width,state,p,time,h) {
+    if(p.winner!==null)return renderVictory(c,width,state,p,time,h);
+    const s=sample(p,time),ground=332;
+    if(s.phase==='capture'){
+      capture(c,width,state,s.victim,s.local,h);return s.phase;
+    }
+    const frame=s.phase==='done'?15:12+(Math.floor(s.local*5)%4);
+    const bounce=s.phase==='done'?0:Math.abs(Math.sin(s.local*Math.PI*5))*7;
+    actor(c,frame,lerp(width*.12,width*.3,ease(s.local/.6)),ground-bounce);
+    if(s.phase==='dance')h.demonDust(c,width*.3,time,'chase',0);
+    return s.phase;
+  }
+  function ready(winner) {
+    const demonReady=!!art?.complete&&art.naturalWidth>0;
+    return demonReady&&(winner===null||portal?.failed||!!portal?.complete&&portal.naturalWidth>0);
   }
   const api = {
     CAPTURE,
     plan,
     sample,
     portalMotion,
-    rageMotion,
+    portalGeometry,
+    worldTravel,
+    winnerMotion,
+    ready,
     captureFrame,
     captureAction,
     fireBreath,

@@ -131,6 +131,7 @@
   }
   function endingHelpers(state) {
     return {vehicleIndex:(s,i)=>Math.max(0,VEHICLES.indexOf(s.config.vehicles?.[i]||['chopper','pickup','ape'][i])),
+      position:(s,i)=>packPosition(s,i,0,null,ADVANCE_SECONDS),
       vehicleSize:row=>imageReady(sheets.vehicles)?vehicleSize(row):{width:50,height:40},
       drawVehicle:(...args)=>{if(imageReady(sheets.vehicles))return drawVehicle(...args)},gate,demonDust,
       demon:(c,t)=>{c.save();c.translate(50,130);c.scale(1.3,1.3);demon(c,t);c.restore()}};
@@ -239,11 +240,9 @@
     }
     c.restore();
   }
-  function demonDust(c, x, tick, mode, actionTime) {
+  function demonDust(c, x, tick, mode, actionTime, stepRate = 4.5) {
     c.save();
-    // Chase frames advance at 9 fps: alternating footfalls every two frames.
-    // Attack has two heavy impacts, followed by settling earth during the bite.
-    const stepRate = 4.5;
+    // Pursuit uses the road-driven gait cadence; cinematic impacts keep their own timing.
     const clock = mode === 'chase' ? tick : actionTime;
     const latest = mode === 'chase' ? Math.floor(clock * stepRate) : 1;
     for (let i = 0; i < 7; i++) {
@@ -361,119 +360,29 @@
       const frame=((Math.floor(time*5.5+i*2.3)%16)+16)%16;
       const image=devilFrame(frame);
       c.save();c.translate(p.x,p.y);c.scale(direction*p.size,p.size);
-      c.globalAlpha=.88-(i%3)*.06;
+      c.globalAlpha=1;
       c.drawImage(image,-32,-24,64,60);c.restore();
     }
     c.restore();
   }
-  function chaseAction(time) {
-    const cycle=Math.floor(time/18),local=time-cycle*18;
-    if(local<7||local>=11.8)return {mode:'chase',age:0};
-    const age=local-7;
-    return {mode:cycle%2?'fire':'reach',age};
+  // Two footfalls per full gait cycle. The visible stride spans 84 logical
+  // road pixels at the demon's fixed on-screen scale, independent of frame rate.
+  const STRIDE_DISTANCE=84;
+  const groundDistance=time=>root.FoolBridge?.distance?.(time)??time*48;
+  function walkSample(time) {
+    const distance=groundDistance(time),cycles=distance/STRIDE_DISTANCE;
+    const phase=((cycles%1)+1)%1;
+    return {distance,phase,frame:Math.floor(phase*4)%4,
+      steps:Math.floor(cycles*2),stepsPerSecond:(root.FoolBridge?.SPEED??48)*2/STRIDE_DISTANCE};
   }
-  const mouthClosure = time => {
-    const phase=((time%6.4)+6.4)%6.4;
-    return smooth((phase-1.5)/.65)*(1-smooth((phase-2.8)/.7));
-  };
-  function demonMotion(time, reduced=false) {
-    const action=reduced?{mode:'chase',age:0}:chaseAction(time);
-    const closed=reduced?0:mouthClosure(time);
-    if(action.mode==='chase')return {...action,closed,settle:0,attack:0,lunge:0};
-    const a=action.age;
-    const attack=smooth((a-.65)/.5)*(1-smooth((a-2.7)/.8));
-    const settle=smooth(a/.65)*(1-smooth((a-3.5)/1.3));
-    return {...action,closed,settle,attack,
-      lunge:action.mode==='reach'?smooth((a-.65)/1)*(1-smooth((a-2.7)/1.5)):0};
-  }
-  let chasePoses=null,poseBuffer=null;
-  function prepareChasePoses() {
-    if(chasePoses)return chasePoses;
-    if(!imageReady(sheets.demon))return null;
-    const rows=[0,1].map(row=>atlasRow('demon',row));
-    const width=Math.max(...rows.flat().map(f=>f.width));
-    const height=Math.max(...rows.flat().map(f=>f.height));
-    const eyes=[[333,99],[341,104],[342,98],[326,134],[332,155],[326,62],[320,61],[326,121]];
-    chasePoses=rows.flat().map((source,index)=>{
-      const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;
-      const ctx=canvas.getContext('2d'),dx=(width-source.width)/2,dy=height-source.height;
-      ctx.drawImage(source,dx,dy);
-      // Locate the hot jaws in the head. The anchor follows each illustrated pose.
-      const pixels=ctx.getImageData(0,0,width,height).data;
-      let total=0,mx=0,my=0;
-      for(let y=0;y<height*.72;y++)for(let x=Math.floor(width*.65);x<width;x++){
-        const at=(y*width+x)*4,r=pixels[at],g=pixels[at+1],b=pixels[at+2];
-        if(pixels[at+3]<100||r<210||g<65||g>235||b>135)continue;
-        const weight=(r-180)*g*Math.pow(x/width,4);
-        total+=weight;mx+=x*weight;my+=y*weight;
-      }
-      return {canvas,mouth:{x:total?mx/total:width*.84,y:total?my/total:height*.48},
-        eye:{x:eyes[index][0]*width/416,y:eyes[index][1]*height/285}};
-    });
-    poseBuffer=document.createElement('canvas');poseBuffer.width=width;poseBuffer.height=height;
-    return chasePoses;
-  }
-  function paintChaseDemon(c,time,motion,x,ground,width) {
-    const poses=prepareChasePoses();if(!poses)return null;
-    const walk=Math.floor(time*9)%4;
-    const weights=new Map();
-    const add=(id,value)=>weights.set(id,(weights.get(id)||0)+value);
-    const rest=1-motion.settle;
-    add(walk,rest*(1-motion.closed));add(4,rest*motion.closed);
-    add(4,motion.settle*(1-motion.attack));
-    add(motion.mode==='fire'?5:7,motion.settle*motion.attack);
-    const buffer=poseBuffer.getContext('2d');buffer.clearRect(0,0,poseBuffer.width,poseBuffer.height);
-    buffer.save();buffer.globalCompositeOperation='lighter';buffer.imageSmoothingEnabled=false;
-    let mouthX=0,mouthY=0,eyeX=0,eyeY=0;
-    for(const [index,weight] of weights){
-      mouthX+=poses[index].mouth.x*weight;mouthY+=poses[index].mouth.y*weight;
-      eyeX+=poses[index].eye.x*weight;eyeY+=poses[index].eye.y*weight;
-    }
-    for(const [index,weight] of weights){
-      if(weight<=0)continue;
-      buffer.globalAlpha=weight;
-      const pose=poses[index];
-      if(weight>.999){buffer.drawImage(pose.canvas,0,0);continue;}
-      // Register the eyes while blending, then taper the deformation to zero
-      // at the grounded feet. This avoids doubled heads and floating crossfades.
-      const dx=eyeX-pose.eye.x,dy=eyeY-pose.eye.y;
-      const influence=y=>1-smooth((y-pose.eye.y-65)/Math.max(1,poseBuffer.height-pose.eye.y-69));
-      for(let sy=0;sy<poseBuffer.height;sy+=4){
-        const sh=Math.min(4,poseBuffer.height-sy),a=influence(sy),b=influence(sy+sh);
-        const top=Math.round(sy+dy*a),bottom=Math.round(sy+sh+dy*b);
-        buffer.drawImage(pose.canvas,0,sy,poseBuffer.width,sh,
-          Math.round(dx*(a+b)/2),top,poseBuffer.width,bottom-top);
-      }
-    }
-    buffer.restore();
-    // Every pose shares the same pixel scale and grounded feet; no atlas/camera swap.
-    const zoom=width/poseBuffer.width,height=poseBuffer.height*zoom;
-    const bob=Math.sin(time*9)*.65;
-    const top=ground-height+bob;
-    c.drawImage(poseBuffer,x,top,width,height);
-    return {mouth:{x:x+mouthX*zoom,y:top+mouthY*zoom}};
-  }
-  function chasingDemon(c,time,positions,reduced=false) {
-    if(!imageReady(sheets.demon)){
-      c.save();c.translate(0,130);c.scale(1.3,1.3);demon(c,time,15);c.restore();return;
-    }
-    const motion=demonMotion(time,reduced),width=221;
-    const target=positions.length?positions.reduce((a,b)=>a.x-a.width/2<b.x-b.width/2?a:b):null;
-    const extension=target?Math.min(32,Math.max(0,target.x-target.width/2-150)):0;
-    const x=-32.5+extension*motion.lunge;
-    c.save();c.translate(0,130);c.scale(1.3,1.3);demonDust(c,15,time,'chase',0);c.restore();
-    const pose=paintChaseDemon(c,time,motion,x,304.2,width);
-    if(pose&&target&&motion.mode==='fire'){
-      const rear=target.x-target.width/2;
-      root.FoolEnding?.fireBreath(c,pose.mouth,motion.age-.95,
-        {x:Math.max(pose.mouth.x+12,rear-22),y:target.y-target.height/2},1.65);
-    }
+  function chasingDemon(c,time) {
+    c.save();c.translate(0,130);c.scale(1.3,1.3);demon(c,time,15);c.restore();
   }
   function background(c, W, tick, progress, effectTime=tick) {
     if(imageReady(sheets.world)){
       const img=sheets.world;
       // Distant architecture and foreground scroll at different velocities.
-      for(const [sy,sh,dy,dh,speed] of [[0,.63,0,190,5],[.74,.26,365,19,48]]){
+      for(const [sy,sh,dy,dh,speed] of [[0,.63,0,190,5],[.74,.26,365,19,root.FoolBridge?.SPEED??48]]){
         const tw=W*2,offset=(tick*speed)%tw;
         for(let x=-offset;x<W;x+=tw)c.drawImage(img,0,img.naturalHeight*sy,img.naturalWidth,img.naturalHeight*sh,Math.floor(x),dy,tw,dh);
       }
@@ -538,14 +447,15 @@
     }
   }
   function demon(c, tick, x = 32, shade = '#9b2831', mode = 'chase', actionTime = 0) {
-    demonDust(c, x, tick, mode, actionTime);
+    const walk=walkSample(tick);
+    demonDust(c, x, tick, mode, actionTime,mode==='chase'?walk.stepsPerSecond:4.5);
     if (imageReady(sheets.demon)) {
       if(mode==='chase'){
-        paintChaseDemon(c,tick,{closed:mouthClosure(tick),settle:0,attack:0,mode:'chase'},x-40,134,170);
+        sprite(c,'demon',4,3,0,walk.frame,x-40,9,170,125);
         return;
       }
       const row=mode==='attack'?1:mode==='devour'?2:0;
-      const frame=row===0?Math.floor(tick*9)%4:Math.min(3,Math.floor(actionTime*9));
+      const frame=Math.min(3,Math.floor(actionTime*9));
       sprite(c,'demon',4,3,row,frame,x-40,9,170,125);
       return;
     }
@@ -609,9 +519,11 @@
     const total = Math.max(1, Number(state.config.questionCount || 33));
     const progress = root.FoolTerrain?root.FoolTerrain.progress(state):clamp(state.valid / total, 0, 1);
     const motion = reduced ? 0 : roadTime;
-    background(c, W, motion, progress, reduced?0:motion+(final?visualState.elapsed:0));
+    const endingTime=final&&visualState?.plan?(reduced?visualState.plan.duration:visualState.elapsed):0;
+    const worldTime=motion+(final&&visualState?.plan?root.FoolEnding.worldTravel(visualState.plan,endingTime)/(root.FoolBridge?.SPEED??48):0);
+    background(c,W,worldTime,progress,reduced?0:worldTime+(final&&state.winner===null?endingTime:0));
     const shot = ammo?.current();
-    if(!shot&&final&&root.FoolEnding&&!imageReady(root.FoolEnding.load(()=>live?.redraw?.()))){endingHelpers(state).demon(c,0);return root.FoolEnding.load(()=>{})?.failed?'done':'loading';}
+    if(!shot&&final&&root.FoolEnding&&!root.FoolEnding.ready(state.winner)){endingHelpers(state).demon(c,0);return root.FoolEnding.load(()=>{})?.failed?'done':'loading';}
     if(!shot&&final&&root.FoolEnding)return root.FoolEnding.render(c,W,state,visualState.plan,reduced?visualState.plan.duration:visualState.elapsed,endingHelpers(state));
     // Keep a compact chasing pack; paint the current pilot last so its outline stays visible.
     const positions = state.groups.map((g, i) => packPosition(state, i, progress, previous, sec, W));
@@ -653,7 +565,7 @@
         break;
       }
     }
-    if(!capturing)chasingDemon(c,motion,positions.filter((p,i)=>!state.groups[i].out),reduced);
+    if(!capturing)chasingDemon(c,motion);
     return queue.length?'capture':'race';
   }
 
@@ -674,7 +586,7 @@
     const caption = document.createElement('figcaption');
     caption.className = 'hell-race-caption';
     caption.textContent = final
-      ? (state.winner === null ? 'Il demone inghiotte l’ultimo veicolo, sputa fuoco verso l’alto e danza vittorioso. Nessun giocatore è fuggito.' : state.groups[state.winner].name + ' attraversa il portale che emerge dal terreno. Il varco sprofonda; il demone ruggisce, lo investe di fuoco, poi salta e batte i pugni a terra.')
+      ? (state.winner === null ? 'Il demone inghiotte l’ultimo veicolo, sputa fuoco verso l’alto e danza vittorioso. Nessun giocatore è fuggito.' : state.groups[state.winner].name + ' accelera; il demone divora gli avversari rimasti. Un portale azzurro, bianco e dorato emerge spezzando il ponte. Il vincitore lo attraversa: Vittoria.')
       : 'Fuga dall’Inferno: le posizioni dei tre veicoli seguono i punteggi. La porta si avvicina con il procedere delle domande.';
     fig.appendChild(caption);
     const ammoStatus = document.createElement('span');
@@ -722,7 +634,7 @@
         ammoStatus.dataset.event = shot?.id ?? '';
         ammoStatus.textContent = shot ? (shot.blocked ? 'Sigillo: attacco bloccato' : root.FoolAmmo.labels[shot.type]) + ' · ' + shot.targets.map(i=>state.groups[i].name).join(', ') : '';
       }
-      if(final&&visualState?.plan&&!shot&&!stop&&imageReady(root.FoolEnding.load(()=>live?.redraw?.())))visualState.elapsed+=delta;
+      if(final&&visualState?.plan&&!shot&&!stop&&root.FoolEnding.ready(state.winner))visualState.elapsed+=delta;
       lastEndingTime=now;
       const phase=scene(ctx, width, state, Math.max(0, elapsed - freeze), final, previous, reduced, roadPhase);
       if(final&&fig.dataset.endingPhase!==phase){fig.dataset.endingPhase=phase;if(phase==='done')fig.dispatchEvent(new CustomEvent('foolendingcomplete',{bubbles:true}));}

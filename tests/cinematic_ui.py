@@ -13,6 +13,9 @@ with sync_playwright() as p:
  browser=p.chromium.launch(executable_path=os.environ.get('CHROMIUM_PATH','/usr/bin/chromium'),args=['--no-sandbox']);errors=[];checks=[]
  def start(width,height):
   page=browser.new_page(viewport={'width':width,'height':height});page.on('pageerror',lambda e:errors.append(str(e)));page.goto(base);page.get_by_role('button',name='Inizia partita').click();page.wait_for_function('FoolEnding.prepare(FoolEnding.load(()=>{}))!==null');page.evaluate('document.fonts.ready');page.clock.install();page.clock.pause_at(page.evaluate('Date.now()+1000'));return page
+ def centered(page):
+  cue=page.locator('.movement-cue').bounding_box();stage=page.locator('#viewport-stage').bounding_box()
+  assert abs(cue['x']+cue['width']/2-stage['x']-stage['width']/2)<1,'Outcome box must be centered on the game stage'
  def panels(page,visible):
   for css in ['.operation-body','.statusline','.turn-order','.options-toggle']:
    assert page.locator(css).is_visible()==visible,css
@@ -21,7 +24,7 @@ with sync_playwright() as p:
   page.get_by_role('button',name='Svela e avvia il tempo').click();page.locator('.answer').nth(page.evaluate('HellscapeUI.game.s.current.correct')).click();page.clock.run_for(120)
   panels(page,False)
   expect(page.locator('.movement-cue')).to_have_text('RISPOSTA CORRETTA')
-  expect(page.locator('.movement-cue')).to_be_visible()
+  expect(page.locator('.movement-cue')).to_be_visible();centered(page)
   page.screenshot(path=str(ART/f'cinematic-movement-{width}.png'))
   snapshot=page.evaluate('JSON.stringify(HellscapeUI.game.snapshot())');page.keyboard.press('Enter');assert page.evaluate('JSON.stringify(HellscapeUI.game.snapshot())')==snapshot
   page.clock.run_for(1800);panels(page,True)
@@ -52,7 +55,7 @@ with sync_playwright() as p:
  page.locator('.answer').nth((page.evaluate('HellscapeUI.game.s.current.correct')+1)%4).click()
  page.clock.run_for(100)
  expect(page.locator('.movement-cue')).to_have_text('RISPOSTA ERRATA')
- expect(page.locator('.movement-cue')).to_be_visible()
+ expect(page.locator('.movement-cue')).to_be_visible();centered(page)
  page.screenshot(path=str(ART/'cinematic-incorrect-1440.png'))
  page.clock.run_for(1800);expect(page.locator('.movement-cue')).to_have_count(0);page.close()
  # Illustrate actual gaps at 0, 600 and 1200 points in the race.
