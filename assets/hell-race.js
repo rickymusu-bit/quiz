@@ -106,7 +106,7 @@
     return bounds;
   }
   function vehiclePreview(id){
-    const canvas=document.createElement('canvas');canvas.width=480;canvas.height=270;canvas.style.width='160px';canvas.style.height='90px';
+    const canvas=document.createElement('canvas');canvas.width=480;canvas.height=270;if(canvas.style){canvas.style.width='160px';canvas.style.height='90px';}
     const paint=()=>{const c=canvas.getContext('2d');c.setTransform(3,0,0,3,0,0);c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';c.clearRect(0,0,160,90);const row=Math.max(0,VEHICLES.indexOf(id)),size=vehicleSize(row);
       // One common preview scale retains the same relative sizes as the race.
       const zoom=1.35/(root.FoolBridge?.RACE_SCALE ?? .62); sprite(c,'vehicles',8,6,row,0,80-size.width*zoom/2,86-size.height*zoom,size.width*zoom,size.height*zoom)};
