@@ -45,7 +45,7 @@ with sync_playwright() as p:
   team=page.evaluate('HellscapeUI.game.s.result.respondent')
   page.locator(f'.turn-order [data-team="{team}"]').click()
   assert page.locator('.bonus-inventory-list .bonus-group').count()==7
-  assert 'ammo-hellscape-v1.png' in page.locator('.ammo-round').first.evaluate('(el)=>getComputedStyle(el).backgroundImage')
+  assert 'ammo-hellscape-v2.png' in page.locator('.ammo-round').first.evaluate('(el)=>getComputedStyle(el).backgroundImage')
   assert page.evaluate('HellscapeUI.game.s.groups[HellscapeUI.game.s.result.respondent].inventory.length')==7
   page.get_by_role('button',name='Chiudi',exact=True).click()
   page.get_by_role('button',name='Prossima domanda',exact=True).click()
