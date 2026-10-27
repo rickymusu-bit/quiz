@@ -20,7 +20,7 @@ with sync_playwright() as p:
   page.goto(f'http://127.0.0.1:{server.server_port}/Fool.html?start=1');page.get_by_role('button',name='Inizia partita').click();page.wait_for_function("[...document.querySelectorAll('.vehicle-preview canvas')].every(c=>c.getContext('2d').getImageData(0,0,160,90).data.some(v=>v))");page.evaluate('document.fonts.ready');page.wait_for_timeout(500)
   page.clock.install();page.clock.pause_at(page.evaluate('Date.now()+1000'));before=page.evaluate('JSON.stringify(HellscapeUI.game.snapshot())')
   def show(count):
-   page.evaluate('''count=>{const s=Fool.clone(HellscapeUI.game.s);s.id+='-terrain';s.valid=count;document.querySelector('.hell-race').replaceWith(FoolHellRace.createStage(s));}''',count)
+   page.evaluate('''count=>{const s=Fool.clone(HellscapeUI.game.s);s.id+='-terrain-'+count;s.valid=count;s.groups.forEach((g,i)=>g.score={n:String(count*[80,55,30][i]),d:'1'});document.querySelector('.hell-race').replaceWith(FoolHellRace.createStage(s));}''',count)
   def png():return base64.b64decode(page.locator('.hell-race canvas').evaluate('c=>c.toDataURL()').split(',')[1])
   images=[]
   for count in [0,16,33]:
