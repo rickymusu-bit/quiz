@@ -139,16 +139,18 @@
     c.fillStyle = color; c.fillRect(Math.round(x), Math.round(y), Math.max(1, Math.round(w)), Math.max(1, Math.round(h)));
   };
   const line = (c, x, y, w, color) => r(c, x, y, w, 2, color);
-  // Absolute, shared scale: the same score is always the same distance
-  // from the demon, regardless of opponents' scores or assigned vehicle.
-  // The visible escape track saturates at five maximum-value answers.
+  // Absolute logarithmic scale: equal scores always share the same distance,
+  // regardless of opponents or vehicles. Each early point has more visual impact.
+  // Full visible advance is capped at five maximum-value answers.
   function positionScore(state, index) {
     const score = state.groups[index].score;
     const n = BigInt(score.n), d = BigInt(score.d);
-    const maxBase = Math.max(1, ...Object.values(state.config.bases || { standard: 300 }));
-    const threshold = BigInt(maxBase) * 5n;
-    const scaled = (n * 100000n) / (d * threshold);
-    return clamp(Number(scaled > 100000n ? 100000n : scaled) / 100000, 0, 1);
+    const maxBase = BigInt(Math.max(1, ...Object.values(state.config.bases || { standard: 300 })));
+    // BigInt first: handles exact fractional points and huge totals without overflow.
+    // 1_000_000 subdivisions per maximum-value answer, capped at five answers.
+    const scaled = n * 1000000n / (d * maxBase);
+    const capped = scaled > 5000000n ? 5000000n : scaled;
+    return Math.log1p(Number(capped) / 1000000) / Math.log(6);
   }
   const ADVANCE_SECONDS = 1.55;
   const RACE_START_X = 204;
