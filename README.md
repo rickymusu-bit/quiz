@@ -132,7 +132,7 @@ Il rifiuto delle domande è rimosso dal motore, dai comandi e dal regolamento. U
 
 La scena riempie il palco 4:3, centrato e ridimensionato senza ritaglio su desktop e smartphone in entrambe le orientazioni. I tre veicoli corrono ravvicinati; nessun nome è disegnato sopra i mezzi. Una sagoma gialla segue ogni fotogramma del veicolo di turno. Davanti al gruppo, all’altezza di quel veicolo, un solo riquadro riporta nome, punti esatti e vite del rispondente. I dati scompaiono quando viene eliminato e nei finali animati.
 
-Il pannello in alto al centro offre **Inventario** e **Svela e avvia il tempo**. Dopo la risposta scompare per 1,25 secondi, lasciando vedere il movimento, poi mostra domanda, alternative e correzione con spiegazione e comando successivo. Con movimento ridotto l’intervallo è 0,4 secondi. Le domande lunghe scorrono all’interno del pannello, che resta sopra i veicoli.
+Il pannello in alto al centro offre **Inventario** e **Svela e avvia il tempo**. Dopo la risposta scompare per 1,25 secondi, lasciando vedere il movimento, poi mostra domanda, alternative e correzione con spiegazione e comando successivo. Con movimento ridotto l’intervallo è 0,4 secondi. Il pannello cresce in altezza secondo il contenuto, senza scorrimento interno o limiti che nascondano spiegazione, ricompense e pulsante Prossima domanda.
 
 In basso a destra, **Turnazione** contiene soltanto i tre nomi: il rispondente attuale è sempre il primo. Cliccando un nome si apre il suo inventario; le Ammo degli altri giocatori restano consultabili e non utilizzabili. Chiudi o Esc tornano al gioco. La consultazione ferma temporaneamente il timer e lo riprende alla chiusura soltanto se prima era in corsa, conservando le pause manuali.
 

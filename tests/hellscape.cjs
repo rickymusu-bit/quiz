@@ -80,6 +80,43 @@ const assert = require('node:assert/strict');
       await page.locator('#rules-section').waitFor();
       await page.getByRole('button', { name: 'Successiva', exact: true }).click();
       await page.getByRole('button', { name: 'Torna alla partita', exact: true }).click();
+      // Every real question must keep its full correction and Next control on screen.
+      for (const bank of ['termologia', 'introduzione-fisica-misura']) {
+        if (bank !== 'termologia') {
+          await page.goto(`http://127.0.0.1:${server.address().port}/Fool.html?start=1`);
+          await page.locator('#bank-choice').selectOption(bank);
+          await page.getByRole('button', {name:/Inizia partita/}).click();
+        }
+        const layout = await page.evaluate(() => {
+          const g = HellscapeUI.game, original = g.s, failures = [];
+          let tallest = 0, longest = null;
+          for (const q of original.bank) {
+            const base=original.config.bases[q.difficulty];
+            g.s = {...original, current:q, screen:'result', suspendAfter:true,
+              result:{id:'layout', correct:true, option:q.correct, respondent:original.respondent,
+                base:String(base), gross:Fool.rational(base), share:Fool.rational(base,3),
+                beneficiaries:original.groups.map((_,i)=>i).filter(i=>i!==original.respondent),
+                bonuses:Fool.TYPES.map(type=>({type}))}};
+            HellscapeUI.renderGame();
+            const panel=document.querySelector('.operation-body'), bounds=panel.getBoundingClientRect(),
+              stage=document.querySelector('main').getBoundingClientRect(),
+              next=panel.querySelector('[data-game-action=next]').getBoundingClientRect();
+            if(panel.scrollHeight>panel.clientHeight+1 || panel.scrollWidth>panel.clientWidth+1 ||
+              bounds.bottom>stage.bottom+1 || next.bottom>bounds.bottom+1)
+              failures.push(q.id);
+            if(bounds.height>tallest){tallest=bounds.height;longest=g.s;}
+          }
+          // Keep the longest actual correction visible for the review screenshot.
+          g.s=longest;
+          HellscapeUI.renderGame();
+          window.__questionLayoutOriginal=original;
+          return {count:original.bank.length, failures};
+        });
+        assert.equal(layout.count,100);
+        assert.deepEqual(layout.failures,[],`${bank}: content and Next must fit without scrolling`);
+        await page.screenshot({path:`artifacts/question-expanded-${bank}-${width}.png`});
+        await page.evaluate(()=>{HellscapeUI.game.s=window.__questionLayoutOriginal;delete window.__questionLayoutOriginal;HellscapeUI.renderGame();});
+      }
       assert.deepEqual(errors, []);
       console.log('PASS', width, height);
       await page.close();

@@ -12,7 +12,7 @@ body.playing #viewport-stage>header{display:none}
 main.operational>.hell-race,main.final-screen .hell-race-final{position:absolute;inset:0;width:100%;height:100%;margin:0;border:0;z-index:-1}
 main.operational>.hell-race canvas,main.final-screen .hell-race canvas{width:100%;height:100%;object-fit:fill}
 #viewport-stage main.operational>.statusline{position:absolute;left:300px;right:18px;top:18px;min-height:38px;display:flex;justify-content:space-between;align-items:center;background:#130d0bd6;border:1px solid #906346;padding:6px 12px;font-size:14px;z-index:2}.statusline .timer{font:26px/1 FoolTerminal,monospace}
-#viewport-stage main.operational>.operation-body{position:absolute;top:68px;left:300px;right:18px;max-height:620px;min-height:0;display:block;padding:18px;background:#130d0bd6;border:1px solid #bd835c;box-shadow:4px 4px #08040380;backdrop-filter:blur(2px);overflow:auto;z-index:2;text-align:left}
+#viewport-stage main.operational>.operation-body{position:absolute;top:68px;left:300px;right:18px;max-height:none;min-height:0;display:block;padding:18px;background:#130d0bd6;border:1px solid #bd835c;box-shadow:4px 4px #08040380;backdrop-filter:blur(2px);overflow:visible;z-index:2;text-align:left}
 #viewport-stage .operation-body.hidden-question{min-height:0;align-content:initial;text-align:left}
 #viewport-stage .operation-body .question{font-size:21px;line-height:1.28;margin:6px 0 14px}#viewport-stage .operation-body h2{font-size:34px}#viewport-stage .operation-body .question-points{font-size:23px;margin:0 0 8px}
 #viewport-stage .operation-body .answers{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0}
@@ -62,7 +62,7 @@ dialog .scoreboard{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));ga
 .hell-race[data-active-visible=false] .current-player{visibility:hidden}
 #viewport-stage main.operational>.statusline{left:240px;right:240px;top:16px;min-height:28px}
 .statusline .time-vial{height:28px}
-#viewport-stage main.operational>.operation-body{top:56px;left:180px;right:180px;max-height:380px;padding:14px 18px}
+#viewport-stage main.operational>.operation-body{top:56px;left:180px;right:180px;padding:14px 18px}
 #viewport-stage .operation-body.hidden-question{text-align:center}
 #viewport-stage .hidden-question .question-actions{justify-content:center;margin:10px 0 0}
 #viewport-stage .hidden-question .eyebrow{font:22px/1 FoolTerminal,monospace;color:#dfb782}
