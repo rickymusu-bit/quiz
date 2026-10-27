@@ -7,12 +7,15 @@ const state = (winner = 0, out = [false, false, false]) => ({
   respondent: 2,
   groups: out.map((flag) => ({ out: flag })),
 });
-test("Only survivor gets a sudden portal, escapes, then demon roars alone", () => {
+test("Only survivor uses a rising portal before roar, fire and ground-pounding rage", () => {
   const s = state(2, [true, true, false]),
     p = E.plan(s, [0, 1]);
   assert.deepEqual(p.victims, []);
-  assert.equal(E.sample(p, 0).phase, "escape");
-  assert.equal(E.sample(p, 2.9).phase, "roar");
+  assert.equal(E.sample(p, 0).phase, "rise");
+  assert.equal(E.sample(p, 0.8).phase, "escape");
+  assert.equal(E.sample(p, 2.4).phase, "roar");
+  assert.equal(E.sample(p, 3.4).phase, "fire");
+  assert.equal(E.sample(p, 5.1).phase, "rage");
   assert.equal(E.sample(p, p.duration).phase, "done");
 });
 test("Score victory removes remaining opponents before opening the portal", () => {
@@ -20,7 +23,7 @@ test("Score victory removes remaining opponents before opening the portal", () =
   assert.deepEqual(p.victims, [1, 2]);
   assert.equal(E.sample(p, 0).victim, 1);
   assert.equal(E.sample(p, E.CAPTURE + 0.1).victim, 2);
-  assert.equal(E.sample(p, p.captureEnd + 0.1).phase, "escape");
+  assert.equal(E.sample(p, p.captureEnd + 0.1).phase, "rise");
   assert.equal(E.sample(p, p.reactionStart + 0.1).phase, "roar");
 });
 test("Game Over eats only the last player and then dances without a portal", () => {
@@ -53,4 +56,25 @@ test("Vehicle is swallowed and chewed before the upward fire breath", () => {
   assert.equal(E.captureAction(2.8), "chew");
   assert.equal(E.captureAction(4), "fire");
   assert.equal(E.captureAction(5.1), "recover");
+});
+
+test("Portal admits the winner before sinking and is gone before rage", () => {
+  assert(E.portalMotion(0.25).offset > 0);
+  assert.equal(E.portalMotion(1).offset, 0);
+  assert.equal(E.portalMotion(2.1).passed, false);
+  assert(E.portalMotion(3.2).passed);
+  assert(E.portalMotion(3.2).visible);
+  assert(E.portalMotion(3.2).offset > 0);
+  assert.equal(E.portalMotion(4.8).visible, false);
+  assert.equal(E.portalMotion(4.8).offset, 190);
+});
+test("Rage alternates airborne jumps with two grounded fist impacts", () => {
+  const jump = E.rageMotion(0.32),
+    hit1 = E.rageMotion(0.57),
+    hit2 = E.rageMotion(0.84);
+  assert(jump.lift > 20);
+  assert.equal(jump.impact, 0);
+  assert(hit1.impact > 0.9 && hit2.impact > 0.9);
+  assert(hit1.lift < 0 && hit2.lift < 0);
+  assert.equal(E.rageMotion(1.1).impact, 0);
 });

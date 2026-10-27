@@ -1,0 +1,13 @@
+'use strict';
+const {createCanvas}=require('@napi-rs/canvas'),T=require('../assets/hell-terrain.js'),fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+function render(level,time=1.25,effectTime=time){const canvas=createCanvas(512,384),c=canvas.getContext('2d');c.globalAlpha=.7;const alpha=c.globalAlpha;T.draw(c,512,time,level,null,effectTime);assert.equal(c.globalAlpha,alpha);return canvas;}
+const pixels=c=>c.getContext('2d').getImageData(0,0,512,384).data;
+const frames=[0,.5,1].map(p=>render(p));
+assert.deepEqual(pixels(render(0,1.25,3)),pixels(render(0,1.25,4)),'Cold stationary ground stays fixed');assert.notDeepEqual(pixels(render(1,1.25,3)),pixels(render(1,1.25,4)),'Fire and geysers animate without scrolling the ground');
+assert.deepEqual(pixels(render(.5)),pixels(frames[1]),'Paused terrain must be deterministic');assert.notDeepEqual(pixels(render(.5,1.5)),pixels(frames[1]),'Terrain scrolls with scene time');
+const warm=canvas=>{const d=pixels(canvas);let count=0;for(let i=0;i<d.length;i+=4)if(d[i]>90&&d[i]>d[i+1]*1.6&&d[i+3]>30)count++;return count;};assert(warm(frames[2])>warm(frames[0])+100,'Late terrain has more glowing fissures and fire');
+for(const frame of frames){const d=pixels(frame);for(let y=0;y<384;y++)if(y<T.TOP||y>=T.BOTTOM)assert(!d.slice(y*512*4,(y+1)*512*4).some(v=>v),'Terrain must stay below the skyline and above the lava border')}
+let calls=0;const c=createCanvas(512,384).getContext('2d'),fill=c.fillRect.bind(c);c.fillRect=(...args)=>{calls++;assert(args.every(Number.isFinite));fill(...args)};T.draw(c,512,1e8,1);assert(calls<4000,'No accumulated world objects after long sessions');
+let peak=384,quiet=0;for(let time=0;time<6;time+=.15){const vent=createCanvas(240,384),ctx=vent.getContext('2d');ctx.globalAlpha=.7;const alpha=ctx.globalAlpha;T.geyser(ctx,120,330,22,1,time);assert.equal(ctx.globalAlpha,alpha);const d=ctx.getImageData(0,0,240,384).data;let top=384;for(let y=0;y<384;y++)for(let x=0;x<240;x++)if(d[(y*240+x)*4+3]>40)top=Math.min(top,y);peak=Math.min(peak,top);quiet=Math.max(quiet,top);}assert(peak<280&&quiet>320,'Geysers must erupt upward and return to a quiet vent');
+const board=createCanvas(1024,3*384),bc=board.getContext('2d');frames.forEach((f,i)=>{bc.fillStyle='#121210';bc.fillRect(0,i*384,1024,384);bc.drawImage(f,0,i*384,1024,384);bc.fillStyle='#f3d6a0';bc.font='20px monospace';bc.fillText(['Inizio','Meta partita','Fine partita'][i],16,i*384+36)});fs.mkdirSync(path.join(__dirname,'../artifacts'),{recursive:true});fs.writeFileSync(path.join(__dirname,'../artifacts/terrain-progression.png'),board.toBuffer('image/png'));
+console.log('PASS: progressive fire, stable scroll/freeze, bounded terrain, horizon preserved');

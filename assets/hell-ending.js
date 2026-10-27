@@ -2,7 +2,7 @@
 (function (root) {
   "use strict";
   const CAPTURE = 5.2,
-    ESCAPE = 2.9,
+    ESCAPE = 2.2,
     REACTION = 3.2;
   const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x)),
     ease = (x) => {
@@ -30,7 +30,7 @@
       victims,
       captureEnd,
       reactionStart,
-      duration: reactionStart + REACTION,
+      duration: captureEnd + (winner === null ? REACTION : 8.4),
     };
   }
   function sample(p, time) {
@@ -44,18 +44,19 @@
         slot,
       };
     }
-    if (p.winner !== null && t < p.reactionStart)
-      return { phase: "escape", local: t - p.captureEnd };
-    if (t < p.duration)
-      return {
-        phase: p.winner === null ? "dance" : "roar",
-        local: t - p.reactionStart,
-      };
-    return { phase: "done", local: REACTION };
+    const elapsed = t - p.captureEnd;
+    if (p.winner !== null) {
+      if (elapsed < 0.55) return { phase: "rise", local: elapsed };
+      if (elapsed < 2.2) return { phase: "escape", local: elapsed - 0.55 };
+      if (elapsed < 2.95) return { phase: "roar", local: elapsed - 2.2 };
+      if (elapsed < 4.8) return { phase: "fire", local: elapsed - 2.95 };
+      if (elapsed < 8.4) return { phase: "rage", local: elapsed - 4.8 };
+    } else if (t < p.duration) return { phase: "dance", local: elapsed };
+    return { phase: "done", local: p.winner === null ? REACTION : 3.6 };
   }
   // Coordinates in the generated source atlas, mapped into normalized frames.
   const anchors = [
-    [405, 205, 325, 139],
+    [405, 205, 311, 122],
     [789, 207, 709, 142],
     [1140, 152, 1085, 131],
     [1481, 121, 1420, 101],
@@ -195,7 +196,14 @@
       const path = "assets/hell-race/demon-ending-v1.webp";
       art.src = root.HellscapeOffline?.assets?.[path] || path;
       art.addEventListener("load", redraw, { once: true });
-      art.addEventListener("error",()=>{art.failed=true;redraw()},{once:true});
+      art.addEventListener(
+        "error",
+        () => {
+          art.failed = true;
+          redraw();
+        },
+        { once: true },
+      );
     }
     return art;
   }
@@ -250,58 +258,103 @@
                   : t < 4.9
                     ? 10
                     : 11;
-  function fireBreath(c, origin, age) {
-    if (age < 0 || age > 1.35) return;
-    const envelope = ease(age / 0.18) * (1 - ease((age - 1.05) / 0.3)),
-      height = 105 * envelope;
+  function fireBreath(
+    c,
+    origin,
+    age,
+    aim = { x: origin.x + 15, y: origin.y - 110 },
+    duration = 1.45,
+  ) {
+    if (age < 0 || age >= duration) return;
+    const envelope =
+      ease(age / 0.12) * (1 - ease((age - duration + 0.25) / 0.25));
+    if (!envelope) return;
+    const dx = aim.x - origin.x,
+      dy = aim.y - origin.y,
+      distance = Math.hypot(dx, dy) || 1,
+      ux = dx / distance,
+      uy = dy / distance,
+      nx = -uy,
+      ny = ux;
+    const length = distance * envelope * (1.015 + 0.045 * Math.sin(age * 38));
+    const shape = (points, color, alpha) => {
+      c.globalAlpha = envelope * alpha;
+      c.fillStyle = color;
+      c.beginPath();
+      points.forEach(([x, y], i) =>
+        i
+          ? c.lineTo(Math.round(x), Math.round(y))
+          : c.moveTo(Math.round(x), Math.round(y)),
+      );
+      c.closePath();
+      c.fill();
+    };
     c.save();
-    // Pixel tongues curl out past the upper jaw, then climb vertically.
-    for (let segment = 17; segment >= 0; segment--) {
-      const t = segment / 17,
-        px =
-          origin.x +
-          6 +
-          Math.sin(t * Math.PI * 0.65) * 15 +
-          Math.sin(age * 23 + t * 14) * t * 3,
-        py = origin.y - 2 - height * t;
-      const width = Math.max(
-          1,
-          (13 * (1 - t) + Math.sin(age * 29 + t * 20) * 3 + 3) * envelope,
-        ),
-        h = Math.max(2, height / 17 + 2);
-      c.globalAlpha = (1 - t * 0.55) * envelope;
-      c.fillStyle = "#c73c16";
-      c.fillRect(
-        Math.round(px - width * 0.65),
-        Math.round(py),
-        Math.ceil(width * 1.3),
-        Math.ceil(h),
-      );
-      c.fillStyle = "#ff851c";
-      c.fillRect(
-        Math.round(px - width / 2),
-        Math.round(py),
-        Math.ceil(width),
-        Math.ceil(h),
-      );
-      c.fillStyle = t < 0.7 ? "#ffe98b" : "#fbbd45";
-      c.fillRect(
-        Math.round(px - width * 0.22),
-        Math.round(py),
-        Math.max(1, Math.round(width * 0.44)),
-        Math.ceil(h),
-      );
+    // A connected fuel stream feeds rolling, irregular flame parcels.
+    for (const [factor, color, opacity] of [
+      [1, "#ef741b", 0.9],
+      [0.38, "#ffe9a0", 0.85],
+    ]) {
+      const left = [],
+        right = [];
+      for (let i = 0; i <= 18; i++) {
+        const t = i / 18,
+          along = length * t * 0.9,
+          spread = (1.7 + t * 4.5) * factor,
+          jitter = Math.sin(age * 37 - i * 2) * t * 2;
+        left.push([
+          origin.x + ux * along + nx * (spread + jitter),
+          origin.y + uy * along + ny * (spread + jitter),
+        ]);
+        right.push([
+          origin.x + ux * along + nx * (-spread + jitter),
+          origin.y + uy * along + ny * (-spread + jitter),
+        ]);
+      }
+      shape([...left, ...right.reverse()], color, opacity);
     }
-    for (let j = 0; j < 14; j++) {
-      const life = 0.55,
-        at = (age + j * 0.071) % life,
-        t = at / life;
-      c.globalAlpha = (1 - t) * envelope;
-      c.fillStyle = j % 2 ? "#f9ca62" : "#ed6b1e";
+    for (let parcel = 0; parcel < 30; parcel++) {
+      const t = (age * 2.1 + parcel * 0.071) % 1,
+        along = length * t,
+        swirl = Math.sin(parcel * 4.7 - age * 19) * (2 + t * 6);
+      const px = origin.x + ux * along + nx * swirl,
+        py = origin.y + uy * along + ny * swirl,
+        radius = (2 + t * 11) * (0.8 + 0.2 * Math.sin(parcel * 7 + age * 33));
+      const outline = [];
+      for (let corner = 0; corner < 8; corner++) {
+        const a = (corner * Math.PI) / 4,
+          rag = 0.8 + 0.25 * Math.sin(corner * 5 + parcel * 3 + age * 24);
+        outline.push([
+          px + Math.cos(a) * radius * rag,
+          py + Math.sin(a) * radius * rag,
+        ]);
+      }
+      shape(outline, parcel % 3 ? "#f47a1c" : "#d74712", 0.75 - t * 0.2);
+      shape(
+        outline.map(([x, y]) => [px + (x - px) * 0.55, py + (y - py) * 0.55]),
+        parcel % 2 ? "#ffd369" : "#ffaf33",
+        0.85 - t * 0.2,
+      );
+      if (t < 0.6) {
+        c.globalAlpha = envelope * 0.75;
+        c.fillStyle = "#ffeab0";
+        c.fillRect(
+          Math.round(px - 1),
+          Math.round(py - 1),
+          2 + Math.round(t * 3),
+          2,
+        );
+      }
+    }
+    for (let spark = 0; spark < 12; spark++) {
+      const t = (age * 2.5 + spark * 0.083) % 1,
+        spread = Math.sin(spark * 4 + age * 9) * t * 17;
+      c.globalAlpha = envelope * (1 - t) * 0.7;
+      c.fillStyle = spark % 2 ? "#ffd477" : "#f28d2b";
       c.fillRect(
-        Math.round(origin.x + 7 + ((j % 5) - 2) * t * 12),
-        Math.round(origin.y - height * 0.4 - at * 110),
-        j % 3 === 0 ? 2 : 1,
+        Math.round(origin.x + ux * length * t + nx * spread),
+        Math.round(origin.y + uy * length * t + ny * spread),
+        1,
         2,
       );
     }
@@ -352,77 +405,140 @@
         for (let j = 0; j < 3; j++)
           c.fillRect(Math.round(p.x - 6 + j * 5), Math.round(p.y - 3), 2, 7);
       }
-      helpers.nameTag(
-        c,
-        W,
-        p.x,
-        Math.min(p.y - (size.height * zoom) / 2, pose.top + 22),
-        state.groups[index].name,
-        helpers.colors[index],
-      );
     }
     fireBreath(c, pose.mouth, t - 3.65);
+  }
+  function portalMotion(time) {
+    return {
+      visible: time >= 0 && time < 4.8,
+      offset: 190 * (1 - ease(time / 0.55) + ease((time - 2.2) / 2.6)),
+      passed: time >= 2.2,
+    };
+  }
+  function rageMotion(time) {
+    const cycle = time % 1.2,
+      air = cycle >= 0.15 && cycle < 0.52;
+    const impact = Math.max(
+      0,
+      1 - Math.abs(cycle - 0.57) / 0.085,
+      1 - Math.abs(cycle - 0.84) / 0.085,
+    );
+    return {
+      frame: air ? 12 : cycle < 0.15 || (cycle > 0.68 && cycle < 0.78) ? 11 : 7,
+      lift: air
+        ? Math.sin(((cycle - 0.15) / 0.37) * Math.PI) * 28
+        : -impact * 3,
+      impact,
+      cycle,
+    };
+  }
+  function drawPortal(c, W, time, ground, h) {
+    const motion = portalMotion(time);
+    if (!motion.visible) return;
+    c.save();
+    c.beginPath();
+    c.rect(0, 0, W, ground + 1);
+    c.clip();
+    c.translate(0, motion.offset);
+    h.gate(c, W - 82, ground - 182, time, true);
+    c.restore();
+    // Rock fragments at the base make the vertical rise and descent explicit.
+    if (time < 0.7 || time > 2.2) {
+      c.save();
+      c.fillStyle = "#806044";
+      for (let i = 0; i < 8; i++) {
+        const x = W - 95 + i * 10,
+          y = ground - 2 - Math.abs(Math.sin(time * 16 + i * 3)) * 3;
+        c.fillRect(Math.round(x), Math.round(y), 3 + (i % 3), 2);
+      }
+      c.restore();
+    }
   }
   function render(c, W, state, p, time, h) {
     const s = sample(p, time),
       ground = 332,
-      winner = p.winner;
-    // The survivor waits while the remaining opponents are removed.
-    if (winner !== null && (s.phase === "capture" || s.phase === "escape")) {
-      const row = h.vehicleIndex(state, winner),
-        local = s.phase === "escape" ? s.local : 0,
-        travel = ease((local - 0.3) / 1.85),
-        center = lerp(W * 0.72, W + 45, travel);
-      if (s.phase === "escape" && local < 2.65) {
-        const pop = clamp(local / 0.13),
-          close = 1 - ease((local - 2.35) / 0.3);
+      winner = p.winner,
+      seq = Math.max(0, time - p.captureEnd);
+    if (s.phase === "capture") {
+      if (winner !== null)
+        h.drawVehicle(
+          c,
+          h.vehicleIndex(state, winner),
+          Math.floor(time * 10) % 8,
+          W * 0.72,
+          ground,
+        );
+      capture(c, W, state, s.victim, s.local, h);
+      return s.phase;
+    }
+    if (winner !== null) {
+      drawPortal(c, W, seq, ground, h);
+      // Exactly one configured vehicle can enter: the declared winner.
+      if (seq < 2.2) {
+        const center = lerp(W * 0.72, W + 45, ease((seq - 0.55) / 1.5));
         c.save();
-        c.globalAlpha = close;
-        c.translate(W - 55, ground);
-        c.scale(Math.max(0.001, pop), 1);
-        c.translate(-(W - 55), -ground);
-        h.gate(c, W - 82, ground - 182, time, true);
-        c.restore();
-      }
-      c.save();
-      if (s.phase === "escape") {
         c.beginPath();
         c.rect(0, 0, W - 55, 384);
         c.clip();
-      }
-      if (local < 2.2 || s.phase === "capture") {
-        h.drawVehicle(c, row, Math.floor(time * 10) % 8, center, ground);
-        const size = h.vehicleSize(row);
-        h.nameTag(
+        h.drawVehicle(
           c,
-          W,
+          h.vehicleIndex(state, winner),
+          Math.floor(time * 10) % 8,
           center,
-          ground - size.height,
-          state.groups[winner].name,
-          h.colors[winner],
+          ground,
         );
-      }
-      c.restore();
-    }
-    if (s.phase === "capture") capture(c, W, state, s.victim, s.local, h);
-    else if (s.phase === "escape") actor(c, 8, W * 0.12, ground);
-    else if (s.phase === "roar" || (s.phase === "done" && winner !== null)) {
-      const frame =
-        s.phase === "done"
-          ? 10
-          : [8, 9, 10, 10, 9, 10][Math.min(5, Math.floor(s.local / 0.45))];
-      actor(c, frame, lerp(W * 0.12, W * 0.2, ease(s.local / 0.6)), ground);
-      if (s.phase === "roar" && s.local > 0.45 && s.local < 2.1) {
-        c.save();
-        c.globalAlpha = 0.18 * Math.sin(((s.local - 0.45) / 1.65) * Math.PI);
-        c.strokeStyle = "#e2a064";
-        c.lineWidth = 1;
-        for (let j = 0; j < 3; j++) {
-          c.beginPath();
-          c.arc(W * 0.63, ground - 105, 12 + j * 10 + s.local * 3, -0.8, 0.6);
-          c.stroke();
-        }
         c.restore();
+      }
+      const x = lerp(W * 0.12, W * 0.22, ease((seq - 2.2) / 0.6));
+      if (s.phase === "rise" || s.phase === "escape") actor(c, 8, x, ground);
+      else if (s.phase === "roar")
+        actor(c, s.local < 0.15 ? 8 : s.local < 0.4 ? 9 : 10, x, ground);
+      else if (s.phase === "fire") {
+        const pose = actor(c, 0, x, ground),
+          portal = portalMotion(seq);
+        if (pose && portal.visible)
+          fireBreath(
+            c,
+            pose.mouth,
+            s.local,
+            { x: W - 55, y: ground - Math.max(3, (190 - portal.offset) * 0.5) },
+            1.85,
+          );
+      } else {
+        const motion =
+          s.phase === "done"
+            ? { frame: 7, lift: 0, impact: 0, cycle: 1.1 }
+            : rageMotion(s.local);
+        const pose = actor(c, motion.frame, x, ground - motion.lift);
+        if (pose && s.phase === "rage") {
+          c.save();
+          c.translate(0, ground - 133);
+          h.demonDust(
+            c,
+            pose.hand.x - 76,
+            time,
+            "attack",
+            Math.max(-1, motion.cycle - 0.42),
+          );
+          c.restore();
+          if (motion.impact > 0) {
+            c.save();
+            c.globalAlpha = motion.impact * 0.65;
+            c.fillStyle = "#9b7552";
+            for (let j = 0; j < 8; j++) {
+              const side = j % 2 ? -1 : 1;
+              c.fillRect(
+                Math.round(
+                  pose.hand.x + side * (5 + j * 3) * (1 - motion.impact),
+                ),
+                Math.round(ground - 3 - (j % 3) * motion.impact * 5),
+                2 + (j % 2),
+                2,
+              );
+            }
+            c.restore();
+          }
+        }
       }
     } else {
       const frame =
@@ -445,6 +561,8 @@
     CAPTURE,
     plan,
     sample,
+    portalMotion,
+    rageMotion,
     captureFrame,
     captureAction,
     fireBreath,

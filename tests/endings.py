@@ -25,18 +25,21 @@ with sync_playwright() as p:
  def raw(page):return page.locator('.hell-race-final canvas').evaluate('c=>c.toDataURL()')
  for winner,name in [(0,'escape-roar'),(None,'eat-fire-dance')]:
   page=start();finish(page,winner);before=page.evaluate('JSON.stringify(HellscapeUI.game.snapshot())');frames=[];phase_set=set()
-  duration=6.3 if winner==0 else 8.6
+  duration=8.7 if winner==0 else 8.6
   for step in range(round(duration*10)):
    page.clock.run_for(100);phase=page.locator('.hell-race-final').get_attribute('data-ending-phase');phase_set.add(phase)
    if '--gifs' in sys.argv:
     image=Image.open(BytesIO(base64.b64decode(raw(page).split(',')[1]))).convert('RGB');frames.append(image)
-   if step in ([1,15,35,58] if winner==0 else [6,12,18,26,39,43,52,65,82]):
+   if step in ([1,6,15,24,34,43,49,56,65,82] if winner==0 else [6,12,18,26,39,43,52,65,82]):
     page.locator('.hell-race-final canvas').screenshot(path=str(ART/f'{name}-{step}.png'),animations='allow')
   assert page.locator('.hell-race-final').get_attribute('data-ending-phase')=='done'
   assert page.evaluate('JSON.stringify(HellscapeUI.game.snapshot())')==before,'Cinematic must preserve game state'
   assert page.evaluate('window.__endingPlan.victims')==([] if winner==0 else [2])
   assert ('escape' in phase_set)==(winner==0)
   assert ('roar' in phase_set)==(winner==0)
+  assert ('rise' in phase_set)==(winner==0)
+  assert ('fire' in phase_set)==(winner==0)
+  assert ('rage' in phase_set)==(winner==0)
   assert ('dance' in phase_set)==(winner is None)
   expect(page.locator('.final-title')).to_be_visible()
   if frames:frames[0].save(ART/f'{name}.gif',save_all=True,append_images=frames[1:],duration=[100]*(len(frames)-1)+[1500],loop=0,optimize=True)

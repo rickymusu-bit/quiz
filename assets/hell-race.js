@@ -1,4 +1,4 @@
-/* Fool — Fuga dall'Inferno v1.3.0 (2026-10-27): scena pixel-art illustrativa.
+/* Fool — Fuga dall'Inferno v1.4.0 (2026-10-27): scena pixel-art illustrativa.
    Nessuna modifica al motore, ai punteggi o ai salvataggi. */
 (function (root) {
   'use strict';
@@ -128,9 +128,9 @@
     return visualState;
   }
   function endingHelpers(state) {
-    return {colors,vehicleIndex:(s,i)=>Math.max(0,VEHICLES.indexOf(s.config.vehicles?.[i]||['chopper','pickup','ape'][i])),
+    return {vehicleIndex:(s,i)=>Math.max(0,VEHICLES.indexOf(s.config.vehicles?.[i]||['chopper','pickup','ape'][i])),
       vehicleSize:row=>imageReady(sheets.vehicles)?vehicleSize(row):{width:50,height:40},
-      drawVehicle:(...args)=>{if(imageReady(sheets.vehicles))return drawVehicle(...args)},nameTag,gate,demonDust,
+      drawVehicle:(...args)=>{if(imageReady(sheets.vehicles))return drawVehicle(...args)},gate,demonDust,
       demon:(c,t)=>{c.save();c.translate(50,130);c.scale(1.3,1.3);demon(c,t);c.restore()}};
   }
   const clamp = (n, a, b) => Math.min(b, Math.max(a, n));
@@ -307,16 +307,16 @@
     }
     return { x: left, y: top - 4 * unit, width: 50 * unit, height: 24 * unit };
   }
-  function background(c, W, tick, progress) {
+  function background(c, W, tick, progress, effectTime=tick) {
     if(imageReady(sheets.world)){
       const img=sheets.world;
       // Distant architecture and foreground scroll at different velocities.
-      for(const [sy,sh,dy,dh,speed] of [[0,.63,0,190,5],[.63,.11,190,175,48],[.74,.26,365,19,48]]){
+      for(const [sy,sh,dy,dh,speed] of [[0,.63,0,190,5],[.74,.26,365,19,48]]){
         const tw=W*2,offset=(tick*speed)%tw;
         for(let x=-offset;x<W;x+=tw)c.drawImage(img,0,img.naturalHeight*sy,img.naturalWidth,img.naturalHeight*sh,Math.floor(x),dy,tw,dh);
       }
-      c.fillStyle='#080909bd';c.fillRect(0,190,W,175);
-      if(progress>.7){const enter=smooth((progress-.7)/.3);gate(c,W+65-enter*134,90,tick,false)}
+      if(root.FoolTerrain)root.FoolTerrain.draw(c,W,tick,progress,img,effectTime);
+      else{c.fillStyle='#161614';c.fillRect(0,184,W,181);}
       return;
     }
 
@@ -350,21 +350,8 @@
       r(c, x + 9, 69, 12, 2, '#e4a143');
     }
     r(c, 0, 73, W, 156 - 73, '#1c1c24');
-    for (const y of [89, 121]) {
-      line(c, 0, y, W, '#4a3839');
-      for (let x = -(tick * 92) % 42; x < W; x += 42) r(c, x, y, 21, 2, '#bb6040');
-    }
-    for (let x = -(tick * 74) % 46; x < W; x += 46) {
-      r(c, x, 151, 22, 2, '#7d4540');
-      r(c, x + 14, 143, 3, 2, '#413039');
-    }
-    // La porta appare solo nell'ultima parte della partita.
-    if (progress > .7) {
-      const enter = smooth((progress - .7) / .3);
-      const x = W + 65 - enter * 134;
-      gate(c, x, 24, tick, false);
-    }
     c.restore();
+    if(root.FoolTerrain)root.FoolTerrain.draw(c,W,tick,progress,null,effectTime);
   }
   function gate(c, x, y, tick, open) {
     if(sprite(c,'portal',8,1,0,Math.floor(tick*10)%8,x-15,y-8,85,open?190:145))return;
@@ -428,9 +415,9 @@
   }
   function scene(c, W, state, sec, final, previous, reduced, roadTime) {
     const total = Math.max(1, Number(state.config.questionCount || 33));
-    const progress = state.phase === 'pareggio' || state.phase === 'conclusa' ? 1 : clamp(state.valid / total, 0, 1);
+    const progress = root.FoolTerrain?root.FoolTerrain.progress(state):clamp(state.valid / total, 0, 1);
     const motion = reduced ? 0 : roadTime;
-    background(c, W, motion, 0);
+    background(c, W, motion, progress, reduced?0:motion+(final?visualState.elapsed:0));
     if(final&&root.FoolEnding&&!imageReady(root.FoolEnding.load(()=>live?.redraw?.()))){endingHelpers(state).demon(c,0);return root.FoolEnding.load(()=>{})?.failed?'done':'loading';}
     if(final&&root.FoolEnding)return root.FoolEnding.render(c,W,state,visualState.plan,reduced?visualState.plan.duration:visualState.elapsed,endingHelpers(state));
     // A consumed player never reappears on the track or in a later final.
@@ -479,7 +466,7 @@
     const caption = document.createElement('figcaption');
     caption.className = 'hell-race-caption';
     caption.textContent = final
-      ? (state.winner === null ? 'Il demone inghiotte l’ultimo veicolo, sputa fuoco verso l’alto e danza vittorioso. Nessun giocatore è fuggito.' : state.groups[state.winner].name + ' attraversa il portale e fugge. Il demone ruggisce furioso.')
+      ? (state.winner === null ? 'Il demone inghiotte l’ultimo veicolo, sputa fuoco verso l’alto e danza vittorioso. Nessun giocatore è fuggito.' : state.groups[state.winner].name + ' attraversa il portale che emerge dal terreno. Il varco sprofonda; il demone ruggisce, lo investe di fuoco, poi salta e batte i pugni a terra.')
       : 'Fuga dall’Inferno: le posizioni dei tre veicoli seguono i punteggi. La porta si avvicina con il procedere delle domande.';
     fig.appendChild(caption);
     const ctx = canvas.getContext('2d', { alpha: false });

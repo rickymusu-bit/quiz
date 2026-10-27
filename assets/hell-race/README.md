@@ -1,6 +1,6 @@
 # Asset della corsa infernale
 
-Versione grafica **1.3.0** — 27/10/2026.
+Versione grafica **1.4.0** — 27/10/2026.
 
 Pixel art infernale dal riferimento approvato: ferro annerito, ruggine, cuoio, emblemi distintivi e luce di lava. Asset raster generati con lo strumento integrato imagegen, convertiti in WebP mantenendo il canale alfa. Specifiche in [PROMPTS-v1.md](PROMPTS-v1.md).
 
@@ -29,6 +29,20 @@ Le ruote sollevano scie di polvere a lobi pixel art, che si espandono, scorrono 
 
 Il demone afferra l’intero veicolo, lo solleva con una mano e lo porta alle fauci: il mezzo viene inghiottito, segue la masticazione e poi una fiammata verso l’alto. Non rimane un veicolo abbandonato sulla strada. Le fiamme e le scintille sono particelle pixel art sincronizzate alla bocca. La memoria visuale della sessione registra le catture completate, senza scrivere nello stato o nei salvataggi del motore, così un eliminato non ricompare nel finale.
 
-Con un vincitore e nessun avversario ancora da rimuovere, il portale appare improvvisamente; il superstite lo attraversa, il varco si chiude e resta il demone che ruggisce arrabbiato. Se la partita termina per punteggio con altri giocatori attivi, le loro catture e le successive fiammate precedono l’apertura del portale. Senza vincitore viene inghiottito l’ultimo veicolo rimasto, seguita dalla fiammata e dalla danza di vittoria del demone. Le schermate WINS/GAME OVER e i relativi controlli compaiono al termine della sequenza, per non coprire l’azione. Con movimento ridotto si passa direttamente al quadro conclusivo.
+Con un vincitore e nessun avversario ancora da rimuovere, il portale sale dal terreno e lascia passare soltanto il superstite. Dopo il passaggio inizia a sprofondare: il demone ruggisce e lo investe con una fiammata mentre scende. Quando il portale è completamente sparito il demone compie tre salti sul posto con colpi dei pugni sul terreno. Se la partita termina per punteggio con altri giocatori attivi, le loro catture e le successive fiammate precedono l’apertura del portale. Senza vincitore viene inghiottito l’ultimo veicolo rimasto, seguita dalla fiammata e dalla danza di vittoria del demone. Le schermate WINS/GAME OVER e i relativi controlli compaiono al termine della sequenza, per non coprire l’azione. Con movimento ridotto si passa direttamente al quadro conclusivo.
 
 `npm run test:endings` verifica le sequenze reali in Chromium, l’assenza di resurrezioni, la continuità dopo un ridisegno UI, pausa, scheda nascosta e movimento ridotto. `python3 tests/endings.py --gifs` genera le GIF in `artifacts/`.
+
+## Terreno continuo e progressivo — v1.4.0
+
+`assets/hell-terrain.js` sostituisce la fascia con separazioni orizzontali con un piano unico di lastre di basalto, texture irregolari ricavate dallo stesso scenario e graniglia. I tasselli statici sono memorizzati in una cache limitata a 24 elementi; il resto è calcolato da seme e orologio della scena, senza RNG della partita.
+
+Il livello è il rapporto tra domande completate e domande impostate. Crescono ampiezza delle crepe, buche, lava visibile, fiamme, ossa, teschi umani, teschi demoniaci con corna e zanne, e rottami metallici riconoscibili come ruote/assi, portiere, cofani e paraurti. Alcune bocche vulcaniche eruttano getti di lava con ricaduta delle gocce, alternando eruzione e quiete. Le decorazioni scorrono sullo stesso piano, dietro gli attori. Pausa e movimento ridotto rispettano l’orologio della scena; il livello è ricostruibile da qualsiasi salvataggio. Una vittoria anticipata non porta artificialmente il terreno al massimo.
+
+Le etichette dei giocatori sono assenti durante tutte le animazioni di cattura e fuga, compreso il superstite in attesa. Rimangono nella corsa normale e nell’interfaccia dell’esito.
+
+`npm run test:terrain` verifica inizio/metà/fine su desktop e Android senza alterare il motore; `python3 tests/terrain_browser.py --gifs` produce il confronto `artifacts/terrain-stages.png` e la GIF `artifacts/terrain-evolution.gif`. I test senza browser controllano progressione, determinismo, limiti di disegno ed eruzioni; i test dei finali impediscono regressioni nelle etichette.
+
+Le fiammate usano un getto continuo simile a un lanciafiamme, con nucleo chiaro, cono turbolento e gocce incandescenti. Dopo un inghiottimento il getto sale verso l’alto; dopo la fuga segue il portale mentre si interra. La timeline ammette una sola attraversata e separa emersione, fuga, ruggito, attacco e rabbia.
+
+Nel finale il suolo resta fermo mentre fiamme e geyser continuano a muoversi con lo stesso orologio della sequenza; pausa e movimento ridotto congelano entrambi.

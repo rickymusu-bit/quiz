@@ -19,6 +19,7 @@ Il sito funziona direttamente come archivio statico, senza compilazione obbligat
 - `assets/js/persistence.js`: accesso iniettato a storage, lettura/scrittura dei profili e ripresa attraverso il motore. Il sito conserva `fool-v1`, `fool-settings-v1` e il JSON esistente.
 - `assets/js/ui.js`: configurazione, impostazioni, schermate, dialoghi, comandi e adattamento del palco. Lo stato dell’interfaccia è racchiuso nel modulo; `HellscapeUI` è la facciata esplicita usata dalle regressioni browser.
 - `assets/css/game.css` e `assets/hellscape.css`: stili di base estratti e stili della grafica esistente, nello stesso ordine di cascata.
+- `assets/hell-terrain.js`: basalto continuo, degradazione per domande completate, ossa, teschi umani e demoniaci, rottami di veicoli e geyser di lava, senza corsie visibili.
 - `assets/hell-ending.js`: timeline e pose per presa, inghiottimento del veicolo, fiammata, portale, ruggito e danza, senza modificare il modello.
 - `assets/hell-race.js`: componente Canvas separato; legge lo stato senza applicare transizioni al motore.
 - `assets/vendor/katex.js` e `katex.css`: KaTeX 0.16.22 e font incorporati estratti senza riscrittura; licenza in `assets/vendor/README.md` e nell’HTML.
@@ -34,6 +35,7 @@ npm test                # motore, persistenza e 200 domande delle due banche
 npm run test:frames     # 48 fotogrammi veicoli + 12 demone, proporzioni e nomi
 npm run test:browser    # regressioni interfaccia e Canvas
 npm run test:endings    # presa, morso, fiammata e i due finali
+npm run test:terrain    # progressione del terreno su desktop e Android
 npm run build           # dist/site, pubblicabile su hosting statico
 npm run test:offline    # genera e verifica dist/Hellscape-offline.html
 ```
@@ -62,11 +64,11 @@ Lo spareggio si apre **solo in caso di parità al primo posto dopo tutte le doma
 
 Le domande dello spareggio sono estratte fra **tutte quelle nuove del dataset**, senza vincoli di difficoltà, mantenendo il tempo della partita. Non si ripetono quesiti già mostrati; se la banca non basta, la partita attende l'aggiunta di nuovi quesiti. Durante lo spareggio il tabellone segnala che i punteggi sono congelati; non si assegnano punti né Ammo e l'esito dipende esclusivamente da risposte corrette o eliminazioni; si disattivano tutti gli effetti delle Ammo della fase ordinaria. Sanzioni, timer e sospensione restano disponibili.
 
-## Fuga dall'Inferno — scena animata v1.3.0
+## Fuga dall'Inferno — scena animata v1.4.0
 
 Durante il quiz la scena occupa l’intero palco fisso 4:3 (1024×768): tre piloti su veicoli junkpunk/dieselpunk attraversano un paesaggio di lava inseguiti da un demone horror. Lo sfondo scorre autonomamente; quando i punti cambiano, i veicoli avanzano e possono superarsi. Le posizioni sono una rappresentazione visiva dei punteggi esatti, anche razionali dopo Marx, **non un punteggio parallelo**. I veicoli dei giocatori eliminati vengono afferrati e inghiottiti dal demone, seguiti da una fiammata verso l’alto.
 
-Il portale compare improvvisamente quando il vincitore è l’unico veicolo rimasto: lo attraversa, il varco si chiude e il demone ruggisce arrabbiato. Se il motore decreta una vittoria per punteggio lasciando altri giocatori attivi, il demone li rimuove prima di aprire il portale. Con Game Over inghiotte l’ultimo mezzo, sputa fuoco e fa una danza di vittoria. I giocatori già mangiati durante la partita non ricompaiono. I finali anticipati per eliminazione funzionano senza attendere l’ultima domanda.
+Il portale emerge dal terreno quando il vincitore è l’unico veicolo rimasto: lo attraversa, poi il varco sprofonda. Il demone ruggisce, spara un getto di fuoco verso il portale ancora in discesa e, quando è sparito, salta e batte i pugni a terra. Se il motore decreta una vittoria per punteggio lasciando altri giocatori attivi, il demone li rimuove prima di aprire il portale. Con Game Over inghiotte l’ultimo mezzo, sputa fuoco e fa una danza di vittoria. I giocatori già mangiati durante la partita non ricompaiono. I finali anticipati per eliminazione funzionano senza attendere l’ultima domanda.
 
 Il modulo `assets/hell-race.js` è un Canvas pixel-art senza dipendenze, privo di influenza sulle regole, sul timer e sui salvataggi. La grafica si interrompe quando la pagina non è visibile e rispetta la preferenza di sistema per la riduzione del movimento. L'indicazione testuale accessibile integra le figure. I sei veicoli selezionabili sono chopper (con pilota), pick-up, camion, coupé, fuoristrada e Ape a tre ruote. Sono riconoscibili per sagoma e simbolo, non per colori vistosi. Le nuove sprite map animate, il portale e il panorama sono descritti in [assets/hell-race/README.md](assets/hell-race/README.md). Ogni mezzo ha otto pose; il demone ha sequenze distinte di corsa, attacco e morso. I punteggi, le regole e i salvataggi esistenti non vengono modificati.
 
@@ -143,3 +145,5 @@ Al comando Prossima domanda, la fiala si riempie dal livello residuo della doman
 Le tre schede sono impilate in ordine ciclico, con il giocatore corrente sempre in cima e illuminato da un contorno giallo. Da chiuse mostrano nome e punteggio numerico; da aperte mostrano soltanto vite e inventario. Apertura e chiusura sono indipendenti e si conservano durante la partita. Rimossi la lista separata dei turni e il comando delle statistiche dalle Opzioni.
 
 L’apertura delle schede espande il contenuto sopra quelle sottostanti senza spostarle. La scheda aperta o selezionata più di recente passa davanti alle altre, anche con la tastiera.
+
+La scena v1.4.0 usa un unico terreno di basalto: con le domande completate aumentano dissesto, crepe incandescenti, ossa, teschi umani e demoniaci con corna, ruote, portiere, lamiere e assi spezzati. I geyser di lava diventano più intensi verso la fine. Il livello dipende da domande completate/domande configurate; una vittoria anticipata conserva il livello raggiunto. Durante cattura e fuga non vengono disegnati nomi sul Canvas; restano nella corsa normale e nell’esito finale.
