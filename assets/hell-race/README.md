@@ -1,6 +1,6 @@
 # Asset della corsa infernale
 
-Versione grafica **1.4.0** — 27/10/2026.
+Versione grafica **1.5.0** — 27/10/2026.
 
 Pixel art infernale dal riferimento approvato: ferro annerito, ruggine, cuoio, emblemi distintivi e luce di lava. Asset raster generati con lo strumento integrato imagegen, convertiti in WebP mantenendo il canale alfa. Specifiche in [PROMPTS-v1.md](PROMPTS-v1.md).
 
@@ -17,9 +17,9 @@ Le eliminazioni e i finali sono coordinati da `assets/hell-ending.js`. Il portal
 
 I due asset statici `vehicles.webp` e `demon.webp` della v1.1.0 sono conservati come versione precedente, ma non vengono caricati dalla nuova scena.
 
-I nomi sono ancorati sopra il bordo superiore effettivo degli sprite, con almeno 5 pixel logici di spazio. Le corsie distano 80 pixel per separare nomi e veicoli anche a pari punteggio. Le larghezze logiche sono: camion 62, pick-up 58, fuoristrada 56, coupé 54, chopper 44, Ape 40. Ogni mezzo conserva le proporzioni della propria sagoma; le anteprime usano un fattore comune, senza ingrandire separatamente i mezzi piccoli. `tests/vehicle_layout.cjs` controlla le dimensioni realmente disegnate su tutti i fotogrammi, nella cattura e nelle anteprime, e genera `artifacts/vehicle-proportions.png`.
+I veicoli formano un gruppo compatto: i tre appoggi verticali occupano 68 pixel logici e lo scarto orizzontale dovuto al punteggio è compresso. I nomi non vengono disegnati sul Canvas. Il mezzo del rispondente viene dipinto per ultimo con un contorno giallo ricavato dall’alfa di ciascun fotogramma; una piccola scheda DOM davanti al gruppo mostra soltanto i suoi dati e segue il mezzo durante il movimento. Turnazione e finestre Inventario/Opzioni sono gestite da `assets/js/ui.js`.
 
-Anche nelle schede giocatore il nome occupa una riga separata sopra l’anteprima del veicolo; punteggio e stato restano a sinistra. Il test browser verifica che i rettangoli di nome e sprite non si sovrappongano in entrambe le orientazioni.
+Le larghezze logiche sono: camion 62, pick-up 58, fuoristrada 56, coupé 54, chopper 44, Ape 40. Ogni mezzo conserva le proporzioni della propria sagoma; le anteprime usano un fattore comune. `tests/vehicle_layout.cjs` controlla dimensioni, integrità dei fotogrammi, compattezza e contorno; i test browser verificano le finestre, l’ordine di turno e il timer in tre dimensioni di schermo.
 
 Le ruote sollevano scie di polvere a lobi pixel art, che si espandono, scorrono all’indietro e sfumano; sassolini seguono piccole traiettorie balistiche. L’intensità dipende dal mezzo. I passi alternati del demone, sincronizzati ai quattro fotogrammi di corsa, generano nuvole più pesanti e zolle di terra; attacco e morso hanno impatti localizzati. Gli effetti dipendono soltanto dall’orologio della scena: nessun uso del generatore casuale del gioco, nessuna coda di particelle o timer aggiuntivo. Pausa e movimento ridotto congelano anche polvere e detriti. `tests/hell_dust.cjs` verifica evoluzione, dissolvenza, determinismo, limite delle particelle e isolamento dello stato Canvas.
 
@@ -39,7 +39,7 @@ Con un vincitore e nessun avversario ancora da rimuovere, il portale sale dal te
 
 Il livello è il rapporto tra domande completate e domande impostate. Crescono ampiezza delle crepe, buche, lava visibile, fiamme, ossa, teschi umani, teschi demoniaci con corna e zanne, e rottami metallici riconoscibili come ruote/assi, portiere, cofani e paraurti. Alcune bocche vulcaniche eruttano getti di lava con ricaduta delle gocce, alternando eruzione e quiete. Le decorazioni scorrono sullo stesso piano, dietro gli attori. Pausa e movimento ridotto rispettano l’orologio della scena; il livello è ricostruibile da qualsiasi salvataggio. Una vittoria anticipata non porta artificialmente il terreno al massimo.
 
-Le etichette dei giocatori sono assenti durante tutte le animazioni di cattura e fuga, compreso il superstite in attesa. Rimangono nella corsa normale e nell’interfaccia dell’esito.
+Le etichette dei giocatori sono assenti durante tutte le animazioni di cattura e fuga, compreso il superstite in attesa. Il solo rispondente è identificato davanti al veicolo durante la corsa normale; il nome del vincitore appare nell’interfaccia dell’esito dopo la cinematica.
 
 `npm run test:terrain` verifica inizio/metà/fine su desktop e Android senza alterare il motore; `python3 tests/terrain_browser.py --gifs` produce il confronto `artifacts/terrain-stages.png` e la GIF `artifacts/terrain-evolution.gif`. I test senza browser controllano progressione, determinismo, limiti di disegno ed eruzioni; i test dei finali impediscono regressioni nelle etichette.
 

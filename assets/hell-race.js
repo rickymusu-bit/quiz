@@ -1,8 +1,8 @@
-/* Fool — Fuga dall'Inferno v1.4.0 (2026-10-27): scena pixel-art illustrativa.
+/* Fool — Fuga dall'Inferno v1.5.0 (2026-10-27): scena pixel-art illustrativa.
    Nessuna modifica al motore, ai punteggi o ai salvataggi. */
 (function (root) {
   'use strict';
-  const H = 384, lanes = [188, 268, 348];
+  const H = 384, lanes = [282, 316, 350];
   const colors = ['#d6ad75', '#be7554', '#b4a08c'];
   const VEHICLES = ['chopper', 'pickup', 'truck', 'coupe', 'offroad', 'ape'];
   // Widths in logical race pixels; preserve each complete silhouette's aspect ratio.
@@ -402,16 +402,31 @@
       r(c, x + 49 + i * 6, y + 116, 5, 13, '#d58a55');
     }
   }
-  function nameTag(c, W, x, spriteTop, name, color) {
-    const tag = String(name).slice(0, 16);
-    c.font = 'bold 10px monospace';
-    const width = Math.min(W - 6, c.measureText(tag).width + 9);
-    const lx = clamp(x - width / 2, 2, W - width - 2);
-    const top = spriteTop - 18; // 13px tag plus a 5px clear gap above the sprite.
-    r(c, lx, top, width, 13, '#0c0e19');
-    r(c, lx, top, 3, 13, color);
-    c.fillStyle = '#f6ead3';
-    c.fillText(tag, lx + 6, top + 10);
+  const outlineFrames = new Map();
+  function vehicleOutline(c, row, frame, x, ground) {
+    if (!imageReady(sheets.vehicles)) return;
+    const source = vehicleRow(row)[frame], key = row + ':' + frame;
+    let mask = outlineFrames.get(key);
+    if (!mask) {
+      mask = document.createElement('canvas');
+      mask.width = source.width; mask.height = source.height;
+      const ctx = mask.getContext('2d');
+      ctx.drawImage(source, 0, 0);
+      ctx.globalCompositeOperation = 'source-in';
+      ctx.fillStyle = '#ffe044';
+      ctx.fillRect(0, 0, mask.width, mask.height);
+      outlineFrames.set(key, mask);
+    }
+    const size = vehicleSize(row), left = Math.round(x - size.width / 2),
+      top = Math.round(ground - size.height), w = Math.round(size.width), h = Math.round(size.height);
+    for (const [dx, dy] of [[-2,0],[2,0],[0,-2],[0,2],[-1,-1],[-1,1],[1,-1],[1,1]])
+      c.drawImage(mask, left + dx, top + dy, w, h);
+  }
+  function packPosition(state, index, progress, previous, sec, W = 512) {
+    const ratio = positionScore(state, index), offset = [-18,32,-5][index];
+    const dest = W * (.47 + .10 * ratio) + 8 * progress + offset;
+    const start = previous ? W * (.47 + .10 * previous[index]) + 8 * progress + offset : dest;
+    return { x: start + (dest - start) * smooth(sec / .9), y: lanes[index] };
   }
   function scene(c, W, state, sec, final, previous, reduced, roadTime) {
     const total = Math.max(1, Number(state.config.questionCount || 33));
@@ -420,23 +435,30 @@
     background(c, W, motion, progress, reduced?0:motion+(final?visualState.elapsed:0));
     if(final&&root.FoolEnding&&!imageReady(root.FoolEnding.load(()=>live?.redraw?.()))){endingHelpers(state).demon(c,0);return root.FoolEnding.load(()=>{})?.failed?'done':'loading';}
     if(final&&root.FoolEnding)return root.FoolEnding.render(c,W,state,visualState.plan,reduced?visualState.plan.duration:visualState.elapsed,endingHelpers(state));
-    // A consumed player never reappears on the track or in a later final.
-    state.groups.forEach((group, i) => {
-      if(group.out)return;
-
-      const configuredVehicle = state.config.vehicles?.[i] || ['chopper', 'pickup', 'ape'][i];
-      const visualGroup = { ...group, vehicle: configuredVehicle };
-      const ratio = positionScore(state, i);
-      const dest = W * (.49 + .22 * ratio) + 12 * progress;
-      const start = previous ? W * (.49 + .22 * previous[i]) + 12 * progress : dest;
-      let x = start + (dest - start) * smooth(sec / .9);
-      let unit = 2, y = lanes[i];
-      let visible = true;
-      if (visible) {
-        const bounds = racer(c, x, y, i, motion, visualGroup, unit);
-        nameTag(c, W, x, bounds.y, group.name, colors[i]);
-      }
-    });
+    // Keep a compact chasing pack; paint the current pilot last so its outline stays visible.
+    const positions = state.groups.map((g, i) => packPosition(state, i, progress, previous, sec, W));
+    const order = state.groups.map((g, i) => i).filter(i => i !== state.respondent);
+    order.push(state.respondent);
+    for (const i of order) {
+      const group = state.groups[i];
+      if (group.out) continue;
+      const configuredVehicle = state.config.vehicles?.[i] || ['chopper','pickup','ape'][i];
+      const visualGroup = { ...group, vehicle: configuredVehicle }, p = positions[i],
+        row = Math.max(0, VEHICLES.indexOf(configuredVehicle));
+      if (i === state.respondent)
+        vehicleOutline(c, row, Math.floor(motion * 10 + i * 2) % 8, p.x, p.y);
+      racer(c, p.x, p.y, i, motion, visualGroup, 2);
+    }
+    const current = state.respondent, active = positions[current],
+      row = Math.max(0, VEHICLES.indexOf(state.config.vehicles?.[current] || ['chopper','pickup','ape'][current]));
+    const size = imageReady(sheets.vehicles) ? vehicleSize(row) : { width: 50, height: 40 };
+    const front = Math.max(...positions.filter((p, i) => !state.groups[i].out).map(p => p.x + 34));
+    if (live?.canvas === c.canvas) {
+      live.figure.style.setProperty('--player-x', (Math.min(W - 144, front + 8) / W * 100) + '%');
+      live.figure.style.setProperty('--player-y', ((active.y - size.height * .5) / H * 100) + '%');
+      live.figure.dataset.activeVisible = String(!state.groups[current].out);
+      live.figure.dataset.activeTeam = String(current);
+    }
     const queue=visualState?.queue||[];
     if(reduced){for(const item of queue)visualState.consumed.add(item.index);queue.length=0;}
     if(queue.length&&root.FoolEnding&&!imageReady(root.FoolEnding.load(()=>live?.redraw?.()))){
@@ -476,7 +498,7 @@
     const old = last?.key === state.id && !final ? last.x : null;
     const previous = old;
     last = { key: state.id, x: next };
-    const record = { frame: 0, canvas };
+    const record = { frame: 0, canvas, figure:fig };
     live = record;
     const start = performance.now(), reduced = reduce.matches;
     let freeze = 0, oldTime = start,lastEndingTime=start;

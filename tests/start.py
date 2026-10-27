@@ -57,6 +57,7 @@ with sync_playwright() as p:
    frame=next(f for f in page.frames if 'Fool.html' in f.url)
    assert frame.evaluate('HellscapeUI.game.s.current.id')==question
    assert frame.evaluate('HellscapeUI.game.s.valid')==1
+   expect(view.locator('#fit-warning')).to_be_hidden()
    assert frame.evaluate('HellscapeUI.game.s.groups.map(g=>g.score)')==[g['score'] for g in json.loads(saved)['groups']]
    view.get_by_role('button',name='Prossima domanda',exact=True).click();expect(view.get_by_role('button',name='Svela e avvia il tempo')).to_be_visible()
    view.get_by_role('button',name='Svela e avvia il tempo').click()
