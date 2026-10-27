@@ -1,4 +1,4 @@
-/* Targeted pixel-title, vehicle preview and Ammo HUD regression test. */
+/* Original illustrated title, vehicle preview and Ammo HUD regression test. */
 const { chromium } = require("playwright");
 const http = require("node:http");
 const fs = require("node:fs");
@@ -33,13 +33,19 @@ const assert = require("node:assert/strict");
   try {
     const origin = "http://127.0.0.1:" + server.address().port;
     await page.goto(origin + "/");
-    const title = page.locator("img.home-wordmark.pixel-wordmark");
+    const title = page.locator("img.home-wordmark");
     await title.waitFor();
-    assert.equal(await title.evaluate(c=>c.naturalWidth),256);
+    await title.evaluate(c=>c.decode());
+    assert.equal(await title.evaluate(c=>c.naturalWidth),2172);
+    assert.equal(await title.evaluate(c=>getComputedStyle(c).imageRendering),'auto');
+    assert.equal(await title.getAttribute("src"),"assets/hellscape-logo.webp");
     assert.equal(await title.getAttribute("alt"),"HELLSCAPE");
-    await page.screenshot({path:"artifacts/title-pixelated.png"});
+    await page.screenshot({path:"artifacts/title-original.png"});
     await page.goto(origin + "/Fool.html?start=1");
     await page.locator("#vehicle0").waitFor();
+    const headerTitle = page.locator('img.hellscape-logo');
+    await headerTitle.evaluate(c=>c.decode());
+    assert.equal(await headerTitle.evaluate(c=>c.naturalWidth),2172);
     await page.locator("#vehicle-preview-0 canvas").evaluate(c => {c.dataset.previousVehicle="true";});
     await page.locator("#vehicle0").selectOption("truck");
     assert.equal(await page.locator("#vehicle-preview-0 canvas").count(), 1);
@@ -79,6 +85,6 @@ const assert = require("node:assert/strict");
     assert.equal(await page.locator(".turn-order .effect-chip").count(),0);
     assert.equal(await page.locator(".turn-order .ammo-impact").count(),0);
     assert.deepEqual(errors,[]);
-    console.log("PASS: pixel title, live vehicle preview, Ammo information and effects HUD");
+    console.log("PASS: original illustrated titles, live vehicle preview, Ammo information and effects HUD");
   } finally { await browser.close(); server.close(); }
 })().catch(error => { console.error(error); process.exitCode=1; });

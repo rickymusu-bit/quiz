@@ -1245,8 +1245,9 @@
     title.tabIndex = -1;
     const art = node("img");
     art.className = "end-wordmark";
-    art.src =
+    const titleAsset =
       s.winner === null ? "assets/game-over.png" : "assets/wins-yellow.png";
+    art.src = window.HellscapeOffline?.assets?.[titleAsset] || titleAsset;
     art.alt = s.winner === null ? "GAME OVER" : "WINS";
     if (s.winner !== null) b.classList.add("victory");
     art.setAttribute("fetchpriority", "high");

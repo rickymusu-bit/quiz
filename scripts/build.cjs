@@ -50,7 +50,7 @@ function inline(file) {
       (_, attr, p) => attr + '="' + data(p) + '"',
     );
 }
-function offline() {
+function offline(review = false) {
   const catalog = JSON.parse(read("datasets.json")),
     texts = {
       "datasets.json": read("datasets.json"),
@@ -61,6 +61,8 @@ function offline() {
   for (const name of fs.readdirSync(path.join(root, "assets/hell-race")))
     if (name.endsWith(".webp"))
       assets["assets/hell-race/" + name] = data("assets/hell-race/" + name);
+  for (const file of ["assets/wins-yellow.png", "assets/game-over.png"])
+    assets[file] = data(file);
   const config = { texts, assets };
   const pages = {};
   for (const file of ["index.html", "Fool.html", "Fool_regole.html"]) {
@@ -74,11 +76,11 @@ function offline() {
   }
   const fixed = `const resources=${safe(config)},pages=${safe(pages)};const frame=document.querySelector('iframe');window.HellscapePreview={resources,navigate(route){const url=new URL(route,'https://offline.invalid/');let html=pages[url.pathname.slice(1)];if(!html)throw Error('Unknown preview page');this.search=url.search;frame.srcdoc=html;}};HellscapePreview.navigate('index.html');`;
   fs.writeFileSync(
-    path.join(out, "Hellscape-offline.html"),
+    path.join(out, review ? "Hellscape-review.html" : "Hellscape-offline.html"),
     '<!doctype html><html lang="it"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Hellscape — anteprima offline</title><meta name="hellscape-revision" content="' +
       revision +
       '"><style>html,body,iframe{width:100%;height:100%;margin:0;border:0;display:block;background:#090909}</style><iframe title="Hellscape" allow="fullscreen"></iframe><script>' +
-      fixed +
+      fixed + (review ? "\n" + read("scripts/quality-preview.js") : "") +
       "</script></html>",
   );
 }
@@ -95,7 +97,8 @@ fs.writeFileSync(
   path.join(out, "revision.json"),
   JSON.stringify({ revision }, null, 2) + "\n",
 );
-if (process.argv.includes("--ammo-preview")) ammoPreview();
+if (process.argv.includes("--quality-preview")) offline(true);
+else if (process.argv.includes("--ammo-preview")) ammoPreview();
 else if (process.argv.includes("--offline")) {offline();ammoPreview();}
 else {
   const site = path.join(out, "site");

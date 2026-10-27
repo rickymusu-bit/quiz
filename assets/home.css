@@ -22,7 +22,3 @@ body{margin:0;background:#080605}
 #fullscreen-status{grid-column:1 / -1;font:18px/1.2 FoolTerminal,monospace;color:#ffdda4;margin:4px 0}
 #play-frame{position:fixed;inset:0;width:100%;height:100dvh;border:0;background:#080605}
 @media(prefers-reduced-motion:reduce){#viewport-stage .menu a:active,#viewport-stage .menu button:active{transform:none}}
-
-/* Low-resolution canvas wordmark, nearest-neighbour enlargement. */
-.home-wordmark.pixel-wordmark,.hellscape-logo.pixel-wordmark { image-rendering: pixelated; }
-.home-wordmark.pixel-wordmark { filter: drop-shadow(0 4px 0 #000b); }

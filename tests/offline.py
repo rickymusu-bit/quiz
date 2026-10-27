@@ -21,6 +21,10 @@ with sync_playwright() as p:
    if r.request.url=='http://offline.test/preview':r.fulfill(content_type='text/html',body=html)
    else:requests.append(r.request.url);r.abort()
   page=context.new_page()
+  # The fully embedded document is transferred through CDP when file:// is blocked.
+  # Allow that transfer on constrained CI workers, independent of network latency.
+  page.set_default_navigation_timeout(120000)
+  page.set_default_timeout(60000)
   try:
    page.goto((ROOT/'dist/Hellscape-offline.html').as_uri())
    file_check='opened directly from file with network disabled'
