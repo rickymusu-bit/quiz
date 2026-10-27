@@ -36,11 +36,14 @@ jobs:
       - run: npm run test:terrain
       - run: npm run build
       - run: npm run test:offline
+      - run: npm run test:quality
       - uses: actions/upload-artifact@v4
         with:
           name: hellscape-${{ github.sha }}
           path: |
             dist/Hellscape-offline.html
             dist/Hellscape-Ammo.html
+            dist/Hellscape-review.html
             dist/revision.json
             artifacts/*.png
+            artifacts/quality/

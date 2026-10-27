@@ -13,7 +13,8 @@
     "preview:ammo": "node scripts/build.cjs --ammo-preview",
     "test:offline": "npm run preview:offline && python3 tests/offline.py && node tests/ammo_animation.cjs --offline",
     "test:endings": "python3 tests/endings.py",
-    "test:terrain": "python3 tests/terrain_browser.py"
+    "test:terrain": "python3 tests/terrain_browser.py",
+    "test:quality": "node scripts/build.cjs --quality-preview && python3 tests/visual_quality.py"
   },
   "devDependencies": {
     "@napi-rs/canvas": "0.1.100",
