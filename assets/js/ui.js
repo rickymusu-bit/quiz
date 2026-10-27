@@ -1198,13 +1198,21 @@
     const r = game?.s.result;
     if (!before || before.game !== game || !r || r.id === before.result) return;
     const epoch = feedbackEpoch;
+    // Leave the final portal/capture cinematic unobstructed.
+    if (game.s.phase === "conclusa") return;
     main.classList.add("showing-movement");
+    const cue = node("div", r.option === null ? "TEMPO SCADUTO" :
+      r.correct ? "RISPOSTA CORRETTA" : "RISPOSTA ERRATA", "movement-cue");
+    cue.dataset.outcome = r.correct ? "correct" : "incorrect";
+    cue.setAttribute("role", "status");
+    cue.setAttribute("aria-live", "polite");
+    main.append(cue);
     syncCinematic();
 
     await new Promise((resolve) =>
       setTimeout(
         resolve,
-        matchMedia("(prefers-reduced-motion: reduce)").matches ? 400 : 1250,
+        matchMedia("(prefers-reduced-motion: reduce)").matches ? 400 : 1650,
       ),
     );
     if (
@@ -1214,6 +1222,7 @@
     )
       return;
     main.classList.remove("showing-movement");
+    cue.remove();
     syncCinematic();
     main
       .querySelector('[data-game-action="next"]')

@@ -139,26 +139,22 @@
     c.fillStyle = color; c.fillRect(Math.round(x), Math.round(y), Math.max(1, Math.round(w)), Math.max(1, Math.round(h)));
   };
   const line = (c, x, y, w, color) => r(c, x, y, w, 2, color);
-  function scoreRatio(groups, index) {
-    const score = groups[index].score;
-    let top = { n: '0', d: '1' };
-    for (const g of groups) {
-      if (BigInt(g.score.n) * BigInt(top.d) > BigInt(top.n) * BigInt(g.score.d)) top = g.score;
-    }
-    if (top.n === '0') return 0;
-    const a = BigInt(score.n) * BigInt(top.d) * 10000n;
-    const b = BigInt(score.d) * BigInt(top.n);
-    return clamp(Number(a / b) / 10000, 0, 1);
-  }
+  // Absolute logarithmic scale: equal scores always share the same distance,
+  // regardless of opponents or vehicles. Each early point has more visual impact.
+  // Full visible advance is capped at five maximum-value answers.
   function positionScore(state, index) {
-    const relative = scoreRatio(state.groups, index);
     const score = state.groups[index].score;
     const n = BigInt(score.n), d = BigInt(score.d);
-    const base = BigInt(Math.max(...Object.values(state.config.bases || { standard: 300 })));
-    const ref = (base * BigInt(state.config.questionCount || 33)) / 5n || 1n;
-    const absolute = Number((n * 100000n) / (n + d * ref)) / 100000;
-    return .4 * relative + .6 * absolute;
+    const maxBase = BigInt(Math.max(1, ...Object.values(state.config.bases || { standard: 300 })));
+    // BigInt first: handles exact fractional points and huge totals without overflow.
+    // 1_000_000 subdivisions per maximum-value answer, capped at five answers.
+    const scaled = n * 1000000n / (d * maxBase);
+    const capped = scaled > 5000000n ? 5000000n : scaled;
+    return Math.log1p(Number(capped) / 1000000) / Math.log(6);
   }
+  const ADVANCE_SECONDS = 1.55;
+  const RACE_START_X = 204;
+  const RACE_SPAN_X = 236;
   function bitmap(c, x, y, lines, palette, size) {
     lines.forEach((row, j) => {
       for (let i = 0; i < row.length; i++) {
@@ -448,10 +444,13 @@
       c.drawImage(mask, left + dx, top + dy, w, h);
   }
   function packPosition(state, index, progress, previous, sec, W = 512) {
-    const ratio = positionScore(state, index), offset = [-18,32,-5][index];
-    const dest = W * (.47 + .10 * ratio) + 8 * progress + offset;
-    const start = previous ? W * (.47 + .10 * previous[index]) + 8 * progress + offset : dest;
-    return { x: start + (dest - start) * smooth(sec / .9), y: lanes[index] };
+    // No per-lane horizontal offset: tied players have the exact same x.
+    const scale = W / 512, ratio = positionScore(state, index);
+    const dest = (RACE_START_X + RACE_SPAN_X * ratio) * scale;
+    const start = previous
+      ? (RACE_START_X + RACE_SPAN_X * previous[index]) * scale
+      : dest;
+    return { x: start + (dest - start) * smooth(sec / ADVANCE_SECONDS), y: lanes[index] };
   }
   function scene(c, W, state, sec, final, previous, reduced, roadTime) {
     const total = Math.max(1, Number(state.config.questionCount || 33));
@@ -544,7 +543,7 @@
       lastEndingTime=now;
       const phase=scene(ctx, width, state, Math.max(0, elapsed - freeze), final, previous, reduced, roadPhase);
       if(final&&fig.dataset.endingPhase!==phase){fig.dataset.endingPhase=phase;if(phase==='done')fig.dispatchEvent(new CustomEvent('foolendingcomplete',{bubbles:true}));}
-      const busy = !reduced && !blocked() && (final ? phase !== 'done' : phase === 'capture' || (moving && elapsed - freeze < .9));
+      const busy = !reduced && !blocked() && (final ? phase !== 'done' : phase === 'capture' || (moving && elapsed - freeze < ADVANCE_SECONDS));
       if(fig.dataset.animationBusy !== String(busy)) {
         fig.dataset.animationBusy = String(busy);
         fig.dispatchEvent(new CustomEvent('foolanimationchange',{bubbles:true,detail:{busy,phase}}));

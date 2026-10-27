@@ -68,7 +68,12 @@ const assert = require('node:assert/strict');
       await page.evaluate(() => { HellscapeUI.game.deadline -= 15000; });
       await page.locator('.answer').nth(await page.evaluate(() => HellscapeUI.game.s.current.correct)).click();
       assert(await page.locator('main').evaluate(e => e.classList.contains('showing-movement')));
-      await page.waitForTimeout(1400);
+      assert.equal(await page.locator('.movement-cue').innerText(), 'RISPOSTA CORRETTA');
+      assert(await page.locator('.movement-cue').isVisible());
+      fs.mkdirSync('artifacts', {recursive:true});
+      await page.screenshot({path:`artifacts/answer-animation-${width}.png`});
+      await page.waitForTimeout(1800);
+      assert.equal(await page.locator('.movement-cue').count(), 0);
       assert.equal(await page.locator('.answer').count(), 4);
       const respondent=await page.evaluate(()=>HellscapeUI.game.s.result.respondent);
       assert.equal(await page.locator(`.turn-order [data-team="${respondent}"] .player-points`).innerText(),
