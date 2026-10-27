@@ -409,8 +409,8 @@
     else if (s.phase === "roar" || (s.phase === "done" && winner !== null)) {
       const frame =
         s.phase === "done"
-          ? 11
-          : [8, 9, 10, 10, 9, 11][Math.min(5, Math.floor(s.local / 0.45))];
+          ? 10
+          : [8, 9, 10, 10, 9, 10][Math.min(5, Math.floor(s.local / 0.45))];
       actor(c, frame, lerp(W * 0.12, W * 0.2, ease(s.local / 0.6)), ground);
       if (s.phase === "roar" && s.local > 0.45 && s.local < 2.1) {
         c.save();
