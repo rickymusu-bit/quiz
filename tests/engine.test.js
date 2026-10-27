@@ -9,6 +9,35 @@ function settings(total=33,weights=30,difficulty='misto'){const topics=[...new S
 function game(total=33,weights=30,difficulty='misto',custom){return F.Game.start(F.prepare(bank,custom||settings(total,weights,difficulty),()=>.25),{random:()=>.25,now:()=>100})}
 function reply(g,correct){g.reveal();g.answer(correct?g.s.current.correct:(g.s.current.correct+1)%4)}
 function finishOrdinary(g,correct=false){const n=g.s.config.questionCount;for(let i=0;i<n;i++){reply(g,correct);if(i<n-1)g.next()}}
+
+test('Spoiler bypasses a pending Nope once but the skipped ordinary turn remains queued',()=>{
+ const g=game(33,0),[source,target,next]=g.s.order;
+ g.attack('salta',source,target,g.uid());
+ const c={id:g.uid(),type:'svela',target:null,origin:'test'};
+ g.s.groups[source].inventory.push(c);
+ g.use(c.id,null);g.pass(target);
+ assert.equal(g.s.respondent,target);
+ assert.equal(g.s.effects.filter(e=>e.type==='salta'&&e.target===target).length,1);
+ g.answer(g.s.current.correct);
+ assert.equal(g.s.valid,1);
+ g.next();assert.equal(g.s.respondent,next);
+ reply(g,false);g.next();assert.equal(g.s.respondent,source);
+ reply(g,false);g.next();assert.equal(g.s.respondent,next);
+ assert.equal(g.s.effects.filter(e=>e.type==='salta'&&e.target===target).length,0);
+ assert.equal(g.s.valid,3);
+ F.Game.restore(g.snapshot());
+});
+test('Two Bullo from one attacker do not grant duplicate shares',()=>{
+ const g=game(33,0),[victim,attacker,other]=g.s.order;
+ for(const source of [attacker,attacker,other])
+  g.attack('ruba',source,victim,g.uid());
+ const points=g.s.config.bases[g.s.current.difficulty];
+ reply(g,true);
+ const each=F.rational(BigInt(points),3n);
+ for(const i of [victim,attacker,other])assert.equal(F.exact(g.s.groups[i].score),F.exact(each));
+ F.Game.restore(g.snapshot());
+});
+
 test('Rules and names: Bullo, Marx and no multiplier',()=>{assert.equal(F.RULES,'20.0.0');assert.equal(F.LABELS.ruba,'Bullo');assert.equal(F.LABELS.marx,'Marx');assert.equal(F.TYPES.length,7);assert.equal(F.VERSION,'2.3.0')});
 test('Six unique junkpunk vehicles and backward-compatible legacy games',()=>{
  const cfg=settings();
