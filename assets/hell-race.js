@@ -1,4 +1,4 @@
-/* Fool — Fuga dall'Inferno v1.2.3 (2026-10-26): scena pixel-art illustrativa.
+/* Fool — Fuga dall'Inferno v1.2.4 (2026-10-27): scena pixel-art illustrativa.
    Nessuna modifica al motore, ai punteggi o ai salvataggi. */
 (function (root) {
   'use strict';
@@ -175,6 +175,77 @@
      '   6666 66 66  6666    ',
      '    66 666666   66     ']
   ];
+  // Analytical particles: time alone determines their position. No game RNG,
+  // particle backlog or independent timers, so pause and reduced motion stay exact.
+  const dustNoise = seed => { const n = Math.sin(seed * 127.1 + 311.7) * 43758.5453; return n - Math.floor(n); };
+  function dustPuff(c, x, ground, age, life, size, drift, seed, strength = 1) {
+    if (age < 0 || age >= life) return;
+    const t = age / life, swell = Math.sqrt(t), fade = Math.min(1, t * 7) * Math.pow(1 - t, 1.4);
+    const radius = size * (.28 + swell * .85);
+    const px = x - drift * age, py = ground - 1 - size * swell * (.55 + dustNoise(seed) * .45);
+    // Broken silhouettes and translucent overlapping lobes, never a solid square.
+    for (let lobe = 0; lobe < 4; lobe++) {
+      const spread = dustNoise(seed + lobe * 3), w = Math.max(2, radius * (1.05 + spread));
+      const h = Math.max(1, radius * (.45 + dustNoise(seed + lobe + 9) * .45));
+      const dx = (spread - .5) * radius * 1.8, dy = -dustNoise(seed + lobe + 17) * radius * .55;
+      c.globalAlpha = Math.min(.38, fade * strength * (lobe === 0 ? .34 : .22));
+      r(c, px + dx - w / 2, py + dy - h, w, h, lobe % 2 ? '#8b6c4e' : '#b08b61');
+      if (lobe === 1) {
+        c.globalAlpha *= .5;
+        r(c, px + dx - w / 2 + 1, py + dy - h, Math.max(1, w - 2), 1, '#d2ae77');
+      }
+    }
+    // Low, darker dust rolling across the road, beneath the airborne cloud.
+    c.globalAlpha = fade * strength * .18;
+    r(c, px - radius, ground - 2, radius * 2, 2, '#594434');
+  }
+  function dirtChip(c, x, ground, age, life, seed, power = 1, direction = -1) {
+    if (age < 0 || age >= life) return;
+    const t = age / life, vx = 15 + dustNoise(seed) * 32;
+    const lift = (5 + dustNoise(seed + 4) * 10) * power;
+    const px = x + direction * vx * age, py = ground - 1 - 4 * lift * t * (1 - t);
+    const size = (dustNoise(seed + 8) > .7 ? 2 : 1) * power;
+    c.globalAlpha = (1 - t * t) * .8;
+    r(c, px, py - size, size, size, '#654935');
+    r(c, px, py - size, size, 1, '#a47c50');
+  }
+  function vehicleDust(c, rear, ground, tick, row, scale = 1) {
+    const weight = [.65, 1.1, 1.45, .85, 1.2, .7][row];
+    const rate = 11, serial = Math.floor(tick * rate);
+    c.save();
+    for (let i = 0; i < 16; i++) {
+      const birth = serial - i, seed = birth + row * 101;
+      const age = tick - birth / rate;
+      const life = .9 + dustNoise(seed + 3) * .45;
+      dustPuff(c, rear, ground, age, life, (5 + dustNoise(seed + 6) * 4) * weight * scale,
+        (30 + dustNoise(seed + 12) * 15) * scale, seed, .85);
+      if (i < 10) dirtChip(c, rear + 2, ground, age, .35 + dustNoise(seed + 7) * .25, seed, scale);
+    }
+    c.restore();
+  }
+  function demonDust(c, x, tick, mode, actionTime) {
+    c.save();
+    // Chase frames advance at 9 fps: alternating footfalls every two frames.
+    // Attack has two heavy impacts, followed by settling earth during the bite.
+    const stepRate = 4.5;
+    const clock = mode === 'chase' ? tick : actionTime;
+    const latest = mode === 'chase' ? Math.floor(clock * stepRate) : 1;
+    for (let i = 0; i < 7; i++) {
+      const step = latest - i;
+      if (mode !== 'chase' && step < 0) continue;
+      const born = mode === 'chase' ? step / stepRate : .12 + step * .23;
+      const age = clock - born;
+      const foot = x + (step % 2 ? 76 : 4), ground = 133;
+      for (let j = 0; j < 5; j++) {
+        const seed = step * 17 + j * 31;
+        dustPuff(c, foot + (dustNoise(seed) - .5) * 13, ground, age - j * .025,
+          1.05 + dustNoise(seed + 8) * .35, 10 + dustNoise(seed + 3) * 7,
+          22 + dustNoise(seed + 5) * 25, seed, 1.15);
+        dirtChip(c, foot, ground, age, .5 + dustNoise(seed + 11) * .3, seed, 1.5, j % 3 === 0 ? 1 : -1);
+      }
+    }
+    c.restore();
+  }
   function racer(c, x, y, i, tick, g, scale = 2) {
     if (scale <= 0) return;
     const unit = Math.max(1, Math.round(scale));
@@ -190,11 +261,7 @@
       const destW = size.width, destH = size.height;
       const destX = Math.round(x - destW * .50);
       const destY = Math.round(y - destH);
-      for (let j = 0; j < 5; j++) {
-        const dist = (tick * 38 + j * 11) % 48;
-        const puff=Math.max(1,Math.round(5*(1-dist/48)));
-        r(c, destX - dist, y - 4 - j % 3, puff*2, puff, j % 2 ? '#5a4133' : '#a16c45');
-      }
+      vehicleDust(c, destX + destW * .16, y - 1, tick + i * .37, id, scale < 2 ? .65 : 1);
       const bounds = drawVehicle(c,id,Math.floor(tick*10+i*2)%8,x,y,scale);
       if (g.out) {
         c.fillStyle = '#0b0908aa';
@@ -204,11 +271,7 @@
       return bounds;
     }
     // Fallback minimale se la rete impedisce il caricamento degli asset.
-    // Tubature incandescenti e fumo.
-    for (let j = 0; j < 3; j++) {
-      const dist = (tick * 24 + j * 13) % 31;
-      r(c, left - 5 - dist, top + 3 + j * 3, 3 + j, 2 + j, j % 2 ? '#5e4743' : '#c56339');
-    }
+    vehicleDust(c, left + 5 * unit, y + unit, tick + i * .37, i % VEHICLES.length, scale < 2 ? .65 : 1);
     bitmap(c, left, top, vehicle, palette, unit);
     // Tre piloti con casco, maschera e occhialoni, distinti dai loro mezzi.
     const headX = left + (i === 1 ? 11 : 12) * unit;
@@ -305,6 +368,7 @@
     }
   }
   function demon(c, tick, x = 32, shade = '#9b2831', mode = 'chase', actionTime = 0) {
+    demonDust(c, x, tick, mode, actionTime);
     if (imageReady(sheets.demon)) {
       const row=mode==='attack'?1:mode==='devour'?2:0;
       const frame=row===0?Math.floor(tick*9)%4:Math.min(3,Math.floor(actionTime*9));
