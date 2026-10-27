@@ -95,7 +95,7 @@
   }
   function vehicleSize(row, scale = 2) {
     const frame = vehicleRow(row)[0];
-    const width = vehicleWidths[row] * (scale < 2 ? .65 : 1);
+    const width = vehicleWidths[row] * (scale < 2 ? .65 : (root.FoolBridge?.RACE_SCALE ?? .62));
     return { width, height: width * frame.height / frame.width };
   }
   function drawVehicle(c, row, frame, x, ground, scale = 2) {
@@ -109,7 +109,7 @@
     const canvas=document.createElement('canvas');canvas.width=160;canvas.height=90;
     const paint=()=>{const c=canvas.getContext('2d');c.imageSmoothingEnabled=false;c.clearRect(0,0,160,90);const row=Math.max(0,VEHICLES.indexOf(id)),size=vehicleSize(row);
       // One common preview scale retains the same relative sizes as the race.
-      const zoom=1.35; sprite(c,'vehicles',8,6,row,0,80-size.width*zoom/2,86-size.height*zoom,size.width*zoom,size.height*zoom)};
+      const zoom=1.35/(root.FoolBridge?.RACE_SCALE ?? .62); sprite(c,'vehicles',8,6,row,0,80-size.width*zoom/2,86-size.height*zoom,size.width*zoom,size.height*zoom)};
     if(imageReady(sheets.vehicles))paint();else sheets.vehicles?.addEventListener('load',paint,{once:true});
     return canvas;
   }
@@ -154,8 +154,8 @@
     return Math.log1p(Number(capped) / 1000000) / Math.log(6);
   }
   const ADVANCE_SECONDS = 1.55;
-  const RACE_START_X = 204;
-  const RACE_SPAN_X = 236;
+  const RACE_START_X = 222;
+  const RACE_SPAN_X = 156;
   function bitmap(c, x, y, lines, palette, size) {
     lines.forEach((row, j) => {
       for (let i = 0; i < row.length; i++) {
@@ -306,16 +306,16 @@
   }
   function flyingDevils(c, W, time) {
     c.save();
-    c.fillStyle = '#1b0910';
-    c.globalAlpha = .7;
+    c.fillStyle = '#10090a';
+    c.globalAlpha = .95;
     for (let i = 0; i < 8; i++) {
       const direction = i % 2 ? -1 : 1;
       const phase = W * (.065 + i * .127) + direction * time * (1.2 + i % 3);
-      const x = ((phase % (W + 20)) + W + 20) % (W + 20) - 10;
+      const x = ((phase % (W + 48)) + W + 48) % (W + 48) - 24;
       const y = 32 + (i * 17) % 39 + Math.sin(time * .65 + i * 2) * 2;
-      const size = .7 + (i % 3) * .12, flap = Math.sin(time * 2.8 + i * 1.9) * 2.5;
+      const size = 2.15 + (i % 3) * .22, flap = Math.sin(time * 2.8 + i * 1.9) * 2.5;
       c.save(); c.translate(Math.round(x), Math.round(y)); c.scale(size, size);
-      // Tiny horned spectators with slow, asymmetric wingbeats in the distant sky.
+      // Large horned silhouettes with slow, asymmetric wingbeats against the red sky.
       c.fillRect(-1, -1, 2, 5);
       c.fillRect(-2, -3, 1, 2); c.fillRect(1, -3, 1, 2);
       c.beginPath(); c.moveTo(-1, 1); c.lineTo(-7, -3 + flap);
@@ -336,7 +336,8 @@
         for(let x=-offset;x<W;x+=tw)c.drawImage(img,0,img.naturalHeight*sy,img.naturalWidth,img.naturalHeight*sh,Math.floor(x),dy,tw,dh);
       }
       flyingDevils(c,W,effectTime);
-      if(root.FoolTerrain)root.FoolTerrain.draw(c,W,tick,progress,img,effectTime);
+      if(root.FoolBridge)root.FoolBridge.draw(c,W,tick,progress,img,effectTime);
+      else if(root.FoolTerrain)root.FoolTerrain.draw(c,W,tick,progress,img,effectTime);
       else{c.fillStyle='#161614';c.fillRect(0,184,W,181);}
       return;
     }
@@ -451,7 +452,12 @@
     const start = previous
       ? (RACE_START_X + RACE_SPAN_X * previous[index]) * scale
       : dest;
-    return { x: start + (dest - start) * smooth(sec / ADVANCE_SECONDS), y: lanes[index] };
+    const sizes=state.groups.map((g,i)=>{
+      const row=Math.max(0,VEHICLES.indexOf(state.config.vehicles?.[i]||['chopper','pickup','ape'][i]));
+      return imageReady(sheets.vehicles)?vehicleSize(row):{width:36,height:28};
+    });
+    const grounds=root.FoolBridge?.grounds(sizes.map(s=>s.height))??lanes;
+    return { x: start + (dest - start) * smooth(sec / ADVANCE_SECONDS), y: grounds[index], ...sizes[index] };
   }
   function scene(c, W, state, sec, final, previous, reduced, roadTime) {
     const total = Math.max(1, Number(state.config.questionCount || 33));
@@ -508,6 +514,8 @@
   function createStage(state, final = false) {
     if (live) root.cancelAnimationFrame(live.frame);
     ammo?.sync(state);
+    root.FoolAmmo?.load(()=>live?.redraw?.());
+    root.FoolBridge?.load(()=>live?.redraw?.());
     if(root.FoolEnding){syncVisual(state,final);root.FoolEnding.load(()=>live?.redraw?.());}
     const fig = document.createElement('figure');
     fig.className = 'hell-race' + (final ? ' hell-race-final' : '');

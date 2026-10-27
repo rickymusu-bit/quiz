@@ -41,5 +41,6 @@ jobs:
           name: hellscape-${{ github.sha }}
           path: |
             dist/Hellscape-offline.html
+            dist/Hellscape-Ammo.html
             dist/revision.json
             artifacts/*.png

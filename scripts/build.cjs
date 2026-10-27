@@ -82,12 +82,21 @@ function offline() {
       "</script></html>",
   );
 }
+function ammoPreview(){
+  const assets={};
+  for(const name of ['vehicles-drive-v1.webp','demon-actions-v1.webp','infernal-world-v1.webp','portal-flames-v1.webp','ammo-relics-v1.webp','lava-bridge-v1.webp','lava-lake-v1.webp']){
+    const p='assets/hell-race/'+name;assets[p]=data(p);
+  }
+  const html=inline('Ammo-preview.html').replace('<head>','<head><meta name="hellscape-revision" content="'+revision+'"><script>window.HellscapeOffline={assets:'+safe(assets)+'};</script>');
+  fs.writeFileSync(path.join(out,'Hellscape-Ammo.html'),html);
+}
 fs.mkdirSync(out, { recursive: true });
 fs.writeFileSync(
   path.join(out, "revision.json"),
   JSON.stringify({ revision }, null, 2) + "\n",
 );
-if (process.argv.includes("--offline")) offline();
+if (process.argv.includes("--ammo-preview")) ammoPreview();
+else if (process.argv.includes("--offline")) {offline();ammoPreview();}
 else {
   const site = path.join(out, "site");
   fs.mkdirSync(site, { recursive: true });
@@ -95,6 +104,7 @@ else {
     "index.html",
     "Fool.html",
     "Fool_regole.html",
+    "Ammo-preview.html",
     "datasets.json",
     ".nojekyll",
     "dataset",

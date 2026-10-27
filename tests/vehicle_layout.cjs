@@ -47,8 +47,8 @@ process.chdir(path.resolve(__dirname,'..'));
    'The normalized logarithmic curve must agree with log(1 + score/base)');
  assert.equal(at([300,900,600],0),at([600,900,300],2),
    'Absolute position cannot depend on any other player score');
- assert(at([300,600,900],2)-at([300,600,900],0)>90,
-   'Different scores must create a visibly large gap');
+ assert(at([300,600,900],2)-at([300,600,900],0)>50,
+   'Different scores must create a visible gap within the compact bridge');
  assert.equal(at([1500,1500,1500],0),at([9000,9000,9000],0),
    'Progress must be clamped at five maximum-value questions');
  assert(at([9000,9000,9000],0)+31<512,'The leading vehicle must stay on the canvas');
