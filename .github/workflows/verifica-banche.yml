@@ -29,7 +29,7 @@ jobs:
   dataset-and-engine:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Convalida archivi e risposte
         run: python3 tests/verify_datasets.py
       - name: Esegui test motore
