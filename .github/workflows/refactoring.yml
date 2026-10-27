@@ -28,8 +28,6 @@ jobs:
             browser_path=$(node -p "require('playwright').chromium.executablePath()")
           fi
           echo "CHROMIUM_PATH=$browser_path" >> "$GITHUB_ENV"
-      - run: npm run preview:offline
-      - run: node tests/visual_quality.cjs
       - run: npm test
       - run: npm run test:frames
       - run: npm run test:browser
@@ -39,7 +37,6 @@ jobs:
       - run: npm run build
       - run: npm run test:offline
       - uses: actions/upload-artifact@v4
-        if: always()
         with:
           name: hellscape-${{ github.sha }}
           path: |

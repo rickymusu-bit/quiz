@@ -1,4 +1,4 @@
-"""Browser contracts for capture, vehicle swallowing/fire breath, escape/victory and Game Over/dance.
+"""Browser contracts for capture, vehicle swallowing/fire breath, escape/roar and Game Over/dance.
 Pass --gifs to record the actual Canvas timeline for review.
 """
 from pathlib import Path
@@ -21,25 +21,25 @@ with sync_playwright() as p:
   page.evaluate('''()=>{const render=FoolEnding.render;FoolEnding.render=(...args)=>{window.__endingPlan=args[3];return render(...args)}}''')
   return page
  def finish(page,winner):
-  page.evaluate('''winner=>{const g=HellscapeUI.game;g.s.id+='-final-'+winner;if(winner===null){g.eliminate(0,'test');g.eliminate(1,'test');g.eliminate(2,'test');g.s.respondent=2;}else{}g.complete(winner);HellscapeUI.changed()}''',winner)
+  page.evaluate('''winner=>{const g=HellscapeUI.game;g.s.id+='-final-'+winner;if(winner===null){g.eliminate(0,'test');g.eliminate(1,'test');g.eliminate(2,'test');g.s.respondent=2;}else{g.eliminate(1,'test');g.eliminate(2,'test');}g.complete(winner);HellscapeUI.changed()}''',winner)
  def raw(page):return page.locator('.hell-race-final canvas').evaluate('c=>c.toDataURL()')
- for winner,name in [(0,'celestial-victory'),(None,'eat-fire-dance')]:
+ for winner,name in [(0,'escape-roar'),(None,'eat-fire-dance')]:
   page=start();finish(page,winner);before=page.evaluate('JSON.stringify(HellscapeUI.game.snapshot())');frames=[];phase_set=set()
-  duration=12 if winner==0 else 8.6
+  duration=8.7 if winner==0 else 8.6
   for step in range(round(duration*10)):
    page.clock.run_for(100);phase=page.locator('.hell-race-final').get_attribute('data-ending-phase');phase_set.add(phase)
    if '--gifs' in sys.argv:
     image=Image.open(BytesIO(base64.b64decode(raw(page).split(',')[1]))).convert('RGB');frames.append(image)
-   if step in ([1,6,15,24,34,43,49,56,65,78,85,93,99,112] if winner==0 else [6,12,18,26,39,43,52,65,82]):
+   if step in ([1,6,15,24,34,43,49,56,65,82] if winner==0 else [6,12,18,26,39,43,52,65,82]):
     page.locator('.hell-race-final canvas').screenshot(path=str(ART/f'{name}-{step}.png'),animations='allow')
   assert page.locator('.hell-race-final').get_attribute('data-ending-phase')=='done'
   assert page.evaluate('JSON.stringify(HellscapeUI.game.snapshot())')==before,'Cinematic must preserve game state'
-  assert page.evaluate('window.__endingPlan.victims')==([1,2] if winner==0 else [2])
+  assert page.evaluate('window.__endingPlan.victims')==([] if winner==0 else [2])
   assert ('escape' in phase_set)==(winner==0)
-  assert ('breakout' in phase_set)==(winner==0)
+  assert ('roar' in phase_set)==(winner==0)
   assert ('rise' in phase_set)==(winner==0)
-  assert 'fire' not in phase_set
-  assert 'rage' not in phase_set
+  assert ('fire' in phase_set)==(winner==0)
+  assert ('rage' in phase_set)==(winner==0)
   assert ('dance' in phase_set)==(winner is None)
   expect(page.locator('.final-title')).to_be_visible()
   if frames:frames[0].save(ART/f'{name}.gif',save_all=True,append_images=frames[1:],duration=[100]*(len(frames)-1)+[1500],loop=0,optimize=True)
@@ -56,7 +56,7 @@ with sync_playwright() as p:
   page=start(True);finish(page,winner);page.clock.run_for(200);assert page.locator('.hell-race-final').get_attribute('data-ending-phase')=='done';a=raw(page);page.clock.run_for(500);assert raw(page)==a;expect(page.locator('.final-title')).to_be_visible();page.close()
  for width,height in [(390,844),(844,390)]:
   for winner in [0,None]:
-   page=start(viewport={'width':width,'height':height});finish(page,winner);page.clock.run_for(12000)
+   page=start(viewport={'width':width,'height':height});finish(page,winner);page.clock.run_for(9000)
    assert page.locator('.hell-race-final').get_attribute('data-ending-phase')=='done'
    assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+1 && document.documentElement.scrollHeight<=innerHeight+1')
    page.screenshot(path=str(ART/f'ending-{width}x{height}-{"win" if winner==0 else "over"}.png'));page.close()

@@ -84,7 +84,7 @@ function offline() {
 }
 function ammoPreview(){
   const assets={};
-  for(const name of ['vehicles-drive-v1.webp','demon-actions-v1.webp','infernal-world-v1.webp','portal-flames-v1.webp','ammo-relics-v1.webp','lava-bridge-v1.webp','lava-lake-v1.webp','demon-ending-v1.webp','celestial-portal-v1.webp']){
+  for(const name of ['vehicles-drive-v1.webp','demon-actions-v1.webp','infernal-world-v1.webp','portal-flames-v1.webp','ammo-relics-v1.webp','lava-bridge-v1.webp','lava-lake-v1.webp']){
     const p='assets/hell-race/'+name;assets[p]=data(p);
   }
   const html=inline('Ammo-preview.html').replace('<head>','<head><meta name="hellscape-revision" content="'+revision+'"><script>window.HellscapeOffline={assets:'+safe(assets)+'};</script>');

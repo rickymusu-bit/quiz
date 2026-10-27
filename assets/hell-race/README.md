@@ -29,9 +29,7 @@ Le ruote sollevano scie di polvere a lobi pixel art, che si espandono, scorrono 
 
 Il demone afferra l’intero veicolo, lo solleva con una mano e lo porta alle fauci: il mezzo viene inghiottito, segue la masticazione e poi una fiammata verso l’alto. Non rimane un veicolo abbandonato sulla strada. Le fiamme e le scintille sono particelle pixel art sincronizzate alla bocca. La memoria visuale della sessione registra le catture completate, senza scrivere nello stato o nei salvataggi del motore, così un eliminato non ricompare nel finale.
 
-Nel finale di vittoria il vincitore accelera e lascia indietro i concorrenti rimasti. Il demone li afferra e inghiotte completamente, uno alla volta. Un portale monumentale bianco, dorato, azzurro e blu emerge da sotto il ponte, rompe la carreggiata e riceve il vincitore. La scritta VITTORIA e i controlli appaiono solo dopo il suo attraversamento. Senza vincitore rimangono cattura, fiammata e danza del Game Over. Con movimento ridotto si passa direttamente al quadro conclusivo.
-
-`celestial-portal-v1.webp` è un nuovo asset RGBA 1024×1536 generato con imagegen e convertito in WebP qualità 94 con alfa. Il prompt richiede un arco celestiale gotico monumentale, marmo bianco, incisioni d’oro e vortice blu/azzurro/bianco, vista di tre quarti verso sinistra, silhouette intera su sfondo trasparente, senza personaggi né scritte. Il renderer separa la colonna anteriore per l’occlusione del veicolo; fratture e detriti del ponte seguono la stessa timeline.
+Con un vincitore e nessun avversario ancora da rimuovere, il portale sale dal terreno e lascia passare soltanto il superstite. Dopo il passaggio inizia a sprofondare: il demone ruggisce e lo investe con una fiammata mentre scende. Quando il portale è completamente sparito il demone compie tre salti sul posto con colpi dei pugni sul terreno. Se la partita termina per punteggio con altri giocatori attivi, le loro catture e le successive fiammate precedono l’apertura del portale. Senza vincitore viene inghiottito l’ultimo veicolo rimasto, seguita dalla fiammata e dalla danza di vittoria del demone. Le schermate WINS/GAME OVER e i relativi controlli compaiono al termine della sequenza, per non coprire l’azione. Con movimento ridotto si passa direttamente al quadro conclusivo.
 
 `npm run test:endings` verifica le sequenze reali in Chromium, l’assenza di resurrezioni, la continuità dopo un ridisegno UI, pausa, scheda nascosta e movimento ridotto. `python3 tests/endings.py --gifs` genera le GIF in `artifacts/`.
 
@@ -45,7 +43,11 @@ Le etichette dei giocatori sono assenti durante tutte le animazioni di cattura e
 
 `npm run test:terrain` verifica inizio/metà/fine su desktop e Android senza alterare il motore; `python3 tests/terrain_browser.py --gifs` produce il confronto `artifacts/terrain-stages.png` e la GIF `artifacts/terrain-evolution.gif`. I test senza browser controllano progressione, determinismo, limiti di disegno ed eruzioni; i test dei finali impediscono regressioni nelle etichette.
 
-Le fiammate restano nelle eliminazioni e nel Game Over. Durante l’inseguimento ordinario il demone cammina: i quattro fotogrammi e i due appoggi dei piedi seguono la distanza della strada (84 unità per ciclo), condividendo velocità e pausa con il ponte. I diavoli di sfondo usano sagome raster opache distribuite su otto altezze.
+Le fiammate usano un getto continuo simile a un lanciafiamme, con nucleo chiaro, cono turbolento e gocce incandescenti. Dopo un inghiottimento il getto sale verso l’alto; dopo la fuga segue il portale mentre si interra. La timeline ammette una sola attraversata e separa emersione, fuga, ruggito, attacco e rabbia.
+
+Nel finale il suolo resta fermo mentre fiamme e geyser continuano a muoversi con lo stesso orologio della sequenza; pausa e movimento ridotto congelano entrambi.
+
+Otto piccoli diavoli alati in silhouette volano nella fascia alta del cielo. Le sagome sono tracciate sul Canvas, larghe al massimo circa 14 pixel logici: oscillano e battono le ali lentamente, senza particelle accumulate o uso del caso del gioco. L’orologio comune congela anche il loro movimento in pausa, a scheda nascosta e con movimento ridotto. Restano dietro la scena principale e i pannelli.
 
 La figura espone `data-animation-busy` ed emette `foolanimationchange` durante avanzamenti, catture e finale. Il renderer non modifica lo stato di gioco; l’interfaccia usa questi segnali per nascondere i pannelli e, quando serve, conservare il tempo di risposta. La pausa temporanea dell’orologio per l’animazione lascia proseguire il Canvas; la pausa manuale e la sospensione lo congelano. Una cattura conclusa passa al prossimo attore o alla corsa nello stesso fotogramma.
 

@@ -102,10 +102,3 @@ body.showing-cinematic dialog::backdrop{background:transparent!important;box-sha
 #viewport-stage .turn-order .ammo-impact { margin-top: 8px; border-top: 1px solid #906346; padding: 7px 2px 1px; font: 15px/1.05 FoolTerminal, monospace; color: #ffdba0; }
 #viewport-stage .turn-order .ammo-impact strong { display: block; font-size: 15px; color: #ffe044; }
 #viewport-stage .turn-order .ammo-impact p { margin: 4px 0 0; overflow-wrap: anywhere; }
-
-/* Preserve the display-resolution backing stores of illustrated race assets. */
-.hell-race canvas,.vehicle-preview canvas{image-rendering:auto}
-
-#viewport-stage .ending.victory .final-title{position:absolute;top:30%;left:50%;transform:translateX(-50%);width:90%;z-index:5;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px}
-.ending .victory-wordmark{font:128px/1 FoolTerminal,monospace;letter-spacing:.04em;color:#fff1b2;text-shadow:0 0 20px #3ba9ff,4px 5px #153c83,-2px -2px #fff}
-#viewport-stage .ending.victory .winner-name{font-size:44px;color:#fff8dc}
