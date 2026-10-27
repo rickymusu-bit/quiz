@@ -1,4 +1,4 @@
-/* Fool — Fuga dall'Inferno v1.2.4 (2026-10-27): scena pixel-art illustrativa.
+/* Fool — Fuga dall'Inferno v1.3.0 (2026-10-27): scena pixel-art illustrativa.
    Nessuna modifica al motore, ai punteggi o ai salvataggi. */
 (function (root) {
   'use strict';
@@ -115,6 +115,24 @@
   }
   const reduce = root.matchMedia('(prefers-reduced-motion: reduce)');
   let live = null, last = null, roadPhase = 0, roadLastTime = null;
+  let visualState = null;
+  function syncVisual(state, final) {
+    if (!visualState || visualState.id !== state.id) {
+      const consumed = state.groups.map((g,i)=>g.out&&!(final&&state.winner===null&&i===state.respondent)?i:null).filter(i=>i!==null);
+      visualState={id:state.id,outs:state.groups.map(g=>g.out),consumed:new Set(consumed),queue:[],plan:null,elapsed:0,key:null};
+    }
+    state.groups.forEach((g,i)=>{if(g.out&&!visualState.outs[i]&&!visualState.consumed.has(i))visualState.queue.push({index:i,start:null});});
+    visualState.outs=state.groups.map(g=>g.out);
+    const key=final?state.id+':'+state.winner:null;
+    if(final&&visualState.key!==key){visualState.plan=root.FoolEnding.plan(state,[...visualState.consumed],visualState.queue.map(q=>q.index));visualState.elapsed=0;visualState.key=key;}
+    return visualState;
+  }
+  function endingHelpers(state) {
+    return {colors,vehicleIndex:(s,i)=>Math.max(0,VEHICLES.indexOf(s.config.vehicles?.[i]||['chopper','pickup','ape'][i])),
+      vehicleSize:row=>imageReady(sheets.vehicles)?vehicleSize(row):{width:50,height:40},
+      drawVehicle:(...args)=>{if(imageReady(sheets.vehicles))return drawVehicle(...args)},nameTag,gate,demonDust,
+      demon:(c,t)=>{c.save();c.translate(50,130);c.scale(1.3,1.3);demon(c,t);c.restore()}};
+  }
   const clamp = (n, a, b) => Math.min(b, Math.max(a, n));
   const smooth = x => { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); };
   const r = (c, x, y, w, h, color) => {
@@ -412,14 +430,13 @@
     const total = Math.max(1, Number(state.config.questionCount || 33));
     const progress = state.phase === 'pareggio' || state.phase === 'conclusa' ? 1 : clamp(state.valid / total, 0, 1);
     const motion = reduced ? 0 : roadTime;
-    background(c, W, motion, final ? 0 : progress);
-    const ended = final ? (reduced ? 5.2 : sec) : 0;
-    const escape = smooth((ended - .25) / 2.8);
-    if (final) gate(c, W - 90, 180, motion, true);
-    let demonX = 15;
-    if (final) demonX = 15 + smooth((ended - 1) / 3.4) * Math.max(70, W * .44);
-
+    background(c, W, motion, 0);
+    if(final&&root.FoolEnding&&!imageReady(root.FoolEnding.load(()=>live?.redraw?.()))){endingHelpers(state).demon(c,0);return root.FoolEnding.load(()=>{})?.failed?'done':'loading';}
+    if(final&&root.FoolEnding)return root.FoolEnding.render(c,W,state,visualState.plan,reduced?visualState.plan.duration:visualState.elapsed,endingHelpers(state));
+    // A consumed player never reappears on the track or in a later final.
     state.groups.forEach((group, i) => {
+      if(group.out)return;
+
       const configuredVehicle = state.config.vehicles?.[i] || ['chopper', 'pickup', 'ape'][i];
       const visualGroup = { ...group, vehicle: configuredVehicle };
       const ratio = positionScore(state, i);
@@ -428,38 +445,32 @@
       let x = start + (dest - start) * smooth(sec / .9);
       let unit = 2, y = lanes[i];
       let visible = true;
-      if (!final && group.out) x = Math.min(x, 125);
-      if (final) {
-        if (i === state.winner) {
-          x += escape * (W - x - 55);
-          if (ended >= 3.1) visible = false;
-        } else {
-          const victims = state.groups.map((g, j) => j).filter(j => j !== state.winner);
-          const order = victims.indexOf(i);
-          const consumed = smooth((ended - 1.65 - order * 1.1) / .7);
-          x += (1.3 * demonX + 100 - x) * consumed;
-          y += (245 - y) * consumed;
-          if (consumed > .85) unit = 1;
-          if (consumed >= 1) visible = false;
-        }
-      }
       if (visible) {
         const bounds = racer(c, x, y, i, motion, visualGroup, unit);
         nameTag(c, W, x, bounds.y, group.name, colors[i]);
       }
     });
-    c.save();c.translate(0,130);c.scale(1.3,1.3);demon(c, motion, demonX, '#9b2831', !final||ended<1?'chase':ended<1.65?'attack':'devour', ended<1.65?Math.max(0,ended-1):Math.max(0,(ended-1.65)%1.1));c.restore();
-    if (final && ended > 3.6) {
-      c.font = 'bold 17px monospace';
-      c.fillStyle = '#f7e2af';
-      const message = state.winner === null ? 'NESSUNO È FUGGITO' : 'FUGA RIUSCITA';
-      c.fillText(message, clamp((W - c.measureText(message).width) / 2, 7, W - 170), 27);
+    const queue=visualState?.queue||[];
+    if(reduced){for(const item of queue)visualState.consumed.add(item.index);queue.length=0;}
+    if(queue.length&&root.FoolEnding&&!imageReady(root.FoolEnding.load(()=>live?.redraw?.()))){
+      if(root.FoolEnding.load(()=>{})?.failed){for(const item of queue)visualState.consumed.add(item.index);queue.length=0;}
+      endingHelpers(state).demon(c,motion);return 'race';
     }
+    if(queue.length&&root.FoolEnding){
+      const item=queue[0];if(item.start===null)item.start=roadTime;
+      const age=Math.max(0,roadTime-item.start);
+      if(age>=root.FoolEnding.CAPTURE){visualState.consumed.add(item.index);queue.shift();}
+      else root.FoolEnding.capture(c,W,state,item.index,age,endingHelpers(state));
+    }else{c.save();c.translate(0,130);c.scale(1.3,1.3);demon(c,motion,15);c.restore();}
+    return 'race';
   }
+
   function createStage(state, final = false) {
     if (live) root.cancelAnimationFrame(live.frame);
+    if(root.FoolEnding){syncVisual(state,final);root.FoolEnding.load(()=>live?.redraw?.());}
     const fig = document.createElement('figure');
     fig.className = 'hell-race' + (final ? ' hell-race-final' : '');
+    if(final)fig.dataset.endingPhase='loading';
     const canvas = document.createElement('canvas');
     canvas.height = H;
     canvas.width = 512;
@@ -468,7 +479,7 @@
     const caption = document.createElement('figcaption');
     caption.className = 'hell-race-caption';
     caption.textContent = final
-      ? (state.winner === null ? 'Nessun giocatore è riuscito a fuggire dall’Inferno.' : state.groups[state.winner].name + ' fugge dall’Inferno. Gli altri vengono catturati dal demone.')
+      ? (state.winner === null ? 'Il demone inghiotte l’ultimo veicolo, sputa fuoco verso l’alto e danza vittorioso. Nessun giocatore è fuggito.' : state.groups[state.winner].name + ' attraversa il portale e fugge. Il demone ruggisce furioso.')
       : 'Fuga dall’Inferno: le posizioni dei tre veicoli seguono i punteggi. La porta si avvicina con il procedere delle domande.';
     fig.appendChild(caption);
     const ctx = canvas.getContext('2d', { alpha: false });
@@ -481,7 +492,7 @@
     const record = { frame: 0, canvas };
     live = record;
     const start = performance.now(), reduced = reduce.matches;
-    let freeze = 0, oldTime = start;
+    let freeze = 0, oldTime = start,lastEndingTime=start;
     const draw = now => {
       if (live !== record || !canvas.isConnected) return;
       const width = 512;
@@ -491,10 +502,13 @@
       const stop = state.paused || state.suspended || document.hidden;
       if (stop) freeze += Math.max(0, (now - oldTime) / 1000);
       oldTime = now;
-      if (roadLastTime !== null && !stop && !reduced) roadPhase += clamp((now - roadLastTime) / 1000, 0, .06);
+      if (roadLastTime !== null && !stop && !reduced && !final) roadPhase += clamp((now - roadLastTime) / 1000, 0, .06);
       roadLastTime = now;
-      scene(ctx, width, state, Math.max(0, elapsed - freeze), final, previous, reduced, final ? Math.max(0,elapsed-freeze) : roadPhase);
-      if (!reduced && (!final || Math.max(0,elapsed-freeze) < 5.8)) record.frame = root.requestAnimationFrame(draw);
+      if(final&&visualState?.plan&&!stop&&imageReady(root.FoolEnding.load(()=>live?.redraw?.())))visualState.elapsed+=Math.min(.1,Math.max(0,(now-lastEndingTime)/1000));
+      lastEndingTime=now;
+      const phase=scene(ctx, width, state, Math.max(0, elapsed - freeze), final, previous, reduced, roadPhase);
+      if(final&&fig.dataset.endingPhase!==phase){fig.dataset.endingPhase=phase;if(phase==='done')fig.dispatchEvent(new CustomEvent('foolendingcomplete',{bubbles:true}));}
+      if (!reduced && (!final || phase!=='done')) record.frame = root.requestAnimationFrame(draw);
     };
     record.redraw = () => {
       if (live !== record || !canvas.isConnected) return;

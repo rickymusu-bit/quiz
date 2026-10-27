@@ -17,3 +17,7 @@ Seamless horizontally tiling side-scrolling game background. Match the reference
 ## Portale
 
 Production transparent game sprite sheet, eight columns and one row. Same complete freestanding tall gothic basalt gate in every cell, flanked by spires, rusty metal and skull details, filled with orange-white fire. Eight coherent flame flicker frames for a loop; fixed outer architecture. Dark crisp pixel art matching the reference, strong lava highlights. No text, labels, grid lines, floor, background or characters.
+
+## Finale v1.3.0 — 27/10/2026
+
+Nuovo atlante trasparente, sedici pose in quattro righe, usando `demon-actions-v1.webp` come riferimento di identità e stile: prima riga mano aperta, presa, sollevamento e mano davanti alla bocca; seconda riga alimentazione, chiusura mandibola e masticazione; terza riga ruggito furioso; quarta riga danza con piedi alternati e pugni alzati. Nessuna vittima o sangue nell’asset: il mezzo resta un componente della scena, sincronizzati alle pose. Il sorgente generato resta separato dal WebP senza perdita.

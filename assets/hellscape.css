@@ -89,3 +89,9 @@ dialog .scoreboard{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));ga
 #viewport-stage main.operational .player-card.active .player-card-body{left:-2px;right:-2px;border-color:#ffe044;box-shadow:0 4px 12px #ffe04433,4px 6px 12px #000a}
 
 .player-card-header .team-vehicle canvas{display:block;width:100%;height:100%;object-fit:contain}
+
+/* Let the entire capture/escape sequence finish before revealing the result UI. */
+.ending:has(.hell-race-final:not([data-ending-phase="done"]))>.final-title,
+.ending:has(.hell-race-final:not([data-ending-phase="done"]))>.final-answer,
+.ending:has(.hell-race-final:not([data-ending-phase="done"]))>.row,
+.ending:has(.hell-race-final:not([data-ending-phase="done"]))>.game-options{visibility:hidden;pointer-events:none}

@@ -1245,7 +1245,9 @@
     if (s.winner !== null)
       title.append(node("span", s.groups[s.winner].name, "winner-name"));
     title.append(art);
-    b.append(title, FoolHellRace.createStage(s, true));
+    const stage = FoolHellRace.createStage(s, true);
+    stage.addEventListener("foolendingcomplete", () => title.focus({ preventScroll: true }));
+    b.append(title, stage);
     if (s.result && s.current && s.result.question === s.current.id) {
       const r = s.result,
         summary = node("div", undefined, "final-answer");
