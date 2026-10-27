@@ -15,7 +15,7 @@ const {chromium}=require("playwright"),fs=require("node:fs"),assert=require("nod
    await page.goto("http://quality.test/");
    await page.frameLocator("iframe").getByRole("link",{name:"Nuova partita",exact:true}).click();
    const frame=page.frames()[1];
-   await frame.getByRole("button",{name:"Inizia partita",exact:true}).click();
+   await frame.getByRole("button",{name:/^Inizia partita/}).click();
    await frame.waitForFunction(()=>document.querySelector(".hell-race canvas")?.width>=1024);
    await frame.evaluate(()=>{
     const g=HellscapeUI.game;
