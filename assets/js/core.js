@@ -5,6 +5,15 @@
     VERSION = "2.3.0",
     TYPES = ["salta", "ruba", "svela", "aura", "karma", "marx", "ira"];
   const LABELS = {
+    salta: "Catene",
+    ruba: "Tributo",
+    svela: "Malocchio",
+    aura: "Sigillo",
+    karma: "Contrappasso",
+    marx: "Livella",
+    ira: "Flagello",
+  };
+  const AMMO_HELP = {
     salta: "Le catene immobilizzano un avversario attivo e gli fanno saltare il prossimo turno ordinario. Più Catene si sommano, una per turno. Se riceve una domanda tramite Malocchio, risponde subito, ma le Catene restano pendenti. Nessuna vita viene tolta.",
     ruba: "Esigi un tributo dal prossimo guadagno del bersaglio: dopo una risposta corretta, lui e gli attaccanti distinti si dividono i nuovi punti in parti uguali. Più Tributi dello stesso autore valgono una sola quota. L’effetto finisce anche se il bersaglio sbaglia o scade il tempo.",
     svela: "Scruti domanda e alternative a timer fermo. Puoi affrontarla oppure passarla immediatamente a un altro dannato attivo: il timer intero parte alla conferma. Chi la riceve non può usare Ammo o passarla di nuovo. Le Catene già pendenti sul bersaglio non vengono consumate.",
@@ -12,15 +21,6 @@
     karma: "Contrappasso agisce passivamente: quando subisci un nuovo attacco non bloccato, una copia si trasforma in quell’Ammo, utilizzabile solo contro l’aggressore. Ogni attacco trasforma al massimo una copia. Non reagisce a Livella o Flagello.",
     marx: "Livella redistribuisce immediatamente in parti uguali i punti di tutti i dannati ancora in gara, compreso chi la usa. Il totale resta identico anche con frazioni. Non agisce sugli eliminati, non viene bloccata da Sigillo e non attiva Contrappasso.",
     ira: "Flagello travolge contemporaneamente tutti i dannati ancora in gara, compreso chi lo evoca: ciascuno perde una vita. Chi raggiunge zero è eliminato; i punti restano invariati. Sigillo non protegge e Contrappasso non reagisce. Se nessuno sopravvive, è Game Over.",
-  };
-  const AMMO_HELP = {
-    salta: "Fa saltare a un avversario attivo la sua prossima occasione di risposta. Più salti sullo stesso bersaglio si sommano. Non consuma una domanda valida e non toglie vite.",
-    ruba: "Condivide il guadagno della prossima risposta corretta del bersaglio fra lui e tutti i beneficiari distinti, in parti uguali. I punti già accumulati restano invariati. L’effetto termina anche se il bersaglio sbaglia o scade il tempo.",
-    svela: "Si usa prima di svelare la domanda. Mostra domanda e alternative a timer fermo: puoi tenerla o passarla a un altro dannato attivo. Il tempo intero parte alla conferma. Chi la riceve non può usare Ammo né passarla di nuovo.",
-    aura: "Va attivata nel tuo turno. Blocca i nuovi attacchi Nope, Bullo e Spoiler fino all’inizio del tuo prossimo turno. Non cancella effetti già pendenti e non protegge da Marx, Ira divina, sanzioni o errori.",
-    karma: "È passiva: una copia si trasforma quando subisci un nuovo attacco non bloccato, diventando quell’Ammo e restando utilizzabile soltanto contro l’autore. Non si attiva manualmente e non reagisce a Marx o Ira divina.",
-    marx: "Redistribuisce subito, in parti uguali, tutti i punti dei dannati ancora in gara, compreso chi la usa. Il totale resta esatto anche con frazioni. Esclude gli eliminati e non viene bloccata da Aura né attiva Karma.",
-    ira: "Toglie contemporaneamente una vita a tutti i dannati ancora in gara, compreso chi la usa. Sulla vita ha lo stesso effetto di una sanzione, esteso a tutti. Chi arriva a zero è eliminato; i punti restano invariati. Aura non la blocca e Karma non si trasforma. Se nessuno sopravvive, è Game Over.",
   };
   const DEFAULT_BONUS_WEIGHTS = Object.fromEntries(
     TYPES.map((type) => [type, type === "ira" ? 5 : type === "marx" ? 15 : 30]),
