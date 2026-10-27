@@ -19,9 +19,13 @@ with sync_playwright() as p:
  for width,height in [(1440,900),(390,844),(844,390)]:
   page=start(width,height);panels(page,True)
   page.get_by_role('button',name='Svela e avvia il tempo').click();page.locator('.answer').nth(page.evaluate('HellscapeUI.game.s.current.correct')).click();page.clock.run_for(120)
-  panels(page,False);page.screenshot(path=str(ART/f'cinematic-movement-{width}.png'))
+  panels(page,False)
+  expect(page.locator('.movement-cue')).to_have_text('RISPOSTA CORRETTA')
+  expect(page.locator('.movement-cue')).to_be_visible()
+  page.screenshot(path=str(ART/f'cinematic-movement-{width}.png'))
   snapshot=page.evaluate('JSON.stringify(HellscapeUI.game.snapshot())');page.keyboard.press('Enter');assert page.evaluate('JSON.stringify(HellscapeUI.game.snapshot())')==snapshot
-  page.clock.run_for(1300);panels(page,True)
+  page.clock.run_for(1800);panels(page,True)
+  expect(page.locator('.movement-cue')).to_have_count(0)
   page.get_by_role('button',name='Prossima domanda',exact=True).click();page.clock.run_for(100)
   page.evaluate("()=>{const g=HellscapeUI.game;g.eliminate(g.s.order.find(i=>i!==g.s.respondent),'test');HellscapeUI.changed()}")
   page.clock.run_for(700);panels(page,False);page.screenshot(path=str(ART/f'cinematic-capture-{width}.png'))
@@ -42,6 +46,19 @@ with sync_playwright() as p:
  page.evaluate('''()=>{const g=HellscapeUI.game;g.setScore(g.s.owner,Fool.rational(300),g.s.revision);HellscapeUI.changed();const d=document.getElementById('dialog');d.innerHTML='<h2>Test</h2>';d.showModal();document.getElementById('message').textContent='Test';}''');page.clock.run_for(100)
  panels(page,False);expect(page.locator('#dialog')).not_to_be_visible();expect(page.locator('#message')).not_to_be_visible()
  assert page.locator('#dialog').evaluate('d=>getComputedStyle(d,"::backdrop").backgroundColor')=='rgba(0, 0, 0, 0)'
- page.clock.run_for(1000);panels(page,True);expect(page.locator('#dialog')).to_be_visible();page.close()
+ page.clock.run_for(1700);panels(page,True);expect(page.locator('#dialog')).to_be_visible();page.close()
+ # Wrong answer: visible message, even when the score remains unchanged.
+ page=start(1440,900);page.get_by_role('button',name='Svela e avvia il tempo').click()
+ page.locator('.answer').nth((page.evaluate('HellscapeUI.game.s.current.correct')+1)%4).click()
+ page.clock.run_for(100)
+ expect(page.locator('.movement-cue')).to_have_text('RISPOSTA ERRATA')
+ expect(page.locator('.movement-cue')).to_be_visible()
+ page.screenshot(path=str(ART/'cinematic-incorrect-1440.png'))
+ page.clock.run_for(1800);expect(page.locator('.movement-cue')).to_have_count(0);page.close()
+ # Illustrate actual gaps at 0, 600 and 1200 points in the race.
+ page=start(1440,900)
+ page.evaluate("""()=>{const g=HellscapeUI.game;g.s.groups.forEach((v,i)=>v.score=Fool.rational(i*600));HellscapeUI.changed();}""")
+ page.clock.run_for(1700)
+ page.screenshot(path=str(ART/'race-score-distance-1440.png'));page.close()
  assert not errors,errors;browser.close();print(json.dumps({'cinematic_ui':checks,'errors':errors},indent=2))
 server.shutdown()
