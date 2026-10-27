@@ -31,7 +31,7 @@ const assert = require('node:assert/strict');
       for (const card of await cards.all()) {
         assert(!await card.evaluate(e => e.open));
         assert(await card.locator('.player-points').isVisible());
-        const nameBox=await card.locator('h3').boundingBox(),vehicleBox=await card.locator('.team-vehicle').boundingBox();
+        const nameBox=await card.locator('h3').boundingBox(),vehicleBox=await card.locator('.team-vehicle canvas').boundingBox();
         assert(nameBox.y+nameBox.height<=vehicleBox.y,'Player name must be above the vehicle sprite in every card');
       }
       const opened = await cards.first().getAttribute('data-team');

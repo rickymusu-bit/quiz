@@ -69,7 +69,7 @@ dialog .scoreboard{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));ga
 .player-sidebar>.scoreboard.player-stack{display:flex;flex-direction:column;gap:12px;max-height:none;overflow:visible;width:100%}
 #viewport-stage main.operational .player-card{padding:0;border:1px solid #906346;box-shadow:3px 3px #08040380;background:#120e0bdb;flex:0 0 auto}
 #viewport-stage main.operational .player-card.active{border:2px solid #ffe044;box-shadow:0 0 13px #ffe04466,inset 0 0 12px #ffe04412;background:#211708e0}
-#viewport-stage .player-card-header{position:relative;isolation:isolate;display:grid;grid-template-columns:minmax(0,1fr) 104px;grid-template-rows:auto 34px 20px;gap:4px 8px;cursor:pointer;padding:13px 30px 13px 14px;min-height:94px;list-style:none;overflow:hidden}
+#viewport-stage .player-card-header{position:relative;isolation:isolate;display:grid;grid-template-columns:minmax(0,1fr) 130px;grid-template-rows:auto 44px 26px;gap:4px 8px;cursor:pointer;padding:13px 30px 13px 14px;min-height:94px;list-style:none;overflow:hidden}
 .player-card-header::-webkit-details-marker{display:none}
 .player-card-header::after{content:'▾';position:absolute;right:12px;top:15px;color:#c7a27d;font-size:20px;line-height:1}
 .player-card[open]>.player-card-header::after{content:'▴'}
@@ -79,7 +79,7 @@ dialog .scoreboard{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));ga
 #viewport-stage main.operational .player-card .player-card-body{padding:10px 14px 14px;border-top:1px solid #725038;max-height:185px;overflow:auto;position:relative;z-index:1}
 .player-card-inventory h4{font:22px/1 FoolTerminal,monospace;margin:10px 0 8px;color:#d7b084}.player-card-inventory p{margin:0}
 .player-card .bonus-list{margin:0;display:grid;gap:6px}.player-card .ammo-item{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:14px}.player-card .ammo-round{width:24px;height:24px}
-.player-card-header .team-symbol.team-vehicle{position:relative;grid-column:2;grid-row:2 / 4;z-index:0;inset:auto;align-self:end;width:104px;height:58px;opacity:.23}
+.player-card-header .team-symbol.team-vehicle{position:relative;grid-column:2;grid-row:2 / 4;z-index:0;inset:auto;align-self:end;width:130px;height:74px;opacity:.23}
 .player-card.out::after{display:none}
 
 /* Expanded content floats over subsequent cards without moving the stack. */
@@ -87,3 +87,5 @@ dialog .scoreboard{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));ga
 #viewport-stage main.operational .player-card{position:relative;overflow:visible}
 #viewport-stage main.operational .player-card .player-card-body{position:absolute;top:100%;left:-1px;right:-1px;z-index:2;max-height:225px;background:#17110f;border:1px solid #906346;box-shadow:4px 6px 12px #000a}
 #viewport-stage main.operational .player-card.active .player-card-body{left:-2px;right:-2px;border-color:#ffe044;box-shadow:0 4px 12px #ffe04433,4px 6px 12px #000a}
+
+.player-card-header .team-vehicle canvas{display:block;width:100%;height:100%;object-fit:contain}
