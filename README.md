@@ -6,6 +6,46 @@ Sito: https://rickymusu-bit.github.io/quiz/
 
 Hellscape è un quiz di fisica per tre giocatori, pubblicato su GitHub Pages dal ramo `main`. Il gioco carica automaticamente i quesiti dal catalogo `datasets.json`. Le domande appartengono a banche separate, associate a materie e argomenti; non è richiesto un server applicativo.
 
+## Struttura e sviluppo
+
+Il refactoring parte dalla head `f2a2458` della PR #17, ancora aperta al momento del lavoro. La PR di refactoring dipende da quelle correzioni; non modifica né integra la PR #17.
+
+Il sito funziona direttamente come archivio statico, senza compilazione obbligatoria, framework o dipendenze JavaScript scaricate a runtime. I moduli usano IIFE con esportazioni CommonJS per i test Node: `core` → `datasets` → `engine`; `loader` dipende da `datasets`; `persistence` riceve storage e motore; `ui` coordina questi moduli. Non ci sono dipendenze circolari.
+
+- `assets/js/core.js`: costanti, frazioni esatte e funzioni condivise.
+- `assets/js/engine.js`: partita, turni, timer, punteggi, Ammo, sanzioni, spareggio, finali e validazione/migrazione dello stato. Si importa in Node senza DOM; l’API pubblica `Fool` resta disponibile.
+- `assets/js/datasets.js`: parsing, validazione delle banche e notazione scientifica.
+- `assets/js/loader.js`: catalogo e caricamento dal sito o dalle risorse incorporate nell’export.
+- `assets/js/persistence.js`: accesso iniettato a storage, lettura/scrittura dei profili e ripresa attraverso il motore. Il sito conserva `fool-v1`, `fool-settings-v1` e il JSON esistente.
+- `assets/js/ui.js`: configurazione, impostazioni, schermate, dialoghi, comandi e adattamento del palco. Lo stato dell’interfaccia è racchiuso nel modulo; `HellscapeUI` è la facciata esplicita usata dalle regressioni browser.
+- `assets/css/game.css` e `assets/hellscape.css`: stili di base estratti e stili della grafica esistente, nello stesso ordine di cascata.
+- `assets/hell-race.js`: componente Canvas separato; legge lo stato senza applicare transizioni al motore.
+- `assets/vendor/katex.js` e `katex.css`: KaTeX 0.16.22 e font incorporati estratti senza riscrittura; licenza in `assets/vendor/README.md` e nell’HTML.
+- `scripts/build.cjs`: copia statica e generazione dell’unico HTML offline dagli stessi sorgenti.
+
+Servono Node 22 o successivo e Python 3.12 per i comandi di sviluppo. Il sito pubblicato non richiede Node o Python.
+
+```sh
+npm ci
+python3 -m pip install -r requirements-test.txt
+npm run dev             # http://127.0.0.1:8000
+npm test                # motore, persistenza e 200 domande delle due banche
+npm run test:frames     # 48 fotogrammi veicoli + 12 demone, proporzioni e nomi
+npm run test:browser    # regressioni interfaccia e Canvas
+npm run build           # dist/site, pubblicabile su hosting statico
+npm run test:offline    # genera e verifica dist/Hellscape-offline.html
+```
+
+I test riutilizzano Chromium in `/usr/bin/chromium`; per un altro eseguibile impostare `CHROMIUM_PATH`. Se non è presente un browser, installarlo con `npx playwright install --with-deps chromium` e impostare `CHROMIUM_PATH` al percorso restituito da `node -p "require('playwright').chromium.executablePath()"`. La generazione dell’export usa soltanto librerie standard di Node.
+
+GitHub Pages può continuare a pubblicare la radice del ramo `main`, con gli stessi URL `index.html`, `Fool.html`, `Fool_regole.html`, catalogo, dataset e asset. `npm run build` produce anche `dist/site` per altri hosting statici; non pubblica nulla e non modifica la configurazione Pages.
+
+L’anteprima include home, gioco, regole, entrambi i dataset, script, CSS, immagini e font in **un solo HTML**. Le pagine sono incorporate in un iframe che viene ricreato alla navigazione, così timer ed eventi della pagina precedente vengono chiusi. La chiave delle partite esportate è `hellscape-offline-v1:fool-v1`; quella dei profili è `hellscape-offline-v1:fool-settings-v1`. Non legge o sovrascrive i salvataggi del sito. Il meta `hellscape-revision` e `dist/revision.json` identificano il commit generatore; gli output sono ignorati da Git e vanno rigenerati dopo ogni modifica, senza correggerli a mano.
+
+`tests/offline.py` carica gli esatti byte dell’HTML in un contesto Chromium senza rete, controlla entrambe le banche, risposte, regole, ripresa, isolamento dei salvataggi, assenza di richieste esterne ed errori JavaScript a 1440×900, 390×844 e 844×390. Il browser gestito di questa sessione blocca gli URL `file://`: il test usa una sola risposta locale intercettata per fornire il documento e non certifica l’apertura diretta da file in quel browser. Gli screenshot vengono scritti in `artifacts/`.
+
+Per confrontare la grafica con la base della PR #17, preparare un checkout e indicarlo a `HELLSCAPE_BASELINE=/percorso/base python3 tests/visual_parity.py` (richiede Pillow). Il test confronta pixel per pixel tre screenshot con movimento ridotto e riprende una partita salvata dal codice della base. È una verifica del solo refactoring: la successiva correzione approvata delle proporzioni dei mezzi e della posizione dei nomi produce differenze visive intenzionali rispetto alla PR #17. La base non viene usata dal sito o dalla build.
+
 ## Partita ordinaria
 
 Il docente configura nomi, simboli e tre veicoli distinti per i giocatori, tempo, punteggi, difficoltà, argomenti e numero di domande (multiplo di tre da 3 a 99, predefinito 33). All'avvio viene indicato esplicitamente il numero di domande della **partita ordinaria**: lo spareggio non è un'alternativa all'inizio della partita. I vecchi profili salvati con meno di 33 domande, non marcati come scelta esplicita, vengono riportati a 33; una nuova scelta di partita breve, salvata dalle impostazioni, resta valida. Se si riprende una partita già salvata con meno di 33 domande, viene mostrato un avviso; la partita esistente non viene modificata automaticamente. Una risposta corretta assegna i **punti base della difficoltà**, senza moltiplicatori o serie; una risposta errata non sottrae punti. I punti possono essere condivisi tramite Bullo. L'ordine dei giocatori è sorteggiato e poi fisso.
@@ -38,7 +78,7 @@ La partita viene salvata automaticamente in `localStorage` nello stesso browser.
 
 ## Contenuto e verifiche
 
-- `Fool.html`: interfaccia e motore incorporato.
+- `Fool.html`: struttura della pagina e caricamento dei moduli; mantiene il suo URL pubblico.
 - `assets/ammo-sprites-48.png`: sei icone originali in pixel art, sprite sheet PNG trasparente da 48 px per icona.
 - `Fool_regole.html`: regolamento proiettabile in classe.
 - `dataset/`, `datasets.json`: banche pubblicate e catalogo.
