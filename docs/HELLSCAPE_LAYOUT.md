@@ -51,6 +51,8 @@ animazioni il controller porta in vista e centra la scena completa, blocca lo
 scorrimento dei pannelli nascosti e sposta il focus sulla figura. Al termine
 riporta in vista i controlli. Le scelte di layout non leggono o modificano lo
 stato della partita; pausa, timer ed esiti restano gestiti dai moduli esistenti.
+L'evento `foolendingcomplete` porta il titolo conclusivo nell'area visibile anche
+in movimento ridotto e quando si visualizzano più scenari finali consecutivi.
 
 ## Verifiche e artefatti
 

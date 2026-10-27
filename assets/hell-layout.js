@@ -20,6 +20,7 @@
   css.setProperty('--stage-aspect', String(reference.width / reference.height));
   if (!stage) return; // Standalone asset preview uses only the coordinate contract.
   let queued = false, wasCinematic = false, wasPlaying = false, wasFinished = false, previousPanel = null;
+  let endingComplete = false;
   function fit() {
     queued = false;
     const viewport = root.visualViewport,
@@ -62,7 +63,7 @@
       if (bounds.bottom > height || bounds.top < 0)
         (stage.querySelector('.statusline') || panel).scrollIntoView({block:'start'});
     }
-    if (layout.compact && finished && !wasFinished && !cinematic) {
+    if (layout.compact && finished && (!wasFinished || endingComplete) && !cinematic) {
       const title = stage.querySelector('.final-title');
       if (title && getComputedStyle(title).visibility !== 'hidden') title.scrollIntoView({block:'nearest'});
       else stage.scrollTop = 0;
@@ -71,6 +72,7 @@
     wasPlaying = playing;
     wasFinished = finished;
     previousPanel = panelMode;
+    endingComplete = false;
     return layout;
   }
   function schedule() {
@@ -83,5 +85,6 @@
   root.addEventListener('resize', schedule);
   root.visualViewport?.addEventListener('resize', schedule);
   doc.addEventListener('fullscreenchange', schedule);
+  doc.addEventListener('foolendingcomplete', () => { endingComplete = true; schedule(); });
   fit();
 })(globalThis);
