@@ -50,3 +50,11 @@ Nel finale il suolo resta fermo mentre fiamme e geyser continuano a muoversi con
 Otto piccoli diavoli alati in silhouette volano nella fascia alta del cielo. Le sagome sono tracciate sul Canvas, larghe al massimo circa 14 pixel logici: oscillano e battono le ali lentamente, senza particelle accumulate o uso del caso del gioco. L’orologio comune congela anche il loro movimento in pausa, a scheda nascosta e con movimento ridotto. Restano dietro la scena principale e i pannelli.
 
 La figura espone `data-animation-busy` ed emette `foolanimationchange` durante avanzamenti, catture e finale. Il renderer non modifica lo stato di gioco; l’interfaccia usa questi segnali per nascondere i pannelli e, quando serve, conservare il tempo di risposta. La pausa temporanea dell’orologio per l’animazione lascia proseguire il Canvas; la pausa manuale e la sospensione lo congelano. Una cattura conclusa passa al prossimo attore o alla corsa nello stesso fotogramma.
+
+## Revisione horror e ponte sospeso
+
+- `ammo-relics-v1.webp`: atlante 3×3 di catena, ossario, basalto infuocato, gabbia gotica, occhio demoniaco, specchio infranto, tributo, bilancia e fiammata. Animazione per assemblaggio, chiusura, apertura, rotazione, eruzione e frammenti; nessun alone geometrico al neon.
+- `lava-bridge-v1.webp`: superficie carrabile di basalto e ferro, parapetto gotico e muratura sospesa con catene. Tre bande sorgente condividono lo scorrimento.
+- `lava-lake-v1.webp`: superficie liquida del lago di lava, separata dal ponte.
+
+Asset generati con imagegen, convertiti in WebP qualità 90 con alfa. Gli originali PNG sono conservati in `/workspace/generated_images/` (exec-648ff1a1-cff7-44ac-9861-1b218517231d, exec-8458c4de-83f5-4838-ba21-499b21c05aa1, exec-3984dcd7-ca3a-4290-844a-160cf1b41f67). La scala di corsa 0,62 e gli appoggi calcolati dalle sagome sostituiscono i vecchi appoggi fissi; corsa e cattura conservano tutte le pose complete.

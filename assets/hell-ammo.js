@@ -3,8 +3,6 @@
   "use strict";
   const labels = { salta: "CATENE", ruba: "TRIBUTO", svela: "MALOCCHIO",
     aura: "SIGILLO", karma: "CONTRAPPASSO", marx: "LIVELLA", ira: "FLAGELLO" };
-  const colors = { salta: "#b7c6d8", ruba: "#ffd568", svela: "#c79aff",
-    aura: "#82e4de", karma: "#e99eff", marx: "#f6c76e", ira: "#ff885b" };
   const details = { salta: "Prossimo turno saltato", ruba: "Prossimo guadagno condiviso",
     svela: "Scelta del destinatario", aura: "Protezione attiva", karma: "Munizione trasformata",
     marx: "Punti divisi in parti uguali", ira: "Tutti perdono una vita" };
@@ -56,104 +54,96 @@
       },
     };
   }
-  const mix = (a, b, t) => a + (b - a) * t;
-  function line(c, points, color, width = 2) {
-    c.strokeStyle = color; c.lineWidth = width; c.lineJoin = "miter";
-    c.beginPath(); points.forEach(([x, y], i) => i ? c.lineTo(Math.round(x), Math.round(y)) : c.moveTo(Math.round(x), Math.round(y))); c.stroke();
+  const mix = (a,b,t) => a+(b-a)*t;
+  let art = null;
+  const cells = [[0,0],[1,0],[2,0],[0,1],[1,1],[2,1],[0,2],[1,2],[2,2]];
+  function load(redraw=()=>{}) {
+    if (!art && typeof root.Image === "function") {
+      art = new root.Image();
+      const path="assets/hell-race/ammo-relics-v1.webp";
+      art.src=root.HellscapeOffline?.assets?.[path]||path;
+      art.addEventListener("load",redraw,{once:true});
+    }
+    return art;
   }
-  function ring(c, x, y, radius, color) {
-    const points = Array.from({ length: 9 }, (_, i) => [x + Math.cos(i * Math.PI / 4) * radius, y + Math.sin(i * Math.PI / 4) * radius]);
-    line(c, points, "#1a1024", 5); line(c, points, color);
+  function relic(c,index,x,y,w,h,angle=0) {
+    const img=load();if(!img?.complete||!img.naturalWidth)return;
+    const [col,row]=cells[index],sw=img.naturalWidth/3,sh=img.naturalHeight/3;
+    c.save();c.translate(Math.round(x),Math.round(y));c.rotate(angle);
+    c.drawImage(img,col*sw,row*sh,sw,sh,Math.round(-w/2),Math.round(-h/2),Math.round(w),Math.round(h));c.restore();
   }
-  function coin(c, x, y) {
-    c.fillStyle = "#704025"; c.fillRect(Math.round(x) - 4, Math.round(y) - 4, 8, 9);
-    c.fillStyle = "#ffd568"; c.fillRect(Math.round(x) - 3, Math.round(y) - 4, 6, 7);
-    c.fillStyle = "#fff0b0"; c.fillRect(Math.round(x) - 1, Math.round(y) - 3, 2, 4);
+  // Physical fragments, with a dark underside and an ember-lit broken face.
+  function debris(c,x,y,t,seed,bone=false) {
+    for(let n=0;n<9;n++) {
+      const a=n*2.4+seed,age=(t+n/13)%1,r=8+age*24;
+      const px=Math.round(x+Math.cos(a)*r),py=Math.round(y+Math.sin(a)*r*.6-age*12);
+      c.fillStyle=bone?"#35251d":"#170f0e";c.fillRect(px-2,py-1,5,4);
+      c.fillStyle=bone?"#b7a078":n%3?"#71402a":"#db6b26";c.fillRect(px-2,py-2,3,2);
+    }
   }
-  function eye(c, x, y, color) {
-    line(c, [[x-23,y],[x-12,y-10],[x+12,y-10],[x+23,y],[x+12,y+10],[x-12,y+10],[x-23,y]], "#211329", 7);
-    line(c, [[x-23,y],[x-12,y-10],[x+12,y-10],[x+23,y],[x+12,y+10],[x-12,y+10],[x-23,y]], color, 3);
-    c.fillStyle = "#fff0c8"; c.fillRect(x-6,y-7,12,14);
-    c.fillStyle = "#281335"; c.fillRect(x-2,y-6,4,12);
-  }
-  function shield(c, x, y, color, grow = 1) {
-    const points = [[-27,-22],[0,-32],[27,-22],[23,11],[0,27],[-23,11],[-27,-22]].map(([dx,dy])=>[x+dx*grow,y+dy*grow]);
-    c.fillStyle = "#17383a88"; c.beginPath(); points.forEach(([px,py],i)=>i?c.lineTo(px,py):c.moveTo(px,py)); c.fill();
-    line(c, points, "#0b2529", 6); line(c, points, color, 3);
-    line(c, [[x-9,y],[x,y+8],[x+13,y-12]], color, 3);
-  }
-  function render(c, width, state, plan, t, positions, reduced = false) {
-    const color = colors[plan.type], pulse = reduced ? 1 : Math.sin(Math.PI * Math.min(1, t * 1.8));
+  function render(c,width,state,plan,t,positions,reduced=false) {
     c.save();
-    // One quiet title plate, without flashes over the road or the vehicles.
-    c.fillStyle = "#100c17e8"; c.fillRect(width/2-112, 65, 224, 56);
-    c.fillStyle = color; c.fillRect(width/2-112, 65, 3, 56);
-    c.textAlign = "center"; c.font = "bold 16px monospace";
-    c.fillText(plan.blocked ? "SIGILLO · BLOCCATO" : labels[plan.type], width/2, 84);
-    c.font = "10px monospace"; c.fillStyle = "#f5e8d8";
-    const names = plan.targets.map(i=>state.groups[i]?.name ?? "").join(" · ");
-    c.fillText(names, width/2, 100, 208);
-    c.font = "9px monospace"; c.fillStyle = color;
-    c.fillText(plan.blocked ? "Attacco neutralizzato" : plan.detail ?? details[plan.type], width/2, 114, 208);
-    const source = positions[plan.source] ?? positions[plan.targets[0]];
-    for (const index of plan.targets) {
-      const p = positions[index]; if (!p) continue;
-      const x = Math.round(p.x), y = p.y - 24;
-      c.globalAlpha = reduced ? 1 : Math.min(1, t * 8, (1-t)*7);
-      if (plan.blocked) {
-        shield(c,x,y,"#82e4de");
-        if (!reduced && t < .65) {
-          const q = Math.min(1,t/.4);
-          const px = mix(source.x,x-30,q), py = mix(source.y-28,y,q);
-          ring(c,px,py,5,color);
-          for(let n=0;n<5;n++) line(c,[[x-30,y],[x-38-n*4,y-16+n*8]],color);
+    const phase=reduced ? .6 : t,fade=reduced?1:Math.min(1,t*8,(1-t)*8);
+    c.globalAlpha=fade;
+    // A riveted, sooty plaque shares the same iron and bone palette as the relics.
+    c.fillStyle="#100e0de8";c.fillRect(width/2-112,62,224,55);
+    c.strokeStyle="#65513a";c.lineWidth=2;c.strokeRect(width/2-112,62,224,55);
+    for(const dx of [-107,107])for(const y of [67,112]){c.fillStyle="#897054";c.fillRect(width/2+dx-1,y-1,3,3);}
+    c.textAlign="center";c.font="bold 16px monospace";c.fillStyle="#dfc59a";
+    c.fillText(plan.blocked?"SIGILLO · BLOCCATO":labels[plan.type],width/2,82);
+    c.font="10px monospace";c.fillStyle="#bbab91";
+    c.fillText(plan.targets.map(i=>state.groups[i]?.name??"").join(" · "),width/2,98,208);
+    c.font="9px monospace";c.fillStyle="#c6814c";
+    c.fillText(plan.blocked?"Attacco neutralizzato":plan.detail??details[plan.type],width/2,111,208);
+    const source=positions[plan.source]??positions[plan.targets[0]];
+    for(const index of plan.targets) {
+      const p=positions[index];if(!p)continue;
+      const x=p.x,y=p.y-(p.height??25)/2,turn=reduced?0:Math.sin(t*Math.PI*2)*.07;
+      const size=Math.max(40,(p.width??36)+14);
+      if(plan.blocked||plan.type==="aura") {
+        // Bone and riveted iron close over the vehicle, then catch stone splinters.
+        const build=reduced?1:Math.min(1,t*4);
+        relic(c,1,x,y,(size+14)*(1.3-.3*build),size*.83,turn-(1-build)*.4);
+        relic(c,3,x,y-(1-build)*26,size+5,size*.91,-turn/2);
+        if(plan.blocked)debris(c,x-size*.4,y,phase,4);
+      } else if(plan.type==="salta") {
+        const close=reduced?1:Math.min(1,t*4);
+        relic(c,0,x,y,size+(1-close)*24,size*.8,turn);
+        debris(c,x,y+10,phase,8);
+      } else if(plan.type==="ruba") {
+        relic(c,6,x,y-24,29,25,turn);
+        for(let n=0;n<4;n++){
+          const q=reduced?n/4:(t*1.3+n/4)%1;
+          relic(c,6,mix(x,source.x,q),mix(y-18,source.y-20,q)-Math.sin(q*Math.PI)*32,12,10,q*2);
         }
-      } else if (plan.type === "salta") {
-        const reach = reduced ? 1 : Math.min(1,t*4);
-        for (let n=0;n<9;n++) {
-          const dx=-35+n*8, dy=(n%2?4:0);
-          line(c,[[x+dx,y-4],[x+dx+4,y-9],[x+dx+10,y-4],[x+dx+4,y+1],[x+dx,y-4]],color,3);
+      } else if(plan.type==="svela") {
+        const open=reduced?1:Math.min(1,t*5);
+        relic(c,4,x,y-28-(reduced?0:Math.sin(t*Math.PI)*5),52,40*(.1+.9*open),turn);
+        debris(c,x,y-16,phase,12,true);
+      } else if(plan.type==="karma") {
+        relic(c,5,x,y-12,49,58,turn);
+        const q=reduced ? .65 :Math.min(1,t*1.4);
+        relic(c,4,mix(x,source.x,q),mix(y,source.y-20,q)-Math.sin(q*Math.PI)*32,24,20,turn);
+        debris(c,x,y,phase,15,true);
+      } else if(plan.type==="marx") {
+        const cx=width/2,cy=210;
+        // Scales are drawn once; individual tribute pouches move in, then out.
+        if(index===plan.targets[0])relic(c,7,cx,cy,64,64,turn);
+        for(let n=0;n<3;n++){
+          const q=reduced?(n+1)/4:(t*1.4+n/3)%1,back=t>.5;
+          relic(c,6,mix(back?cx:x,back?x:cx,q),mix(back?cy:y-15,back?y-15:cy,q),15,13,q);
         }
-        line(c,[[x-29,y-25*reach],[x-29,y+19],[x+29,y+19],[x+29,y-25*reach]],"#64758c",3);
-        c.fillStyle="#e4b96a"; c.fillRect(x-6,y-8,12,13); c.fillStyle="#41314a"; c.fillRect(x-1,y-5,3,5);
-      } else if (plan.type === "ruba") {
-        for (let n=0;n<6;n++) {
-          const q = reduced ? n/6 : (t*1.5+n/6)%1;
-          coin(c,mix(x,source.x,q),mix(y-12,source.y-36,q)-Math.sin(q*Math.PI)*48);
-        }
-        ring(c,x,y,32,color);
-      } else if (plan.type === "svela") {
-        const lift = reduced ? 0 : (1-Math.min(1,t*4))*22;
-        eye(c,x,y-33-lift,color);
-        for(let n=-1;n<=1;n++) line(c,[[x+n*13,y-15],[x+n*8,y+8]],"#9f6ed1",1);
-      } else if (plan.type === "aura") {
-        shield(c,x,y,color,reduced?1:.7+.3*pulse);
-        ring(c,x,y,37,color);
-      } else if (plan.type === "karma") {
-        ring(c,x,y,34,color); eye(c,x,y-25,color);
-        const q = reduced ? .6 : Math.min(1,t*1.5);
-        const px=mix(x,source.x,q),py=mix(y,source.y-25,q)-Math.sin(q*Math.PI)*44;
-        line(c,[[x,y],[px,py]],color,2);
-        line(c,[[px-6,py-5],[px,py],[px-6,py+5]],color,3);
-      } else if (plan.type === "marx") {
-        const center={x:width/2,y:225};
-        line(c,[[x,y-12],[center.x,center.y]],"#b58346",2);
-        for(let n=0;n<3;n++) {
-          const q = reduced ? (n+1)/4 : (t*1.2+n/3)%1;
-          coin(c,mix(t<.5?x:center.x,t<.5?center.x:x,q),mix(t<.5?y-12:center.y,t<.5?center.y:y-12,q));
-        }
-        line(c,[[x-12,y-32],[x+12,y-32]],color,3); line(c,[[x-12,y-25],[x+12,y-25]],color,3);
-      } else if (plan.type === "ira") {
-        const reach = reduced ? 1 : Math.min(1,t*3);
-        line(c,[[x-8,132],[x+8,170],[x-7,199],[x+8,226],[x,y-8]],"#6a282a",9);
-        line(c,[[x-8,132],[x+8,170],[x-7,199],[x+8,226],[x,mix(226,y-8,reach)]],"#ffe1a0",3);
-        ring(c,x,y+6,16+20*(reduced ? .5 : t),color);
-        c.fillStyle="#ffb285"; c.font="bold 13px monospace"; c.fillText("−1 VITA",x,y-43);
+      } else if(plan.type==="ira") {
+        const rise=reduced?1:Math.min(1,t*4);
+        relic(c,2,x,y+4,size+16,32,turn);
+        relic(c,8,x,y-12-(1-rise)*14,40,55*rise*(reduced?1:1+Math.sin(t*55+index)*.08),turn);
+        debris(c,x,y+4,phase,index*7);
+        c.fillStyle="#d6b18a";c.font="bold 10px monospace";c.fillText("−1 VITA",x,y-48);
       }
     }
     c.restore();
   }
-  const api = { plans, createTracker, render, labels };
+  const api = { plans, createTracker, render, labels, load };
   if (typeof module !== "undefined") module.exports = api;
   else root.FoolAmmo = api;
 })(globalThis);
