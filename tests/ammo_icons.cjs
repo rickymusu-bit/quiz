@@ -6,14 +6,14 @@ const root=path.join(__dirname,'..');
 const types=['Catene','Tributo','Malocchio','Sigillo','Contrappasso','Livella','Flagello'];
 const info=['Salta un turno','Condivide punti','Passa una domanda','Blocca attacchi','Ritorce un malus','Pareggia i punti','Toglie una vita a tutti'];
 (async()=>{
- const img=await loadImage(path.join(root,'assets/ammo-hellscape-v1.png'));
- assert.equal(img.width,168,'Seven 24px sprites in one horizontal atlas');
- assert.equal(img.height,24);
+ const img=await loadImage(path.join(root,'assets/ammo-hellscape-v2.png'));
+ assert.equal(img.width,336,'Seven 48px sprites in one horizontal atlas');
+ assert.equal(img.height,48);
  const signatures=new Set();
  for(let i=0;i<7;i++){
-  const sample=createCanvas(24,24),ctx=sample.getContext('2d');
-  ctx.drawImage(img,i*24,0,24,24,0,0,24,24);
-  const pixels=ctx.getImageData(0,0,24,24).data;
+  const sample=createCanvas(48,48),ctx=sample.getContext('2d');
+  ctx.drawImage(img,i*48,0,48,48,0,0,48,48);
+  const pixels=ctx.getImageData(0,0,48,48).data;
   signatures.add(crypto.createHash('sha256').update(pixels).digest('hex'));
   assert(pixels.some((v,n)=>n%4===0&&v>100),'Sprite must have visible foreground: '+types[i]);
  }
@@ -32,5 +32,5 @@ const info=['Salta un turno','Condivide punti','Passa una domanda','Blocca attac
  }
  c.textAlign='left';fs.mkdirSync(path.join(root,'artifacts'),{recursive:true});
  fs.writeFileSync(path.join(root,'artifacts/hellscape-ammo-icons.png'),out.toBuffer('image/png'));
- console.log('PASS: 7 unique 24x24 infernal icons and matching preview screenshot');
+ console.log('PASS: 7 unique 48x48 infernal icons and matching preview screenshot');
 })().catch(e=>{console.error(e);process.exitCode=1});
