@@ -5,13 +5,13 @@
     VERSION = "2.3.0",
     TYPES = ["salta", "ruba", "svela", "aura", "karma", "marx", "ira"];
   const LABELS = {
-    salta: "Nope",
-    ruba: "Bullo",
-    svela: "Spoiler",
-    aura: "Aura",
-    karma: "Karma",
-    marx: "Marx",
-    ira: "Ira divina",
+    salta: "Le catene immobilizzano un avversario attivo e gli fanno saltare il prossimo turno ordinario. Più Catene si sommano, una per turno. Se riceve una domanda tramite Malocchio, risponde subito, ma le Catene restano pendenti. Nessuna vita viene tolta.",
+    ruba: "Esigi un tributo dal prossimo guadagno del bersaglio: dopo una risposta corretta, lui e gli attaccanti distinti si dividono i nuovi punti in parti uguali. Più Tributi dello stesso autore valgono una sola quota. L’effetto finisce anche se il bersaglio sbaglia o scade il tempo.",
+    svela: "Scruti domanda e alternative a timer fermo. Puoi affrontarla oppure passarla immediatamente a un altro dannato attivo: il timer intero parte alla conferma. Chi la riceve non può usare Ammo o passarla di nuovo. Le Catene già pendenti sul bersaglio non vengono consumate.",
+    aura: "Attiva il sigillo nel tuo turno per bloccare i nuovi attacchi Catene, Tributo e Malocchio fino al tuo prossimo turno. Non cancella effetti già pendenti, non si accumula e non protegge da Livella, Flagello, sanzioni o errori.",
+    karma: "Contrappasso agisce passivamente: quando subisci un nuovo attacco non bloccato, una copia si trasforma in quell’Ammo, utilizzabile solo contro l’aggressore. Ogni attacco trasforma al massimo una copia. Non reagisce a Livella o Flagello.",
+    marx: "Livella redistribuisce immediatamente in parti uguali i punti di tutti i dannati ancora in gara, compreso chi la usa. Il totale resta identico anche con frazioni. Non agisce sugli eliminati, non viene bloccata da Sigillo e non attiva Contrappasso.",
+    ira: "Flagello travolge contemporaneamente tutti i dannati ancora in gara, compreso chi lo evoca: ciascuno perde una vita. Chi raggiunge zero è eliminato; i punti restano invariati. Sigillo non protegge e Contrappasso non reagisce. Se nessuno sopravvive, è Game Over.",
   };
   const AMMO_HELP = {
     salta: "Fa saltare a un avversario attivo la sua prossima occasione di risposta. Più salti sullo stesso bersaglio si sommano. Non consuma una domanda valida e non toglie vite.",
