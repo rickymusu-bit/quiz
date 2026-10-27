@@ -33,10 +33,10 @@ const assert = require("node:assert/strict");
   try {
     const origin = "http://127.0.0.1:" + server.address().port;
     await page.goto(origin + "/");
-    const title = page.locator("canvas.home-wordmark.pixel-wordmark");
+    const title = page.locator("img.home-wordmark.pixel-wordmark");
     await title.waitFor();
-    assert.equal(await title.evaluate(c=>c.width),256);
-    assert.equal(await title.evaluate(c=>c.getAttribute("aria-label")),"HELLSCAPE");
+    assert.equal(await title.evaluate(c=>c.naturalWidth),256);
+    assert.equal(await title.getAttribute("alt"),"HELLSCAPE");
     await page.screenshot({path:"artifacts/title-pixelated.png"});
     await page.goto(origin + "/Fool.html?start=1");
     await page.locator("#vehicle0").waitFor();
