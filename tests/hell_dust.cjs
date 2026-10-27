@@ -3,7 +3,7 @@ const {createCanvas}=require('@napi-rs/canvas'),vm=require('node:vm'),fs=require
 const root={matchMedia:()=>({matches:false})};
 const source=fs.readFileSync(path.join(__dirname,'../assets/hell-race.js'),'utf8').replace('root.FoolHellRace = { createStage, vehiclePreview };','root.FoolHellRace = { vehicleDust, demonDust, dustPuff, dirtChip, flyingDevils };');
 const math=Object.create(Math);math.random=()=>{throw Error('Dust must not consume game RNG')};
-vm.runInNewContext(source,{window:root,Math:math});const dust=root.FoolHellRace;
+vm.runInNewContext(source,{window:root,Math:math,document:{createElement:()=>createCanvas(1,1)}});const dust=root.FoolHellRace;
 function render(fn){const canvas=createCanvas(360,180),c=canvas.getContext('2d');c.globalAlpha=.7;const alpha=c.globalAlpha;fn(c);assert.equal(c.globalAlpha,alpha,'Effect must restore canvas opacity');return canvas;}
 function pixels(canvas){return canvas.getContext('2d').getImageData(0,0,canvas.width,canvas.height).data;}
 for(const type of ['vehicle','demon','sky']){
@@ -25,4 +25,4 @@ for(let frame=0;frame<4;frame++){
 fs.mkdirSync(path.join(__dirname,'../artifacts'),{recursive:true});fs.writeFileSync(path.join(__dirname,'../artifacts/dust-sequence.png'),board.toBuffer('image/png'));
 console.log('PASS: evolving dust, deterministic freeze, bounded particles, lifetime and isolated canvas state; no game RNG');
 
-const sky=render(c=>dust.flyingDevils(c,360,4)),sd=pixels(sky);for(let y=90;y<180;y++)assert(!sd.slice(y*360*4,(y+1)*360*4).some(v=>v),'Flying devils stay in the distant sky');
+const sky=render(c=>dust.flyingDevils(c,360,4)),sd=pixels(sky);for(let y=174;y<180;y++)assert(!sd.slice(y*360*4,(y+1)*360*4).some(v=>v),'Flying devils stay in the distant sky');

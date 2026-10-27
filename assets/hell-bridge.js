@@ -1,7 +1,8 @@
 /* Narrow suspension deck. Geometry is shared by the race and its layout tests. */
 (function(root){
   'use strict';
-  const TOP=228,BOTTOM=338,GAP=4,RACE_SCALE=.62;
+  const TOP=208,BOTTOM=338,GAP=4,RACE_SCALE=.62;
+  const TOP_MARGIN=4,BOTTOM_MARGIN=18;
   let art=null,lake=null;
   function load(redraw=()=>{}){
     if(!art&&typeof root.Image==='function'){
@@ -17,44 +18,11 @@
   }
   function grounds(heights){
     const occupied=heights.reduce((a,b)=>a+b,0)+GAP*(heights.length-1);
-    let y=TOP+(BOTTOM-TOP-occupied)/2;
+    const available=BOTTOM-BOTTOM_MARGIN-(TOP+TOP_MARGIN);
+    let y=TOP+TOP_MARGIN+(available-occupied)/2;
     return heights.map(h=>{y+=h;const ground=y;y+=GAP;return ground;});
   }
-  const RAIL_SPAN = 64, PIER_SPAN = 144;
-  const modulo = (n, base) => ((n % base) + base) % base;
-  function railSection(c, image, index, x, y, width = RAIL_SPAN) {
-    if (image?.complete && image.naturalWidth) {
-      const sourceX = modulo(index * RAIL_SPAN, 768) / 768 * image.naturalWidth;
-      c.drawImage(image, sourceX, 120 / 672 * image.naturalHeight,
-        width / 768 * image.naturalWidth, 94 / 672 * image.naturalHeight,
-        x, y, width + .25, 20);
-    } else {
-      c.strokeStyle = '#7e6850'; c.lineWidth = 1.5;
-      for (const dy of [8, 16]) {
-        c.beginPath(); c.moveTo(x, y + dy); c.lineTo(x + width, y + dy); c.stroke();
-      }
-      for (let dx = 0; dx < width; dx += 16) {
-        c.fillStyle = '#44352c'; c.fillRect(x + dx, y + 5, 2, 15);
-      }
-    }
-  }
-  function railing(c, width, time, front, image = art) {
-    const offset = time * 48, y = front ? BOTTOM + 1 : TOP - 20;
-    c.save();
-    for (let index = Math.floor(offset / RAIL_SPAN) - 1;
-         index <= Math.floor((offset + width) / RAIL_SPAN) + 1; index++) {
-      const x = index * RAIL_SPAN - offset;
-      const damaged = modulo(index + (front ? 3 : 0), 7) === 2;
-      if (!damaged) { railSection(c, image, index, x, y); continue; }
-      // The surviving stub and a tilted, detached panel leave a real open gap.
-      railSection(c, image, index, x, y, 16);
-      c.save(); c.translate(x + 17, y + 16); c.rotate(front ? .62 : -.38);
-      railSection(c, image, index, 0, -9, 31); c.restore();
-      c.strokeStyle = '#b88b55'; c.lineWidth = .8;
-      c.beginPath(); c.moveTo(x + 16, y + 9); c.lineTo(x + 20, y + 6); c.stroke();
-    }
-    c.restore();
-  }
+  const PIER_SPAN = 144;
   function pillars(c, width, time, image) {
     const offset = time * 48;
     c.save();
@@ -89,8 +57,6 @@
     }
     c.restore();
   }
-  // Draw the near-side rail after the racers, so the bridge has two distinct edges.
-  function foreground(c, width, time) { railing(c, width, time, true); }
   function draw(c,width,time,progress,world,effectTime=time){
     c.save();
     c.fillStyle='#681a0c';c.fillRect(0,184,width,200);
@@ -107,11 +73,10 @@
     }
     const image=load();
     pillars(c,width,time,image);
-    railing(c,width,time,false,image);
     if(image?.complete&&image.naturalWidth){
       const tile=768,offset=(time*48)%tile,s=image.naturalHeight/672;
       for(let x=-offset;x<width;x+=tile){
-        // Separate the top rail, driveable deck and suspended masonry fascia.
+        // Keep the deck and masonry fascia; neither edge has a railing.
         for(const [sy,sh,dy,dh] of [[214,123,TOP,BOTTOM-TOP],[337,260,BOTTOM,20]])
           c.drawImage(image,0,sy*s,image.naturalWidth,sh*s,Math.floor(x),dy,tile+1,dh);
       }
@@ -145,6 +110,6 @@
     }
     c.restore();
   }
-  const api={TOP,BOTTOM,GAP,RACE_SCALE,grounds,draw,foreground,load};
+  const api={TOP,BOTTOM,GAP,RACE_SCALE,grounds,draw,load,TOP_MARGIN,BOTTOM_MARGIN};
   if(typeof module!=='undefined')module.exports=api;else root.FoolBridge=api;
 })(globalThis);

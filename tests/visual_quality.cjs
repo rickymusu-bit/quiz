@@ -15,7 +15,7 @@ const {chromium}=require("playwright"),fs=require("node:fs"),assert=require("nod
    await page.goto("http://quality.test/");
    await page.frameLocator("iframe").getByRole("link",{name:"Nuova partita",exact:true}).click();
    const frame=page.frames()[1];
-   await frame.locator("#vehicle1").selectOption("truck");
+   await frame.locator("#vehicle2").selectOption("truck");
    await frame.getByRole("button",{name:/^Inizia partita/}).click();
    await frame.waitForFunction(()=>document.querySelector(".hell-race canvas")?.width>=1024);
    await frame.evaluate(()=>{
@@ -40,7 +40,7 @@ const {chromium}=require("playwright"),fs=require("node:fs"),assert=require("nod
     document.body.append(canvas);
    });
    const stateBefore=await frame.evaluate(()=>JSON.stringify(HellscapeUI.game.s));
-   for(const [name,progress,time] of [["start",0,0],["ruins",1,0],["reach",.5,8],["fire",.5,26]]){
+   for(const [name,progress,time] of [["start",0,0],["ruins",1,0],["closed-mouth",.5,2.5],["wind-up",.5,7.4],["reach",.5,8.9],["recovery",.5,11.4],["fire",.5,26.9]]){
     const result=await frame.evaluate(({progress,time})=>{
      const s=Fool.clone(HellscapeUI.game.s);s.valid=progress*s.config.questionCount;
      const c=document.querySelector("#quality-scene").getContext("2d");

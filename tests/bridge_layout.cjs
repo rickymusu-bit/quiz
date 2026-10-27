@@ -10,8 +10,8 @@ const bridge=require('../assets/hell-bridge.js');
  for(const a of names)for(const b of names.filter(n=>n!==a))for(const d of names.filter(n=>n!==a&&n!==b)){
   const s={groups:[0,1,2].map(()=>({score:{n:'0',d:'1'}})),config:{vehicles:[a,b,d],bases:{facile:100,media:200,difficile:300}}};
   const poses=[0,1,2].map(i=>root.FoolHellRace.packPosition(s,i,0,null,2));
-  assert(poses[0].y-poses[0].height>=bridge.TOP,'First silhouette stays on deck');
-  assert(poses[2].y<=bridge.BOTTOM,'Last silhouette stays on deck');
+  assert(poses[0].y-poses[0].height>=bridge.TOP+bridge.TOP_MARGIN,'First silhouette stays on deck');
+  assert(poses[2].y<=bridge.BOTTOM-bridge.BOTTOM_MARGIN,'Last silhouette stays on deck');
   for(let i=1;i<3;i++)assert(poses[i].y-poses[i].height-poses[i-1].y>=bridge.GAP-.001,'Full sprite boxes never overlap, including tied scores');
   assert(poses[2].y-poses[0].y<80,'The pack remains compact');
   assert(poses.every(p=>p.x===poses[0].x),'Tied scores stay level');count++;

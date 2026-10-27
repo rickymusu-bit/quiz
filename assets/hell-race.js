@@ -305,76 +305,169 @@
     }
     return { x: left, y: top - 4 * unit, width: 50 * unit, height: 24 * unit };
   }
-  function flyingDevils(c, W, time) {
-    c.save();
-    c.fillStyle='#10090a';
-    // Bezier silhouettes render directly at display resolution: hooked horns,
-    // articulated bat wings, clawed legs and a long arrow-tipped tail.
-    for(let i=0;i<6;i++){
-      const direction=i%2?-1:1;
-      const x=((W*(.08+i*.18)+direction*time*(1.2+i%3))%(W+60)+W+60)%(W+60)-30;
-      const y=36+(i*19)%38+Math.sin(time*.65+i*2)*2;
-      const size=.64+(i%3)*.07,flap=Math.sin(time*2.8+i*1.9)*7;
-      c.save();c.translate(x,y);c.scale(size*direction,size);c.globalAlpha=.94;
-      for(const side of [-1,1]){
-        c.save();c.scale(side,1);
-        c.beginPath();c.moveTo(2,-1);
-        c.bezierCurveTo(8,-7,17,-13+flap,29,-10+flap);
-        c.quadraticCurveTo(24,-4+flap,26,3+flap*.35);
-        c.quadraticCurveTo(19,-1,17,7+flap*.2);
-        c.quadraticCurveTo(12,2,10,10);
-        c.quadraticCurveTo(7,4,3,6);c.closePath();c.fill();
-        // Horns curve outward, then taper inward to needle tips.
-        c.beginPath();c.moveTo(2,-6);c.quadraticCurveTo(10,-11,7,-18);
-        c.quadraticCurveTo(6,-11,1,-10);c.closePath();c.fill();
-        c.beginPath();c.moveTo(2,5);c.lineTo(5,13);c.lineTo(3,18);
-        c.lineTo(8,17);c.lineTo(7,14);c.lineTo(7,10);
-        c.lineTo(4,3);c.closePath();c.fill();
-        c.restore();
+  const devilFrames=new Map();
+  function devilFrame(frame) {
+    if(devilFrames.has(frame))return devilFrames.get(frame);
+    const canvas=document.createElement('canvas');canvas.width=192;canvas.height=180;
+    const c=canvas.getContext('2d'),flap=Math.sin(frame/16*Math.PI*2)*7;
+    c.translate(96,72);c.scale(3,3);
+    const shade=c.createLinearGradient(0,-18,0,25);
+    shade.addColorStop(0,'#301815');shade.addColorStop(.55,'#160c0c');shade.addColorStop(1,'#281411');
+    c.fillStyle=shade;
+    for(const side of [-1,1]){
+      c.save();c.scale(side,1);
+      c.beginPath();c.moveTo(2,-1);
+      c.bezierCurveTo(8,-7,17,-13+flap,29,-10+flap);
+      c.quadraticCurveTo(24,-4+flap,26,3+flap*.35);
+      c.quadraticCurveTo(19,-1,17,7+flap*.2);
+      c.quadraticCurveTo(12,2,10,10);
+      c.quadraticCurveTo(7,4,3,6);c.closePath();c.fill();
+      c.strokeStyle='#603326';c.lineWidth=.45;c.globalAlpha=.65;
+      for(const [tx,ty] of [[28,-10+flap],[25,3+flap*.35],[17,7+flap*.2]]){
+        c.beginPath();c.moveTo(3,0);c.quadraticCurveTo(10,-5,tx,ty);c.stroke();
       }
-      c.beginPath();c.ellipse(0,-6,3.4,4.6,0,0,Math.PI*2);c.fill();
-      c.beginPath();c.moveTo(-3,-3);c.quadraticCurveTo(-5,3,-2,9);
-      c.lineTo(2,9);c.quadraticCurveTo(5,3,3,-3);c.closePath();c.fill();
-      c.strokeStyle='#10090a';c.lineWidth=1.8;c.lineCap='round';
-      c.beginPath();c.moveTo(0,7);c.bezierCurveTo(-1,15,17,13,13,23);c.stroke();
-      c.beginPath();c.moveTo(13,26);c.lineTo(9,20);c.lineTo(16,21);c.closePath();c.fill();
+      c.globalAlpha=1;
+      c.beginPath();c.moveTo(2,-6);c.quadraticCurveTo(10,-11,7,-18);
+      c.quadraticCurveTo(6,-11,1,-10);c.closePath();c.fill();
+      c.beginPath();c.moveTo(2,5);c.lineTo(5,13);c.lineTo(3,18);
+      c.lineTo(8,17);c.lineTo(7,14);c.lineTo(7,10);c.lineTo(4,3);c.closePath();c.fill();
       c.restore();
+    }
+    c.beginPath();c.ellipse(0,-6,3.4,4.6,0,0,Math.PI*2);c.fill();
+    c.beginPath();c.moveTo(-3,-3);c.quadraticCurveTo(-5,3,-2,9);
+    c.lineTo(2,9);c.quadraticCurveTo(5,3,3,-3);c.closePath();c.fill();
+    c.strokeStyle='#291412';c.lineWidth=1.8;c.lineCap='round';
+    c.beginPath();c.moveTo(0,7);c.bezierCurveTo(-1,15,17,13,13,23);c.stroke();
+    c.beginPath();c.moveTo(13,26);c.lineTo(9,20);c.lineTo(16,21);c.closePath();c.fill();
+    // Rasterize once at the same source density as the illustrated scene assets.
+    // Subtle grain and wing ribs keep the distant silhouettes from looking like flat icons.
+    c.globalCompositeOperation='source-atop';
+    for(let n=0;n<160;n++){
+      const x=((n*37)%173)/3-28,y=((n*71)%137)/3-17;
+      c.fillStyle=n%3?'#77402c55':'#09070888';c.fillRect(x,y,.3,.4);
+    }
+    devilFrames.set(frame,canvas);return canvas;
+  }
+  function devilPosition(index,width,time) {
+    const span=width+90,slot=(index+.5)*span/8;
+    return {x:((slot+time*2)%span+span)%span-45,
+      y:25+((index*3)%8)*17+Math.sin(time*.65+index*2)*1.4,
+      size:.48+(index%3)*.065};
+  }
+  function flyingDevils(c,W,time) {
+    c.save();c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';
+    for(let i=0;i<8;i++){
+      const p=devilPosition(i,W,time),direction=i%2?-1:1;
+      const frame=((Math.floor(time*5.5+i*2.3)%16)+16)%16;
+      const image=devilFrame(frame);
+      c.save();c.translate(p.x,p.y);c.scale(direction*p.size,p.size);
+      c.globalAlpha=.88-(i%3)*.06;
+      c.drawImage(image,-32,-24,64,60);c.restore();
     }
     c.restore();
   }
   function chaseAction(time) {
     const cycle=Math.floor(time/18),local=time-cycle*18;
-    if(local<7||local>=9.4)return {mode:'chase',age:0,blend:0};
-    const age=local-7,duration=2.4;
-    return {mode:cycle%2?'fire':'reach',age,
-      blend:smooth(age/.22)*(1-smooth((age-duration+.32)/.32))};
+    if(local<7||local>=11.8)return {mode:'chase',age:0};
+    const age=local-7;
+    return {mode:cycle%2?'fire':'reach',age};
+  }
+  const mouthClosure = time => {
+    const phase=((time%6.4)+6.4)%6.4;
+    return smooth((phase-1.5)/.65)*(1-smooth((phase-2.8)/.7));
+  };
+  function demonMotion(time, reduced=false) {
+    const action=reduced?{mode:'chase',age:0}:chaseAction(time);
+    const closed=reduced?0:mouthClosure(time);
+    if(action.mode==='chase')return {...action,closed,settle:0,attack:0,lunge:0};
+    const a=action.age;
+    const attack=smooth((a-.65)/.5)*(1-smooth((a-2.7)/.8));
+    const settle=smooth(a/.65)*(1-smooth((a-3.5)/1.3));
+    return {...action,closed,settle,attack,
+      lunge:action.mode==='reach'?smooth((a-.65)/1)*(1-smooth((a-2.7)/1.5)):0};
+  }
+  let chasePoses=null,poseBuffer=null;
+  function prepareChasePoses() {
+    if(chasePoses)return chasePoses;
+    if(!imageReady(sheets.demon))return null;
+    const rows=[0,1].map(row=>atlasRow('demon',row));
+    const width=Math.max(...rows.flat().map(f=>f.width));
+    const height=Math.max(...rows.flat().map(f=>f.height));
+    const eyes=[[333,99],[341,104],[342,98],[326,134],[332,155],[326,62],[320,61],[326,121]];
+    chasePoses=rows.flat().map((source,index)=>{
+      const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;
+      const ctx=canvas.getContext('2d'),dx=(width-source.width)/2,dy=height-source.height;
+      ctx.drawImage(source,dx,dy);
+      // Locate the hot jaws in the head. The anchor follows each illustrated pose.
+      const pixels=ctx.getImageData(0,0,width,height).data;
+      let total=0,mx=0,my=0;
+      for(let y=0;y<height*.72;y++)for(let x=Math.floor(width*.65);x<width;x++){
+        const at=(y*width+x)*4,r=pixels[at],g=pixels[at+1],b=pixels[at+2];
+        if(pixels[at+3]<100||r<210||g<65||g>235||b>135)continue;
+        const weight=(r-180)*g*Math.pow(x/width,4);
+        total+=weight;mx+=x*weight;my+=y*weight;
+      }
+      return {canvas,mouth:{x:total?mx/total:width*.84,y:total?my/total:height*.48},
+        eye:{x:eyes[index][0]*width/416,y:eyes[index][1]*height/285}};
+    });
+    poseBuffer=document.createElement('canvas');poseBuffer.width=width;poseBuffer.height=height;
+    return chasePoses;
+  }
+  function paintChaseDemon(c,time,motion,x,ground,width) {
+    const poses=prepareChasePoses();if(!poses)return null;
+    const walk=Math.floor(time*9)%4;
+    const weights=new Map();
+    const add=(id,value)=>weights.set(id,(weights.get(id)||0)+value);
+    const rest=1-motion.settle;
+    add(walk,rest*(1-motion.closed));add(4,rest*motion.closed);
+    add(4,motion.settle*(1-motion.attack));
+    add(motion.mode==='fire'?5:7,motion.settle*motion.attack);
+    const buffer=poseBuffer.getContext('2d');buffer.clearRect(0,0,poseBuffer.width,poseBuffer.height);
+    buffer.save();buffer.globalCompositeOperation='lighter';buffer.imageSmoothingEnabled=false;
+    let mouthX=0,mouthY=0,eyeX=0,eyeY=0;
+    for(const [index,weight] of weights){
+      mouthX+=poses[index].mouth.x*weight;mouthY+=poses[index].mouth.y*weight;
+      eyeX+=poses[index].eye.x*weight;eyeY+=poses[index].eye.y*weight;
+    }
+    for(const [index,weight] of weights){
+      if(weight<=0)continue;
+      buffer.globalAlpha=weight;
+      const pose=poses[index];
+      if(weight>.999){buffer.drawImage(pose.canvas,0,0);continue;}
+      // Register the eyes while blending, then taper the deformation to zero
+      // at the grounded feet. This avoids doubled heads and floating crossfades.
+      const dx=eyeX-pose.eye.x,dy=eyeY-pose.eye.y;
+      const influence=y=>1-smooth((y-pose.eye.y-65)/Math.max(1,poseBuffer.height-pose.eye.y-69));
+      for(let sy=0;sy<poseBuffer.height;sy+=4){
+        const sh=Math.min(4,poseBuffer.height-sy),a=influence(sy),b=influence(sy+sh);
+        const top=Math.round(sy+dy*a),bottom=Math.round(sy+sh+dy*b);
+        buffer.drawImage(pose.canvas,0,sy,poseBuffer.width,sh,
+          Math.round(dx*(a+b)/2),top,poseBuffer.width,bottom-top);
+      }
+    }
+    buffer.restore();
+    // Every pose shares the same pixel scale and grounded feet; no atlas/camera swap.
+    const zoom=width/poseBuffer.width,height=poseBuffer.height*zoom;
+    const bob=Math.sin(time*9)*.65;
+    const top=ground-height+bob;
+    c.drawImage(poseBuffer,x,top,width,height);
+    return {mouth:{x:x+mouthX*zoom,y:top+mouthY*zoom}};
   }
   function chasingDemon(c,time,positions,reduced=false) {
-    const action=reduced?{mode:'chase',blend:0}:chaseAction(time);
-    const base=alpha=>{
-      c.save();c.globalAlpha=alpha;c.translate(0,130);c.scale(1.3,1.3);demon(c,time,15);c.restore();
-    };
-    if(action.mode==='chase'){base(1);return;}
-    const art=root.FoolEnding?.load(()=>live?.redraw?.());
-    if(!imageReady(art)){base(1);return;}
-    base(1-action.blend);
-    // Use the complete illustrated action poses, with the same pause clock as
-    // the road. These near misses never change lives, scores or vehicle positions.
-    const frames=root.FoolEnding.prepare(art),width=221;
-    const frame=action.mode==='reach'?(action.age<.7?0:1):10;
-    const pose=frames[frame],zoom=width/pose.canvas.width;
-    const target=positions.reduce((a,b)=>a.x-a.width/2<b.x-b.width/2?a:b);
-    const handX=pose.hand.x*zoom;
-    const extension=Math.max(0,Math.min(58,target.x-target.width/2-14-(-34+handX)));
-    const lunge=action.mode==='reach'?Math.sin(Math.PI*action.age/2.4)*extension:0;
-    c.save();c.globalAlpha=action.blend;
-    const actor=root.FoolEnding.actor(c,frame,-34+lunge,303,width);
-    if(actor&&action.mode==='fire'){
-      const rear=target.x-target.width/2;
-      root.FoolEnding.fireBreath(c,actor.mouth,action.age-.3,
-        {x:Math.max(actor.mouth.x+12,rear-22),y:target.y-target.height/2},1.65);
+    if(!imageReady(sheets.demon)){
+      c.save();c.translate(0,130);c.scale(1.3,1.3);demon(c,time,15);c.restore();return;
     }
-    c.restore();
+    const motion=demonMotion(time,reduced),width=221;
+    const target=positions.length?positions.reduce((a,b)=>a.x-a.width/2<b.x-b.width/2?a:b):null;
+    const extension=target?Math.min(32,Math.max(0,target.x-target.width/2-150)):0;
+    const x=-32.5+extension*motion.lunge;
+    c.save();c.translate(0,130);c.scale(1.3,1.3);demonDust(c,15,time,'chase',0);c.restore();
+    const pose=paintChaseDemon(c,time,motion,x,304.2,width);
+    if(pose&&target&&motion.mode==='fire'){
+      const rear=target.x-target.width/2;
+      root.FoolEnding?.fireBreath(c,pose.mouth,motion.age-.95,
+        {x:Math.max(pose.mouth.x+12,rear-22),y:target.y-target.height/2},1.65);
+    }
   }
   function background(c, W, tick, progress, effectTime=tick) {
     if(imageReady(sheets.world)){
@@ -447,6 +540,10 @@
   function demon(c, tick, x = 32, shade = '#9b2831', mode = 'chase', actionTime = 0) {
     demonDust(c, x, tick, mode, actionTime);
     if (imageReady(sheets.demon)) {
+      if(mode==='chase'){
+        paintChaseDemon(c,tick,{closed:mouthClosure(tick),settle:0,attack:0,mode:'chase'},x-40,134,170);
+        return;
+      }
       const row=mode==='attack'?1:mode==='devour'?2:0;
       const frame=row===0?Math.floor(tick*9)%4:Math.min(3,Math.floor(actionTime*9));
       sprite(c,'demon',4,3,row,frame,x-40,9,170,125);
@@ -531,7 +628,6 @@
         vehicleOutline(c, row, Math.floor(motion * 10 + i * 2) % 8, p.x, p.y);
       racer(c, p.x, p.y, i, motion, visualGroup, 2);
     }
-    root.FoolBridge?.foreground?.(c, W, motion);
     if(shot){
       c.save();c.translate(0,130);c.scale(1.3,1.3);demon(c,motion,15);c.restore();
       root.FoolAmmo.render(c,W,state,shot,ammo.sample(reduced),positions,reduced);
