@@ -19,7 +19,11 @@ main.operational>.hell-race canvas,main.final-screen .hell-race canvas{width:100
 #viewport-stage .operation-body .answer{width:100%;min-height:58px;font-size:17px;padding:9px;gap:10px;background:#201911d9;justify-content:flex-start;text-align:left}
 #viewport-stage .operation-body .answer.correct{border-color:#edcd63;background:#665019dd}#viewport-stage .operation-body .answer.selected:not(.correct){border-color:#ed5e3e;background:#5c211cdd}
 #viewport-stage .operation-body .letter{font-size:25px;flex:0 0 22px}#viewport-stage .operation-body .solution{font-size:17px;line-height:1.3;padding:10px 0;border:0;margin:10px 0}.operation-body .keyboard-hint{display:none}
-#viewport-stage main.showing-movement>:not(.hell-race){visibility:hidden;pointer-events:none}.movement-cue{position:absolute;top:30%;left:30%;right:5%;text-align:center;font:46px/1 FoolTerminal,monospace;color:#ffe0a5;text-shadow:3px 3px #000;pointer-events:none}
+#viewport-stage main.showing-movement>:not(.hell-race):not(.movement-cue){visibility:hidden;pointer-events:none}
+#viewport-stage main.operational>.movement-cue{position:absolute;top:32%;left:26%;right:10%;z-index:6;text-align:center;padding:8px 10px;font:58px/1 FoolTerminal,monospace;letter-spacing:.03em;color:#ffe044;background:#100b09e0;border:2px solid #d2a33d;text-shadow:3px 3px #000;box-shadow:4px 4px #090504;pointer-events:none;animation:outcome-flash .22s steps(2,end) 2}
+#viewport-stage main.operational>.movement-cue[data-outcome=incorrect]{color:#ff735c;border-color:#bb392c}
+@keyframes outcome-flash{50%{filter:brightness(1.4)}}
+@media(prefers-reduced-motion:reduce){#viewport-stage main.operational>.movement-cue{animation:none}}
 #viewport-stage main.final-screen .ending{height:100%;position:relative;isolation:isolate;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:20px;background:none}#viewport-stage .ending .final-answer{max-width:800px;background:#130d0bd9;padding:12px;font-size:16px}#viewport-stage .ending .game-options{background:#130d0be8;padding:6px}.ending .final-title{margin:0}.ending .end-wordmark{max-height:110px}
 dialog .scoreboard{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}dialog .team{background:#1b1714;padding:12px}dialog{overscroll-behavior:contain}dialog button{min-height:44px}
 /* Keep the question and all four alternatives above the explanation. */
@@ -82,7 +86,7 @@ dialog[data-passive=options]{width:620px;overflow:auto}dialog[data-passive=inven
 header .brand .hellscape-logo{display:block;width:170px;height:39px;object-fit:contain;filter:none}
 
 /* Only the Canvas remains visible for important race actions and endings. */
-body.showing-cinematic main.operational>:not(.hell-race),
+body.showing-cinematic main.operational>:not(.hell-race):not(.movement-cue),
 body.showing-cinematic main.final-screen .ending>:not(.hell-race),
 body.showing-cinematic dialog,
 body.showing-cinematic #message,
