@@ -7,6 +7,6 @@
 
 Le risorse sono servite dal sito stesso, senza richieste a CDN o servizi di caratteri esterni. Il filtro del logo è in `src/logo-filter.svg`; home, gioco e presentazione usano la stessa identità visiva.
 
-- `hellscape-chase.webp`: illustrazione della home con demone e tutti i sei veicoli (chopper, pick-up, camion, coupé, fuoristrada, Ape). Generata dai riferimenti `hell-race/demon.webp` e `hell-race/vehicles.webp`; originale conservato in `/workspace/generated_images/exec-7a70b224-2e9d-421a-999d-73ca4595471f.png`. Conversione WebP senza perdita, 1448×1086.
+- `hellscape-chase.webp`: illustrazione frontale della home con sei veicoli che fuggono verso chi guarda e il demone dietro di loro (chopper, pick-up, camion, coupé, fuoristrada, Ape). Generata dai riferimenti `hell-race/demon.webp` e `hell-race/vehicles.webp`; originale conservato in `/workspace/generated_images/exec-ec0be6fc-8e56-4eed-b1ee-a4191909d165.png`. Conversione WebP senza perdita, 1448×1086.
 - `hellscape-logo.webp`: lettering HELLSCAPE nello stesso stile Doom del logo FOOL, metallo antracite, biselli argentati e bordi incandescenti; trasparenza nativa. Originale conservato in `/workspace/generated_images/exec-89462bb3-db03-45be-bff6-fdd2c7b7a5b3.png`. Conversione WebP senza perdita, 2172×724. Usato nella home e nelle intestazioni.
 - `home.css`: impaginazione della schermata iniziale 4:3, senza ritaglio dei veicoli o sovrapposizione dei comandi al convoglio. Conserva nomi accessibili, focus, scorciatoie e schermo intero.
