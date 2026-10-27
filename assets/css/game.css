@@ -241,18 +241,18 @@ dialog .columns { margin: 1rem 0; }
 .bonus-inventory-list .bonus-group { display: list-item; }
 .bonus-inventory-list .bonus-group button { margin: .4rem 0 .2rem .6rem; }
 
-/* Six distinct pixel-art pickups; each icon is one owned Ammo unit. */
+/* Seven infernal pixel-art icons, one sprite per collectible Ammo. */
 .ammo-item { display:flex; align-items:center; flex-wrap:wrap; gap:.3rem .48rem; margin:.2rem 0; min-width:0; }
 .ammo-label { white-space:normal; }
 .ammo-heading { display:flex; flex-wrap:wrap; align-items:center; gap:.35rem .55rem; flex:1 1 auto; min-width:0; }
 .ammo-rounds { display:inline-flex; align-items:center; flex-wrap:wrap; gap:.1rem; max-width:100%; }
-.ammo-round { display:inline-block; flex:0 0 auto; width:1.55rem; height:1.55rem; background-image:url('../ammo-sprites-48.png'); background-repeat:no-repeat; background-size:600% 100%; background-position:var(--ammo-position,0%) center; image-rendering:pixelated; }
-[data-ammo="salta"] { --ammo-position:0%; }   /* Nope: corde */
-[data-ammo="ruba"]  { --ammo-position:20%; }  /* Bullo: cartuccia da fucile */
-[data-ammo="svela"] { --ammo-position:40%; }  /* Spoiler: mirino */
-[data-ammo="aura"]  { --ammo-position:60%; }  /* Aura: giubbotto antiproiettile */
-[data-ammo="karma"] { --ammo-position:80%; }  /* Karma: granata */
-[data-ammo="marx"]  { --ammo-position:100%; } /* Marx: bomba */
+.ammo-round { display:inline-block; flex:0 0 auto; width:1.55rem; height:1.55rem; background-image:url('../ammo-hellscape-v1.png'); background-repeat:no-repeat; background-size:700% 100%; background-position:var(--ammo-position,0%) center; image-rendering:pixelated; }
+[data-ammo="salta"] { --ammo-position:0%; }
+[data-ammo="ruba"]  { --ammo-position:16.66667%; }
+[data-ammo="svela"] { --ammo-position:33.33333%; }
+[data-ammo="aura"]  { --ammo-position:50%; }
+[data-ammo="karma"] { --ammo-position:66.66667%; }
+[data-ammo="marx"]  { --ammo-position:83.33333%; }
 .bonus-list { display:flex; flex-direction:column; align-items:flex-start; }
 .bonus-inventory-list .ammo-heading { min-width:0; }
 @media(max-width:650px) { .ammo-round { width:1.4rem; height:1.4rem; } }
@@ -361,10 +361,10 @@ body.portrait #orientation-note { position: fixed; inset: 0; display: grid; alig
 
 
 /* Ammo are interactive icons; names and rules live in the item popup. */
-button.ammo-round{background-image:url('../ammo-sprites-48.png');background-repeat:no-repeat;background-size:600% 100%;background-position:var(--ammo-position) center;width:48px;height:48px;min-width:48px;min-height:48px;padding:0;border:0;background-color:transparent;box-shadow:none;cursor:pointer;image-rendering:pixelated;touch-action:manipulation}
+button.ammo-round{background-image:url('../ammo-hellscape-v1.png');background-repeat:no-repeat;background-size:700% 100%;background-position:var(--ammo-position) center;width:48px;height:48px;min-width:48px;min-height:48px;padding:0;border:0;background-color:transparent;box-shadow:none;cursor:pointer;image-rendering:pixelated;touch-action:manipulation}
 button.ammo-round:hover{filter:brightness(1.25)}
 button.ammo-round:focus-visible{outline:2px solid #ffe044;outline-offset:2px}
-.ammo-round[data-ammo="ira"]{background-image:url('../ammo-ira-divina.webp');background-size:contain;background-position:center}
+.ammo-round[data-ammo="ira"]{--ammo-position:100%}
 .ammo-rounds{gap:6px}
 .ammo-rewards{display:flex;align-items:center;flex-wrap:wrap;gap:5px 8px}
 .ammo-setting{display:flex;align-items:center;gap:12px;margin:10px 0}.ammo-setting label{flex:1}
