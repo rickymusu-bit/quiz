@@ -705,7 +705,7 @@
     row.title =
       max === 1
         ? "Spareggio: un errore o il tempo scaduto eliminano."
-        : count + " vite su 3 · ogni sanzione o Ira divina toglie un cuore";
+        : count + " vite su 3 · ogni sanzione o Flagello toglie un cuore";
     for (let i = 0; i < max; i++) {
       const heart = node(
         "span",
@@ -976,25 +976,25 @@
     const ammo = event.copy?.type;
     let description = "";
     if (event.type === "aura-block")
-      description = name(event.target) + ": Aura ha bloccato " + F.LABELS[event.ammo];
+      description = name(event.target) + ": Sigillo ha bloccato " + F.LABELS[event.ammo];
     else if (event.type === "karma-trigger")
-      description = name(event.target) + ": Karma diventa " + F.LABELS[event.ammo];
+      description = name(event.target) + ": Contrappasso diventa " + F.LABELS[event.ammo];
     else if (event.type === "spoiler-pass")
-      description = name(event.target) + ": riceve la domanda con Spoiler";
+      description = name(event.target) + ": riceve la domanda con Malocchio";
     else if (event.type === "turn-skipped")
-      description = name(event.target) + ": turno saltato per Nope";
+      description = name(event.target) + ": turno saltato per Catene";
     else if (ammo === "salta")
-      description = name(event.target) + ": Nope, salterà il prossimo turno";
+      description = name(event.target) + ": Catene, salterà il prossimo turno";
     else if (ammo === "ruba")
-      description = name(event.target) + ": Bullo, prossimo guadagno condiviso";
+      description = name(event.target) + ": Tributo, prossimo guadagno condiviso";
     else if (ammo === "svela")
-      description = name(event.source) + ": Spoiler, scelta del destinatario";
+      description = name(event.source) + ": Malocchio, scelta del destinatario";
     else if (ammo === "aura")
-      description = name(event.source) + ": Aura protettiva attivata";
+      description = name(event.source) + ": Sigillo protettiva attivata";
     else if (ammo === "marx")
-      description = "Tutti: Marx redistribuisce i punti";
+      description = "Tutti: Livella redistribuisce i punti";
     else if (ammo === "ira")
-      description = "Tutti: Ira divina toglie una vita";
+      description = "Tutti: Flagello toglie una vita";
     if (!description) return null;
     const panel = node("section", undefined, "ammo-impact");
     panel.setAttribute("aria-label", "Ultimo effetto Ammo");
@@ -1032,14 +1032,14 @@
         const statuses = node("span", undefined, "active-ammo-effects");
         for (const effect of effects) {
           const label = effect.type === "salta"
-            ? "Nope: prossimo turno saltato"
-            : "Bullo: prossimi punti condivisi";
+            ? "Catene: prossimo turno saltato"
+            : "Tributo: prossimi punti condivisi";
           const status = node("span", label, "effect-chip");
           status.title = label + " · da " + s.groups[effect.source].name;
           statuses.append(status);
         }
         if (g.aura !== null)
-          statuses.append(node("span", "Aura: attiva", "effect-chip shielded"));
+          statuses.append(node("span", "Sigillo: attiva", "effect-chip shielded"));
         button.append(statuses);
       }
       item.append(button);
@@ -1374,7 +1374,7 @@
       b.append(
         node(
           "p",
-          "Spoiler: scegli a timer fermo. Il tempo intero parte alla conferma.",
+          "Malocchio: scegli a timer fermo. Il tempo intero parte alla conferma.",
           "good",
         ),
       );
@@ -1976,7 +1976,7 @@
         d.append(
           node(
             "p",
-            "Marx redistribuisce immediatamente " +
+            "Livella redistribuisce immediatamente " +
               F.exact(total) +
               " punti fra " +
               active.length +
