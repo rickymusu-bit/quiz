@@ -10,7 +10,7 @@ function game(total=33,weights=30,difficulty='misto',custom){return F.Game.start
 function reply(g,correct){g.reveal();g.answer(correct?g.s.current.correct:(g.s.current.correct+1)%4)}
 function finishOrdinary(g,correct=false){const n=g.s.config.questionCount;for(let i=0;i<n;i++){reply(g,correct);if(i<n-1)g.next()}}
 
-test('Spoiler bypasses a pending Nope once but the skipped ordinary turn remains queued',()=>{
+test('Malocchio bypasses a pending Catene once but the skipped ordinary turn remains queued',()=>{
  const g=game(33,0),[source,target,next]=g.s.order;
  g.attack('salta',source,target,g.uid());
  const c={id:g.uid(),type:'svela',target:null,origin:'test'};
@@ -27,7 +27,7 @@ test('Spoiler bypasses a pending Nope once but the skipped ordinary turn remains
  assert.equal(g.s.valid,3);
  F.Game.restore(g.snapshot());
 });
-test('Two Bullo from one attacker do not grant duplicate shares',()=>{
+test('Two Tributo from one attacker do not grant duplicate shares',()=>{
  const g=game(33,0),[victim,attacker,other]=g.s.order;
  for(const source of [attacker,attacker,other])
   g.attack('ruba',source,victim,g.uid());
@@ -38,7 +38,7 @@ test('Two Bullo from one attacker do not grant duplicate shares',()=>{
  F.Game.restore(g.snapshot());
 });
 
-test('Rules and names: Bullo, Marx and no multiplier',()=>{assert.equal(F.RULES,'20.0.0');assert.equal(F.LABELS.ruba,'Bullo');assert.equal(F.LABELS.marx,'Marx');assert.equal(F.TYPES.length,7);assert.equal(F.VERSION,'2.3.0')});
+test('Rules and names: Tributo, Livella and no multiplier',()=>{assert.equal(F.RULES,'20.0.0');assert.equal(F.LABELS.ruba,'Tributo');assert.equal(F.LABELS.marx,'Livella');assert.equal(F.TYPES.length,7);assert.equal(F.VERSION,'2.3.0')});
 test('Six unique junkpunk vehicles and backward-compatible legacy games',()=>{
  const cfg=settings();
  const selected=['ape','chopper','truck'];
@@ -50,7 +50,7 @@ test('Six unique junkpunk vehicles and backward-compatible legacy games',()=>{
  assert.match(html,/vehicle-chooser/);
 });
 
-test('Default settings keep 33 questions and Marx at 15 percent',()=>{
+test('Default settings keep 33 questions and Livella at 15 percent',()=>{
  const cfg=settings();delete cfg.questionCount;delete cfg.bonusWeights.marx;
  const validated=F.config(cfg);assert.equal(validated.questionCount,33);
  assert.equal(validated.bonusWeights.marx,15);
@@ -93,10 +93,10 @@ test('2.2.0 ordinary saved games restore without resetting their progress',()=>{
 test('3–99 questions: multiples of 3, unique, exact topic quotas',()=>{for(let n=3;n<=99;n+=3){const p=F.prepare(bank,settings(n));assert.equal(p.chosen.length,n);assert.equal(new Set(p.chosen.map(q=>q.id)).size,n);for(const [t,c]of Object.entries(p.config.quotas))assert.equal(p.chosen.filter(q=>q.topic===t).length,c)}});
 test('Invalid counts and probabilities are rejected',()=>{for(const n of [0,1,4,100,102,3.5])assert.throws(()=>F.prepare(bank,settings(n)));for(const v of [-1,101,NaN,'30']){const cfg=settings();cfg.bonusWeights.aura=v;assert.throws(()=>F.prepare(bank,cfg))}});
 test('Base points stay constant when a group answers correctly again',()=>{const g=game(33,0),first=g.s.order[0];let expected=F.rational(0);for(let n=0;n<4;n++){const q=g.s.current;if(g.s.respondent===first)expected=F.add(expected,F.rational(g.s.config.bases[q.difficulty]));reply(g,true);if(n<3)g.next()}assert.equal(F.exact(g.s.groups[first].score),F.exact(expected));assert.equal(g.s.groups[first].streak,undefined)});
-test('Bullo divides only base points',()=>{const g=game(33,0),receiver=g.s.respondent,beneficiary=g.s.order[1],amount=g.s.config.bases[g.s.current.difficulty];g.s.effects.push({id:g.uid(),type:'ruba',source:beneficiary,target:receiver});reply(g,true);assert.equal(F.exact(g.s.groups[receiver].score),F.exact(F.rational(BigInt(amount),2n)));assert.equal(F.exact(g.s.groups[beneficiary].score),F.exact(F.rational(BigInt(amount),2n)))});
-test('Marx redistributes all accumulated points exactly without rounding',()=>{const g=game(33,0);g.s.groups.forEach((team,i)=>team.score=F.rational([101,200,1][i]));const owner=g.s.respondent;const copy={id:g.uid(),type:'marx',target:null,origin:'test'};g.s.groups[owner].inventory.push(copy);g.use(copy.id,null);for(const team of g.s.groups)assert.equal(F.exact(team.score),'302/3');assert.equal(g.s.groups[owner].inventory.length,0);assert(g.s.events.some(e=>e.type==='marx-redistribution'));F.Game.restore(g.snapshot())});
-test('Marx excludes eliminated teams and ignores Aura while keeping history',()=>{const g=game(33,0);g.s.groups[0].score=F.rational(101);g.s.groups[1].score=F.rational(200);g.s.groups[2].score=F.rational(999);g.eliminate(2,'Tre sanzioni');g.s.groups[1].aura=g.s.turn;const copy={id:g.uid(),type:'marx',target:null,origin:'test'};g.s.groups[g.s.respondent].inventory.push(copy);g.use(copy.id,null);assert.equal(F.exact(g.s.groups[0].score),'301/2');assert.equal(F.exact(g.s.groups[1].score),'301/2');assert.equal(F.exact(g.s.groups[2].score),'999');assert.equal(g.s.groups[1].aura,g.s.turn);F.Game.restore(g.snapshot())});
-test('Marx awards at 100% and preserved probability is added to previous save formats',()=>{const g=game(33,100);reply(g,true);assert(g.s.result.bonuses.some(b=>b.type==='marx'));const saved=g.snapshot();saved.version='2.0.0';saved.rules='19.0.0';delete saved.config.bonusWeights.marx;const restored=F.Game.restore(saved);assert.equal(restored.s.config.bonusWeights.marx,15);assert.equal(restored.s.version,'2.3.0');assert.equal(restored.s.rules,'20.0.0')});
+test('Tributo divides only base points',()=>{const g=game(33,0),receiver=g.s.respondent,beneficiary=g.s.order[1],amount=g.s.config.bases[g.s.current.difficulty];g.s.effects.push({id:g.uid(),type:'ruba',source:beneficiary,target:receiver});reply(g,true);assert.equal(F.exact(g.s.groups[receiver].score),F.exact(F.rational(BigInt(amount),2n)));assert.equal(F.exact(g.s.groups[beneficiary].score),F.exact(F.rational(BigInt(amount),2n)))});
+test('Livella redistributes all accumulated points exactly without rounding',()=>{const g=game(33,0);g.s.groups.forEach((team,i)=>team.score=F.rational([101,200,1][i]));const owner=g.s.respondent;const copy={id:g.uid(),type:'marx',target:null,origin:'test'};g.s.groups[owner].inventory.push(copy);g.use(copy.id,null);for(const team of g.s.groups)assert.equal(F.exact(team.score),'302/3');assert.equal(g.s.groups[owner].inventory.length,0);assert(g.s.events.some(e=>e.type==='marx-redistribution'));F.Game.restore(g.snapshot())});
+test('Livella excludes eliminated teams and ignores Sigillo while keeping history',()=>{const g=game(33,0);g.s.groups[0].score=F.rational(101);g.s.groups[1].score=F.rational(200);g.s.groups[2].score=F.rational(999);g.eliminate(2,'Tre sanzioni');g.s.groups[1].aura=g.s.turn;const copy={id:g.uid(),type:'marx',target:null,origin:'test'};g.s.groups[g.s.respondent].inventory.push(copy);g.use(copy.id,null);assert.equal(F.exact(g.s.groups[0].score),'301/2');assert.equal(F.exact(g.s.groups[1].score),'301/2');assert.equal(F.exact(g.s.groups[2].score),'999');assert.equal(g.s.groups[1].aura,g.s.turn);F.Game.restore(g.snapshot())});
+test('Livella awards at 100% and preserved probability is added to previous save formats',()=>{const g=game(33,100);reply(g,true);assert(g.s.result.bonuses.some(b=>b.type==='marx'));const saved=g.snapshot();saved.version='2.0.0';saved.rules='19.0.0';delete saved.config.bonusWeights.marx;const restored=F.Game.restore(saved);assert.equal(restored.s.config.bonusWeights.marx,15);assert.equal(restored.s.version,'2.3.0');assert.equal(restored.s.rules,'20.0.0')});
 test('Independent bonus awards',()=>{for(const chance of [0,100]){const g=game(33,chance);reply(g,true);assert.equal(g.s.result.bonuses.length,chance===100?7:0);F.Game.restore(g.snapshot())}});
 test('At the end of ordinary questions a single score leader wins without a tie',()=>{const g=game(3,0);reply(g,true);g.next();reply(g,false);g.next();reply(g,false);assert.equal(g.s.phase,'conclusa');assert.equal(g.s.winner,g.s.order[0])});
 test('Only the top-score tied groups enter the elimination tie-break',()=>{const cfg=settings(3,0);cfg.bases={facile:100,media:100,difficile:100};const g=game(3,0,'misto',cfg);reply(g,true);g.next();reply(g,true);g.next();reply(g,false);assert.equal(g.s.phase,'pareggio');assert.equal(g.s.tieOrder.length,2);assert.equal(g.s.groups[g.s.order[2]].out,true);g.next();reply(g,false);assert.equal(g.s.phase,'pareggio');g.next();reply(g,true);assert.equal(g.s.phase,'conclusa');assert.equal(g.s.winner,g.s.order[1])});
@@ -107,7 +107,7 @@ test('Ninety-nine questions transition to tie-break only at 99',()=>{const g=gam
 test('Save and resume during tie-break preserves elimination and timer',()=>{const g=game(3,0);finishOrdinary(g);g.next();reply(g,false);const s=g.snapshot(),r=F.Game.restore(s);assert.equal(r.s.phase,'pareggio');assert.equal(r.s.tieIndex,0);assert.equal(r.s.groups[g.s.order[0]].out,true);r.next();assert.equal(r.s.respondent,g.s.order[1]);F.Game.restore(r.snapshot())});
 test('Previous ordinary saves can be migrated without changing scores',()=>{const g=game(33,0);reply(g,true);const s=g.snapshot();s.version='1.2.0';s.rules='18.2.0';s.groups[0].streak=1;s.drawWins=[0,0,0];const r=F.Game.restore(s);assert.equal(r.s.phase,'ordinaria');assert.equal(r.s.version,'2.3.0');assert.equal(r.s.groups[0].streak,undefined);assert.equal(F.exact(r.s.groups[g.s.respondent].score),F.exact(g.s.groups[g.s.respondent].score))});
 test('Two disciplinary eliminations immediately award the remaining team',()=>{const g=game();g.openSanctions();g.s.panel.counts=[3,3,0];g.closeSanctions(true);assert.equal(g.s.phase,'conclusa');assert.equal(g.s.winner,2)});
-test('One unblocked attack transforms one Karma only, preserving the remaining copies',()=>{
+test('One unblocked attack transforms one Contrappasso only, preserving the remaining copies',()=>{
  const g=game(),target=g.s.order[1],source=g.s.owner,items=[0,1,2].map(()=>({id:g.uid(),type:'karma',target:null,origin:'test'}));
  g.s.groups[target].inventory.push(...items);g.attack('ruba',source,target,g.uid());
  assert.equal(g.s.groups[target].inventory.filter(c=>c.type==='karma').length,2);
@@ -115,12 +115,12 @@ test('One unblocked attack transforms one Karma only, preserving the remaining c
  g.attack('salta',source,target,g.uid());assert.equal(items[1].type,'salta');assert.equal(items[2].type,'karma');
  F.Game.restore(g.snapshot());
 });
-test('An Aura-blocked attack leaves every Karma unchanged',()=>{
+test('An Sigillo-blocked attack leaves every Contrappasso unchanged',()=>{
  const g=game(),target=g.s.order[1];g.s.groups[target].aura=g.s.turn;
  const karma={id:g.uid(),type:'karma',target:null,origin:'test'};g.s.groups[target].inventory.push(karma);
  assert.equal(g.attack('ruba',g.s.owner,target,g.uid()),false);assert.equal(karma.type,'karma');assert.equal(g.s.effects.length,0);
 });
-test('Marx changes points while leaving other players Aura and Karma untouched',()=>{
+test('Livella changes points while leaving other players Sigillo and Contrappasso untouched',()=>{
  const g=game(),owner=g.s.owner,target=g.s.order[1];g.s.groups[owner].score=F.rational(90);g.s.groups[target].aura=g.s.turn;
  g.s.groups[target].inventory.push({id:g.uid(),type:'karma',target:null,origin:'test'},{id:g.uid(),type:'karma',target:null,origin:'test'});
  const marx={id:g.uid(),type:'marx',target:null,origin:'test'};g.s.groups[owner].inventory.push(marx);g.use(marx.id,null);
@@ -161,10 +161,10 @@ test('Timer preserves exact remaining time across pause and restored games, then
 });
 
 function wrath(g){const item={id:g.uid(),type:'ira',target:null,origin:'test'};g.s.groups[g.s.owner].inventory.push(item);return item}
-test('Ira divina defaults to 5 percent, with an independent exact threshold',()=>{
+test('Flagello defaults to 5 percent, with an independent exact threshold',()=>{
  for(const [random,awarded] of [[.049,true],[.05,false]]){const cfg=settings(33,0);delete cfg.bonusWeights.ira;const g=game(33,0,'misto',cfg);g.random=()=>random;reply(g,true);assert.equal(g.s.config.bonusWeights.ira,5);assert.equal(g.s.result.bonuses.some(c=>c.type==='ira'),awarded);assert.equal(g.s.result.bonuses.length,Number(awarded));}
 });
-test('Ira divina hits everyone including the owner, bypasses Aura and leaves Karma and scores intact',()=>{
+test('Flagello hits everyone including the owner, bypasses Sigillo and leaves Contrappasso and scores intact',()=>{
  const g=game(33,0),owner=g.s.owner;g.s.groups.forEach((team,i)=>{team.score=F.rational(i+1,3);team.aura=g.s.turn;team.inventory.push({id:g.uid(),type:'karma',target:null,origin:'test'})});const before=g.s.groups.map(t=>F.exact(t.score));const item=wrath(g);g.use(item.id,null);
  assert.deepEqual(g.s.groups.map((t,i)=>F.remainingLives(g.s,i)),[2,2,2]);assert.deepEqual(g.s.groups.map(t=>t.sanctions),[0,0,0]);assert.deepEqual(g.s.groups.map(t=>F.exact(t.score)),before);assert(g.s.groups.every(t=>t.aura===g.s.turn&&t.inventory.length===1&&t.inventory[0].type==='karma'));assert.equal(g.s.owner,owner);F.Game.restore(g.snapshot());
 });
@@ -172,14 +172,14 @@ test('Three uses remove all players simultaneously with no premature winner',()=
  const g=game(33,0);for(let n=0;n<3;n++){const item=wrath(g);g.use(item.id,null);if(n<2)assert.equal(g.s.phase,'ordinaria')}
  assert.equal(g.s.phase,'conclusa');assert.equal(g.s.winner,null);assert(g.s.groups.every(t=>t.out));F.Game.restore(g.snapshot());
 });
-test('A self-eliminating Ira divina cancels an open question and advances safely',()=>{
+test('A self-eliminating Flagello cancels an open question and advances safely',()=>{
  const g=game(33,0),owner=g.s.owner;g.s.groups[owner].sanctions=2;const item=wrath(g);g.reveal();const question=g.s.current.id;g.use(item.id,null);
  assert(g.s.groups[owner].out);assert.notEqual(g.s.respondent,owner);assert.equal(g.s.screen,'hidden');assert.equal(g.s.valid,0);assert(g.s.cancelled.includes(question));assert.equal(g.running,false);F.Game.restore(g.snapshot());
 });
-test('Ira divina awards the sole survivor after every victim has been processed',()=>{
+test('Flagello awards the sole survivor after every victim has been processed',()=>{
  const g=game(33,0),winner=g.s.order[2];g.s.groups.forEach(t=>t.sanctions=2);g.s.groups[winner].sanctions=0;const item=wrath(g);g.use(item.id,null);assert.equal(g.s.winner,winner);assert.equal(g.s.phase,'conclusa');assert.equal(F.remainingLives(g.s,winner),2);F.Game.restore(g.snapshot());
 });
-test('Ira divina skips eliminated players and damage combines with later sanctions',()=>{
+test('Flagello skips eliminated players and damage combines with later sanctions',()=>{
  const g=game(33,0),owner=g.s.owner,dead=g.s.order[2];g.eliminate(dead,'test');let item=wrath(g);g.use(item.id,null);assert.equal(g.s.groups[dead].damage,0);assert.equal(g.s.groups[owner].sanctions,0);g.openSanctions();g.s.panel.counts[owner]=2;g.closeSanctions(true);assert(g.s.groups[owner].out);assert.equal(g.s.groups[owner].sanctions,2);assert.equal(g.s.groups[owner].damage,1);F.Game.restore(g.snapshot());
 });
 test('Legacy 2.2.1 saves gain the new Ammo without changing lives, points or chosen settings',()=>{
@@ -194,7 +194,7 @@ test('Persisted Ira damage survives restore and rejects malformed life counters'
 test('The tie-break resets ordinary damage and still forbids Ammo',()=>{
  const g=game(3,0),item=wrath(g);g.use(item.id,null);finishOrdinary(g);assert.equal(g.s.phase,'pareggio');assert(g.s.groups.every(t=>t.damage===0));assert.deepEqual(g.s.groups.map((t,i)=>F.remainingLives(g.s,i)),[1,1,1]);g.next();const illegal=wrath(g);assert.throws(()=>g.use(illegal.id,null));g.s.groups[g.s.owner].inventory=[];F.Game.restore(g.snapshot());
 });
-test('Ira divina has no target and validates before consuming a copy',()=>{const g=game(33,0),item=wrath(g);assert.throws(()=>g.use(item.id,g.s.order[1]));assert(g.s.groups[g.s.owner].inventory.some(c=>c.id===item.id));assert(g.s.groups.every(t=>t.damage===0));});
+test('Flagello has no target and validates before consuming a copy',()=>{const g=game(33,0),item=wrath(g);assert.throws(()=>g.use(item.id,g.s.order[1]));assert(g.s.groups[g.s.owner].inventory.some(c=>c.id===item.id));assert(g.s.groups.every(t=>t.damage===0));});
 
 test('A sanction always removes exactly one life, including the last tie-break heart',()=>{
  const g=game(3,0);finishOrdinary(g);g.next();const owner=g.s.respondent;assert.equal(F.remainingLives(g.s,owner),1);g.openSanctions();g.s.panel.counts[owner]=1;g.closeSanctions(true);assert.equal(F.remainingLives(g.s,owner),0);assert(g.s.groups[owner].out);assert.equal(g.s.groups[owner].sanctions,1);F.Game.restore(g.snapshot());
