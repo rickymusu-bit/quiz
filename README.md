@@ -74,7 +74,7 @@ Il modulo `assets/hell-race.js` è un Canvas pixel-art senza dipendenze, privo d
 
 ## Interfaccia e salvataggi
 
-La home, la schermata di gioco e le regole sono responsive per desktop, tablet e smartphone. Gli inventari dei giocatori mostrano **solo i tipi di Ammo effettivamente posseduti**, con una **icona pixel-art per ogni unità posseduta**, diversa per forma e materiale (Catene: ruota incatenata; Tributo: mano scheletrica e monete; Malocchio: occhio ardente; Sigillo: scudo runico; Contrappasso: catena con uncini; Livella: bilancia con teschi; Flagello: colonna di fuoco). Nessuna cifra sostituisce le icone. I nomi appaiono al passaggio del puntatore; clic o tocco aprono una finestra con nome e spiegazione; le probabilità compaiono soltanto nelle impostazioni. La consultazione non consuma l’oggetto: nell’inventario proprio si sceglie Usa e poi si conferma. I vincoli di Contrappasso compaiono nella finestra. Nomi e conteggi restano accessibili ai lettori di schermo. Il comando per il fullscreen mostra **Schermo intero** o **Esci da schermo intero** in funzione dello stato del browser, anche quando il gioco è aperto in un iframe dalla home.
+La home, la schermata di gioco e le regole sono responsive per desktop, tablet e smartphone. Gli inventari dei giocatori mostrano **solo i tipi di Ammo effettivamente posseduti**, con una **icona pixel-art per ogni unità posseduta**, diversa per forma e materiale (Catene: manette e catena in ferro; Tributo: borsa di monete; Malocchio: bulbo deforme con iridi multiple; Sigillo: scudo runico; Contrappasso: teschio bifronte; Livella: bilancia con teschi; Flagello: mazza ferrata avvolta in stoffa borgogna). Nessuna cifra sostituisce le icone. I nomi appaiono al passaggio del puntatore; clic o tocco aprono una finestra con nome e spiegazione; le probabilità compaiono soltanto nelle impostazioni. La consultazione non consuma l’oggetto: nell’inventario proprio si sceglie Usa e poi si conferma. I vincoli di Contrappasso compaiono nella finestra. Nomi e conteggi restano accessibili ai lettori di schermo. Il comando per il fullscreen mostra **Schermo intero** o **Esci da schermo intero** in funzione dello stato del browser, anche quando il gioco è aperto in un iframe dalla home.
 
 La schermata iniziale offre **Nuova partita** e mostra **Riprendi partita** quando in questo browser è presente una partita salvata ancora in corso. La ripresa apre direttamente il gioco, mantenendo il timer fermo. Preparare una nuova partita conserva il salvataggio precedente fino alla conferma di **Inizia partita**.
 
@@ -83,7 +83,7 @@ La partita viene salvata automaticamente in `localStorage` nello stesso browser.
 ## Contenuto e verifiche
 
 - `Fool.html`: struttura della pagina e caricamento dei moduli; mantiene il suo URL pubblico.
-- `assets/ammo-hellscape-v1.png`: sette nuove icone pixel art infernali in una tavola PNG da 24 px per icona, visualizzate a 48 px.
+- `assets/ammo-hellscape-v2.png`: sette nuove icone pixel art infernali in una tavola PNG da 48 px per icona, con trasparenza e sagome differenziate.
 - `Fool_regole.html`: regolamento della gara dei dannati.
 - `dataset/`, `datasets.json`: banche pubblicate e catalogo.
 - `docs/PROMPT_GENERAZIONE_DOMANDE.md`: istruzioni per creare quesiti.
