@@ -90,13 +90,14 @@
     const animated=key==='vehicles'||key==='demon';
     const image=animated?atlasRow(key,row)[frame]:sheets[key];
     const rect=animated?[0,0,image.width,image.height]:frameRect(key,columns,rows,row,frame),scale=Math.min(width/rect[2],height/rect[3]);
-    const w=rect[2]*scale,h=rect[3]*scale;
+    const w=key==='vehicles'&&row===2?width:rect[2]*scale,h=rect[3]*scale;
     c.drawImage(image,...rect,Math.round(x+(width-w)/2),Math.round(y+height-h),Math.round(w),Math.round(h));return true;
   }
   function vehicleSize(row, scale = 2) {
     const frame = vehicleRow(row)[0];
     const width = vehicleWidths[row] * (scale < 2 ? .65 : (root.FoolBridge?.RACE_SCALE ?? .62));
-    return { width, height: width * frame.height / frame.width };
+    // Correct the truck's compressed wheelbase without flattening the cab.
+    return { width: width * (row === 2 ? 1.14 : 1), height: width * frame.height / frame.width };
   }
   function drawVehicle(c, row, frame, x, ground, scale = 2) {
     const size = vehicleSize(row, scale);
@@ -530,6 +531,7 @@
         vehicleOutline(c, row, Math.floor(motion * 10 + i * 2) % 8, p.x, p.y);
       racer(c, p.x, p.y, i, motion, visualGroup, 2);
     }
+    root.FoolBridge?.foreground?.(c, W, motion);
     if(shot){
       c.save();c.translate(0,130);c.scale(1.3,1.3);demon(c,motion,15);c.restore();
       root.FoolAmmo.render(c,W,state,shot,ammo.sample(reduced),positions,reduced);

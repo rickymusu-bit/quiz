@@ -61,14 +61,13 @@
     return x > 0n ? 1 : x < 0n ? -1 : 0;
   };
   const exact = (a) => (a.d === "1" ? a.n : a.n + "/" + a.d);
-  // Display only: rounded decimal text; exact rational scores remain authoritative.
+  // Display only: nearest integer, with half points rounded away from zero.
+  // Rational scores stay exact for redistribution, comparisons and saved games.
   function formatScore(a) {
     const n = BigInt(a.n), d = BigInt(a.d), negative = n < 0n;
     const magnitude = negative ? -n : n;
-    const cents = (magnitude * 100n + d / 2n) / d;
-    const fraction = String(cents % 100n).padStart(2, "0").replace(/0+$/, "");
-    return (negative && cents ? "-" : "") + String(cents / 100n) +
-      (fraction ? "," + fraction : "");
+    const rounded = (magnitude + d / 2n) / d;
+    return (negative && rounded ? "-" : "") + String(rounded);
   }
   function remainingLives(s, index) {
     const g = s.groups[index];

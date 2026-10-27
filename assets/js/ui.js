@@ -1437,7 +1437,7 @@
             F.formatScore(r.gross) +
               " pt" +
               (r.beneficiaries.length
-                ? " · quota esatta " +
+                ? " · quota " +
                   F.formatScore(r.share) +
                   " a " +
                   [r.respondent, ...r.beneficiaries]

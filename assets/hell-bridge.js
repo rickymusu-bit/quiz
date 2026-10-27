@@ -20,6 +20,77 @@
     let y=TOP+(BOTTOM-TOP-occupied)/2;
     return heights.map(h=>{y+=h;const ground=y;y+=GAP;return ground;});
   }
+  const RAIL_SPAN = 64, PIER_SPAN = 144;
+  const modulo = (n, base) => ((n % base) + base) % base;
+  function railSection(c, image, index, x, y, width = RAIL_SPAN) {
+    if (image?.complete && image.naturalWidth) {
+      const sourceX = modulo(index * RAIL_SPAN, 768) / 768 * image.naturalWidth;
+      c.drawImage(image, sourceX, 120 / 672 * image.naturalHeight,
+        width / 768 * image.naturalWidth, 94 / 672 * image.naturalHeight,
+        x, y, width + .25, 20);
+    } else {
+      c.strokeStyle = '#7e6850'; c.lineWidth = 1.5;
+      for (const dy of [8, 16]) {
+        c.beginPath(); c.moveTo(x, y + dy); c.lineTo(x + width, y + dy); c.stroke();
+      }
+      for (let dx = 0; dx < width; dx += 16) {
+        c.fillStyle = '#44352c'; c.fillRect(x + dx, y + 5, 2, 15);
+      }
+    }
+  }
+  function railing(c, width, time, front, image = art) {
+    const offset = time * 48, y = front ? BOTTOM + 1 : TOP - 20;
+    c.save();
+    for (let index = Math.floor(offset / RAIL_SPAN) - 1;
+         index <= Math.floor((offset + width) / RAIL_SPAN) + 1; index++) {
+      const x = index * RAIL_SPAN - offset;
+      const damaged = modulo(index + (front ? 3 : 0), 7) === 2;
+      if (!damaged) { railSection(c, image, index, x, y); continue; }
+      // The surviving stub and a tilted, detached panel leave a real open gap.
+      railSection(c, image, index, x, y, 16);
+      c.save(); c.translate(x + 17, y + 16); c.rotate(front ? .62 : -.38);
+      railSection(c, image, index, 0, -9, 31); c.restore();
+      c.strokeStyle = '#b88b55'; c.lineWidth = .8;
+      c.beginPath(); c.moveTo(x + 16, y + 9); c.lineTo(x + 20, y + 6); c.stroke();
+    }
+    c.restore();
+  }
+  function pillars(c, width, time, image) {
+    const offset = time * 48;
+    c.save();
+    for (let index = Math.floor(offset / PIER_SPAN) - 1;
+         index <= Math.floor((offset + width) / PIER_SPAN) + 1; index++) {
+      const x = index * PIER_SPAN - offset, y = BOTTOM + 7;
+      const gradient = c.createLinearGradient(x - 20, 0, x + 20, 0);
+      gradient.addColorStop(0, '#161310'); gradient.addColorStop(.35, '#665644');
+      gradient.addColorStop(.7, '#41382e'); gradient.addColorStop(1, '#161210');
+      c.fillStyle = gradient;
+      c.beginPath(); c.moveTo(x - 25, y); c.lineTo(x + 25, y);
+      c.lineTo(x + 14, y + 18); c.lineTo(x + 12, 430);
+      c.lineTo(x - 14, 430); c.lineTo(x - 16, y + 18); c.closePath(); c.fill();
+      // Masonry continues below the screen into the lake, with corroded braces.
+      c.save(); c.clip();
+      if (image?.complete && image.naturalWidth) {
+        c.globalAlpha = .4;
+        c.drawImage(image, image.naturalWidth * .12, image.naturalHeight * .5,
+          image.naturalWidth * .08, image.naturalHeight * .32, x - 25, y, 50, 85);
+        c.globalAlpha = 1;
+      }
+      c.strokeStyle = '#1a1511'; c.lineWidth = 1;
+      for (let row = 0; row < 8; row++) {
+        const by = y + 6 + row * 11;
+        c.beginPath(); c.moveTo(x - 25, by); c.lineTo(x + 25, by); c.stroke();
+        c.beginPath(); c.moveTo(x + (row % 2 ? -5 : 6), by);
+        c.lineTo(x + (row % 2 ? -5 : 6), by + 11); c.stroke();
+      }
+      c.fillStyle = '#a66a38'; c.fillRect(x - 12, y + 12, 2, 78);
+      c.fillStyle = '#211914'; c.fillRect(x + 9, y + 12, 3, 78);
+      c.restore();
+    }
+    c.restore();
+  }
+  // Draw the near-side rail after the racers, so the bridge has two distinct edges.
+  function foreground(c, width, time) { railing(c, width, time, true); }
   function draw(c,width,time,progress,world,effectTime=time){
     c.save();
     c.fillStyle='#681a0c';c.fillRect(0,184,width,200);
@@ -35,11 +106,13 @@
       c.fillStyle=i%3?'#e95d1a88':'#ffbe5288';c.fillRect(Math.round(x),y,6+i%9,1);
     }
     const image=load();
+    pillars(c,width,time,image);
+    railing(c,width,time,false,image);
     if(image?.complete&&image.naturalWidth){
       const tile=768,offset=(time*48)%tile,s=image.naturalHeight/672;
       for(let x=-offset;x<width;x+=tile){
         // Separate the top rail, driveable deck and suspended masonry fascia.
-        for(const [sy,sh,dy,dh] of [[120,94,208,20],[214,123,TOP,BOTTOM-TOP],[337,260,BOTTOM,40]])
+        for(const [sy,sh,dy,dh] of [[214,123,TOP,BOTTOM-TOP],[337,260,BOTTOM,20]])
           c.drawImage(image,0,sy*s,image.naturalWidth,sh*s,Math.floor(x),dy,tile+1,dh);
       }
     }else{c.fillStyle='#292722';c.fillRect(0,TOP,width,BOTTOM-TOP);}
@@ -72,6 +145,6 @@
     }
     c.restore();
   }
-  const api={TOP,BOTTOM,GAP,RACE_SCALE,grounds,draw,load};
+  const api={TOP,BOTTOM,GAP,RACE_SCALE,grounds,draw,foreground,load};
   if(typeof module!=='undefined')module.exports=api;else root.FoolBridge=api;
 })(globalThis);

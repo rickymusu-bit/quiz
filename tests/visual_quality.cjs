@@ -15,6 +15,7 @@ const {chromium}=require("playwright"),fs=require("node:fs"),assert=require("nod
    await page.goto("http://quality.test/");
    await page.frameLocator("iframe").getByRole("link",{name:"Nuova partita",exact:true}).click();
    const frame=page.frames()[1];
+   await frame.locator("#vehicle1").selectOption("truck");
    await frame.getByRole("button",{name:/^Inizia partita/}).click();
    await frame.waitForFunction(()=>document.querySelector(".hell-race canvas")?.width>=1024);
    await frame.evaluate(()=>{
@@ -23,9 +24,10 @@ const {chromium}=require("playwright"),fs=require("node:fs"),assert=require("nod
     const item={id:g.uid(),type:"marx",target:null,origin:"test"};
     g.s.groups[g.s.respondent].inventory.push(item);g.use(item.id,null);HellscapeUI.changed();
    });
-   await frame.waitForFunction(()=>[...document.querySelectorAll(".player-points")].every(p=>p.textContent==="100,67 pt"));
+   await frame.waitForFunction(()=>[...document.querySelectorAll(".player-points")].every(p=>p.textContent==="101 pt"));
    assert(await frame.evaluate(()=>HellscapeUI.game.s.groups.every(p=>Fool.exact(p.score)==="302/3")));
-   await page.screenshot({path:`artifacts/quality-decimal-${width}.png`});
+   await frame.waitForFunction(()=>document.querySelector('.hell-race')?.dataset.ammo==='' && !document.body.classList.contains('showing-cinematic'));
+   await page.screenshot({path:`artifacts/quality-integer-${width}.png`});
    const source=fs.readFileSync("assets/hell-race.js","utf8").replace(
     "root.FoolHellRace = { createStage, vehiclePreview };",
     "root.QualityRace = { scene, chaseAction, ready:()=>Object.values(sheets).every(imageReady) };");
@@ -63,7 +65,7 @@ const {chromium}=require("playwright"),fs=require("node:fs"),assert=require("nod
    await page.waitForTimeout(200);
    assert.equal(await frame.locator(".hell-race canvas").evaluate(c=>c.toDataURL()),still);
    assert.deepEqual(errors,[]);assert.deepEqual(requests,[]);
-   await context.close();console.log("PASS decimal scores, high resolution, bridge progression, near misses, pause and reduced motion",width);
+   await context.close();console.log("PASS integer scores, high resolution, bridge progression, near misses, pause and reduced motion",width);
   }
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1});
