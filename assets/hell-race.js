@@ -304,29 +304,68 @@
     }
     return { x: left, y: top - 4 * unit, width: 50 * unit, height: 24 * unit };
   }
-  function flyingDevils(c, W, time) {
-    c.save();
-    c.fillStyle = '#10090a';
-    c.globalAlpha = .95;
-    for (let i = 0; i < 8; i++) {
-      const direction = i % 2 ? -1 : 1;
-      const phase = W * (.065 + i * .127) + direction * time * (1.2 + i % 3);
-      const x = ((phase % (W + 48)) + W + 48) % (W + 48) - 24;
-      const y = 32 + (i * 17) % 39 + Math.sin(time * .65 + i * 2) * 2;
-      const size = 2.15 + (i % 3) * .22, flap = Math.sin(time * 2.8 + i * 1.9) * 2.5;
-      c.save(); c.translate(Math.round(x), Math.round(y)); c.scale(size, size);
-      // Large horned silhouettes with slow, asymmetric wingbeats against the red sky.
-      c.fillRect(-1, -1, 2, 5);
-      c.fillRect(-2, -3, 1, 2); c.fillRect(1, -3, 1, 2);
-      c.beginPath(); c.moveTo(-1, 1); c.lineTo(-7, -3 + flap);
-      c.lineTo(-5, 1 + flap * .4); c.lineTo(-3, 0); c.lineTo(-1, 3); c.fill();
-      c.beginPath(); c.moveTo(1, 1); c.lineTo(7, -3 - flap);
-      c.lineTo(5, 1 - flap * .4); c.lineTo(3, 0); c.lineTo(1, 3); c.fill();
-      c.fillRect(0, 4, 1, 2); c.fillRect(direction, 5, 1, 1);
+  const devilFrames=new Map();
+  function devilFrame(frame) {
+    if(devilFrames.has(frame))return devilFrames.get(frame);
+    const canvas=document.createElement('canvas');canvas.width=192;canvas.height=180;
+    const c=canvas.getContext('2d'),flap=Math.sin(frame/16*Math.PI*2)*7;
+    c.translate(96,72);c.scale(3,3);
+    const shade=c.createLinearGradient(0,-18,0,25);
+    shade.addColorStop(0,'#301815');shade.addColorStop(.55,'#160c0c');shade.addColorStop(1,'#281411');
+    c.fillStyle=shade;
+    for(const side of [-1,1]){
+      c.save();c.scale(side,1);
+      c.beginPath();c.moveTo(2,-1);
+      c.bezierCurveTo(8,-7,17,-13+flap,29,-10+flap);
+      c.quadraticCurveTo(24,-4+flap,26,3+flap*.35);
+      c.quadraticCurveTo(19,-1,17,7+flap*.2);
+      c.quadraticCurveTo(12,2,10,10);
+      c.quadraticCurveTo(7,4,3,6);c.closePath();c.fill();
+      c.strokeStyle='#603326';c.lineWidth=.45;c.globalAlpha=.65;
+      for(const [tx,ty] of [[28,-10+flap],[25,3+flap*.35],[17,7+flap*.2]]){
+        c.beginPath();c.moveTo(3,0);c.quadraticCurveTo(10,-5,tx,ty);c.stroke();
+      }
+      c.globalAlpha=1;
+      c.beginPath();c.moveTo(2,-6);c.quadraticCurveTo(10,-11,7,-18);
+      c.quadraticCurveTo(6,-11,1,-10);c.closePath();c.fill();
+      c.beginPath();c.moveTo(2,5);c.lineTo(5,13);c.lineTo(3,18);
+      c.lineTo(8,17);c.lineTo(7,14);c.lineTo(7,10);c.lineTo(4,3);c.closePath();c.fill();
       c.restore();
+    }
+    c.beginPath();c.ellipse(0,-6,3.4,4.6,0,0,Math.PI*2);c.fill();
+    c.beginPath();c.moveTo(-3,-3);c.quadraticCurveTo(-5,3,-2,9);
+    c.lineTo(2,9);c.quadraticCurveTo(5,3,3,-3);c.closePath();c.fill();
+    c.strokeStyle='#291412';c.lineWidth=1.8;c.lineCap='round';
+    c.beginPath();c.moveTo(0,7);c.bezierCurveTo(-1,15,17,13,13,23);c.stroke();
+    c.beginPath();c.moveTo(13,26);c.lineTo(9,20);c.lineTo(16,21);c.closePath();c.fill();
+    // Rasterize once at the same source density as the illustrated scene assets.
+    // Subtle grain and wing ribs keep the distant silhouettes from looking like flat icons.
+    c.globalCompositeOperation='source-atop';
+    for(let n=0;n<160;n++){
+      const x=((n*37)%173)/3-28,y=((n*71)%137)/3-17;
+      c.fillStyle=n%3?'#77402c55':'#09070888';c.fillRect(x,y,.3,.4);
+    }
+    devilFrames.set(frame,canvas);return canvas;
+  }
+  function devilPosition(index,width,time) {
+    const span=width+90,slot=(index+.5)*span/8;
+    return {x:((slot+time*2)%span+span)%span-45,
+      y:25+((index*3)%8)*17+Math.sin(time*.65+index*2)*1.4,
+      size:.48+(index%3)*.065};
+  }
+  function flyingDevils(c,W,time) {
+    c.save();c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';
+    for(let i=0;i<8;i++){
+      const p=devilPosition(i,W,time),direction=i%2?-1:1;
+      const frame=((Math.floor(time*5.5+i*2.3)%16)+16)%16;
+      const image=devilFrame(frame);
+      c.save();c.translate(p.x,p.y);c.scale(direction*p.size,p.size);
+      c.globalAlpha=1;
+      c.drawImage(image,-32,-24,64,60);c.restore();
     }
     c.restore();
   }
+
   function background(c, W, tick, progress, effectTime=tick) {
     if(imageReady(sheets.world)){
       const img=sheets.world;

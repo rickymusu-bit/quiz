@@ -19,7 +19,7 @@
     rational,
     add,
     compare,
-    exact,
+    formatScore: exact,
     remainingLives,
     shuffle,
   } = core;

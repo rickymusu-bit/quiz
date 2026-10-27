@@ -61,6 +61,14 @@
     return x > 0n ? 1 : x < 0n ? -1 : 0;
   };
   const exact = (a) => (a.d === "1" ? a.n : a.n + "/" + a.d);
+  // Display only: nearest integer, with half points rounded away from zero.
+  // Rational scores stay exact for redistribution, comparisons and saved games.
+  function formatScore(a) {
+    const n = BigInt(a.n), d = BigInt(a.d), negative = n < 0n;
+    const magnitude = negative ? -n : n;
+    const rounded = (magnitude + d / 2n) / d;
+    return (negative && rounded ? "-" : "") + String(rounded);
+  }
   function remainingLives(s, index) {
     const g = s.groups[index];
     return g.out ? 0 : s.tieRound > 0 ? 1 : Math.max(0, 3 - g.sanctions - (g.damage ?? 0));
@@ -88,6 +96,7 @@
     add,
     compare,
     exact,
+    formatScore,
     remainingLives,
     shuffle,
   };
