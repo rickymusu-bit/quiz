@@ -127,6 +127,13 @@ L'intro spareggio non esiste ancora: lo screenshot documenta il primo turno.
 Il workflow della PR conserva entrambi gli HTML, revisione e screenshot nel suo
 artefatto scaricabile. Gli output `dist/` non sono modificati manualmente.
 
+L'HTML autonomo è circa 31 MiB: incorporare i due titoli prima mancanti aggiunge
+circa 4,5 MiB all'export, senza aumentare i file del sito. Nei browser gestiti che
+bloccano `file://`, il test trasferisce quei byte via CDP; il timeout di navigazione
+è 120 secondi per consentire il trasferimento anche sui worker con CPU limitata.
+Il banco di revisione riutilizza la pagina di gioco tra scenari successivi,
+ferma il timer precedente e ripristina il renderer dopo il campione del portale.
+
 I test del motore/persistenza, frame, browser, finali e offline sono eseguiti
 separatamente; i risultati conclusivi e gli eventuali limiti sono riportati
 nella PR. Nessuna modifica a regole, punteggi, Ammo, turni o formato dei salvataggi.

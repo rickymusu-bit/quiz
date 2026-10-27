@@ -43,22 +43,24 @@ report = {'revision':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT
 
 with sync_playwright() as p:
     browser = p.chromium.launch(executable_path=os.environ.get('CHROMIUM_PATH','/usr/bin/chromium'),args=['--no-sandbox'])
-    for width, height in VIEWPORTS:
-        for dpr in [1, 2]:
-            context = browser.new_context(viewport={'width':width,'height':height},device_scale_factor=dpr,
-                                          offline=True,reduced_motion='reduce')
-            context.add_init_script('Math.random=()=>.25')
-            def route(r):
-                if r.request.url == 'http://quality.test/preview':
-                    r.fulfill(content_type='text/html',body=HTML)
-                else:
-                    report['external_requests'].append(r.request.url)
-                    r.abort()
-            context.route('**/*',route)
-            page = context.new_page()
-            page.on('pageerror',lambda error:report['errors'].append(str(error)))
-            page.goto('http://quality.test/preview')
-            page.locator('#quality-tools').evaluate('(el)=>el.style.display="none"')
+    for dpr in [1, 2]:
+        context = browser.new_context(viewport={'width':VIEWPORTS[0][0],'height':VIEWPORTS[0][1]},device_scale_factor=dpr,
+                                      offline=True,reduced_motion='reduce')
+        context.add_init_script('Math.random=()=>.25')
+        def route(r):
+            if r.request.url == 'http://quality.test/preview':
+                r.fulfill(content_type='text/html',body=HTML)
+            else:
+                report['external_requests'].append(r.request.url)
+                r.abort()
+        context.route('**/*',route)
+        page = context.new_page()
+        page.set_default_navigation_timeout(120000)
+        page.on('pageerror',lambda error:report['errors'].append(str(error)))
+        page.goto('http://quality.test/preview')
+        page.locator('#quality-tools').evaluate('(el)=>el.style.display="none"')
+        for width, height in VIEWPORTS:
+            page.set_viewport_size({'width':width,'height':height})
             prefix = f'{width}x{height}-dpr{dpr}'
             for scenario in ['home','selezione','quiz','ammo','ultima','spareggio','portale','vittoria','gameover','regole']:
                 if scenario == 'ammo':
@@ -108,8 +110,10 @@ with sync_playwright() as p:
             assert f.evaluate('!!document.fullscreenElement')
             r = f.locator('#viewport-stage').bounding_box()
             assert abs(r['width']/r['height'] - 4/3) < .001
+            f.evaluate('document.exitFullscreen()')
+            (ART/'measurements.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))
             print('PASS offline visual audit',width,height,'DPR',dpr,flush=True)
-            context.close()
+        context.close()
     browser.close()
 assert not report['errors'],report['errors']
 assert not report['external_requests'],report['external_requests']

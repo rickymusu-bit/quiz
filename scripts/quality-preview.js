@@ -24,17 +24,24 @@
     HellscapePreview.navigate(route);
     await loaded;
   }
+  let rendererDocument = null, endingRender = null;
   async function show(scenario) {
     tools.open = false;
     if (scenario === 'home') { await navigate('index.html'); return; }
     if (scenario === 'regole') { await navigate('Fool_regole.html'); return; }
-    await navigate('Fool.html?start=1');
-    await waitFor(() => frame.contentDocument.querySelector('#vehicle0'));
+    if (scenario === 'selezione' || !frame.contentWindow.HellscapeUI)
+      await navigate('Fool.html?start=1');
+    await waitFor(() => frame.contentWindow.HellscapeUI &&
+      (frame.contentWindow.HellscapeUI.game || frame.contentDocument.querySelector('#vehicle0')));
     const w = frame.contentWindow, d = frame.contentDocument;
     if (scenario === 'selezione') return;
-    [...d.querySelectorAll('button')].find(b => b.textContent.includes('Inizia partita')).click();
+    if (!w.HellscapeUI.game)
+      [...d.querySelectorAll('button')].find(b => b.textContent.includes('Inizia partita')).click();
     await waitFor(() => w.HellscapeUI?.game);
     const ui = w.HellscapeUI, F = w.Fool;
+    ui.game.stop();
+    if (rendererDocument !== d) { rendererDocument = d; endingRender = w.FoolEnding.render; }
+    w.FoolEnding.render = endingRender;
     const config = JSON.parse(JSON.stringify(ui.game.s.config));
     config.questionCount = 3;
     Object.keys(config.quotas).forEach(key => config.quotas[key] = 0);
