@@ -388,7 +388,7 @@
       const s = this.s,
         g = s.groups[target];
       if (g.aura !== null) {
-        this.log(LABELS[type] + " bloccato da Aura di " + g.name,
+        this.log(LABELS[type] + " bloccato da Sigillo di " + g.name,
           { type: "aura-block", target, source, ammo: type, turn: s.turn });
         return false;
       }
@@ -399,7 +399,7 @@
         karma.target = source;
         karma.origin = id;
         this.log(
-          "Karma di " +
+          "Contrappasso di " +
             g.name +
             " diventa " +
             LABELS[type] +
@@ -430,10 +430,10 @@
         "Solo il giocatore titolare può usare Ammo",
       );
       const copy = g.inventory.find((c) => c.id === copyId);
-      need(copy && copy.type !== "karma", "Karma si trasforma automaticamente");
+      need(copy && copy.type !== "karma", "Contrappasso si trasforma automaticamente");
       need(
         copy.type !== "svela" || s.screen === "hidden",
-        "Spoiler richiede domanda nascosta",
+        "Malocchio richiede domanda nascosta",
       );
       if (["salta", "ruba"].includes(copy.type)) {
         need(
@@ -445,7 +445,7 @@
         );
         need(
           copy.target === null || copy.target === target,
-          "Bersaglio Karma vincolato",
+          "Bersaglio Contrappasso vincolato",
         );
       }
       if (copy.type === "svela" && copy.target !== null)
@@ -479,7 +479,7 @@
         );
         for (const i of active) s.groups[i].score = clone(share);
         this.log(
-          "Marx: " +
+          "Livella: " +
             exact(total) +
             " punti redistribuiti in parti uguali (" +
             exact(share) +
@@ -496,8 +496,8 @@
         // Resolve the shared hit before checking for a winner: the owner is hit too.
         for (const i of active) s.groups[i].damage = (s.groups[i].damage ?? 0) + 1;
         for (const i of active)
-          if (remainingLives(s, i) === 0) this.eliminate(i, "Ira divina");
-        this.log("Ira divina: tutti i dannati in gara perdono una vita", {
+          if (remainingLives(s, i) === 0) this.eliminate(i, "Flagello");
+        this.log("Flagello: tutti i dannati in gara perdono una vita", {
           type: "divine-wrath", groups: active,
         });
         this.resolveEliminations();
@@ -515,11 +515,11 @@
       if (target !== s.owner) {
         need(
           s.passLock === null || s.passLock === target,
-          "Bersaglio Karma vincolato",
+          "Bersaglio Contrappasso vincolato",
         );
         if (this.attack("svela", s.owner, target, this.uid())) {
           s.respondent = target;
-          this.log(s.groups[target].name + " riceve la domanda con Spoiler",
+          this.log(s.groups[target].name + " riceve la domanda con Malocchio",
             { type: "spoiler-pass", source: s.owner, target, turn: s.turn });
         }
       }
@@ -953,7 +953,7 @@
       need(
         g.aura === null ||
           (Number.isInteger(g.aura) && g.aura > 0 && g.aura <= s.turn),
-        "Aura non valida",
+        "Sigillo non valida",
       );
       need(Array.isArray(g.inventory), "Inventario non valido");
       for (const c of g.inventory) {
@@ -968,7 +968,7 @@
         need(
           c.target === null ||
             (group(c.target) && ["salta", "ruba", "svela"].includes(c.type)),
-          "Vincolo Karma non valido",
+          "Vincolo Contrappasso non valido",
         );
       }
       need(
