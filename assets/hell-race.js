@@ -307,6 +307,29 @@
     }
     return { x: left, y: top - 4 * unit, width: 50 * unit, height: 24 * unit };
   }
+  function flyingDevils(c, W, time) {
+    c.save();
+    c.fillStyle = '#1b0910';
+    c.globalAlpha = .7;
+    for (let i = 0; i < 8; i++) {
+      const direction = i % 2 ? -1 : 1;
+      const phase = W * (.065 + i * .127) + direction * time * (1.2 + i % 3);
+      const x = ((phase % (W + 20)) + W + 20) % (W + 20) - 10;
+      const y = 32 + (i * 17) % 39 + Math.sin(time * .65 + i * 2) * 2;
+      const size = .7 + (i % 3) * .12, flap = Math.sin(time * 2.8 + i * 1.9) * 2.5;
+      c.save(); c.translate(Math.round(x), Math.round(y)); c.scale(size, size);
+      // Tiny horned spectators with slow, asymmetric wingbeats in the distant sky.
+      c.fillRect(-1, -1, 2, 5);
+      c.fillRect(-2, -3, 1, 2); c.fillRect(1, -3, 1, 2);
+      c.beginPath(); c.moveTo(-1, 1); c.lineTo(-7, -3 + flap);
+      c.lineTo(-5, 1 + flap * .4); c.lineTo(-3, 0); c.lineTo(-1, 3); c.fill();
+      c.beginPath(); c.moveTo(1, 1); c.lineTo(7, -3 - flap);
+      c.lineTo(5, 1 - flap * .4); c.lineTo(3, 0); c.lineTo(1, 3); c.fill();
+      c.fillRect(0, 4, 1, 2); c.fillRect(direction, 5, 1, 1);
+      c.restore();
+    }
+    c.restore();
+  }
   function background(c, W, tick, progress, effectTime=tick) {
     if(imageReady(sheets.world)){
       const img=sheets.world;
@@ -315,6 +338,7 @@
         const tw=W*2,offset=(tick*speed)%tw;
         for(let x=-offset;x<W;x+=tw)c.drawImage(img,0,img.naturalHeight*sy,img.naturalWidth,img.naturalHeight*sh,Math.floor(x),dy,tw,dh);
       }
+      flyingDevils(c,W,effectTime);
       if(root.FoolTerrain)root.FoolTerrain.draw(c,W,tick,progress,img,effectTime);
       else{c.fillStyle='#161614';c.fillRect(0,184,W,181);}
       return;
@@ -351,6 +375,7 @@
     }
     r(c, 0, 73, W, 156 - 73, '#1c1c24');
     c.restore();
+    flyingDevils(c,W,effectTime);
     if(root.FoolTerrain)root.FoolTerrain.draw(c,W,tick,progress,null,effectTime);
   }
   function gate(c, x, y, tick, open) {
@@ -449,29 +474,28 @@
         vehicleOutline(c, row, Math.floor(motion * 10 + i * 2) % 8, p.x, p.y);
       racer(c, p.x, p.y, i, motion, visualGroup, 2);
     }
-    const current = state.respondent, active = positions[current],
-      row = Math.max(0, VEHICLES.indexOf(state.config.vehicles?.[current] || ['chopper','pickup','ape'][current]));
-    const size = imageReady(sheets.vehicles) ? vehicleSize(row) : { width: 50, height: 40 };
-    const front = Math.max(...positions.filter((p, i) => !state.groups[i].out).map(p => p.x + 34));
-    if (live?.canvas === c.canvas) {
-      live.figure.style.setProperty('--player-x', (Math.min(W - 144, front + 8) / W * 100) + '%');
-      live.figure.style.setProperty('--player-y', ((active.y - size.height * .5) / H * 100) + '%');
-      live.figure.dataset.activeVisible = String(!state.groups[current].out);
-      live.figure.dataset.activeTeam = String(current);
-    }
     const queue=visualState?.queue||[];
     if(reduced){for(const item of queue)visualState.consumed.add(item.index);queue.length=0;}
     if(queue.length&&root.FoolEnding&&!imageReady(root.FoolEnding.load(()=>live?.redraw?.()))){
       if(root.FoolEnding.load(()=>{})?.failed){for(const item of queue)visualState.consumed.add(item.index);queue.length=0;}
-      endingHelpers(state).demon(c,motion);return 'race';
+      endingHelpers(state).demon(c,motion);return queue.length?'capture':'race';
     }
-    if(queue.length&&root.FoolEnding){
-      const item=queue[0];if(item.start===null)item.start=roadTime;
-      const age=Math.max(0,roadTime-item.start);
-      if(age>=root.FoolEnding.CAPTURE){visualState.consumed.add(item.index);queue.shift();}
-      else root.FoolEnding.capture(c,W,state,item.index,age,endingHelpers(state));
-    }else{c.save();c.translate(0,130);c.scale(1.3,1.3);demon(c,motion,15);c.restore();}
-    return 'race';
+    let capturing = false;
+    while(queue.length && root.FoolEnding) {
+      const item = queue[0];
+      if(item.start === null) item.start = roadTime;
+      const age = Math.max(0, roadTime - item.start);
+      if(age >= root.FoolEnding.CAPTURE) {
+        visualState.consumed.add(item.index);
+        queue.shift();
+      } else {
+        root.FoolEnding.capture(c,W,state,item.index,age,endingHelpers(state));
+        capturing = true;
+        break;
+      }
+    }
+    if(!capturing){c.save();c.translate(0,130);c.scale(1.3,1.3);demon(c,motion,15);c.restore();}
+    return queue.length?'capture':'race';
   }
 
   function createStage(state, final = false) {
@@ -497,10 +521,13 @@
     const next = state.groups.map((g, i) => positionScore(state, i));
     const old = last?.key === state.id && !final ? last.x : null;
     const previous = old;
+    const moving = !reduce.matches && !!previous?.some((ratio,i)=>Math.abs(ratio-next[i])>.000001);
     last = { key: state.id, x: next };
-    const record = { frame: 0, canvas, figure:fig };
+    const record = { frame: 0, canvas };
     live = record;
     const start = performance.now(), reduced = reduce.matches;
+    const blocked = () => state.suspended || (state.paused && state.pauseReason !== 'animazione');
+    fig.dataset.animationBusy = String(!reduced && !blocked() && (final || visualState?.queue.length > 0 || !!moving));
     let freeze = 0, oldTime = start,lastEndingTime=start;
     const draw = now => {
       if (live !== record || !canvas.isConnected) return;
@@ -508,7 +535,7 @@
       if (canvas.width !== width) canvas.width = width;
       ctx.imageSmoothingEnabled = false;
       const elapsed = (now - start) / 1000;
-      const stop = state.paused || state.suspended || document.hidden;
+      const stop = blocked() || document.hidden;
       if (stop) freeze += Math.max(0, (now - oldTime) / 1000);
       oldTime = now;
       if (roadLastTime !== null && !stop && !reduced && !final) roadPhase += clamp((now - roadLastTime) / 1000, 0, .06);
@@ -517,7 +544,12 @@
       lastEndingTime=now;
       const phase=scene(ctx, width, state, Math.max(0, elapsed - freeze), final, previous, reduced, roadPhase);
       if(final&&fig.dataset.endingPhase!==phase){fig.dataset.endingPhase=phase;if(phase==='done')fig.dispatchEvent(new CustomEvent('foolendingcomplete',{bubbles:true}));}
-      if (!reduced && (!final || phase!=='done')) record.frame = root.requestAnimationFrame(draw);
+      const busy = !reduced && !blocked() && (final ? phase !== 'done' : phase === 'capture' || (moving && elapsed - freeze < .9));
+      if(fig.dataset.animationBusy !== String(busy)) {
+        fig.dataset.animationBusy = String(busy);
+        fig.dispatchEvent(new CustomEvent('foolanimationchange',{bubbles:true,detail:{busy,phase}}));
+      }
+      if (live === record && !reduced && (!final || phase!=='done')) record.frame = root.requestAnimationFrame(draw);
     };
     record.redraw = () => {
       if (live !== record || !canvas.isConnected) return;

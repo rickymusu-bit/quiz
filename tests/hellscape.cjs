@@ -28,14 +28,18 @@ const assert = require('node:assert/strict');
       const turns = page.locator('.turn-order button');
       assert.equal(await turns.count(), 3);
       assert.equal(await page.locator('.player-sidebar,.player-card,.game-options').count(), 0);
-      assert.equal(await page.locator('.current-player .heart').count(), 3);
+      assert.equal(await page.locator('.current-player').count(), 0);
+      assert.equal(await page.locator('.turn-order .heart').count(), 9);
+      assert.equal(await page.locator('.turn-order .player-points').count(), 3);
       const current = await page.evaluate(() => HellscapeUI.game.s.respondent);
       assert.equal(await turns.first().getAttribute('data-team'), String(current));
       const other = (current + 1) % 3;
       await page.evaluate(i => HellscapeUI.game.s.groups[i].inventory.push({id:'read-only-test',type:'aura',target:null,origin:'test'}), other);
       await page.locator(`.turn-order [data-team="${other}"]`).click();
       assert.equal(await page.locator('#inventory-team').inputValue(), String(other));
-      assert(await page.getByRole('button', {name:'Usa',exact:true}).isDisabled());
+      await page.locator('#dialog .ammo-round').click();
+      assert(await page.locator('#ammo-info').getByRole('button', {name:'Usa',exact:true}).isDisabled());
+      await page.locator('#ammo-info').getByRole('button',{name:'Chiudi',exact:true}).click();
       await page.screenshot({path:`artifacts/inventory-${width}.png`});
       await page.getByRole('button', { name: 'Chiudi', exact: true }).click();
       await page.waitForTimeout(300);
@@ -66,6 +70,9 @@ const assert = require('node:assert/strict');
       assert(await page.locator('main').evaluate(e => e.classList.contains('showing-movement')));
       await page.waitForTimeout(1400);
       assert.equal(await page.locator('.answer').count(), 4);
+      const respondent=await page.evaluate(()=>HellscapeUI.game.s.result.respondent);
+      assert.equal(await page.locator(`.turn-order [data-team="${respondent}"] .player-points`).innerText(),
+        await page.evaluate(i=>Fool.exact(HellscapeUI.game.s.groups[i].score)+' pt',respondent));
       assert.equal(await page.locator('.chosen-label,.quantity-guide').count(), 0);
       await page.screenshot({path:`artifacts/question-${width}.png`});
       const residual = await page.evaluate(() => HellscapeUI.game.left() / (HellscapeUI.game.s.config.seconds * 1000));
@@ -80,6 +87,43 @@ const assert = require('node:assert/strict');
       await page.locator('#rules-section').waitFor();
       await page.getByRole('button', { name: 'Successiva', exact: true }).click();
       await page.getByRole('button', { name: 'Torna alla partita', exact: true }).click();
+      // Every real question must keep its full correction and Next control on screen.
+      for (const bank of ['termologia', 'introduzione-fisica-misura']) {
+        if (bank !== 'termologia') {
+          await page.goto(`http://127.0.0.1:${server.address().port}/Fool.html?start=1`);
+          await page.locator('#bank-choice').selectOption(bank);
+          await page.getByRole('button', {name:/Inizia partita/}).click();
+        }
+        const layout = await page.evaluate(() => {
+          const g = HellscapeUI.game, original = g.s, failures = [];
+          let tallest = 0, longest = null;
+          for (const q of original.bank) {
+            const base=original.config.bases[q.difficulty];
+            g.s = {...original, current:q, screen:'result', suspendAfter:true,
+              result:{id:'layout', correct:true, option:q.correct, respondent:original.respondent,
+                base:String(base), gross:Fool.rational(base), share:Fool.rational(base,3),
+                beneficiaries:original.groups.map((_,i)=>i).filter(i=>i!==original.respondent),
+                bonuses:Fool.TYPES.map(type=>({type}))}};
+            HellscapeUI.renderGame();
+            const panel=document.querySelector('.operation-body'), bounds=panel.getBoundingClientRect(),
+              stage=document.querySelector('main').getBoundingClientRect(),
+              next=panel.querySelector('[data-game-action=next]').getBoundingClientRect();
+            if(panel.scrollHeight>panel.clientHeight+1 || panel.scrollWidth>panel.clientWidth+1 ||
+              bounds.bottom>stage.bottom+1 || next.bottom>bounds.bottom+1)
+              failures.push(q.id);
+            if(bounds.height>tallest){tallest=bounds.height;longest=g.s;}
+          }
+          // Keep the longest actual correction visible for the review screenshot.
+          g.s=longest;
+          HellscapeUI.renderGame();
+          window.__questionLayoutOriginal=original;
+          return {count:original.bank.length, failures};
+        });
+        assert.equal(layout.count,100);
+        assert.deepEqual(layout.failures,[],`${bank}: content and Next must fit without scrolling`);
+        await page.screenshot({path:`artifacts/question-expanded-${bank}-${width}.png`});
+        await page.evaluate(()=>{HellscapeUI.game.s=window.__questionLayoutOriginal;delete window.__questionLayoutOriginal;HellscapeUI.renderGame();});
+      }
       assert.deepEqual(errors, []);
       console.log('PASS', width, height);
       await page.close();

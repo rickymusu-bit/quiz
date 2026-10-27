@@ -19,32 +19,34 @@ with sync_playwright() as p:
  for bank,width,height in [('termologia',1440,900),('introduzione-fisica-misura',844,390)]:
   page=b.new_page(viewport={'width':width,'height':height});page.on('pageerror',lambda e:errors.append(str(e)))
   page.goto(base+'Fool.html?settings=1');expect(page.get_by_role('heading',name='Impostazioni',exact=True)).to_be_visible();expect(page.locator('#question-count')).to_be_visible()
-  page.locator('#bank-choice').select_option(bank);expect(page.locator('#question-count')).to_have_value('33');expect(page.locator('#weight-marx')).to_have_value('15');fits(page)
+  page.locator('#bank-choice').select_option(bank);expect(page.locator('#question-count')).to_have_value('33');expect(page.locator('#weight-marx')).to_have_value('15');expect(page.locator('#weight-ira')).to_have_value('5');fits(page)
   for count in [3,6,99]:
    page.locator('#question-count').fill(str(count));page.locator('#seconds').click()
    assert sum(page.locator('#quotas input').evaluate_all('(els)=>els.map(e=>Number(e.value))'))==count
-   for kind in ['salta','ruba','svela','aura','karma','marx']:page.locator('#weight-'+kind).fill('100')
+   for kind in ['salta','ruba','svela','aura','karma','marx','ira']:page.locator('#weight-'+kind).fill('100')
    page.get_by_role('button',name='Salva impostazioni').click();expect(page.locator('#message')).to_contain_text('Impostazioni salvate');fits(page)
-   page.get_by_role('button',name='Anteprima',exact=True).click();page.get_by_role('button',name='Prepara anteprima').click()
-   expect(page.get_by_role('heading',name='Anteprima docente')).to_be_visible();assert page.evaluate('HellscapeUI.prepared.chosen.length')==count
-   page.evaluate('()=>{HellscapeUI.previewIndex=HellscapeUI.prepared.chosen.length-1;HellscapeUI.preview()}');expect(page.get_by_role('button',name='Successiva →')).to_be_disabled();fits(page)
-   page.get_by_role('button',name='Torna alle impostazioni').click();page.get_by_role('button',name='Generali',exact=True).click()
+   expect(page.get_by_role('button',name='Anteprima',exact=True)).to_have_count(0)
+   expect(page.locator('#teacher-preview')).to_have_count(0)
+   page.goto(base+'Fool.html');page.locator('#bank-choice').select_option(bank)
+   page.get_by_role('button',name=f'Inizia partita ({count} domande)',exact=True).click()
+   assert page.evaluate('HellscapeUI.game.s.config.questionCount')==count
+   assert page.evaluate('HellscapeUI.game.s.queue.length')==count-1
+   fits(page)
+   page.goto(base+'Fool.html?settings=1');page.locator('#bank-choice').select_option(bank)
   stored=page.evaluate('localStorage.getItem("fool-settings-v1")');page.locator('#question-count').fill('4');page.locator('#seconds').click();page.get_by_role('button',name='Salva impostazioni').click();assert page.evaluate('localStorage.getItem("fool-settings-v1")')==stored
   page.locator('#question-count').fill('3');page.locator('#seconds').click();page.get_by_role('button',name='Salva impostazioni').click()
   page.goto(base+'Fool.html');page.locator('#bank-choice').select_option(bank);expect(page.get_by_role('button',name='Inizia partita (3 domande)',exact=True)).to_be_enabled();page.get_by_role('button',name='Inizia partita (3 domande)',exact=True).click()
   assert page.evaluate('HellscapeUI.game.s.config.questionCount')==3 and page.evaluate('HellscapeUI.game.s.queue.length')==2
   page.get_by_role('button',name='Svela e avvia il tempo').click();assert page.get_by_role('button',name='Inventario',exact=True).count()==0
-  page.locator('.answer').nth(page.evaluate('HellscapeUI.game.s.current.correct')).click();assert page.evaluate('HellscapeUI.game.s.result.bonuses.length')==6
-  for name in ['Nope','Bullo','Spoiler','Aura','Karma']:expect(page.locator('.solution')).to_contain_text(name)
+  page.locator('.answer').nth(page.evaluate('HellscapeUI.game.s.current.correct')).click();assert page.evaluate('HellscapeUI.game.s.result.bonuses.length')==7
+  for kind in ['salta','ruba','svela','aura','karma','marx','ira']:expect(page.locator(f'.solution .ammo-round[data-ammo="{kind}"]')).to_have_count(1)
   expect(page.locator('.answer-feedback')).to_have_count(0)
   assert page.locator('.multiplier-value').count()==0
   team=page.evaluate('HellscapeUI.game.s.result.respondent')
   page.locator(f'.turn-order [data-team="{team}"]').click()
-  assert page.locator('.bonus-inventory-list .bonus-group').count()==5
+  assert page.locator('.bonus-inventory-list .bonus-group').count()==7
   assert 'ammo-sprites-48.png' in page.locator('.ammo-round').first.evaluate('(el)=>getComputedStyle(el).backgroundImage')
-  assert page.evaluate('HellscapeUI.game.s.groups[HellscapeUI.game.s.result.respondent].inventory.length')==6
-  page.get_by_role('button',name='Successivi',exact=True).click()
-  assert page.locator('.bonus-inventory-list .bonus-group').count()==1
+  assert page.evaluate('HellscapeUI.game.s.groups[HellscapeUI.game.s.result.respondent].inventory.length')==7
   page.get_by_role('button',name='Chiudi',exact=True).click()
   page.get_by_role('button',name='Prossima domanda',exact=True).click()
   page.evaluate('()=>{for(let n=0;n<2;n++)HellscapeUI.game.s.groups[HellscapeUI.game.s.owner].inventory.push({id:HellscapeUI.game.uid(),type:"aura",target:null,origin:"test"});HellscapeUI.changed()}')
@@ -52,10 +54,10 @@ with sync_playwright() as p:
   assert page.evaluate('HellscapeUI.game.s.groups[HellscapeUI.game.s.owner].inventory.filter(c=>c.type==="aura").length')==2
   for _ in range(2):
    page.get_by_role('button',name='Inventario',exact=True).click()
-   assert page.locator('.bonus-inventory-list .bonus-group').filter(has_text='Aura').locator('.ammo-round').count()>=1
-   page.locator('.bonus-group').filter(has_text='Aura').get_by_role('button',name='Usa',exact=True).click();page.get_by_role('button',name='Conferma uso').click()
+   assert page.locator('.bonus-inventory-list .bonus-group[data-bonus="aura"] .ammo-round').count()>=1
+   page.locator('.bonus-group[data-bonus="aura"] .ammo-round').first.click();page.locator('#ammo-info').get_by_role('button',name='Usa',exact=True).click();page.get_by_role('button',name='Conferma uso').click()
   assert page.evaluate('HellscapeUI.game.s.usedBonus')
-  page.reload();page.get_by_role('button',name='Riprendi partita',exact=True).click();assert page.evaluate('HellscapeUI.game.s.valid')==1;fits(page)
+  page.goto(base+'Fool.html?resume=1');assert page.evaluate('HellscapeUI.game.s.valid')==1;fits(page)
   # A legacy short match without an explicit confirmation must restart at 33.
   page.evaluate('''()=>{const data=JSON.parse(localStorage.getItem("fool-settings-v1"));for(const v of Object.values(data.profiles)){v.questionCount=3;delete v.questionCountConfirmed;const keys=Object.keys(v.quotas);v.quotas=Object.fromEntries(keys.map((key,i)=>[key,i===0?3:0]));}localStorage.setItem("fool-settings-v1",JSON.stringify(data))}''')
   page.goto(base+'Fool.html?start=1');page.locator('#bank-choice').select_option(bank)
@@ -67,9 +69,9 @@ with sync_playwright() as p:
   page.evaluate('()=>{const data=JSON.parse(localStorage.getItem("fool-settings-v1"));for(const v of Object.values(data.profiles)){delete v.questionCount;delete v.bonusWeights;v.probability=90;v.seconds=60;v.quotas=Object.fromEntries(Object.keys(v.quotas).map(t=>[t,0]));let left=33;while(left)for(const t in v.quotas)if(left){v.quotas[t]++;left--}}localStorage.setItem("fool-settings-v1",JSON.stringify(data))}')
   page.goto(base+'Fool.html?settings=1');page.locator('#bank-choice').select_option(bank);expect(page.locator('#seconds')).to_have_value('60');expect(page.locator('#question-count')).to_have_value('33')
   for kind in ['salta','ruba','svela','aura','karma']:expect(page.locator('#weight-'+kind)).to_have_value('30')
-  expect(page.locator('#weight-marx')).to_have_value('15')
+  expect(page.locator('#weight-marx')).to_have_value('15');expect(page.locator('#weight-ira')).to_have_value('5')
   page.goto(base+'Fool_regole.html')
-  for section in range(21):page.locator('#section').select_option(str(section));fits(page)
-  checks.append({'bank':bank,'size':[width,height],'counts':[3,6,99],'awards':6,'uses':2});page.close()
+  for section in range(22):page.locator('#section').select_option(str(section));fits(page)
+  checks.append({'bank':bank,'size':[width,height],'counts':[3,6,99],'awards':7,'uses':2});page.close()
  assert not errors,errors;b.close();print(json.dumps({'configurable':checks,'errors':errors}))
 if 'server' in globals():server.shutdown()
