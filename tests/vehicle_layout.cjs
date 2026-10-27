@@ -37,8 +37,16 @@ process.chdir(path.resolve(__dirname,'..'));
  const origin=at([0,0,0],0);
  assert.equal(origin,at([0,0,0],1));
  assert.equal(at([600,600,600],0),at([600,600,600],2));
- assert(Math.abs((at([300,600,900],2)-origin)-3*(at([300,600,900],0)-origin))<.02,
-   'The forward gap must be proportional to score');
+ const p300=at([300,300,300],0),p600=at([600,600,600],0),
+       p900=at([900,900,900],0),p1200=at([1200,1200,1200],0);
+ assert(p300-origin>p600-p300 && p600-p300>p900-p600 &&
+   p900-p600>p1200-p900,
+   'Logarithmic advancement must reward early score increases more strongly');
+ assert(Math.abs((p300-origin)/(at([1500,1500,1500],0)-origin)-
+   Math.log(2)/Math.log(6))<.001,
+   'The normalized logarithmic curve must agree with log(1 + score/base)');
+ assert.equal(at([300,900,600],0),at([600,900,300],2),
+   'Absolute position cannot depend on any other player score');
  assert(at([300,600,900],2)-at([300,600,900],0)>90,
    'Different scores must create a visibly large gap');
  assert.equal(at([1500,1500,1500],0),at([9000,9000,9000],0),
