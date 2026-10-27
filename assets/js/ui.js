@@ -23,6 +23,7 @@
     selectedBankId = null,
     configurationLoad = 0,
     feedbackEpoch = 0,
+    cinematicPause = null,
     lastFinalGame = null,
     setupMode = launchParams.get("settings") === "1" ? "settings" : "config";
   const teamDraft = {
@@ -1114,9 +1115,40 @@
   function feedbackState() {
     return game ? { game, result: game.s.result?.id } : null;
   }
+  function cinematicActive() {
+    return ui === "game" && !!game && (main.classList.contains("showing-movement") ||
+      main.querySelector('.hell-race[data-animation-busy="true"]') !== null);
+  }
+  function syncCinematic() {
+    const active = cinematicActive();
+    document.body.classList.toggle("showing-cinematic", active);
+    if (active && game.running) {
+      cinematicPause = {game, question:game.s.current?.id};
+      game.pause("animazione");
+      persist();
+      updateTimeVial();
+    } else if (!active && cinematicPause) {
+      const held = cinematicPause;
+      cinematicPause = null;
+      if (held.game === game && game.s.current?.id === held.question &&
+          game.s.screen === "answer" && game.s.paused && game.s.pauseReason === "animazione" &&
+          !game.s.panel && !game.s.suspended && !fitBlocked) {
+        game.resume(game.s.revision);
+        changed();
+      }
+    }
+  }
+  function gameStage(state, final = false) {
+    const stage = FoolHellRace.createStage(state, final);
+    stage.addEventListener("foolanimationchange", () => {
+      if (stage.isConnected) syncCinematic();
+    });
+    return stage;
+  }
   function cancelFeedback() {
     feedbackEpoch++;
     main.classList.remove("showing-movement");
+    document.body.classList.remove("showing-cinematic");
     main.querySelector(".movement-cue")?.remove();
   }
   async function animateOutcome(before) {
@@ -1124,6 +1156,7 @@
     if (!before || before.game !== game || !r || r.id === before.result) return;
     const epoch = feedbackEpoch;
     main.classList.add("showing-movement");
+    syncCinematic();
 
     await new Promise((resolve) =>
       setTimeout(
@@ -1138,6 +1171,7 @@
     )
       return;
     main.classList.remove("showing-movement");
+    syncCinematic();
     main
       .querySelector('[data-game-action="next"]')
       ?.focus({ preventScroll: true });
@@ -1167,8 +1201,8 @@
     if (s.winner !== null)
       title.append(node("span", s.groups[s.winner].name, "winner-name"));
     title.append(art);
-    const stage = FoolHellRace.createStage(s, true);
-    stage.addEventListener("foolendingcomplete", () => title.focus({ preventScroll: true }));
+    const stage = gameStage(s, true);
+    stage.addEventListener("foolendingcomplete", () => requestAnimationFrame(() => title.focus({ preventScroll: true })));
     b.append(title, stage);
     if (s.result && s.current && s.result.question === s.current.id) {
       const r = s.result,
@@ -1403,6 +1437,7 @@
       $("fit-warning").hidden = true;
       main.className = "final-screen";
       main.replaceChildren(endScreen());
+      syncCinematic();
       if (lastFinalGame !== s.id) {
         lastFinalGame = s.id;
         requestAnimationFrame(() => {
@@ -1412,7 +1447,7 @@
       return;
     }
     main.className = "operational";
-    const stage = FoolHellRace.createStage(s);
+    const stage = gameStage(s);
     main.replaceChildren(stage, turnOrder());
     const status = node("div", undefined, "statusline");
     status.append(timeVial());
@@ -1433,6 +1468,7 @@
     if (s.suspendAfter)
       body.append(node("p", "Sospensione al termine della domanda.", "muted"));
     main.append(body, optionsToggle());
+    syncCinematic();
     if (s.draftBonus && !$("dialog").open) {
       inventoryCanResume = false;
       const c = s.groups[s.owner].inventory.find(
@@ -2271,6 +2307,17 @@
       )
     )
       return;
+    if (cinematicActive()) {
+      const key = event.key.toLowerCase();
+      if (key === "p" && game?.s.screen === "answer" && game.s.pauseReason === "animazione") {
+        event.preventDefault();
+        cinematicPause = null;
+        game.s.pauseReason = "manuale";
+        changed();
+      } else if (["enter", " ", "a", "b", "c", "d", "i", "s", "v", "l", "o", "arrowleft", "f1", "?"].includes(key))
+        event.preventDefault();
+      return;
+    }
     if ($("ammo-info")?.open) return;
     const key = event.key.toLowerCase(),
       dialogOpen = $("dialog").open;

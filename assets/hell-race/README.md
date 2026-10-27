@@ -48,3 +48,5 @@ Le fiammate usano un getto continuo simile a un lanciafiamme, con nucleo chiaro,
 Nel finale il suolo resta fermo mentre fiamme e geyser continuano a muoversi con lo stesso orologio della sequenza; pausa e movimento ridotto congelano entrambi.
 
 Otto piccoli diavoli alati in silhouette volano nella fascia alta del cielo. Le sagome sono tracciate sul Canvas, larghe al massimo circa 14 pixel logici: oscillano e battono le ali lentamente, senza particelle accumulate o uso del caso del gioco. L’orologio comune congela anche il loro movimento in pausa, a scheda nascosta e con movimento ridotto. Restano dietro la scena principale e i pannelli.
+
+La figura espone `data-animation-busy` ed emette `foolanimationchange` durante avanzamenti, catture e finale. Il renderer non modifica lo stato di gioco; l’interfaccia usa questi segnali per nascondere i pannelli e, quando serve, conservare il tempo di risposta. La pausa temporanea dell’orologio per l’animazione lascia proseguire il Canvas; la pausa manuale e la sospensione lo congelano. Una cattura conclusa passa al prossimo attore o alla corsa nello stesso fotogramma.

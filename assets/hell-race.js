@@ -478,15 +478,24 @@
     if(reduced){for(const item of queue)visualState.consumed.add(item.index);queue.length=0;}
     if(queue.length&&root.FoolEnding&&!imageReady(root.FoolEnding.load(()=>live?.redraw?.()))){
       if(root.FoolEnding.load(()=>{})?.failed){for(const item of queue)visualState.consumed.add(item.index);queue.length=0;}
-      endingHelpers(state).demon(c,motion);return 'race';
+      endingHelpers(state).demon(c,motion);return queue.length?'capture':'race';
     }
-    if(queue.length&&root.FoolEnding){
-      const item=queue[0];if(item.start===null)item.start=roadTime;
-      const age=Math.max(0,roadTime-item.start);
-      if(age>=root.FoolEnding.CAPTURE){visualState.consumed.add(item.index);queue.shift();}
-      else root.FoolEnding.capture(c,W,state,item.index,age,endingHelpers(state));
-    }else{c.save();c.translate(0,130);c.scale(1.3,1.3);demon(c,motion,15);c.restore();}
-    return 'race';
+    let capturing = false;
+    while(queue.length && root.FoolEnding) {
+      const item = queue[0];
+      if(item.start === null) item.start = roadTime;
+      const age = Math.max(0, roadTime - item.start);
+      if(age >= root.FoolEnding.CAPTURE) {
+        visualState.consumed.add(item.index);
+        queue.shift();
+      } else {
+        root.FoolEnding.capture(c,W,state,item.index,age,endingHelpers(state));
+        capturing = true;
+        break;
+      }
+    }
+    if(!capturing){c.save();c.translate(0,130);c.scale(1.3,1.3);demon(c,motion,15);c.restore();}
+    return queue.length?'capture':'race';
   }
 
   function createStage(state, final = false) {
@@ -512,10 +521,13 @@
     const next = state.groups.map((g, i) => positionScore(state, i));
     const old = last?.key === state.id && !final ? last.x : null;
     const previous = old;
+    const moving = !reduce.matches && !!previous?.some((ratio,i)=>Math.abs(ratio-next[i])>.000001);
     last = { key: state.id, x: next };
     const record = { frame: 0, canvas };
     live = record;
     const start = performance.now(), reduced = reduce.matches;
+    const blocked = () => state.suspended || (state.paused && state.pauseReason !== 'animazione');
+    fig.dataset.animationBusy = String(!reduced && !blocked() && (final || visualState?.queue.length > 0 || !!moving));
     let freeze = 0, oldTime = start,lastEndingTime=start;
     const draw = now => {
       if (live !== record || !canvas.isConnected) return;
@@ -523,7 +535,7 @@
       if (canvas.width !== width) canvas.width = width;
       ctx.imageSmoothingEnabled = false;
       const elapsed = (now - start) / 1000;
-      const stop = state.paused || state.suspended || document.hidden;
+      const stop = blocked() || document.hidden;
       if (stop) freeze += Math.max(0, (now - oldTime) / 1000);
       oldTime = now;
       if (roadLastTime !== null && !stop && !reduced && !final) roadPhase += clamp((now - roadLastTime) / 1000, 0, .06);
@@ -532,7 +544,12 @@
       lastEndingTime=now;
       const phase=scene(ctx, width, state, Math.max(0, elapsed - freeze), final, previous, reduced, roadPhase);
       if(final&&fig.dataset.endingPhase!==phase){fig.dataset.endingPhase=phase;if(phase==='done')fig.dispatchEvent(new CustomEvent('foolendingcomplete',{bubbles:true}));}
-      if (!reduced && (!final || phase!=='done')) record.frame = root.requestAnimationFrame(draw);
+      const busy = !reduced && !blocked() && (final ? phase !== 'done' : phase === 'capture' || (moving && elapsed - freeze < .9));
+      if(fig.dataset.animationBusy !== String(busy)) {
+        fig.dataset.animationBusy = String(busy);
+        fig.dispatchEvent(new CustomEvent('foolanimationchange',{bubbles:true,detail:{busy,phase}}));
+      }
+      if (live === record && !reduced && (!final || phase!=='done')) record.frame = root.requestAnimationFrame(draw);
     };
     record.redraw = () => {
       if (live !== record || !canvas.isConnected) return;
