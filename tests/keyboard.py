@@ -52,7 +52,7 @@ with sync_playwright() as p:
   # Keep native Enter activation for other focused controls.
   option('Sanzioni').focus();page.keyboard.press('Enter');expect(view.locator('#dialog')).to_be_visible();view.get_by_role('button',name='Chiudi senza sanzionare').click()
   expect(view.get_by_role('button',name='Prossima domanda',exact=True)).to_be_visible();view.locator('.question-points').click();page.keyboard.press('Enter');assert frame.evaluate('HellscapeUI.game.s.screen')=='hidden'
-  frame.goto(frame.url);view.get_by_role('button',name='Riprendi partita',exact=True).click();page.keyboard.press('Enter');assert frame.evaluate('HellscapeUI.game.s.screen')=='answer' and frame.evaluate('HellscapeUI.game.running');page.keyboard.press('d');assert frame.evaluate('HellscapeUI.game.s.valid')==6
+  frame.goto(base+'Fool.html?resume=1');page.keyboard.press('Enter');assert frame.evaluate('HellscapeUI.game.s.screen')=='answer' and frame.evaluate('HellscapeUI.game.running');page.keyboard.press('d');assert frame.evaluate('HellscapeUI.game.s.valid')==6
   page.keyboard.press('Enter');frame.evaluate('()=>{HellscapeUI.game.bell();HellscapeUI.changed()}');page.keyboard.press('a');page.keyboard.press('Enter');assert frame.evaluate('HellscapeUI.game.s.suspended')
   frame.evaluate('()=>{HellscapeUI.game.continueSession();HellscapeUI.game.openSanctions();HellscapeUI.game.s.panel.counts=[3,3,3];HellscapeUI.game.closeSanctions(true);HellscapeUI.changed()}');page.keyboard.press('a');page.keyboard.press('Enter');assert frame.evaluate('HellscapeUI.game.s.phase')=='conclusa'
   frame.evaluate('fitFoolViewport()');assert frame.evaluate('document.documentElement.scrollHeight<=innerHeight+1')

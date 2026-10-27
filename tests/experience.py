@@ -37,7 +37,7 @@ with sync_playwright() as p:
   assert page.locator('.review-answer.selected').inner_text().startswith('ABCD'[chosen]+'. '+json.loads(question)['options'][chosen])
   page.keyboard.press('Escape');expect(page.locator('#dialog')).not_to_be_visible();assert page.evaluate('JSON.stringify({groups:HellscapeUI.game.s.groups,valid:HellscapeUI.game.s.valid,turn:HellscapeUI.game.s.turn,current:HellscapeUI.game.s.current,remaining:HellscapeUI.game.s.remaining})')==state
   # Review survives a reload and restores the exact displayed question.
-  page.reload();page.get_by_role('button',name='Riprendi partita',exact=True).click();page.keyboard.press('ArrowLeft');expect(page.locator('.review-answer.selected')).to_contain_text(json.loads(question)['options'][chosen]);page.keyboard.press('Escape');expect(page.locator('#dialog')).not_to_be_visible()
+  page.goto(base+'Fool.html?resume=1');page.keyboard.press('ArrowLeft');expect(page.locator('.review-answer.selected')).to_contain_text(json.loads(question)['options'][chosen]);page.keyboard.press('Escape');expect(page.locator('#dialog')).not_to_be_visible()
   page.keyboard.press('i');expect(page.get_by_role('heading',name='Inventario',exact=True)).to_be_visible();page.keyboard.press('Escape');expect(page.locator('#dialog')).not_to_be_visible()
   # One sanction removes one ordinary-game heart.
   page.keyboard.press('s');page.locator('#sanction-plus-0').click(timeout=3000);page.get_by_role('button',name='Conferma intervento',exact=True).click()
@@ -60,7 +60,7 @@ with sync_playwright() as p:
  assert page.evaluate('HellscapeUI.game.s.groups.map(g=>g.sanctions)')==[0,1,2]
  page.evaluate('()=>{HellscapeUI.game.next();HellscapeUI.game.reveal();HellscapeUI.game.answer((HellscapeUI.game.s.current.correct+1)%4);HellscapeUI.changed()}');assert page.evaluate('HellscapeUI.game.s.groups.reduce((n,g,i)=>n+Fool.remainingLives(HellscapeUI.game.s,i),0)')==2
  loser=page.evaluate('HellscapeUI.game.s.respondent');expect(page.locator('.current-player .lives')).to_have_attribute('aria-label','0 vite su 1')
- page.reload();page.get_by_role('button',name='Riprendi partita',exact=True).click();assert page.evaluate('HellscapeUI.game.s.groups.reduce((n,g,i)=>n+Fool.remainingLives(HellscapeUI.game.s,i),0)')==2;page.close()
+ page.goto(base+'Fool.html?resume=1');assert page.evaluate('HellscapeUI.game.s.groups.reduce((n,g,i)=>n+Fool.remainingLives(HellscapeUI.game.s,i),0)')==2;page.close()
  # The rules keep every remaining slide and navigation entry after removing refusal.
  page=browser.new_page(viewport={'width':1440,'height':900});page.goto(base+'Fool_regole.html');expect(page.locator('.slide')).to_have_count(21);expect(page.locator('#section option')).to_have_count(21);expect(page.locator('[data-go]')).to_have_count(21);assert 'rifiut' not in page.locator('body').inner_text().lower();page.close()
  # Deadline and final-screen outcomes retain an explicit chosen/no-answer label.

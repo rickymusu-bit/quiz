@@ -59,7 +59,7 @@ with sync_playwright() as p:
    assert page.locator('.bonus-inventory-list .bonus-group').filter(has_text='Aura').locator('.ammo-round').count()>=1
    page.locator('.bonus-group').filter(has_text='Aura').get_by_role('button',name='Usa',exact=True).click();page.get_by_role('button',name='Conferma uso').click()
   assert page.evaluate('HellscapeUI.game.s.usedBonus')
-  page.reload();page.get_by_role('button',name='Riprendi partita',exact=True).click();assert page.evaluate('HellscapeUI.game.s.valid')==1;fits(page)
+  page.goto(base+'Fool.html?resume=1');assert page.evaluate('HellscapeUI.game.s.valid')==1;fits(page)
   # A legacy short match without an explicit confirmation must restart at 33.
   page.evaluate('''()=>{const data=JSON.parse(localStorage.getItem("fool-settings-v1"));for(const v of Object.values(data.profiles)){v.questionCount=3;delete v.questionCountConfirmed;const keys=Object.keys(v.quotas);v.quotas=Object.fromEntries(keys.map((key,i)=>[key,i===0?3:0]));}localStorage.setItem("fool-settings-v1",JSON.stringify(data))}''')
   page.goto(base+'Fool.html?start=1');page.locator('#bank-choice').select_option(bank)

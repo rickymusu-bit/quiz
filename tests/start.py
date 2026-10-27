@@ -56,6 +56,11 @@ with sync_playwright() as p:
    expect(view.get_by_role('heading',name='Prepara Hellscape')).to_be_visible()
    frame=next(f for f in page.frames if 'Fool.html' in f.url)
    assert frame.evaluate('localStorage.getItem("fool-v1")')==saved
+   expect(view.get_by_role('button',name='Riprendi partita',exact=True)).to_have_count(0)
+   if bank=='termologia':
+    frame.evaluate('document.fonts.ready')
+    frame.wait_for_function("[...document.querySelectorAll('.vehicle-preview canvas')].length===3 && [...document.querySelectorAll('.vehicle-preview canvas')].every(c=>c.getContext('2d').getImageData(0,0,c.width,c.height).data.some(v=>v))")
+    page.screenshot(path=str(ROOT/f'artifacts/setup-no-resume-{home_width}x{home_height}.png'))
    view.get_by_role('button',name='Torna alla schermata iniziale',exact=True).click()
    expect(page.get_by_role('link',name='Riprendi partita',exact=True)).to_be_visible()
    page.get_by_role('link',name='Riprendi partita',exact=True).click()

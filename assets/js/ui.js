@@ -197,10 +197,9 @@
       return null;
     }
   }
-  function offerResume(parent) {
+  function savedGameNotice(parent) {
     const raw = localSave();
     if (!raw) return;
-    parent.append(btn("Riprendi partita", () => restoreGame(localSave())));
     try {
       const saved = JSON.parse(raw),
         count = saved?.config?.questionCount ?? 33;
@@ -371,7 +370,7 @@
       setupMode === "settings" ? "Impostazioni" : "Prepara Hellscape",
       "Caricamento delle domande dal sito…",
     );
-    if (setupMode === "config") offerResume(loading);
+    if (setupMode === "config") savedGameNotice(loading);
     try {
       const available = await loadCatalog();
       if (request !== configurationLoad || ui !== setupMode) return;
@@ -404,7 +403,7 @@
         ? "I parametri si applicano alle nuove partite e si conservano in questo browser. Salva prima di cambiare argomento."
         : "Scegli nomi, veicoli e argomento delle domande.",
     );
-    if (!editing) offerResume(p);
+    if (!editing) savedGameNotice(p);
     const choice = select(
       "Argomento delle domande",
       "bank-choice",
