@@ -25,10 +25,14 @@ with sync_playwright() as p:
    assert sum(page.locator('#quotas input').evaluate_all('(els)=>els.map(e=>Number(e.value))'))==count
    for kind in ['salta','ruba','svela','aura','karma','marx']:page.locator('#weight-'+kind).fill('100')
    page.get_by_role('button',name='Salva impostazioni').click();expect(page.locator('#message')).to_contain_text('Impostazioni salvate');fits(page)
-   page.get_by_role('button',name='Anteprima',exact=True).click();page.get_by_role('button',name='Prepara anteprima').click()
-   expect(page.get_by_role('heading',name='Anteprima docente')).to_be_visible();assert page.evaluate('HellscapeUI.prepared.chosen.length')==count
-   page.evaluate('()=>{HellscapeUI.previewIndex=HellscapeUI.prepared.chosen.length-1;HellscapeUI.preview()}');expect(page.get_by_role('button',name='Successiva →')).to_be_disabled();fits(page)
-   page.get_by_role('button',name='Torna alle impostazioni').click();page.get_by_role('button',name='Generali',exact=True).click()
+   expect(page.get_by_role('button',name='Anteprima',exact=True)).to_have_count(0)
+   expect(page.locator('#teacher-preview')).to_have_count(0)
+   page.goto(base+'Fool.html');page.locator('#bank-choice').select_option(bank)
+   page.get_by_role('button',name=f'Inizia partita ({count} domande)',exact=True).click()
+   assert page.evaluate('HellscapeUI.game.s.config.questionCount')==count
+   assert page.evaluate('HellscapeUI.game.s.queue.length')==count-1
+   fits(page)
+   page.goto(base+'Fool.html?settings=1');page.locator('#bank-choice').select_option(bank)
   stored=page.evaluate('localStorage.getItem("fool-settings-v1")');page.locator('#question-count').fill('4');page.locator('#seconds').click();page.get_by_role('button',name='Salva impostazioni').click();assert page.evaluate('localStorage.getItem("fool-settings-v1")')==stored
   page.locator('#question-count').fill('3');page.locator('#seconds').click();page.get_by_role('button',name='Salva impostazioni').click()
   page.goto(base+'Fool.html');page.locator('#bank-choice').select_option(bank);expect(page.get_by_role('button',name='Inizia partita (3 domande)',exact=True)).to_be_enabled();page.get_by_role('button',name='Inizia partita (3 domande)',exact=True).click()

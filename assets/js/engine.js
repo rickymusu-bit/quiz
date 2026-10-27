@@ -754,7 +754,7 @@
       const s = this.s;
       if (["answer", "choice"].includes(s.screen)) {
         s.suspendAfter = true;
-        this.log("Campanella: concludere la domanda, poi sospendere");
+        this.log("Sospensione: concludere la domanda, poi fermare la gara");
       } else {
         s.suspended = true;
         this.stop();

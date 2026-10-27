@@ -14,7 +14,6 @@
   let bank = null,
     prepared = null,
     game = null,
-    previewIndex = 0,
     ui = "config",
     fitting = false,
     fitBlocked = false,
@@ -25,7 +24,6 @@
     configurationLoad = 0,
     feedbackEpoch = 0,
     lastFinalGame = null,
-    settingsDraft = null,
     setupMode = launchParams.get("settings") === "1" ? "settings" : "config";
   const teamDraft = {
     names: ["Giocatore 1", "Giocatore 2", "Giocatore 3"],
@@ -77,7 +75,7 @@
     Opzioni: "O",
     Sanzioni: "S",
     "Riassegna punti": "V",
-    "Campanella / sospendi": "L",
+    "Sospendi la gara": "L",
     "Riprendi la sessione": "L",
     Salva: "K",
     "Schermo intero": "F",
@@ -399,10 +397,7 @@
   function renderConfiguration() {
     main.replaceChildren();
     const editing = setupMode === "settings",
-      value =
-        settingsDraft?.source === bank.source
-          ? settingsDraft.value
-          : savedSettings();
+      value = savedSettings();
     const p = heading(
       editing ? "Impostazioni" : "Prepara Hellscape",
       editing
@@ -422,7 +417,6 @@
         selectedBankId = $("bank-choice").value;
         bank = null;
         prepared = null;
-        settingsDraft = null;
         await configure();
       });
     p.append(choice);
@@ -492,7 +486,6 @@
     for (const [key, label] of [
       ["general", "Generali"],
       ["topics", "Argomenti"],
-      ["preview", "Anteprima"],
     ]) {
       const button = btn(label, () => showSettingsTab(key));
       button.dataset.settingsTab = key;
@@ -591,7 +584,6 @@
           } catch (e) {
             throw Error("Il browser non consente di salvare le impostazioni.");
           }
-          settingsDraft = null;
           message("Impostazioni salvate per le nuove partite.");
         },
         "primary",
@@ -599,24 +591,6 @@
       btn("Torna alla schermata iniziale", goHome),
     );
     p.append(row);
-    const teacher = node("section", undefined, "panel");
-    teacher.id = "teacher-preview";
-    teacher.append(
-      node("h3", "Anteprima docente"),
-      node(
-        "p",
-        "Contiene le soluzioni: aprila prima di proiettare alla classe.",
-        "muted",
-      ),
-      btn("Prepara anteprima", () => {
-        const value = readSettings();
-        prepared = F.prepare(bank.bank, settingsConfig(value));
-        settingsDraft = { source: bank.source, value };
-        previewIndex = 0;
-        preview();
-      }),
-    );
-    p.append(teacher);
     showSettingsTab(settingsTab);
   }
   function showSettingsTab(tab) {
@@ -624,7 +598,6 @@
     for (const [key, selector] of [
       ["general", ".settings-grid"],
       ["topics", "#topics"],
-      ["preview", "#teacher-preview"],
     ]) {
       const el = main.querySelector(selector);
       if (el) el.hidden = key !== tab;
@@ -712,82 +685,6 @@
         ]),
       ),
     };
-  }
-  function preview() {
-    ui = "preview";
-    main.className = "";
-    main.replaceChildren();
-    const p = heading(
-      "Anteprima docente",
-      "Soluzioni visibili: non proiettare questa schermata. È un’estrazione di esempio; ogni nuova partita estrae di nuovo le domande.",
-    );
-    p.append(
-      node(
-        "p",
-        prepared.config.questionCount +
-          " domande estratte · " +
-          (prepared.eligible.length - prepared.config.questionCount) +
-          " quesiti di riserva · " +
-          prepared.config.seconds +
-          " secondi · Ammo indipendenti",
-      ),
-    );
-    const q = prepared.chosen[previewIndex];
-    p.append(
-      node(
-        "h3",
-        previewIndex +
-          1 +
-          "/" +
-          prepared.config.questionCount +
-          " — " +
-          prepared.config.bases[q.difficulty] +
-          " punti",
-      ),
-      text("p", q.body, "question"),
-    );
-    q.options.forEach((a, i) =>
-      p.append(text("p", "ABCD"[i] + ". " + a + (i === q.correct ? " ✓" : ""))),
-    );
-    p.append(text("p", q.explanation, "help"));
-    const row = node("div", undefined, "row");
-    row.append(
-      btn(
-        "← Precedente",
-        () => {
-          previewIndex--;
-          preview();
-        },
-        "",
-        previewIndex === 0,
-      ),
-      btn(
-        "Successiva →",
-        () => {
-          previewIndex++;
-          preview();
-        },
-        "",
-        previewIndex === prepared.config.questionCount - 1,
-      ),
-      btn("Sostituisci domanda", () => {
-        const ids = new Set(prepared.chosen.map((q) => q.id));
-        const pool = prepared.bank.filter(
-          (x) =>
-            !ids.has(x.id) &&
-            x.topic === q.topic &&
-            x.difficulty === q.difficulty,
-        );
-        if (!pool.length)
-          throw Error("Nessun sostituto dello stesso argomento e difficoltà");
-        prepared.chosen[previewIndex] = F.mix(
-          F.shuffle(pool, Math.random)[0],
-          Math.random,
-        );
-        preview();
-      }),
-    );
-    p.append(row, btn("Torna alle impostazioni", configure));
   }
   function start() {
     game = F.Game.start(prepared);
@@ -1140,7 +1037,7 @@
             showSanctions();
           })),
           btn("Riassegna punti", showScoreAdjustment, "", s.phase !== "ordinaria"),
-          btn("Campanella / sospendi", command(() => {
+          btn("Sospendi la gara", command(() => {
             closeDialog();
             game.bell();
           })),
@@ -1508,7 +1405,7 @@
         "owner-status",
       ));
     if (s.suspendAfter)
-      body.append(node("p", "Campanella: sospensione al termine della domanda.", "muted"));
+      body.append(node("p", "Sospensione al termine della domanda.", "muted"));
     main.append(body, optionsToggle());
     if (s.draftBonus && !$("dialog").open) {
       inventoryCanResume = false;
@@ -1624,7 +1521,7 @@
       d.append(
         node(
           "p",
-          "Correggi un errore del docente. La modifica riguarda soltanto i punti: Ammo e sanzioni restano invariate.",
+          "Correggi il punteggio di un dannato. La modifica riguarda soltanto i punti: Ammo e sanzioni restano invariate.",
         ),
       );
       const team = select(
@@ -2042,7 +1939,7 @@
     const s = game.s,
       revision = s.revision,
       pending = s.panel;
-    dialog("Sanzioni — decisione del docente", (d) => {
+    dialog("Sanzioni — arbitro infernale", (d) => {
       d.append(
         node(
           "p",
@@ -2103,7 +2000,7 @@
             [
               ["disturbo", "Disturbo / offese ad altri giocatori"],
               ["suggerimento", "Suggerimenti"],
-              ["protesta", "Offese / interruzioni al docente"],
+              ["protesta", "Offese / interruzioni all’arbitro"],
             ],
             pending.reasons[i],
           );
@@ -2569,15 +2466,6 @@
     set game(value) {
       game = value;
     },
-    get prepared() {
-      return prepared;
-    },
-    get previewIndex() {
-      return previewIndex;
-    },
-    set previewIndex(value) {
-      previewIndex = value;
-    },
     F,
     changed,
     math,
@@ -2585,6 +2473,5 @@
     restoreGame,
     showRules,
     goHome,
-    preview,
   };
 })();
