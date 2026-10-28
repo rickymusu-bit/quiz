@@ -1,3 +1,5 @@
+> Documento storico. Per regole, corsie, portale dall’alto e crollo si applica [la specifica v1.3.0](HELLSCAPE_CORREZIONI_CODEX_v1.3.0.md).
+
 # Hellscape — Regia cinematografica, inseguimento finale e spareggio
 
 **Versione documento:** 1.2.0  

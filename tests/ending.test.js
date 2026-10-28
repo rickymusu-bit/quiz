@@ -7,7 +7,7 @@ const state = (winner = 0, out = [false, false, false]) => ({
   respondent: 2,
   groups: out.map((flag) => ({ out: flag })),
 });
-test("Only survivor crosses the emerged portal before sinking, fists, flame and exhaustion", () => {
+test("Only survivor crosses the descending portal before collapse, fists, flame and exhaustion", () => {
   const s = state(2, [true, true, false]),
     p = E.plan(s, [0, 1]);
   assert.deepEqual(p.victims, []);
@@ -58,14 +58,14 @@ test("Vehicle stays gripped through the lift, disappears inside the mouth and re
   assert.equal(E.captureAction(5.1), "recover");
 });
 
-test("Portal opens after emergence and sinks only after the crossing", () => {
-  assert(E.portalMotion(.5).offset > 0);
+test("Portal opens after impact and collapses only after the crossing", () => {
+  assert(E.portalMotion(.5).offset < 0);
   assert.equal(E.portalMotion(F.T.riseEnd).offset, 0);
   assert.equal(E.portalMotion(F.T.riseEnd).opening, 0);
   assert.equal(E.portalMotion(F.T.openEnd).opening, 1);
   assert.equal(E.portalMotion(F.T.escapeEnd-.01).passed, false);
   assert.equal(E.portalMotion(F.T.escapeEnd).passed, true);
-  assert(E.portalMotion(F.T.closeEnd+.5).offset>0);
+  assert(E.portalMotion(F.T.closeEnd+.5).collapse>0);assert.equal(E.portalMotion(F.T.closeEnd+.5).offset,0);
   assert.equal(E.portalMotion(F.T.sinkEnd).visible, false);
 });
 test("Rage plants the feet and anticipates three heavy fist impacts", () => {

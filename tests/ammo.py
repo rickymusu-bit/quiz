@@ -13,7 +13,7 @@ with sync_playwright() as p:
  browser=p.chromium.launch(executable_path=os.environ.get('CHROMIUM_PATH','/usr/bin/chromium'),args=['--no-sandbox']);errors=[];checks=[]
  for width,height,touch in [(1440,900,False),(390,844,True),(844,390,True)]:
   page=browser.new_page(viewport={'width':width,'height':height},has_touch=touch,reduced_motion='reduce');page.on('pageerror',lambda e:errors.append(str(e)))
-  page.goto(base+'Fool.html?settings=1');expect(page.locator('#weight-ira')).to_have_value('5');expect(page.locator('.ammo-setting')).to_have_count(7)
+  page.goto(base+'Fool.html?settings=1');expect(page.locator('#weight-ira')).to_have_value('5');expect(page.locator('.ammo-setting')).to_have_count(8)
   expect(page.locator('.ammo-setting').filter(has_text='Flagello')).to_have_count(0)
   icon=page.locator('.ammo-setting [data-ammo="ira"]');expect(icon).to_have_attribute('title','Flagello')
   if touch:icon.tap()
@@ -23,9 +23,10 @@ with sync_playwright() as p:
   page.goto(base+'Fool.html?start=1');page.get_by_role('button',name='Inizia partita').click()
   page.evaluate('''()=>{const g=HellscapeUI.game;for(const type of Fool.TYPES)g.s.groups[g.s.owner].inventory.push({id:g.uid(),type,target:null,origin:'test'});for(let n=0;n<2;n++)g.s.groups[g.s.owner].inventory.push({id:g.uid(),type:'ira',target:null,origin:'test'});HellscapeUI.changed()}''')
   for use in range(3):
+   if use>0:page.evaluate('''()=>{const g=HellscapeUI.game;g.s.groups[g.s.owner].inventory.push({id:g.uid(),type:'ira',target:null,origin:'new-turn-test'});HellscapeUI.changed()}''')
    page.get_by_role('button',name='Inventario',exact=True).click()
    expect(page.locator('#dialog .ammo-label')).to_have_count(0)
-   expect(page.locator('#dialog [data-ammo="ira"]')).to_have_count(3-use)
+   expect(page.locator('#dialog [data-ammo="ira"]')).to_have_count(3 if use==0 else 1)
    if use==0:
     page.evaluate('document.fonts.ready');page.screenshot(path=str(ART/f'ammo-inventory-{width}.png'))
    item=page.locator('#dialog [data-ammo="ira"]').first

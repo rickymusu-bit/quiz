@@ -53,7 +53,7 @@
     const el=(tag,text,cls)=>{const e=document.createElement(tag);if(text)e.textContent=text;if(cls)e.className=cls;return e;};
     function update(view) {
       if(!view.blocking){layer?.remove();layer=null;signature=null;return;}
-      if(!layer){layer=el('section',null,'tie-layer');layer.setAttribute('aria-label','Transizione dello spareggio');figure.append(layer);}
+      if(!layer){layer=el('section',null,'tie-layer');layer.setAttribute('aria-label','Transizione dello Ultimo Miglio');figure.append(layer);}
       layer.dataset.phase=view.phase;
       layer.style.setProperty('--tie-opacity',String(view.opacity));
       const key=[view.key,view.phase,view.paused,view.reduced].join(':');
@@ -62,11 +62,11 @@
       const control=document.activeElement?.dataset.tieAction;
       signature=key;
       const card=el('div',null,'tie-card'),heading=el('h2',view.kind==='elimination'?'ELIMINATO':
-        view.kind==='round'?'NUOVO GIRO DI SPAREGGIO':'SPAREGGIO A ELIMINAZIONE','tie-heading');
+        view.kind==='round'?'NUOVO GIRO · ULTIMO MIGLIO':'ULTIMO MIGLIO','tie-heading');
       heading.tabIndex=-1;
       const status=el('p',view.phase==='capture'?'Il demone cattura il veicolo eliminato':
         view.kind==='elimination'?state.groups[view.index].name+' · '+(state.result?.option===null?'Tempo scaduto':'Risposta errata'):
-        view.kind==='round'?'Giro '+state.tieRound:'Un errore o il tempo scaduto ti eliminano','tie-rules');
+        view.kind==='round'?'Giro '+state.tieRound:'Errore o tempo scaduto: −1 vita. Eliminazione a zero.','tie-rules');
       status.setAttribute('role','status');
       card.append(heading,status);
       const roster=el('ul',null,'tie-roster');
@@ -74,12 +74,14 @@
       for(const index of indices){
         const group=state.groups[index],item=el('li'),name=el('strong',group.name),heart=el('span',null,'heart'+(group.out?' lost':''));
         item.dataset.team=String(index);heart.setAttribute('role','img');heart.setAttribute('aria-label',group.out?'Nessuna vita rimasta':'Una vita');
-        item.append(name,heart,el('span',root.Fool.formatScore(group.score)+' pt','tie-points'));roster.append(item);
+        const hearts=el('span',null,'tie-hearts'),count=root.Fool.remainingLives(state,index);
+        for(let n=0;n<3;n++){const h=heart.cloneNode();h.classList.toggle('lost',n>=count);h.setAttribute('aria-label',n<count?'Vita residua':'Vita persa');hearts.append(h);}
+        item.append(name,hearts,el('span',root.Fool.formatScore(group.score)+' pt','tie-points'));roster.append(item);
       }
       card.append(roster,el('p','Punti congelati · Ammo disattivate','tie-note'));
       const controls=el('div',null,'tie-controls'),pause=el('button',view.paused?'Riprendi scena':'Pausa scena');
       pause.dataset.tieAction='pause';pause.type='button';pause.onclick=()=>{tracker.togglePause();redraw();};controls.append(pause);
-      if(view.canSkip){const skip=el('button',view.reduced?(view.kind==='round'?'Continua il giro':'Inizia spareggio'):'Salta introduzione');
+      if(view.canSkip){const skip=el('button',view.reduced?(view.kind==='round'?'Continua il giro':'Inizia Ultimo Miglio'):'Salta introduzione');
         skip.dataset.tieAction='skip';skip.type='button';skip.onclick=()=>{tracker.skip();redraw();};controls.append(skip);}
       card.append(controls);
       layer.replaceChildren(card);

@@ -37,9 +37,9 @@ with sync_playwright() as p:
   assert page.evaluate('window.__endingPlan.victims')==([] if winner==0 else [2])
   assert ('escape' in phase_set)==(winner==0)
   assert 'roar' not in phase_set
-  for phase in ['open','close','sink','exhausted']:
+  for phase in ['open','close','collapse','exhausted']:
    assert (phase in phase_set)==(winner==0)
-  assert ('rise' in phase_set)==(winner==0)
+  assert ('descent' in phase_set)==(winner==0)
   assert ('fire' in phase_set)==(winner==0)
   assert ('rage' in phase_set)==(winner==0)
   assert ('dance' in phase_set)==(winner is None)

@@ -56,12 +56,12 @@ with sync_playwright() as p:
  page=browser.new_page(viewport={'width':1440,'height':900});page.on('pageerror',lambda e:errors.append(str(e)));page.goto(base+'Fool.html')
  page.get_by_role('button',name='Inizia partita').click()
  page.evaluate('''()=>{const c=Fool.clone(HellscapeUI.game.s.config);c.questionCount=3;for(const key of Object.keys(c.quotas))c.quotas[key]=0;c.quotas[Object.keys(c.quotas)[0]]=3;HellscapeUI.game=Fool.Game.start(Fool.prepare(HellscapeUI.game.s.bank,c));HellscapeUI.game.s.groups.forEach((g,i)=>g.sanctions=i);for(let i=0;i<3;i++){HellscapeUI.game.reveal();HellscapeUI.game.answer((HellscapeUI.game.s.current.correct+1)%4);if(i<2)HellscapeUI.game.next()}HellscapeUI.changed()}''')
- assert page.evaluate('HellscapeUI.game.s.phase')=='pareggio';assert page.evaluate('HellscapeUI.game.s.groups.reduce((n,g,i)=>n+Fool.remainingLives(HellscapeUI.game.s,i),0)')==3
- for i in range(3):assert page.evaluate(f'Fool.remainingLives(HellscapeUI.game.s,{i})')==1
+ assert page.evaluate('HellscapeUI.game.s.phase')=='pareggio';assert page.evaluate('HellscapeUI.game.s.groups.reduce((n,g,i)=>n+Fool.remainingLives(HellscapeUI.game.s,i),0)')==6
+ for i in range(3):assert page.evaluate(f'Fool.remainingLives(HellscapeUI.game.s,{i})')==3-i
  assert page.evaluate('HellscapeUI.game.s.groups.map(g=>g.sanctions)')==[0,1,2]
- page.evaluate('()=>{HellscapeUI.game.next();HellscapeUI.game.reveal();HellscapeUI.game.answer((HellscapeUI.game.s.current.correct+1)%4);HellscapeUI.changed()}');assert page.evaluate('HellscapeUI.game.s.groups.reduce((n,g,i)=>n+Fool.remainingLives(HellscapeUI.game.s,i),0)')==2
- loser=page.evaluate('HellscapeUI.game.s.respondent');expect(page.locator(f'.turn-order [data-team="{loser}"] .lives')).to_have_attribute('aria-label','0 vite su 1')
- page.goto(base+'Fool.html?resume=1');assert page.evaluate('HellscapeUI.game.s.groups.reduce((n,g,i)=>n+Fool.remainingLives(HellscapeUI.game.s,i),0)')==2;page.close()
+ page.evaluate('()=>{HellscapeUI.game.next();HellscapeUI.game.reveal();HellscapeUI.game.answer((HellscapeUI.game.s.current.correct+1)%4);HellscapeUI.changed()}');assert page.evaluate('HellscapeUI.game.s.groups.reduce((n,g,i)=>n+Fool.remainingLives(HellscapeUI.game.s,i),0)')==5
+ loser=page.evaluate('HellscapeUI.game.s.respondent');expect(page.locator(f'.turn-order [data-team="{loser}"] .lives')).to_have_attribute('aria-label',f'{2-loser} '+('vita' if 2-loser==1 else 'vite')+' su 3')
+ page.goto(base+'Fool.html?resume=1');assert page.evaluate('HellscapeUI.game.s.groups.reduce((n,g,i)=>n+Fool.remainingLives(HellscapeUI.game.s,i),0)')==5;page.close()
  # The rules keep every remaining slide and navigation entry after removing refusal.
  page=browser.new_page(viewport={'width':1440,'height':900});page.goto(base+'Fool_regole.html');expect(page.locator('.slide')).to_have_count(22);expect(page.locator('#section option')).to_have_count(22);expect(page.locator('[data-go]')).to_have_count(22);assert 'rifiut' not in page.locator('body').inner_text().lower();page.close()
  # Deadline and final-screen outcomes retain an explicit chosen/no-answer label.

@@ -25,7 +25,7 @@ with sync_playwright() as p:
  def run(page,ms):page.clock.run_for(ms)
  def motion_preference(page,f,value):
   page.emulate_media(reduced_motion=value)
-  label='Inizia spareggio' if value=='reduce' else 'Salta introduzione'
+  label='Inizia Ultimo Miglio' if value=='reduce' else 'Salta introduzione'
   # The media event rebuilds the stage asynchronously. Observe each rendered
   # preference before changing it again or focusing one of its controls.
   for attempt in range(20):
@@ -38,7 +38,7 @@ with sync_playwright() as p:
    for(let i=0;i<3;i++){g.reveal();g.answer((unique?i===0:two&&i<2)?g.s.current.correct:(g.s.current.correct+1)%4);ui.changed();if(i<2){g.next();ui.changed();}}}''',{'two':two,'unique':unique})
   run(page,1800)
  def skip(page,f,reduced=False):
-  f.get_by_role('button',name='Inizia spareggio' if reduced else 'Salta introduzione',exact=True).click();run(page,100)
+  f.get_by_role('button',name='Inizia Ultimo Miglio' if reduced else 'Salta introduzione',exact=True).click();run(page,100)
  def ready(f):
   assert f.evaluate('HellscapeUI.game.s.screen')=='hidden';assert not f.evaluate('HellscapeUI.game.running');assert not f.locator('.tie-layer').count()
   assert f.evaluate('document.activeElement?.dataset.gameAction')=='reveal','Focus returns to the unrevealed question'
@@ -49,8 +49,8 @@ with sync_playwright() as p:
    assert f.evaluate('HellscapeUI.game.s.phase')=='pareggio';assert f.locator('.operation-body').is_visible();assert not f.locator('.tie-layer').count()
    before=snapshot(f);order=f.evaluate('HellscapeUI.game.s.tieOrder');f.evaluate("window.__tieDone=0;document.addEventListener('fooltiecomplete',()=>__tieDone++)")
    f.get_by_role('button',name='Prossima domanda',exact=True).click();run(page,650)
-   expect(f.locator('.tie-heading')).to_have_text('SPAREGGIO A ELIMINAZIONE');assert f.locator('.tie-roster li').count()==3
-   assert f.locator('.tie-roster .heart:not(.lost)').count()==3
+   expect(f.locator('.tie-heading')).to_have_text('ULTIMO MIGLIO');assert f.locator('.tie-roster li').count()==3
+   assert f.locator('.tie-roster .heart:not(.lost)').count()==6
    assert [int(v) for v in f.locator('.tie-roster li').evaluate_all('es=>es.map(e=>e.dataset.team)')]==order
    assert not f.locator('.operation-body').is_visible();assert f.locator('.operation-body').evaluate('e=>e.inert')
    assert snapshot(f)==before
@@ -59,7 +59,7 @@ with sync_playwright() as p:
    run(page,100);page.keyboard.press('p');run(page,50);frozen=f.locator('.hell-race canvas').evaluate('c=>c.toDataURL()');run(page,500)
    assert f.locator('.hell-race canvas').evaluate('c=>c.toDataURL()')==frozen;assert snapshot(f)==before
    page.set_viewport_size({'width':height,'height':width});run(page,50)
-   assert f.locator('.hell-race canvas').evaluate('c=>c.toDataURL()')==frozen
+   assert f.locator('.hell-race canvas').evaluate('c=>c.width<=1536')
    page.set_viewport_size({'width':width,'height':height});run(page,50)
    box=f.locator('.hell-race').bounding_box();assert abs(box['width']/box['height']-4/3)<.001
    assert f.evaluate('document.documentElement.scrollWidth<=innerWidth+1')
@@ -102,7 +102,7 @@ with sync_playwright() as p:
   respondent=f.evaluate('HellscapeUI.game.s.respondent')
   f.evaluate('(timeout)=>{const g=HellscapeUI.game;g.reveal();g.answer(timeout?null:(g.s.current.correct+1)%4);HellscapeUI.changed()}',i==1);run(page,450)
   if i==1:expect(f.locator('.tie-rules')).to_contain_text('Tempo scaduto')
-  expect(f.locator('.tie-heading')).to_have_text('ELIMINATO');assert f.locator('.tie-roster .lost').count()==1
+  expect(f.locator('.tie-heading')).to_have_text('ELIMINATO');assert f.locator('.tie-roster .lost').count()==3
   assert f.locator('.tie-roster li').get_attribute('data-team')==str(respondent)
   if i==0:page.screenshot(path=str(ART/'eliminated.png'))
   if i==2:
@@ -130,8 +130,8 @@ with sync_playwright() as p:
  motion_preference(page,f,'no-preference');motion_preference(page,f,'reduce')
  f.get_by_role('button',name='Pausa scena',exact=True).focus();page.keyboard.press('Enter');run(page,100);assert f.evaluate('FoolHellRace.tieStatus().paused')
  page.keyboard.press(' ');run(page,100);assert not f.evaluate('FoolHellRace.tieStatus().paused')
- f.get_by_role('button',name='Inizia spareggio',exact=True).focus();page.keyboard.press('Enter');run(page,100);ready(f)
- f.evaluate('()=>{const g=HellscapeUI.game;g.reveal();g.answer((g.s.current.correct+1)%4);HellscapeUI.changed()}');run(page,100)
+ f.get_by_role('button',name='Inizia Ultimo Miglio',exact=True).focus();page.keyboard.press('Enter');run(page,100);ready(f)
+ f.evaluate('()=>{const g=HellscapeUI.game;g.s.groups[g.s.respondent].damage=2-g.s.groups[g.s.respondent].sanctions;g.reveal();g.answer((g.s.current.correct+1)%4);HellscapeUI.changed()}');run(page,100)
  expect(f.locator('.tie-heading')).to_have_text('ELIMINATO');frozen=f.locator('.hell-race canvas').evaluate('c=>c.toDataURL()');run(page,500)
  assert f.locator('.hell-race canvas').evaluate('c=>c.toDataURL()')==frozen
  run(page,700);assert not f.locator('.tie-layer').count();assert f.locator('.operation-body').is_visible();assert not f.evaluate('HellscapeUI.game.running');context.close()

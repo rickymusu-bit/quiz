@@ -11,7 +11,7 @@
   tools.append(summary);
   const status = document.createElement('p');
   status.setAttribute('role', 'status');
-  status.textContent = 'Anteprima completa: locomozione, spareggio, inseguimento, portale e nuovo epilogo.';
+  status.textContent = 'Anteprima completa: locomozione, Ultimo Miglio, inseguimento, portale e nuovo epilogo.';
   const waitFor = async test => {
     const deadline = performance.now() + 15000;
     while (!test()) {
@@ -79,7 +79,7 @@
           for(let i=0;i<3;i++){game.reveal();game.answer(game.s.current.correct);ui.changed();if(i<2){game.next();ui.changed();}}
           w.FoolHellRace.beginTie(game.s);ui.changed();
         }else{
-          game.reveal();game.answer((game.s.current.correct+1)%4);ui.changed();w.FoolHellRace.pauseTie();
+          game.s.groups[game.s.respondent].damage=2-game.s.groups[game.s.respondent].sanctions;game.reveal();game.answer((game.s.current.correct+1)%4);ui.changed();w.FoolHellRace.pauseTie();
         }
       }
     } else if (['ultima', 'spareggio'].includes(scenario)) {
@@ -100,7 +100,7 @@
       }
       if (!['vittoria','gameover'].includes(scenario)) {
         const render=w.FoolEnding.render,sampleFrame=w.FoolEnding.frame,T=w.FoolEpilogue.T;
-        const stamp={emersione:.6,frattura:1.1,portale:T.openEnd+.02,attraversamento:T.openEnd+.6,
+        const stamp={emersione:.6,frattura:T.descentEnd+.15,portale:T.openEnd+.02,attraversamento:T.openEnd+.6,
           sprofondamento:T.closeEnd+.7,pugni:T.sinkEnd+.46,'fiammata-finale':T.rageEnd+.8,affanno:T.fireEnd+.65}[scenario];
         w.FoolEnding.frame=(...args)=>{args[2]=args[0].chaseEnd+stamp;return sampleFrame(...args)};
         w.FoolEnding.render=(...args)=>{args[4]=args[3].chaseEnd+stamp;return render(...args)};
@@ -117,7 +117,7 @@
     await d.fonts.ready;
   }
   let busy = false;
-  for (const [key, label] of Object.entries({home:'Home',selezione:'Veicoli',quiz:'Domanda / Ammo',corsa:'Corsa / locomozione',ultima:'Ultimo esito',spareggio:'Primo turno spareggio','intro-spareggio':'Intro spareggio (3)','intro-due':'Intro spareggio (2)','giro-spareggio':'Nuovo giro','eliminazione-spareggio':'Eliminazione (in pausa)','inseguimento-2':'Inseguimento: 2 perdenti','inseguimento-1':'Inseguimento: 1 perdente','inseguimento-0':'Inseguimento: solo vincitore','fila-finale':'Fotogramma: fila','presa-finale':'Fotogramma: presa','bocca-finale':'Fotogramma: bocca',emersione:'Portale: emersione',frattura:'Ponte: frattura',portale:'Portale: aperto',attraversamento:'Portale: attraversamento',sprofondamento:'Portale: sprofondamento',pugni:'Epilogo: pugni','fiammata-finale':'Epilogo: fiammata',affanno:'Epilogo: affanno',vittoria:'Vittoria',gameover:'Game Over',regole:'Regole'})) {
+  for (const [key, label] of Object.entries({home:'Home',selezione:'Veicoli',quiz:'Domanda / Ammo',corsa:'Corsa / locomozione',ultima:'Ultimo esito',spareggio:'Primo turno Ultimo Miglio','intro-spareggio':'Intro Ultimo Miglio (3)','intro-due':'Intro Ultimo Miglio (2)','giro-spareggio':'Nuovo giro','eliminazione-spareggio':'Eliminazione (in pausa)','inseguimento-2':'Inseguimento: 2 perdenti','inseguimento-1':'Inseguimento: 1 perdente','inseguimento-0':'Inseguimento: solo vincitore','fila-finale':'Fotogramma: corsie','presa-finale':'Fotogramma: presa','bocca-finale':'Fotogramma: bocca',emersione:'Portale: discesa',frattura:'Ponte: frattura',portale:'Portale: aperto',attraversamento:'Portale: attraversamento',sprofondamento:'Portale: crollo',pugni:'Epilogo: pugni','fiammata-finale':'Epilogo: fiammata',affanno:'Epilogo: affanno',vittoria:'Vittoria',gameover:'Game Over',regole:'Regole'})) {
     const button = document.createElement('button');
     button.textContent = label;
     button.style.cssText = 'min-height:44px;padding:8px;margin:4px;font:inherit';

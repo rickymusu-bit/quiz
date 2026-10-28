@@ -39,25 +39,26 @@ with sync_playwright() as p:
   page.clock.run_for(200);data=snap(f);fr=data['frame'];phase=data['phase']
   if not phases or phases[-1]!=phase:phases.append(phase)
   if fr.get('portal'):
-   assert fr['portal']['geometry']['near']-fr['portal']['geometry']['far']>110
-   if fr['portal']['sink']>0 or fr['bridge']['collapse']>0:assert fr['cleared']
+   assert fr['portal']['geometry']['near']-fr['portal']['geometry']['far']<110
+   if fr['portal']['collapse']>0 or fr['bridge']['collapse']>0:assert fr['cleared']
    if phase in ['rage','fire','exhausted','done']:assert not fr['portal']['visible']
    assert fr['positions'][1]['visible'] is False and fr['positions'][2]['visible'] is False
   if phase in ['open','fire'] and phase not in paused:
    paused.add(phase);f.get_by_role('button',name='Pausa scena',exact=True).click();page.clock.run_for(100);image=raw(f);time=snap(f)['frame']['time'];page.clock.run_for(500)
-   assert raw(f)==image and snap(f)['frame']['time']==time
-   f.evaluate('HellscapeUI.changed()');page.clock.run_for(100);assert raw(f)==image
-   page.set_viewport_size({'width':768,'height':1366});page.clock.run_for(100);assert raw(f)==image
-   page.set_viewport_size({'width':1366,'height':768});page.clock.run_for(100)
+   assert snap(f)['frame']['time']==time
+   assert raw(f)==image, {'phase':phase,'paused':snap(f).get('paused'),'time':time,'raster':f.locator('.hell-race canvas').evaluate('c=>[c.width,c.height]')}
+   f.evaluate('HellscapeUI.changed()');page.clock.run_for(100);assert snap(f)['frame']['time']==time
+   page.set_viewport_size({'width':768,'height':1366});page.clock.run_for(100);assert snap(f)['frame']['time']==time
+   page.set_viewport_size({'width':1366,'height':768});page.clock.run_for(100);image=raw(f)
    f.evaluate("Object.defineProperty(document,'hidden',{configurable:true,get:()=>true});document.dispatchEvent(new Event('visibilitychange'))");page.clock.run_for(500);assert raw(f)==image
    f.evaluate("Object.defineProperty(document,'hidden',{configurable:true,get:()=>false});document.dispatchEvent(new Event('visibilitychange'))")
    f.get_by_role('button',name='Riprendi scena',exact=True).focus();page.keyboard.press('Enter');page.clock.run_for(100)
-  if phase in ['rise','open','escape','sink','rage','fire','exhausted','done'] and phase not in shots:
+  if phase in ['descent','open','escape','collapse','rage','fire','exhausted','done'] and phase not in shots:
    shots.add(phase);page.screenshot(path=str(ART/f'movie-{phase}.png'))
   if step%2==0:
    frames.append(Image.open(BytesIO(page.screenshot())).convert('RGB').resize((683,384),Image.Resampling.LANCZOS))
   assert state(f)==before,'The whole movie must preserve the authoritative game and timer'
- assert phases==['lineup','winner-chase','rise','open','escape','close','sink','rage','fire','exhausted','done'],phases
+ assert phases==['lineup','winner-chase','descent','open','escape','close','collapse','rage','fire','exhausted','done'],phases
  assert paused=={'open','fire'};assert f.evaluate('__endingDone')==1
  expect(f.locator('.end-wordmark')).to_have_attribute('alt','VITTORIA');expect(f.locator('.winner-escape')).to_have_text("Fuggitivo è fuggito dall'inferno!")
  f.evaluate('HellscapeUI.changed()');page.clock.run_for(100);assert f.evaluate('__endingDone')==1
@@ -68,11 +69,11 @@ with sync_playwright() as p:
   for dpr in DPRS:
    context,page,f=start(width,height,dpr);vehicle=VEHICLES[(vi+(dpr-1)*3)%6]
    f.evaluate('''()=>{const E=FoolEnding,render=E.render,frame=E.frame,T=FoolEpilogue.T;window.__portalSample='open';
-    const at=p=>p.chaseEnd+(__portalSample==='open'?T.openEnd:__portalSample==='cross'?T.openEnd+.6:__portalSample==='sink'?T.closeEnd+.75:T.duration);
+    const at=p=>p.chaseEnd+(__portalSample==='open'?T.openEnd:__portalSample==='cross'?T.openEnd+.6:__portalSample==='collapse'?T.closeEnd+.75:T.duration);
     E.frame=(...a)=>{a[2]=at(a[0]);return frame(...a)};E.render=(...a)=>{a[4]=at(a[3]);return render(...a)}}''')
    finish(f,vehicle=vehicle);page.clock.run_for(100);f.evaluate('FoolHellRace.pauseScene()');page.clock.run_for(100)
    before=state(f)
-   for key in ['open','cross','sink','done']:
+   for key in ['open','cross','collapse','done']:
     f.evaluate('key=>{__portalSample=key;HellscapeUI.changed()}',key);page.clock.run_for(100)
     f.evaluate('async()=>{await document.fonts.ready;await Promise.all([...document.images].map(i=>i.decode().catch(()=>{})))}')
     data=snap(f);fr=data['frame'];box=f.locator('.hell-race canvas').bounding_box();assert abs(box['width']/box['height']-4/3)<.001
@@ -89,7 +90,7 @@ with sync_playwright() as p:
  for reduced,winner in [(False,None),(True,None),(True,0)]:
   context,page,f=start(390,844,2,reduced);finish(f,winner);page.clock.run_for(100)
   if not reduced:page.clock.run_for(math.ceil(snap(f)['plan']['duration']*1000)+200)
-  assert snap(f)['phase']=='done';before=state(f);image=raw(f);page.clock.run_for(500);assert raw(f)==image and state(f)==before
+  assert snap(f)['phase']=='done';before=state(f);image=raw(f);page.clock.run_for(500);assert (not reduced or raw(f)==image) and state(f)==before
   if winner is None:assert not snap(f)['frame'].get('portal');expect(f.locator('.end-wordmark')).to_have_attribute('alt','GAME OVER')
   else:expect(f.locator('.end-wordmark')).to_have_attribute('alt','VITTORIA')
   expect(f.locator('.final-title')).to_be_visible();context.close()

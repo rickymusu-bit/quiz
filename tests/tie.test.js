@@ -19,11 +19,11 @@ test('A restored tie skips historical intros; reduced motion waits for an access
  const g=game(),t=createTracker();ordinary(g,t);const restored=createTracker();restored.sync(g.s);assert(!restored.sample().waiting);assert(!restored.begin(g.s));
  t.begin(g.s);t.advance(60,{reduced:true});assert(t.sample().blocking);t.skip(true);assert(t.sample().blocking,'Capture cannot be skipped');t.skip(false);assert(t.takeCompletion());
 });
-test('Each wrong tie answer has one notice; remaining players still answer and successful rounds use a short intro',()=>{
+test('Each final-life wrong answer has one notice; remaining players still answer and successful rounds use a short intro',()=>{
  const g=game(),t=createTracker();ordinary(g,t);t.begin(g.s);t.skip();t.takeCompletion();
  for(let i=0;i<3;i++){g.next();t.sync(g.s);answer(g,true);t.sync(g.s);}
  assert.equal(g.s.tieRound,2);assert(t.begin(g.s));assert.equal(t.sample().kind,'round');t.advance(DURATION.round);t.takeCompletion();
- g.next();t.sync(g.s);answer(g);t.sync(g.s);assert.equal(t.sample().kind,'elimination');const index=t.sample().index;
+ g.next();g.s.groups[g.s.respondent].damage=2;t.sync(g.s);answer(g);t.sync(g.s);assert.equal(t.sample().kind,'elimination');const index=t.sample().index;
  t.advance(.5);t.sync(g.s);assert.equal(t.sample().elapsed,.5);assert.equal(t.sample().index,index);
  t.advance(DURATION.elimination);assert(!t.sample().blocking);assert.equal(g.s.phase,'pareggio');g.next();t.sync(g.s);assert.notEqual(g.s.respondent,index);
  const before=JSON.stringify(g.snapshot());t.advance(5);assert.equal(JSON.stringify(g.snapshot()),before);
@@ -34,7 +34,7 @@ test('A unique score leader never triggers a tie intro',()=>{
 });
 
 test('Pause remains available through a capture without holding its approach forever',()=>{
- const g=game(),t=createTracker();ordinary(g,t);t.begin(g.s);t.skip();t.takeCompletion();g.next();t.sync(g.s);answer(g);t.sync(g.s);
+ const g=game(),t=createTracker();ordinary(g,t);t.begin(g.s);t.skip();t.takeCompletion();g.next();g.s.groups[g.s.respondent].damage=2;t.sync(g.s);answer(g);t.sync(g.s);
  t.advance(DURATION.elimination,{captures:true});assert.equal(t.sample().phase,'capture');assert(!t.sample().holdCapture);
  const elapsed=t.sample().elapsed;t.togglePause();t.advance(3,{captures:true});assert.equal(t.sample().elapsed,elapsed);
  t.togglePause();t.advance(1,{captures:true});assert(t.sample().blocking);t.completeCapture();assert(!t.sample().blocking);

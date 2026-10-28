@@ -1,3 +1,5 @@
+> Documento storico. Per regole, corsie, portale dall’alto e crollo si applica [la specifica v1.3.0](HELLSCAPE_CORREZIONI_CODEX_v1.3.0.md).
+
 # Portale, ponte ed epilogo — PR D
 
 Quarta fase della specifica cinematografica 1.2.0, dopo il merge della PR C.
