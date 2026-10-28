@@ -1,0 +1,1 @@
+PASS: 2 viewport/DPR cases; frozen engine/input/focus, deferred captures, new rounds, all three eliminations/Game Over, reduced motion and resume

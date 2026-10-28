@@ -1,0 +1,35 @@
+{
+  "endings": [
+    {
+      "ending": "portal-escape",
+      "phases": [
+        "close",
+        "collapse",
+        "descent",
+        "done",
+        "escape",
+        "exhausted",
+        "fire",
+        "lineup",
+        "open",
+        "rage",
+        "winner-chase"
+      ],
+      "victims": []
+    },
+    {
+      "ending": "eat-fire-dance",
+      "phases": [
+        "capture",
+        "dance",
+        "done",
+        "lineup"
+      ],
+      "victims": [
+        2
+      ]
+    }
+  ],
+  "pause_hidden_reduced": "PASS",
+  "errors": []
+}

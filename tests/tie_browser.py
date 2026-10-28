@@ -100,7 +100,7 @@ with sync_playwright() as p:
  f.evaluate('''()=>{const render=FoolEnding.render;FoolEnding.render=(...args)=>{window.__tiePlan=args[3];return render(...args)}}''')
  for i in range(3):
   respondent=f.evaluate('HellscapeUI.game.s.respondent')
-  f.evaluate('(timeout)=>{const g=HellscapeUI.game;g.reveal();g.answer(timeout?null:(g.s.current.correct+1)%4);HellscapeUI.changed()}',i==1);run(page,450)
+  f.evaluate('(timeout)=>{const g=HellscapeUI.game;g.s.groups[g.s.respondent].damage=2-g.s.groups[g.s.respondent].sanctions;g.reveal();g.answer(timeout?null:(g.s.current.correct+1)%4);HellscapeUI.changed()}',i==1);run(page,450)
   if i==1:expect(f.locator('.tie-rules')).to_contain_text('Tempo scaduto')
   expect(f.locator('.tie-heading')).to_have_text('ELIMINATO');assert f.locator('.tie-roster .lost').count()==3
   assert f.locator('.tie-roster li').get_attribute('data-team')==str(respondent)

@@ -1,0 +1,80 @@
+
+> hellscape@3.9.0 test:browser
+> node tests/hellscape.cjs && node tests/infernal_assets.cjs && python3 tests/hell_race.py && python3 tests/start.py && python3 tests/experience.py && python3 tests/keyboard.py && python3 tests/options.py && python3 tests/configurable.py && python3 tests/ammo.py && python3 tests/cinematic_ui.py && node tests/ux_regressions.cjs
+
+PASS 1440 900
+PASS 390 844
+PASS 844 390
+PASS: visible previews, animated/still frames, unchanged state, pause, victory and Game Over
+{"start_answer_resume": [{"fullscreen": false, "bank": "termologia", "viewport": [1440, 900]}, {"fullscreen": false, "bank": "introduzione-fisica-misura", "viewport": [1440, 900]}, {"fullscreen": false, "bank": "termologia", "viewport": [390, 844]}, {"fullscreen": false, "bank": "introduzione-fisica-misura", "viewport": [390, 844]}, {"fullscreen": true, "bank": "termologia", "viewport": [844, 390]}, {"fullscreen": true, "bank": "introduzione-fisica-misura", "viewport": [844, 390]}], "errors": []}
+{"experience": [{"viewport": [1440, 900], "notation_parts": 33}, {"viewport": [844, 390], "notation_parts": 33}], "errors": []}
+{"keyboard_cases": [{"fullscreen": false, "bank": "termologia", "size": [1440, 900]}, {"fullscreen": true, "bank": "introduzione-fisica-misura", "size": [844, 390]}], "errors": []}
+{"options_direct_reveal_total_points": [{"fullscreen": false, "size": [1440, 900]}, {"fullscreen": true, "size": [844, 390]}], "errors": []}
+{"configurable": [{"bank": "termologia", "size": [1440, 900], "counts": [3, 6, 99], "awards": 8, "uses": 2}, {"bank": "introduzione-fisica-misura", "size": [844, 390], "counts": [3, 6, 99], "awards": 8, "uses": 2}], "errors": []}
+{
+  "ammo": [
+    {
+      "viewport": [
+        1440,
+        900
+      ],
+      "touch": false,
+      "shared_hit": "PASS",
+      "info_without_use": "PASS"
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "touch": true,
+      "shared_hit": "PASS",
+      "info_without_use": "PASS"
+    },
+    {
+      "viewport": [
+        844,
+        390
+      ],
+      "touch": true,
+      "shared_hit": "PASS",
+      "info_without_use": "PASS"
+    }
+  ],
+  "errors": []
+}
+{
+  "cinematic_ui": [
+    {
+      "viewport": [
+        1440,
+        900
+      ],
+      "motion_and_capture": "PASS",
+      "timer_and_manual_pause": "PASS"
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "motion_and_capture": "PASS",
+      "timer_and_manual_pause": "PASS"
+    },
+    {
+      "viewport": [
+        844,
+        390
+      ],
+      "motion_and_capture": "PASS",
+      "timer_and_manual_pause": "PASS"
+    }
+  ],
+  "errors": []
+}
+PASS: original illustrated titles, live vehicle preview, Ammo information and effects HUD
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1
+npm notice To update run: npm install -g npm@12.2.1
+npm notice

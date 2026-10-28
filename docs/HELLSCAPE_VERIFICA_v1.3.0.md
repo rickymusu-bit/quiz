@@ -55,7 +55,7 @@ Il test offline carica gli esatti byte del build tramite intercettazione locale 
 | Portale | 1086×1448 | Proiezione del piano, pareti estruse, apertura allineata alla corsia del vincitore |
 | Titoli / home | 1981×793 / 2172×724 | Asset originali, proporzioni native mantenute |
 
-Profilo in Chromium headless del workspace, 2,5 secondi per viewport: desktop 1440×1080 DPR 1 circa 30 FPS e CPU p95 2,2 ms per paint; mobile emulato 390×844 DPR 2 circa 29,6 FPS e CPU p95 3,4 ms. Raster osservati rispettivamente 1440×1080 (5,93 MiB RGBA) e 780×585 (1,74 MiB). Il limite assoluto del singolo canvas è 1536×1152 (6,75 MiB); il compositing del demone usa un secondo buffer limitato allo stesso modo. Non è una misura su hardware Android fisico né della memoria complessiva del browser.
+Profilo in Chromium headless del workspace, 2,5 secondi per viewport: desktop 1440×1080 DPR 1 circa 23.2 FPS e CPU p95 9.8 ms per paint; mobile emulato 390×844 DPR 2 circa 27.2 FPS e CPU p95 5.8 ms. Raster osservati rispettivamente 1440×1080 (5,93 MiB RGBA) e 780×585 (1,74 MiB). Il limite assoluto del singolo canvas è 1536×1152 (6,75 MiB); il compositing del demone usa un secondo buffer limitato allo stesso modo. Non è una misura su hardware Android fisico né della memoria complessiva del browser.
 
 ## Limiti visivi ancora aperti
 

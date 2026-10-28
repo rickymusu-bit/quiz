@@ -1,0 +1,130 @@
+[
+  {
+    "viewport": [
+      1440,
+      1080
+    ],
+    "dpr": 1,
+    "raster": [
+      1440,
+      1080
+    ],
+    "rgbaBytes": 6220800,
+    "cssWidth": 1440,
+    "smoothing": true,
+    "frames": 60,
+    "elapsedMs": 2587.9000000003725,
+    "paintFPS": 23.18482167007665,
+    "cpuP95ms": 9.799999999813735,
+    "endingCrop": [
+      438,
+      258
+    ],
+    "sources": [
+      {
+        "name": "vehicles-drive-v1.webp",
+        "width": 1254,
+        "height": 1254
+      },
+      {
+        "name": "demon-actions-v1.webp",
+        "width": 1536,
+        "height": 1024
+      },
+      {
+        "name": "demon-ending-v1.webp",
+        "width": 1536,
+        "height": 1024
+      },
+      {
+        "name": "ammo-relics-v1.webp",
+        "width": 1330,
+        "height": 1182
+      },
+      {
+        "name": "lava-bridge-v1.webp",
+        "width": 2172,
+        "height": 724
+      },
+      {
+        "name": "lava-lake-v1.webp",
+        "width": 1536,
+        "height": 1024
+      },
+      {
+        "name": "portal-marble-v1.webp",
+        "width": 1086,
+        "height": 1448
+      },
+      {
+        "name": "victory-title-v1.webp",
+        "width": 1981,
+        "height": 793
+      }
+    ]
+  },
+  {
+    "viewport": [
+      390,
+      844
+    ],
+    "dpr": 2,
+    "raster": [
+      780,
+      585
+    ],
+    "rgbaBytes": 1825200,
+    "cssWidth": 390,
+    "smoothing": true,
+    "frames": 68,
+    "elapsedMs": 2500.0999999996275,
+    "paintFPS": 27.198912043522313,
+    "cpuP95ms": 5.7999999998137355,
+    "endingCrop": [
+      438,
+      258
+    ],
+    "sources": [
+      {
+        "name": "vehicles-drive-v1.webp",
+        "width": 1254,
+        "height": 1254
+      },
+      {
+        "name": "demon-actions-v1.webp",
+        "width": 1536,
+        "height": 1024
+      },
+      {
+        "name": "demon-ending-v1.webp",
+        "width": 1536,
+        "height": 1024
+      },
+      {
+        "name": "ammo-relics-v1.webp",
+        "width": 1330,
+        "height": 1182
+      },
+      {
+        "name": "lava-bridge-v1.webp",
+        "width": 2172,
+        "height": 724
+      },
+      {
+        "name": "lava-lake-v1.webp",
+        "width": 1536,
+        "height": 1024
+      },
+      {
+        "name": "portal-marble-v1.webp",
+        "width": 1086,
+        "height": 1448
+      },
+      {
+        "name": "victory-title-v1.webp",
+        "width": 1981,
+        "height": 793
+      }
+    ]
+  }
+]
