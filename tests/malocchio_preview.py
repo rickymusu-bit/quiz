@@ -24,17 +24,17 @@ with sync_playwright() as p:
                 if r.request.url=='http://malocchio.test/':r.fulfill(content_type='text/html',body=(ROOT/'dist/Hellscape-offline.html').read_text())
                 else:external.append(r.request.url);r.abort()
             ctx.route('**/*',route)
-        q=ctx.new_page();q.on('pageerror',lambda e:report['errors'].append(str(e)))
+        q=ctx.new_page();q.clock.install();q.on('pageerror',lambda e:report['errors'].append(str(e)))
         if offline:
             q.goto('http://malocchio.test/');q.frame_locator('iframe').get_by_role('link',name='Nuova partita',exact=True).click();v=q.frames[1]
         else:q.goto(f'http://127.0.0.1:{server.server_port}/Fool.html?start=1');v=q
         v.get_by_role('button',name='Inizia partita',exact=False).click();v.wait_for_function('FoolAmmo.ready() && FoolBridge.load()?.complete && FoolEnding.prepare(FoolEnding.load(()=>{}))!==null')
-        v.evaluate('document.fonts.ready');q.clock.install();q.clock.pause_at(q.evaluate('Date.now()+1000'))
+        v.evaluate('document.fonts.ready');q.clock.pause_at(q.evaluate('Date.now()+1000'))
         fixture=v.evaluate('''()=>{const g=HellscapeUI.game,s=g.s,[source,next,target]=s.order;const names=[];names[source]='Aster';names[next]='Moro';names[target]='Vespro';
           s.config.names=names;s.config.bases={facile:100,media:100,difficile:100};s.config.bonusWeights=Object.fromEntries(Fool.TYPES.map(t=>[t,['aura','antisigillo'].includes(t)?100:0]));
           for(const p of s.groups){p.score=Fool.rational(500);p.name=names[s.groups.indexOf(p)];p.inventory=[];}
           for(const i of [source,next])s.groups[i].inventory=[{id:g.uid(),type:'svela',target:null,origin:'preview'}];
-          for(const question of [...s.bank,...s.queue,s.current]){question.body='Quanto vale 2 + 2? ('+question.id+')';question.options=['3','4','5','6'];question.correct=1;question.explanation='Due più due fa quattro.';}
+          for(const question of [...s.bank,...s.queue,s.current]){question.body='Quanto vale 2 + 2?';question.options=['3','4','5','6'];question.correct=1;question.explanation='Due più due fa quattro.';}
           s.config.vehicles[source]='chopper';s.config.vehicles[next]='pickup';s.config.vehicles[target]='ape';HellscapeUI.changed();return {source,next,target};}''')
         q.clock.run_for(1800);return ctx,q,v,fixture,external
     def card(v):v.get_by_role('button',name='Inventario',exact=True).click();v.locator('#dialog [data-ammo="svela"]').first.click()
@@ -91,10 +91,10 @@ with sync_playwright() as p:
         if offline:q.clock.run_for(int(left)+100)
         else:answer(v,correct)
         q.clock.run_for(2200);a=snapshot(v)
-        assert a['scores'][f['target']]==('150' if correct else '0') and a['scores'][f['source']]=='500' and a['lives']==[3,3,3]
+        assert a['scores'][f['target']]==('150' if correct else '0') and a['scores'][f['source']]=='500' and a['lives']==[3,3,3], {'case':[width,height,offline,reduced,correct],'fixture':f,'actual':a}
         assert a['ammo'][f['target']]==(['aura','antisigillo'] if correct else [])
         if not correct:assert '−50' in v.locator('.solution').inner_text()
-        q.screenshot(path=str(ART/f'result-{width}-{offline}.png'));v.get_by_role('button',name='Prossima domanda',exact=True).click()
+        q.clock.run_for(10000);q.screenshot(path=str(ART/f'result-{width}-{offline}.png'),full_page=True);v.get_by_role('button',name='Prossima domanda',exact=True).click()
         assert v.evaluate('HellscapeUI.game.s.owner')==f['next'] and v.evaluate('HellscapeUI.game.s.malocchio') is None
         v.evaluate('Fool.Game.restore(HellscapeUI.game.snapshot())');assert v.evaluate('document.documentElement.scrollWidth<=innerWidth')
         assert not external;report['checks'].append({'viewport':[width,height],'offline':offline,'reduced':reduced,'correct':correct,'hidden_alternatives':'PASS','zero_floor':'PASS','retained_rewards':'PASS','author_rotation':'PASS','restore_timer_no_replay':'PASS'});ctx.close()
