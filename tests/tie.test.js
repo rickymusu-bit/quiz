@@ -32,3 +32,10 @@ test('A unique score leader never triggers a tie intro',()=>{
  const g=game(),t=createTracker();t.sync(g.s);for(let i=0;i<3;i++){answer(g,i===0);t.sync(g.s);if(i<2){g.next();t.sync(g.s);}}
  assert.equal(g.s.phase,'conclusa');assert(!t.begin(g.s));assert(!t.sample().waiting);
 });
+
+test('Pause remains available through a capture without holding its approach forever',()=>{
+ const g=game(),t=createTracker();ordinary(g,t);t.begin(g.s);t.skip();t.takeCompletion();g.next();t.sync(g.s);answer(g);t.sync(g.s);
+ t.advance(DURATION.elimination,{captures:true});assert.equal(t.sample().phase,'capture');assert(!t.sample().holdCapture);
+ const elapsed=t.sample().elapsed;t.togglePause();t.advance(3,{captures:true});assert.equal(t.sample().elapsed,elapsed);
+ t.togglePause();t.advance(1,{captures:true});assert(t.sample().blocking);t.completeCapture();assert(!t.sample().blocking);
+});

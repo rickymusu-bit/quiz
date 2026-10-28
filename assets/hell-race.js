@@ -659,6 +659,7 @@
       ctx.save();ctx.translate(width/2,H/2);ctx.scale(zoom,zoom);ctx.translate(-width/2,-H/2);
       phase=scene(ctx, width, state, reduced ? ADVANCE_SECONDS : elapsed, final, previous, reduced, clock.snapshot());
       ctx.restore();
+      if((final&&phase==='done')||(!final&&!visualState?.queue.length))tie?.completeCapture();
       if(view?.strength){ctx.fillStyle='rgba(9,5,14,'+(view.strength*.22)+')';ctx.fillRect(0,0,width,H);}
       const updated=tie?.sample({reduced,captures:visualState?.queue.length>0});
       if(updated){fig.dataset.tiePhase=updated.phase;tieLayer.update(updated);}

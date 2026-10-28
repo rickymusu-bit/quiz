@@ -99,7 +99,11 @@ with sync_playwright() as p:
    f.get_by_role('button',name='Pausa scena',exact=True).click();run(page,100);frozen=f.locator('.hell-race canvas').evaluate('c=>c.toDataURL()');run(page,500)
    assert f.locator('.hell-race canvas').evaluate('c=>c.toDataURL()')==frozen
    f.get_by_role('button',name='Riprendi scena',exact=True).click()
-  run(page,750);assert f.locator('.hell-race').get_attribute('data-tie-phase')=='idle'
+  run(page,750);assert f.locator('.hell-race').get_attribute('data-tie-phase')=='capture'
+  if i==0:
+   page.keyboard.press('p');run(page,100);frozen=f.locator('.hell-race canvas').evaluate('c=>c.toDataURL()');run(page,500)
+   assert f.locator('.hell-race canvas').evaluate('c=>c.toDataURL()')==frozen
+   f.get_by_role('button',name='Riprendi scena',exact=True).click();run(page,50)
   run(page,5600 if i<2 else 10000)
   if i<2:
    assert f.evaluate('HellscapeUI.game.s.phase')=='pareggio'
@@ -116,7 +120,11 @@ with sync_playwright() as p:
  page.emulate_media(reduced_motion='no-preference');run(page,100);page.emulate_media(reduced_motion='reduce');run(page,100)
  f.get_by_role('button',name='Pausa scena',exact=True).focus();page.keyboard.press('Enter');run(page,100);assert f.evaluate('FoolHellRace.tieStatus().paused')
  page.keyboard.press(' ');run(page,100);assert not f.evaluate('FoolHellRace.tieStatus().paused')
- f.get_by_role('button',name='Inizia spareggio',exact=True).focus();page.keyboard.press('Enter');run(page,100);ready(f);context.close()
+ f.get_by_role('button',name='Inizia spareggio',exact=True).focus();page.keyboard.press('Enter');run(page,100);ready(f)
+ f.evaluate('()=>{const g=HellscapeUI.game;g.reveal();g.answer((g.s.current.correct+1)%4);HellscapeUI.changed()}');run(page,100)
+ expect(f.locator('.tie-heading')).to_have_text('ELIMINATO');frozen=f.locator('.hell-race canvas').evaluate('c=>c.toDataURL()');run(page,500)
+ assert f.locator('.hell-race canvas').evaluate('c=>c.toDataURL()')==frozen
+ run(page,700);assert not f.locator('.tie-layer').count();assert f.locator('.operation-body').is_visible();assert not f.evaluate('HellscapeUI.game.running');context.close()
  # Resume never replays an intro that was in progress in another document.
  context,page,f=start();ordinary(page,f);f.get_by_role('button',name='Prossima domanda',exact=True).click();run(page,500)
  saved=f.evaluate('JSON.stringify(HellscapeUI.game.s.groups)');page.evaluate("HellscapePreview.navigate('Fool.html?resume=1')");run(page,100)

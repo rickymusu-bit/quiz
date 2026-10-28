@@ -30,21 +30,21 @@
     }
     function advance(delta,{reduced=false,captures=false}={}) {
       if(paused)return;
-      if(notice){notice.elapsed+=delta;if(notice.elapsed>=DURATION.elimination)notice=null;return;}
+      if(notice){notice.elapsed+=delta;if(notice.elapsed>=DURATION.elimination){if(captures)notice.capturing=true;else notice=null;}return;}
       if(active&&!captures&&!reduced){active.elapsed+=delta;if(active.elapsed>=DURATION[active.kind])finish();}
     }
     function sample({reduced=false,captures=false}={}) {
       const item=notice||active, waiting=!!pending&&pending.kind==='intro';
-      const phase=notice?'eliminated':active?(captures?'capture':active.kind):'idle';
+      const phase=notice?(notice.capturing?'capture':'eliminated'):active?(captures?'capture':active.kind):'idle';
       const elapsed=item?.elapsed??0, duration=active?DURATION[active.kind]:0;
       const strength=active?.kind==='intro'&&!captures&&!reduced
         ? ease(elapsed/DURATION.fade)*ease((duration-elapsed)/DURATION.fade):0;
       return {key:item?.key,kind:item?.kind,phase,index:notice?.index,blocking:!!item,
-        waiting,holdCapture:waiting||!!notice,paused,reduced,elapsed,strength,
+        waiting,holdCapture:waiting||!!notice&&!notice.capturing,paused,reduced,elapsed,strength,
         opacity:reduced||notice||captures?1:ease(elapsed/DURATION.fade)*ease((duration-elapsed)/DURATION.fade),
         canSkip:!!active&&!captures};
     }
-    return {sync,begin,advance,sample,skip(captures=false){if(active&&!captures)finish();},
+    return {sync,begin,advance,sample,completeCapture(){if(notice?.capturing){notice=null;paused=false;}},skip(captures=false){if(active&&!captures)finish();},
       togglePause(){if(active||notice)paused=!paused;},
       takeCompletion(){const done=completion;completion=null;return done;}};
   }
@@ -64,7 +64,7 @@
       const card=el('div',null,'tie-card'),heading=el('h2',view.kind==='elimination'?'ELIMINATO':
         view.kind==='round'?'NUOVO GIRO DI SPAREGGIO':'SPAREGGIO A ELIMINAZIONE','tie-heading');
       heading.tabIndex=-1;
-      const status=el('p',view.phase==='capture'?'Cattura del veicolo escluso dallo spareggio':
+      const status=el('p',view.phase==='capture'?'Il demone cattura il veicolo eliminato':
         view.kind==='elimination'?state.groups[view.index].name+' · '+(state.result?.option===null?'Tempo scaduto':'Risposta errata'):
         view.kind==='round'?'Giro '+state.tieRound:'Un errore o il tempo scaduto ti eliminano','tie-rules');
       status.setAttribute('role','status');
