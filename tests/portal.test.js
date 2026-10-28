@@ -59,12 +59,32 @@ test('Masonry falls without fading, lands on the deck and remains at the same wo
  assert.deepEqual(landed,P.pieces(F.frame(r,F.T.duration+3).portal));
  assert(landed.some(p=>Math.abs(p.angle)>1),'Blocks rotate while falling');
 });
-test('The new native facade contains real transparent doorway space and solid marble piers',async()=>{
+test('The native side-view sprite contains transparent doorway space and solid marble piers',async()=>{
  const {loadImage,createCanvas}=require('@napi-rs/canvas'),image=await loadImage(P.ASSET);
- assert.equal(image.width,948);assert.equal(image.height,1659);
+ assert.equal(image.width,1024);assert.equal(image.height,1536);
  const c=createCanvas(image.width,image.height).getContext('2d');c.drawImage(image,0,0);
- assert.equal(c.getImageData(474,1200,1,1).data[3],0);
- assert(c.getImageData(140,1000,1,1).data[3]>240);
+ assert.equal(c.getImageData(484,900,1,1).data[3],0);
+ assert(c.getImageData(280,850,1,1).data[3]>240);
+});
+test('The upright portal uses its native angle with uniform scaling and no affine deformation',async()=>{
+ const {loadImage,createCanvas}=require('@napi-rs/canvas'),fs=require('node:fs'),vm=require('node:vm');
+ const image=await loadImage(P.ASSET),root={FoolBridge:B,FoolEpilogue:F,__art:image};
+ const source=fs.readFileSync('assets/hell-portal.js','utf8').replace('let art=null;','let art=root.__art;');
+ vm.runInNewContext(source,root);const portal=root.FoolPortal;
+ const ctx=createCanvas(768,576).getContext('2d'),draw=ctx.drawImage.bind(ctx),calls=[];
+ ctx.drawImage=(...args)=>{calls.push(args);return draw(...args)};
+ for(const name of ['transform','setTransform','scale','rotate'])ctx[name]=()=>assert.fail('An upright side-view sprite must not be warped or rotated');
+ for(const t of [1.35,1.95,2.28,2.95]){
+  const p=F.frame(fixture(72),t).portal;calls.length=0;portal.back(ctx,p);portal.front(ctx,p);
+  assert.equal(calls.length,2,'The far image and its near occluding part share the same sprite');
+  for(const args of calls){assert.equal(args.length,5);near(args[3]/image.width,args[4]/image.height);}
+ }
+ for(const ground of B.grounds([44,70,44])){
+  const p=F.frame(fixture(72,ground),F.IMPACT).portal,frame=P.spriteFrame(p);
+  for(const foot of P.SPRITE.feet)for(const [,y]of foot){
+   const contact=frame.y+y*frame.scale;assert(contact>=B.TOP&&contact<=B.BOTTOM,'Native footing stays on the deck');
+  }
+ }
 });
 test('Water clipping occurs in world height, including the extruded foundations',()=>{
  const clipped=P.aboveWater([{x:0,depth:20,z:10},{x:16,depth:20,z:10},{x:16,depth:20,z:-30},{x:0,depth:20,z:-30}],-16);

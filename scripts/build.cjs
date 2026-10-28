@@ -59,7 +59,7 @@ function offline(review = false) {
   for (const bank of catalog.banche) texts[bank.url] = read(bank.url);
   const assets = {};
   assets["assets/antisigillo.svg"] = data("assets/antisigillo.svg");
-  for(const name of ["black-stone-bridge-v1.png","lava-sea-v2.png","portal-azure-v2.png"])
+  for(const name of ["black-stone-bridge-v1.png","lava-sea-v2.png","portal-side-v3.png"])
     assets["assets/hell-race/"+name]=data("assets/hell-race/"+name);
   for (const name of fs.readdirSync(path.join(root, "assets/hell-race")))
     if (name.endsWith(".webp") && name !== 'portal-flames-v1.webp')

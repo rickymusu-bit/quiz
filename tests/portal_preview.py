@@ -8,7 +8,7 @@ from io import BytesIO
 import threading, json, os, subprocess, hashlib, sys
 
 ROOT = Path(__file__).resolve().parent.parent
-ART = ROOT / 'artifacts/portal-azure'
+ART = ROOT / 'artifacts/portal-side'
 ART.mkdir(parents=True, exist_ok=True)
 INSPECT = '--inspect' in sys.argv
 class Quiet(SimpleHTTPRequestHandler):
@@ -22,7 +22,7 @@ with sync_playwright() as p:
     page.on('pageerror', lambda e: report['errors'].append(str(e)))
     page.goto(f'http://127.0.0.1:{server.server_port}/Fool.html?start=1')
     page.get_by_role('button', name='Inizia partita', exact=False).click()
-    page.wait_for_function('FoolPortal.load()?.complete && FoolPortal.load().naturalWidth===948 && FoolEnding.prepare(FoolEnding.load(()=>{}))!==null')
+    page.wait_for_function('FoolPortal.load()?.complete && FoolPortal.load().naturalWidth===1024 && FoolEnding.prepare(FoolEnding.load(()=>{}))!==null')
     page.evaluate('document.fonts.ready')
     page.clock.install(); page.clock.pause_at(page.evaluate('Date.now()+1000')); page.clock.run_for(200)
     page.evaluate('''()=>{const g=HellscapeUI.game;g.s.id+='-portal-azure';g.s.groups[1].name='Fuggitivo';
@@ -58,7 +58,7 @@ with sync_playwright() as p:
         palette = frames[30].quantize(colors=128, method=Image.Quantize.MEDIANCUT)
         encoded = [f.quantize(palette=palette, dither=Image.Dither.NONE) for f in frames]
         durations = [(round((i+1)*100/12)-round(i*100/12))*10 for i in range(96)]
-        file = ART/'portal-azure-gameplay.gif'
+        file = ART/'portal-side-gameplay.gif'
         encoded[0].save(file, save_all=True, append_images=encoded[1:], duration=durations, loop=0, disposal=1, optimize=False)
         gif = Image.open(file); duration = 0
         for i in range(gif.n_frames): gif.seek(i); duration += gif.info.get('duration',0)
@@ -83,7 +83,7 @@ with sync_playwright() as p:
         context.route('**/*',route);q=context.new_page();q.on('pageerror',lambda e:report['errors'].append(str(e)));q.goto('http://portal.test/')
         q.frame_locator('iframe').get_by_role('link',name='Nuova partita',exact=True).click();f=q.frames[1]
         f.get_by_role('button',name='Inizia partita',exact=False).click()
-        f.wait_for_function('FoolPortal.load()?.complete && FoolPortal.load().naturalWidth===948 && FoolEnding.prepare(FoolEnding.load(()=>{}))!==null')
+        f.wait_for_function('FoolPortal.load()?.complete && FoolPortal.load().naturalWidth===1024 && FoolEnding.prepare(FoolEnding.load(()=>{}))!==null')
         assert f.evaluate('FoolPortal.load().src.startsWith("data:image/png;base64,")')
         f.evaluate('''()=>{const g=HellscapeUI.game;g.s.id+='-offline-portal';g.eliminate(1,'già divorato');g.eliminate(2,'già divorato');g.complete(0);HellscapeUI.changed()}''')
         f.wait_for_function('FoolHellRace.presentationSnapshot().phase==="done"')

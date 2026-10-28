@@ -8,7 +8,7 @@
   const stages=[];let end=0;for(const [phase,duration] of Object.entries(D)){stages.push({phase:phase==='cross'?'escape':phase,start:end,end:end+duration});end+=duration;}
   // Legacy sampling hooks keep their names; they now mark descent/collapse ends.
   const T=Object.freeze(Object.fromEntries([...stages.map(s=>[s.phase+'End',s.end]),['duration',end],['riseEnd',D.descent],['sinkEnd',D.descent+D.open+D.cross+D.close+D.collapse],['brake',1.2]]));
-  const GATE=Object.freeze({far:28,near:82,height:204,water:0,thickness:24,skew:1,openingFar:46,openingNear:64,openingHeight:138,bury:280});
+  const GATE=Object.freeze({far:22,near:88,height:204,water:0,thickness:24,skew:1,openingFar:46,openingNear:64,openingHeight:138,bury:280});
   const pose=frame=>[{frame,weight:1}],mix=(a,b,t)=>[{frame:a,weight:1-t},{frame:b,weight:t}];
   function sample(t){for(const s of stages)if(t<s.end)return {phase:s.phase,local:Math.max(0,t-s.start)};return {phase:'done',local:0};}
   const IMPACT=D.descent;

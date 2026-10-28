@@ -382,7 +382,7 @@
 
   function background(c, W, tick, progress, effectTime=tick, ending=null) {
     const layers=ending?.bridge?{damage:ending.bridge,
-      behind:()=>root.FoolPortal.back(c,ending.portal),above:()=>root.FoolPortal.surface(c,ending.portal)}:null;
+      behind:()=>root.FoolPortal.back(c,ending.portal)}:null;
     if(root.FoolBridge?.environment(c,W,H,tick,effectTime)){
       flyingDevils(c,W,effectTime);
       root.FoolBridge.draw(c,W,tick,progress,null,effectTime,layers);
