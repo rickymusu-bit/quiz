@@ -10,7 +10,7 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/v130');fs.
   const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium',args:['--no-sandbox','--disable-dev-shm-usage']});
   const report={revision:execFileSync('git',['rev-parse','HEAD'],{cwd:root,encoding:'utf8'}).trim(),checks:[],screenshots:[],errors:[]};
   try{
-    for(const [width,height,dpr] of [[1440,1080,1],[390,844,2],[844,390,2]]){
+    for(const [width,height,dpr] of [[1440,1080,1],[667,375,2],[844,390,2]]){
       const page=await browser.newPage({viewport:{width,height},deviceScaleFactor:dpr});page.on('pageerror',e=>report.errors.push(e.message));
       await page.goto(`http://127.0.0.1:${server.address().port}/Fool.html?start=1`);await page.getByRole('button',{name:/Inizia partita/}).click();
       await page.waitForFunction(()=>FoolEnding.prepare(FoolEnding.load(()=>{}))&&FoolPortal.load()?.complete);

@@ -95,7 +95,7 @@ with sync_playwright() as p:
         report.update({'viewport':[1024,768],'gif_pixels':[640,480],'frames':72,'duration_ms':6000,'capture_fps':12,'palette_colors':256,
           'bytes':file.stat().st_size,'sha256':hashlib.sha256(file.read_bytes()).hexdigest(),'engine_unchanged_during_animation':True})
         # The running question timer pauses with the shot and resumes only afterwards.
-        c2,q,v,fixture,_=start(390,844);v.get_by_role('button',name='Svela e avvia il tempo',exact=True).click()
+        c2,q,v,fixture,_=start(667,375);v.get_by_role('button',name='Svela e avvia il tempo',exact=True).click()
         v.locator('body').press('i');v.locator('#dialog [data-ammo="antisigillo"]').click();select(v,fixture);confirm(v)
         q.clock.run_for(250);assert not v.evaluate('HellscapeUI.game.running');left=v.evaluate('HellscapeUI.game.left()')
         q.keyboard.press('p');q.clock.run_for(100);frozen=v.locator('.hell-race canvas').evaluate('c=>c.toDataURL()')
@@ -104,7 +104,7 @@ with sync_playwright() as p:
         q.keyboard.press('p');q.clock.run_for(3000);assert v.evaluate('HellscapeUI.game.running');verify(v,fixture)
         v.evaluate('HellscapeUI.changed()');q.clock.run_for(100);assert v.locator('.hell-race').get_attribute('data-ammo')==''
         report['pause_timer_resume_no_replay']='PASS';c2.close()
-        c3,q,v,fixture,external=start(390,844,offline=True,reduced=True);info(v);select(v,fixture);confirm(v)
+        c3,q,v,fixture,external=start(667,375,offline=True,reduced=True);info(v);select(v,fixture);confirm(v)
         q.clock.run_for(100);frozen=v.locator('.hell-race canvas').evaluate('c=>c.toDataURL()');q.clock.run_for(150)
         assert v.locator('.hell-race canvas').evaluate('c=>c.toDataURL()')==frozen
         q.screenshot(path=str(ART/'mobile-reduced.png'));q.clock.run_for(350)

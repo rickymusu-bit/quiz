@@ -12,7 +12,7 @@ ART=ROOT/'artifacts';ART.mkdir(exist_ok=True)
 with sync_playwright() as p:
  browser=p.chromium.launch(executable_path=os.environ.get('CHROMIUM_PATH','/usr/bin/chromium'),args=['--no-sandbox'])
  checks=[]
- for width,height in [(1440,900),(390,844),(844,390)]:
+ for width,height in [(1440,900),(667,375),(844,390)]:
   context=browser.new_context(viewport={'width':width,'height':height},offline=True,reduced_motion='reduce')
   context.add_init_script('Math.random=()=>0.25')
   errors=[];requests=[]

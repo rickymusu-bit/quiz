@@ -16,6 +16,7 @@
     "test:terrain": "python3 tests/terrain_browser.py",
     "test:quality": "node scripts/build.cjs --quality-preview && python3 tests/visual_quality.py",
     "test:layout": "python3 tests/responsive.py",
+    "test:orientation": "python3 tests/orientation.py",
     "test:motion": "node tests/motion.cjs && node scripts/build.cjs --quality-preview && python3 tests/motion_browser.py",
     "test:ties": "node --test tests/tie.test.js && node scripts/build.cjs --quality-preview && python3 tests/tie_browser.py",
     "test:chase": "node --test tests/chase.test.js && node scripts/build.cjs --quality-preview && python3 tests/chase_browser.py",

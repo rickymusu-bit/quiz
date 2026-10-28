@@ -57,7 +57,7 @@ assert(!selected||[...types,...modes,'reload'].includes(selected),'Unknown Ammo 
     await view.locator('#dialog').getByRole('button',{name:'Conferma uso',exact:true}).click();
   }
   try {
-    for(const [width,height] of [[1440,900],[390,844],[844,390]]) {
+    for(const [width,height] of [[1440,900],[667,375],[844,390]]) {
       for(const type of types.filter(type=>!selected||selected===type)){
         const {page,view}=await start(width,height);await use(view,type);
         await page.clock.runFor(650);

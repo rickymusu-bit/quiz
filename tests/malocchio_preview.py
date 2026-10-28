@@ -78,7 +78,7 @@ with sync_playwright() as p:
         for j in range(im.n_frames):im.seek(j);total+=im.info['duration']
         assert total==16000
         report.update({'viewport':[1024,768],'gif_pixels':[640,480],'duration_ms':16000,'capture_fps':8,'frames':128,'bytes':file.stat().st_size,'sha256':hashlib.sha256(file.read_bytes()).hexdigest()});ctx.close()
-    for width,height,offline,reduced,correct in [(390,844,False,False,False),(844,390,False,False,True),(390,844,True,True,False)]:
+    for width,height,offline,reduced,correct in [(667,375,False,False,False),(844,390,False,False,True),(667,375,True,True,False)]:
         ctx,q,v,f,external=start(width,height,reduced,offline);v.evaluate('HellscapeUI.game.s.groups[HellscapeUI.game.s.order[2]].score=Fool.rational(50)');card(v);activate(v);q.clock.run_for(2100);peek_check(v)
         held=v.evaluate('HellscapeUI.game.left()');q.keyboard.press('a');q.keyboard.press('Enter');q.clock.run_for(250);assert v.evaluate('HellscapeUI.game.s.screen')=='choice' and v.evaluate('HellscapeUI.game.left()')==held
         q.screenshot(path=str(ART/f'peek-{width}-{offline}.png'));v.get_by_role('button',name='Passa a Vespro',exact=True).click();q.clock.run_for(100)

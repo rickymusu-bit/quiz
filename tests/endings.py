@@ -56,7 +56,7 @@ with sync_playwright() as p:
  page.evaluate("Object.defineProperty(document,'hidden',{configurable:true,get:()=>true})");page.clock.run_for(100);hidden=raw(page);page.clock.run_for(500);assert raw(page)==hidden;page.close()
  for winner in [0,None]:
   page=start(True);finish(page,winner);page.clock.run_for(200);assert page.locator('.hell-race-final').get_attribute('data-ending-phase')=='done';a=raw(page);page.clock.run_for(500);assert raw(page)==a;expect(page.locator('.final-title')).to_be_visible();page.close()
- for width,height in [(390,844),(844,390)]:
+ for width,height in [(667,375),(844,390)]:
   for winner in [0,None]:
    page=start(viewport={'width':width,'height':height});finish(page,winner);page.clock.run_for(100);page.clock.run_for(math.ceil(page.evaluate('FoolHellRace.presentationSnapshot().plan.duration')*1000)+200)
    assert page.locator('.hell-race-final').get_attribute('data-ending-phase')=='done'

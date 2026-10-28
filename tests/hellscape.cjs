@@ -15,8 +15,9 @@ const assert = require('node:assert/strict');
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium', args: ['--no-sandbox', '--disable-dev-shm-usage', '--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
   try {
-    for (const [width, height] of [[1440, 900], [390, 844], [844, 390]]) {
+    for (const [width, height] of [[1440, 900], [667,375], [844, 390]]) {
       const page = await browser.newPage({ viewport: { width, height } });
+      page.setDefaultTimeout(60000);
       const errors = []; page.on('pageerror', error => errors.push(error.message));
       await page.goto(`http://127.0.0.1:${server.address().port}/Fool.html?start=1`);
       await page.locator('#vehicle0').waitFor();
@@ -46,7 +47,7 @@ const assert = require('node:assert/strict');
       fs.mkdirSync('artifacts', {recursive:true});
       await page.screenshot({path:`artifacts/interface-${width}.png`});
       await page.getByRole('button', { name: 'Inventario', exact: true }).click();
-      assert(!(await page.locator('dialog').innerText()).includes('Ogni attacco'));
+      assert(!(await page.locator('#dialog').innerText()).includes('Ogni attacco'));
       await page.getByRole('button', { name: 'Chiudi', exact: true }).click();
       await page.getByRole('button', { name: 'Svela e avvia il tempo' }).click();
       await page.locator(`.turn-order [data-team="${other}"]`).click();

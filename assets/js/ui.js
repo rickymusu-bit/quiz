@@ -1192,7 +1192,7 @@
       cinematicPause = null;
       if (held.game === game && game.s.current?.id === held.question &&
           game.s.screen === "answer" && game.s.paused && game.s.pauseReason === "animazione" &&
-          !game.s.panel && !game.s.suspended && !fitBlocked) {
+          !game.s.panel && !game.s.suspended && !fitBlocked && !FoolLayout.portrait) {
         game.resume(game.s.revision);
         changed();
       }
@@ -1464,6 +1464,8 @@
           "good",
         ),
       );
+    if(s.screen === "answer" && s.paused && !s.panel)
+      b.append(btn("Riprendi partita",command(()=>game.resume(revision)),"primary resume-question"));
     if (s.screen === "result") {
       const r = s.result,
         ex = node("div", undefined, "solution");
@@ -1530,6 +1532,7 @@
   function renderGame() {
     cancelFeedback();
     if (!game) return;
+    if(FoolLayout.portrait && game.running){game.pause("orientamento schermo");persist();}
     ui = "game";
     const s = game.s,
       revision = s.revision;
@@ -1904,7 +1907,7 @@
       if (
         wasRunning && game === original && game.s.screen === "answer" &&
         game.s.paused && !game.s.panel && !game.s.draftBonus &&
-        !game.s.suspended && !fitBlocked
+        !game.s.suspended && !fitBlocked && !FoolLayout.portrait
       ) game.resume(game.s.revision);
     };
   }
@@ -2076,7 +2079,7 @@
               throw e;
             }
             if (s.screen === "answer" && paused) {
-              if (inventoryCanResume) game.run();
+              if (inventoryCanResume && !FoolLayout.portrait) game.run();
               else {
                 s.paused = true;
                 s.pauseReason = "ripresa";
@@ -2366,7 +2369,7 @@
     }
   }
   function checkFit() {
-    if (!game || fitting || ui !== "game" || $("dialog").open) return;
+    if (!game || fitting || ui !== "game" || $("dialog").open || FoolLayout.portrait) return;
     window.fitFoolViewport?.();
     for (const el of main.querySelectorAll(".math-scroll")) {
       if (el.scrollWidth > el.clientWidth + 1) el.tabIndex = 0;
@@ -2561,7 +2564,7 @@
   });
 
   document.addEventListener("foolorientation", () => {
-    if (game?.running) {
+    if (FoolLayout.portrait && game?.running) {
       game.pause("orientamento schermo");
       persist();
       renderGame();

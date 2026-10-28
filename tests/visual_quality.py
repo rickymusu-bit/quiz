@@ -2,7 +2,7 @@
 
 Run: node scripts/build.cjs --quality-preview && python3 tests/visual_quality.py
 Screenshots and measured (not HTML-declared) dimensions go to artifacts/quality/.
-Use --quick for just desktop and Android portrait.
+Use --quick for just desktop and small Android landscape.
 """
 from pathlib import Path
 from playwright.sync_api import sync_playwright
@@ -16,9 +16,9 @@ ROOT = Path(__file__).resolve().parent.parent
 ART = ROOT / 'artifacts/quality'
 ART.mkdir(parents=True, exist_ok=True)
 HTML = (ROOT / 'dist/Hellscape-review.html').read_text()
-VIEWPORTS = [(1920, 1080), (1366, 768), (1024, 768), (844, 390), (390, 844)]
+VIEWPORTS = [(1920, 1080), (1366, 768), (1024, 768), (844, 390), (667,375)]
 if '--quick' in sys.argv:
-    VIEWPORTS = [(1366, 768), (390, 844), (844, 390)]
+    VIEWPORTS = [(1366, 768), (667,375), (844, 390)]
 
 METRICS = """() => [...document.querySelectorAll('img,canvas,button,a,h1,h2,.ammo-round,.heart,.time-vial,.question,.subtitle')].filter(el => {
   const r=el.getBoundingClientRect(),s=getComputedStyle(el);

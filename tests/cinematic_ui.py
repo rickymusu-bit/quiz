@@ -19,7 +19,7 @@ with sync_playwright() as p:
  def panels(page,visible):
   for css in ['.operation-body','.statusline','.turn-order','.options-toggle']:
    assert page.locator(css).is_visible()==visible,css
- for width,height in [(1440,900),(390,844),(844,390)]:
+ for width,height in [(1440,900),(667,375),(844,390)]:
   page=start(width,height);panels(page,True)
   page.get_by_role('button',name='Svela e avvia il tempo').click();page.locator('.answer').nth(page.evaluate('HellscapeUI.game.s.current.correct')).click();page.clock.run_for(120)
   panels(page,False)

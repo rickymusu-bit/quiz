@@ -75,7 +75,7 @@ with sync_playwright() as p:
         im=Image.open(file);assert im.n_frames==136;total=0
         for j in range(im.n_frames):im.seek(j);total+=im.info['duration']
         assert total==17000;report.update({'viewport':[1024,768],'gif_pixels':[640,480],'duration_ms':17000,'capture_fps':8,'frames':136,'bytes':file.stat().st_size,'sha256':hashlib.sha256(file.read_bytes()).hexdigest()});ctx.close()
-    for width,height,offline,reduced in [(390,844,False,False),(844,390,False,False),(390,844,True,True)]:
+    for width,height,offline,reduced in [(667,375,False,False),(844,390,False,False),(667,375,True,True)]:
         ctx,q,v,f,external=start(width,height,offline,reduced);card(v,'aura');activate(v);q.clock.run_for(2100)
         assert v.locator(f'.turn-order [data-team="{f["source"]}"]').get_by_text('Sigillo: 3 turni',exact=True).count()==1
         card(v,'sacrificio');assert v.locator('#ammo-info').get_by_role('button',name='Usa',exact=True).is_disabled();q.screenshot(path=str(ART/f'locked-{width}-{offline}.png'));close(v)

@@ -15,7 +15,7 @@ server=ThreadingHTTPServer(('127.0.0.1',0),partial(Quiet,directory=str(ROOT)))
 threading.Thread(target=server.serve_forever,daemon=True).start()
 with sync_playwright() as p:
  browser=p.chromium.launch(executable_path=os.environ.get('CHROMIUM_PATH','/usr/bin/chromium'),args=['--no-sandbox']);checks=[];errors=[]
- for width,height in [(1440,900),(390,844),(844,390)]:
+ for width,height in [(1440,900),(667,375),(844,390)]:
   page=browser.new_page(viewport={'width':width,'height':height},reduced_motion='reduce');page.on('pageerror',lambda e:errors.append(str(e)))
   page.goto(f'http://127.0.0.1:{server.server_port}/Fool.html?start=1');page.get_by_role('button',name='Inizia partita').click();page.wait_for_function("[...document.querySelectorAll('.vehicle-preview canvas')].every(c=>c.getContext('2d').getImageData(0,0,160,90).data.some(v=>v))");page.evaluate('document.fonts.ready');page.wait_for_timeout(500)
   page.clock.install();page.clock.pause_at(page.evaluate('Date.now()+1000'));before=page.evaluate('JSON.stringify(HellscapeUI.game.snapshot())')

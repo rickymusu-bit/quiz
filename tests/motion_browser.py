@@ -10,7 +10,7 @@ HTML=(ROOT/'dist/Hellscape-review.html').read_text()
 report={'revision':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),'cases':[],'errors':[],'external_requests':[]}
 with sync_playwright() as p:
  browser=p.chromium.launch(executable_path=os.environ.get('CHROMIUM_PATH','/usr/bin/chromium'),args=['--no-sandbox'])
- for width,height,dpr,reduced in [(1366,768,1,False),(844,390,2,False),(390,844,2,False),(390,844,2,True)]:
+ for width,height,dpr,reduced in [(1366,768,1,False),(844,390,2,False),(667,375,2,False),(667,375,2,True)]:
   context=browser.new_context(viewport={'width':width,'height':height},device_scale_factor=dpr,offline=True,reduced_motion='reduce' if reduced else 'no-preference')
   def route(r):
    if r.request.url=='http://motion.test/preview':r.fulfill(content_type='text/html',body=HTML)
@@ -87,4 +87,4 @@ with sync_playwright() as p:
 assert not report['errors'],report['errors']
 assert not report['external_requests'],report['external_requests']
 (ART/'measurements.json').write_text(json.dumps(report,indent=2))
-print('PASS: offline motion on desktop and Android portrait/landscape DPR 1/2; pause/visibility, rebuild continuity, reduced motion, engine invariance')
+print('PASS: offline motion on desktop and Android landscape DPR 1/2; pause/visibility, rebuild continuity, reduced motion, engine invariance')

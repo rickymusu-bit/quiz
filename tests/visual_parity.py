@@ -17,7 +17,7 @@ for root in [BASE,ROOT]:
  threading.Thread(target=server.serve_forever,daemon=True).start();servers.append(server)
 with sync_playwright() as p:
  b=p.chromium.launch(executable_path=os.environ.get('CHROMIUM_PATH','/usr/bin/chromium'),args=['--no-sandbox']);checks=[];old_save=None
- for w,h in [(1440,900),(390,844),(844,390)]:
+ for w,h in [(1440,900),(667,375),(844,390)]:
   for label,server in zip(['before','after'],servers):
    page=b.new_page(viewport={'width':w,'height':h},reduced_motion='reduce');errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
    page.add_init_script('Math.random=()=>0.25')

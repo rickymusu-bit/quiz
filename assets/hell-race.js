@@ -125,6 +125,7 @@
   let visualState = null;
   // Browsers can suspend RAF even for a brief tab switch; discard that gap explicitly.
   document.addEventListener?.('visibilitychange', () => clock.rebase(performance.now()));
+  document.addEventListener?.('foolorientation',()=>{clock.rebase(performance.now());live?.redraw?.();});
   function syncVisual(state, final) {
     if (!visualState || visualState.id !== state.id) {
       const consumed = state.groups.map((g,i)=>g.out&&!(final&&state.winner===null&&i===state.respondent)?i:null).filter(i=>i!==null);
@@ -653,6 +654,7 @@
     let lastPaint=null;
     const draw = now => {
       if (live !== record || !canvas.isConnected) return;
+      if(root.FoolLayout?.portrait){clock.rebase(now);record.frame=root.requestAnimationFrame(draw);return;}
       // Bound fill rate on DPR displays; all motion still uses elapsed time.
       if(lastPaint!==null&&now-lastPaint<1000/30-.5){record.frame=root.requestAnimationFrame(draw);return;}
       lastPaint=now;

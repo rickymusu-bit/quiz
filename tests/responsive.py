@@ -22,7 +22,7 @@ try:
     with sync_playwright() as p:
         browser = p.chromium.launch(executable_path=os.environ.get('CHROMIUM_PATH', '/usr/bin/chromium'), args=['--no-sandbox'])
         for dpr in [1, 2]:
-            for width, height in [(1920,1080), (1366,768), (1024,768), (844,390), (390,844)]:
+            for width, height in [(1920,1080), (1366,768), (1024,768), (844,390), (667,375)]:
                 page = browser.new_page(viewport={'width':width,'height':height}, device_scale_factor=dpr, reduced_motion='reduce')
                 page.on('pageerror', lambda e: errors.append(str(e)))
                 page.add_init_script('Math.random=()=>.25')
@@ -39,7 +39,7 @@ try:
                         assert r['y'] >= 0 and r['y'] + r['height'] <= height + 1
                 page.screenshot(path=str(ART/f'home-{width}-dpr{dpr}.png'))
                 page.get_by_role('link', name='Nuova partita', exact=True).click()
-                expect(page.get_by_role('button', name='Inizia partita')).to_be_enabled()
+                expect(page.get_by_role('button', name='Inizia partita')).to_be_enabled(timeout=20000)
                 if compact:
                     for i in range(3):
                         assert page.locator(f'#vehicle{i}').bounding_box()['height'] >= 44
@@ -58,7 +58,7 @@ try:
                         assert answer.bounding_box()['height'] >= 44
                     panel = page.locator('.operation-body').bounding_box()
                     if panel['height'] < height - 70:
-                        assert panel['y'] >= 0 and panel['y'] + panel['height'] <= height + 1
+                        assert panel['y'] >= 0 and panel['y'] + panel['height'] <= height + 1, (width,height,dpr,panel)
                 canvas = page.locator('.hell-race canvas')
                 r = canvas.bounding_box()
                 assert abs(r['width']/r['height']-4/3) < .001
@@ -68,11 +68,14 @@ try:
                 pixels = canvas.evaluate('c=>c.toDataURL()')
                 page.screenshot(path=str(ART/f'question-{width}-dpr{dpr}.png'))
                 canvas.screenshot(path=str(ART/f'scene-{width}-dpr{dpr}.png'))
-                # Reflow reallocates the bounded DPR raster while preserving game state.
+                # Portrait gates play without changing a manually paused match.
                 page.set_viewport_size({'width':height,'height':width})
                 page.wait_for_timeout(150)
                 assert canvas.evaluate('c=>c.width<=1536 && Math.abs(c.width/c.height-4/3)<.005')
                 assert page.evaluate('JSON.stringify(HellscapeUI.game.snapshot())') == before
+                expect(page.locator('#orientation-note')).to_be_visible()
+                expect(page.locator('#viewport-stage')).to_be_hidden()
+                assert canvas.evaluate('c=>c.toDataURL()') == pixels
                 assert page.locator('#fit-warning').is_hidden()
                 assert page.evaluate('document.querySelector("#viewport-stage").scrollWidth<=document.querySelector("#viewport-stage").clientWidth+1')
                 page.set_viewport_size({'width':width,'height':height})

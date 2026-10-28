@@ -21,13 +21,4 @@
 .tie-layer[data-phase=eliminated] .tie-heading { color:#ff765d; }
 .tie-layer[data-phase=eliminated] .tie-card { width:min(90%,560px); }
 .tie-score-note { display:block;flex-basis:100%;color:#d5b98b;font:14px/1.2 FoolTerminal,monospace; }
-/* Portrait letterbox space holds native text, leaving the complete chase visible. */
-@media (orientation:portrait) {
-  body[data-layout=compact] .tie-layer:not([data-phase=capture]) {
-    top:auto;bottom:100%;height:calc((100dvh - var(--scene-max-height))/2);
-    align-items:flex-end;padding:8px;
-  }
-  body[data-layout=compact] .hell-race:has(.tie-layer) { overflow:visible; }
-}
-
 .scene-controls {position:absolute;left:8px;bottom:8px;z-index:5;}

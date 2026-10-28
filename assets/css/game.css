@@ -285,12 +285,6 @@ body.finished header { display: none; }
 
 /* Landscape viewport: reflow first, then fit the complete stage (no clipping). */
 [hidden] { display: none !important; }
-#orientation-note { display: none; }
-body.portrait #viewport-stage { display: none; }
-body.portrait dialog { visibility: hidden; }
-body.portrait dialog::backdrop { background: transparent; }
-body.portrait #orientation-note { position: fixed; inset: 0; display: grid; align-content: center; justify-items: center; text-align: center; padding: 1rem; background: #101013; }
-#orientation-note h2 { color: var(--accent); font: 400 3rem FoolTerminal, monospace; }
 #viewport-stage { margin: 0; }
 #viewport-stage > main { max-width: none; }
 #viewport-stage header { flex-wrap: nowrap; padding-block: .25rem; }

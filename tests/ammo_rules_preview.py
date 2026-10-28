@@ -70,7 +70,7 @@ with sync_playwright() as p:
     im=Image.open(file);assert im.n_frames==144
     report.update({'viewport':[1024,768],'gif_pixels':[640,480],'duration_ms':12000,'capture_fps':12,'frames':144,'bytes':file.stat().st_size,'sha256':hashlib.sha256(file.read_bytes()).hexdigest()});ctx.close()
     # Running timer: Sacrificio freezes during the shot, resumes afterwards; Tributo retires a revealed question.
-    for width,height,offline,reduced in [(390,844,False,False),(844,390,False,False),(390,844,True,True)]:
+    for width,height,offline,reduced in [(667,375,False,False),(844,390,False,False),(667,375,True,True)]:
         ctx,q,v,f,external=start(width,height,reduced,offline);v.get_by_role('button',name='Svela e avvia il tempo',exact=True).click();q.clock.run_for(500)
         v.locator('body').press('i');v.locator('#dialog [data-ammo="sacrificio"]').click();select(v);confirm(v);q.clock.run_for(100)
         assert not v.evaluate('HellscapeUI.game.running');left=v.evaluate('HellscapeUI.game.left()')
@@ -87,7 +87,7 @@ with sync_playwright() as p:
         assert not external;assert v.evaluate('document.documentElement.scrollWidth<=innerWidth')
         q.screenshot(path=str(ART/f'after-{width}-{height}-{offline}.png'));report['checks'].append({'viewport':[width,height],'offline':offline,'reduced':reduced,'timer_pause_resume':'PASS','revealed_tribute':'PASS','restore_no_replay':'PASS'});ctx.close()
     # The last heart is actually removed, including an open-question transition and saved-game compatibility.
-    ctx,q,v,f,_=start(390,844,reduced=True);v.evaluate('HellscapeUI.game.s.groups[HellscapeUI.game.s.owner].damage=2');card(v,'sacrificio');select(v)
+    ctx,q,v,f,_=start(667,375,reduced=True);v.evaluate('HellscapeUI.game.s.groups[HellscapeUI.game.s.owner].damage=2');card(v,'sacrificio');select(v)
     assert 'ELIMINAZIONE' in v.locator('#dialog').inner_text();confirm(v);q.clock.run_for(4500);a=state(v)
     assert a['out'][f['owner']] and a['lives'][f['owner']]==0 and a['scores'][f['owner']]=='1777' and a['owner']!=f['owner']
     v.evaluate('Fool.Game.restore(HellscapeUI.game.snapshot())');report['last_life']='PASS';ctx.close()

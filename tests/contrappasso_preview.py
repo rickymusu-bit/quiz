@@ -65,7 +65,7 @@ with sync_playwright() as p:
         im=Image.open(file);assert im.n_frames==104;total=0
         for j in range(im.n_frames):im.seek(j);total+=im.info['duration']
         assert total==13000;report.update({'viewport':[1024,768],'gif_pixels':[640,480],'duration_ms':13000,'capture_fps':8,'frames':104,'bytes':file.stat().st_size,'sha256':hashlib.sha256(file.read_bytes()).hexdigest()});ctx.close()
-    for width,height,offline,reduced in [(390,844,False,False),(844,390,False,False),(390,844,True,True)]:
+    for width,height,offline,reduced in [(667,375,False,False),(844,390,False,False),(667,375,True,True)]:
         ctx,q,v,f,external=start(width,height,offline,reduced)
         v.evaluate('''()=>{const g=HellscapeUI.game,s=g.s;for(const type of ['karma','aura'])s.groups[s.owner].inventory.push({id:g.uid(),type,target:null,origin:'fixture'});}''')
         if offline:v.evaluate('HellscapeUI.game.s.groups[HellscapeUI.game.s.owner].score=Fool.rational(50)')

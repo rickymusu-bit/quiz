@@ -4,10 +4,10 @@
   const reference = Object.freeze({width:1024, height:768, rasterWidth:768, rasterHeight:576});
   function measure(width, height) {
     const scale = Math.min(width / reference.width, height / reference.height);
-    return {scale, compact:scale < 1,
+    return {scale, compact:scale < 1, landscape:width > height,
       sceneWidth:reference.width * scale, sceneHeight:reference.height * scale};
   }
-  const api = {reference, measure};
+  const api = {reference, measure, portrait:false};
   if (typeof module !== 'undefined') module.exports = api;
   root.FoolLayout = api;
   if (!root.document) return;
@@ -19,10 +19,46 @@
   css.setProperty('--stage-ratio', reference.width + '/' + reference.height);
   css.setProperty('--stage-aspect', String(reference.width / reference.height));
   if (!stage) return; // Standalone asset preview uses only the coordinate contract.
+  const orientation = doc.createElement('dialog');
+  orientation.id = 'orientation-note';
+  orientation.setAttribute('aria-labelledby','orientation-title');
+  orientation.innerHTML = '<div class="orientation-phone" aria-hidden="true">↶</div><h2 id="orientation-title">Ruota lo schermo</h2><p>Hellscape si gioca in orizzontale.</p><p>Ruota il dispositivo o allarga la finestra.<br>Il tempo della partita resta fermo.</p>';
+  orientation.addEventListener('cancel',event=>event.preventDefault());
+  doc.body.append(orientation);
+  let previousFocus = null;
+  function orient() {
+    const portrait = !measure(root.innerWidth,root.innerHeight).landscape;
+    const changed = api.portrait !== portrait;
+    if(changed && portrait)previousFocus=doc.activeElement;
+    api.portrait = portrait;
+    doc.body.classList.toggle('portrait',portrait);
+    stage.inert = portrait;
+    if(portrait) {
+      stage.setAttribute('aria-hidden','true');
+      if(!orientation.open || !orientation.contains(doc.activeElement)) {
+        if(orientation.open)orientation.close();
+        orientation.showModal();
+      }
+    } else {
+      stage.removeAttribute('aria-hidden');
+      if(orientation.open)orientation.close();
+      if(changed && previousFocus?.isConnected && !previousFocus.disabled)previousFocus.focus({preventScroll:true});
+      previousFocus=null;
+    }
+    if(changed)doc.dispatchEvent(new CustomEvent('foolorientation',{detail:{portrait}}));
+  }
+  // Capture before page-specific shortcuts, including those registered earlier.
+  for(const name of ['keydown','click'])doc.addEventListener(name,event=>{
+    if(!measure(root.innerWidth,root.innerHeight).landscape) {
+      event.preventDefault();event.stopImmediatePropagation();
+    }
+  },true);
   let queued = false, wasCinematic = false, wasPlaying = false, wasFinished = false, previousPanel = null;
   let endingComplete = false;
   function fit() {
     queued = false;
+    orient();
+    if(api.portrait)return measure(root.innerWidth,root.innerHeight);
     const viewport = root.visualViewport,
       width = viewport?.width || root.innerWidth,
       height = viewport?.height || root.innerHeight;
@@ -37,8 +73,7 @@
     css.setProperty('--scene-max-height', layout.sceneHeight + 'px');
     stage.style.transform = layout.compact ? 'none' : 'translate(-50%,-50%) scale(' + layout.scale + ')';
     stage.dataset.fitScale = String(layout.compact ? 1 : layout.scale);
-    if (doc.body.classList.contains('portrait')) doc.body.classList.remove('portrait');
-    for (const dialog of doc.querySelectorAll('dialog[open]')) {
+    for (const dialog of doc.querySelectorAll('dialog[open]:not(#orientation-note)')) {
       dialog.style.maxHeight = Math.max(100, height - 24) + 'px';
       dialog.style.maxWidth = Math.max(100, width - 24) + 'px';
       dialog.style.overflow = 'auto';
@@ -48,7 +83,7 @@
       finished = doc.body.classList.contains('finished'),
       panel = stage.querySelector('.operation-body'),
       panelMode = !panel ? null : panel.classList.contains('hidden-question') ? 'hidden' :
-        panel.querySelector('.solution') ? 'result' : 'answer';
+        panel.querySelector('.solution') ? 'result' : panel.querySelector('.resume-question') ? 'paused' : 'answer';
     if (layout.compact && cinematic && !wasCinematic) {
       stage.scrollTop = 0;
       const scene = stage.querySelector('.hell-race');
@@ -82,7 +117,7 @@
   root.fitFoolViewport = fit; // Existing public UI/test hook.
   new MutationObserver(schedule).observe(stage, {childList:true, subtree:true});
   new MutationObserver(schedule).observe(doc.body, {attributes:true, attributeFilter:['class']});
-  root.addEventListener('resize', schedule);
+  root.addEventListener('resize', ()=>{orient();schedule();});
   root.visualViewport?.addEventListener('resize', schedule);
   doc.addEventListener('fullscreenchange', schedule);
   doc.addEventListener('foolendingcomplete', () => { endingComplete = true; schedule(); });

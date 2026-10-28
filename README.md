@@ -1,3 +1,5 @@
+**Si gioca solo in orizzontale.** In verticale ruota il dispositivo: timer e animazioni restano fermi e la partita conserva i progressi.
+
 # Contrappasso · motore 2.8.0 / regole 25.0.0
 
 Stato integrato e accettazione: [verifica finale del 28/10/2026](docs/HELLSCAPE_VERIFICA_FINALE_2026-10-28.md). Le sezioni storiche non prevalgono sulle regole correnti.
@@ -182,7 +184,7 @@ Alla fine delle domande previste **vince il giocatore attivo con più punti**. S
 
 Ogni uso confermato mostra materiali illustrati horror, gotici e junkpunk, ricavati da un atlante raster: Catene serra maglie di ferro corroso con lucchetto a teschio; Tributo muove sacche di monete maledette; Malocchio apre un occhio di carne fra palpebre d'osso; Sigillo chiude una gabbia di ossa e ferraglia; Contrappasso usa uno specchio gotico infranto; Livella raccoglie e ripartisce il tributo con una bilancia d'ossa; Flagello rompe il basalto e fa eruttare fuoco. Gli attacchi bloccati producono schegge sul Sigillo. Le eliminazioni da Flagello vengono animate dopo il colpo collettivo.
 
-Durante gli effetti i pannelli lasciano visibile la corsa e il timer resta fermo; `P` permette la pausa manuale durante una domanda aperta. Con movimento ridotto viene mostrata una posa statica per 450 ms. Le animazioni leggono gli eventi già risolti dal motore: non consumano altre munizioni e non vengono ripetute ricaricando un salvataggio. `npm run test:ammo` controlla desktop, Android verticale e orizzontale; `node tests/ammo_animation.cjs --offline` verifica gli stessi effetti nell'HTML esportato senza rete.
+Durante gli effetti i pannelli lasciano visibile la corsa e il timer resta fermo; `P` permette la pausa manuale durante una domanda aperta. Con movimento ridotto viene mostrata una posa statica per 450 ms. Le animazioni leggono gli eventi già risolti dal motore: non consumano altre munizioni e non vengono ripetute ricaricando un salvataggio. `npm run test:ammo` controlla desktop e schermi Android orizzontali; `node tests/ammo_animation.cjs --offline` verifica gli stessi effetti nell'HTML esportato senza rete.
 
 ## Ultimo Miglio
 
