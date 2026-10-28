@@ -119,6 +119,7 @@
   }
   const reduce = root.matchMedia('(prefers-reduced-motion: reduce)');
   const ammo = root.FoolAmmo?.createTracker();
+  const tie = root.FoolTie?.createTracker();
   let live = null, last = null, clock = new motion.Clock(), clockId = null;
   let visualState = null;
   // Browsers can suspend RAF even for a brief tab switch; discard that gap explicitly.
@@ -460,9 +461,9 @@
       w = source.width * scale, h = source.height * scale;
     c.drawImage(chaseBlend, Math.round(x+(width-w)/2), Math.round(y+height-h), Math.round(w), Math.round(h));
   }
-  function drawChaser(c, travel) {
+  function drawChaser(c, travel, advance = 0) {
     const {left, ground, scale} = motion.CHASE;
-    c.save(); c.translate(left, ground - 134 * scale); c.scale(scale, scale);
+    c.save(); c.translate(left + advance, ground - 134 * scale); c.scale(scale, scale);
     demon(c, travel.roadTime, 40, '#9b2831', 'chase', 0, travel); c.restore();
   }
   function demon(c, tick, x = 32, shade = '#9b2831', mode = 'chase', actionTime = 0, travel = null) {
@@ -538,8 +539,10 @@
     const motion = reduced ? 0 : travel.roadTime;
     background(c, W, motion, progress, reduced ? 0 : travel.time);
     const shot = ammo?.current();
-    if(!shot&&final&&root.FoolEnding&&!imageReady(root.FoolEnding.load(()=>live?.redraw?.()))){endingHelpers(state).demon(c,0);return root.FoolEnding.load(()=>{})?.failed?'done':'loading';}
-    if(!shot&&final&&root.FoolEnding)return root.FoolEnding.render(c,W,state,visualState.plan,reduced?visualState.plan.duration:visualState.elapsed,endingHelpers(state));
+    const tieView=tie?.sample({reduced,captures:visualState?.queue.length>0});
+    const hold=tieView?.holdCapture;
+    if(!hold&&!shot&&final&&root.FoolEnding&&!imageReady(root.FoolEnding.load(()=>live?.redraw?.()))){endingHelpers(state).demon(c,0);return root.FoolEnding.load(()=>{})?.failed?'done':'loading';}
+    if(!hold&&!shot&&final&&root.FoolEnding)return root.FoolEnding.render(c,W,state,visualState.plan,reduced?visualState.plan.duration:visualState.elapsed,endingHelpers(state));
     // Keep a compact chasing pack; paint the current pilot last so its outline stays visible.
     const positions = state.groups.map((g, i) => packPosition(state, i, progress, previous, sec, W));
     const order = state.groups.map((g, i) => i).filter(i => i !== state.respondent);
@@ -547,19 +550,21 @@
     for (const i of order) {
       const group = state.groups[i];
       // A lethal Flagello is shown before its victims are captured.
-      if (group.out && !(shot?.type === 'ira' && shot.targets.includes(i))) continue;
+      const awaitingCapture=hold&&visualState?.queue.some(item=>item.index===i);
+      if (group.out && !awaitingCapture && !(shot?.type === 'ira' && shot.targets.includes(i))) continue;
       const configuredVehicle = state.config.vehicles?.[i] || ['chopper','pickup','ape'][i];
       const visualGroup = { ...group, vehicle: configuredVehicle }, p = positions[i],
         row = Math.max(0, VEHICLES.indexOf(configuredVehicle));
-      if (i === state.respondent)
+      if (i === state.respondent || (tieView?.blocking&&tieView.kind!=='elimination'&&state.tieOrder.includes(i)))
         vehicleOutline(c, row, Math.floor(motion * 10 + i * 2) % 8, p.x, p.y);
       racer(c, p.x, p.y, i, motion, visualGroup, 2);
     }
     if(shot){
-      drawChaser(c, travel);
+      drawChaser(c, travel, (tieView?.strength??0)*10);
       root.FoolAmmo.render(c,W,state,shot,ammo.sample(reduced),positions,reduced);
       return 'ammo';
     }
+    if(hold){drawChaser(c,travel,(tieView?.strength??0)*10);return tieView.blocking?'eliminated':'race';}
     const queue=visualState?.queue||[];
     if(reduced){for(const item of queue)visualState.consumed.add(item.index);queue.length=0;}
     if(queue.length&&root.FoolEnding&&!imageReady(root.FoolEnding.load(()=>live?.redraw?.()))){
@@ -580,13 +585,14 @@
         break;
       }
     }
-    if(!capturing){drawChaser(c, travel);}
-    return queue.length?'capture':'race';
+    if(!capturing){drawChaser(c, travel, (tieView?.strength??0)*10);}
+    return queue.length?'capture':tieView?.blocking?'tie-intro':'race';
   }
 
   function createStage(state, final = false) {
     if (live) root.cancelAnimationFrame(live.frame);
     ammo?.sync(state);
+    tie?.sync(state);
     root.FoolAmmo?.load(()=>live?.redraw?.());
     root.FoolBridge?.load(()=>live?.redraw?.());
     if(root.FoolEnding){syncVisual(state,final);root.FoolEnding.load(()=>live?.redraw?.());}
@@ -625,18 +631,19 @@
     const previous = last.from, tweenStart = last.at;
     const moving = !reduced && clock.time - tweenStart < ADVANCE_SECONDS && previous.some((ratio,i)=>Math.abs(ratio-next[i])>.000001);
     const record = { frame: 0, canvas };
+    const tieLayer=root.FoolTie?.mount(fig,tie,state,()=>record.redraw?.());
     live = record;
     const blocked = () => state.suspended || (state.paused && state.pauseReason !== 'animazione');
-    fig.dataset.animationBusy = String(!blocked() && (!!ammo?.current() || (!reduced && ((final && !visualState?.completed) || visualState?.queue.length > 0 || moving))));
+    fig.dataset.animationBusy = String(!blocked() && (!!tie?.sample().blocking || !!ammo?.current() || (!reduced && ((final && !visualState?.completed) || (!tie?.sample().holdCapture && visualState?.queue.length > 0) || moving))));
     let phase = final ? 'loading' : visualState?.queue.length ? 'capture' : 'race';
     const draw = now => {
       if (live !== record || !canvas.isConnected) return;
       const width = RACE_WIDTH;
       if (canvas.width !== width) canvas.width = width;
       ctx.imageSmoothingEnabled = false;
-      const stop = blocked() || document.hidden;
+      const stop = blocked() || document.hidden || tie?.sample().paused;
       const delta = clock.advance(now, {blocked:stop || (final && visualState?.completed), reduced,
-        target:motion.roadTarget(final, phase)});
+        target:tie?.sample().blocking&&phase!=='capture'?motion.ROAD_SPEED*.35:motion.roadTarget(final, phase)});
       if(ammo?.current()&&!stop)ammo.advance(delta,reduced);
       const shot = ammo?.current();
       fig.dataset.ammo = shot?.type ?? '';
@@ -644,16 +651,27 @@
         ammoStatus.dataset.event = shot?.id ?? '';
         ammoStatus.textContent = shot ? (shot.blocked ? 'Sigillo: attacco bloccato' : root.FoolAmmo.labels[shot.type]) + ' · ' + shot.targets.map(i=>state.groups[i].name).join(', ') : '';
       }
-      if(final&&visualState?.plan&&!shot&&!stop&&imageReady(root.FoolEnding.load(()=>live?.redraw?.())))visualState.elapsed+=delta;
+      tie?.advance(delta,{reduced,captures:visualState?.queue.length>0});
+      if(final&&visualState?.plan&&!shot&&!stop&&!tie?.sample().holdCapture&&imageReady(root.FoolEnding.load(()=>live?.redraw?.())))visualState.elapsed+=delta;
       const elapsed = clock.time - tweenStart;
+      const view=tie?.sample({reduced,captures:visualState?.queue.length>0});
+      const zoom=1+(view?.strength??0)*.015;
+      ctx.save();ctx.translate(width/2,H/2);ctx.scale(zoom,zoom);ctx.translate(-width/2,-H/2);
       phase=scene(ctx, width, state, reduced ? ADVANCE_SECONDS : elapsed, final, previous, reduced, clock.snapshot());
+      ctx.restore();
+      if((final&&phase==='done')||(!final&&!visualState?.queue.length))tie?.completeCapture();
+      if(view?.strength){ctx.fillStyle='rgba(9,5,14,'+(view.strength*.22)+')';ctx.fillRect(0,0,width,H);}
+      const updated=tie?.sample({reduced,captures:visualState?.queue.length>0});
+      if(updated){fig.dataset.tiePhase=updated.phase;tieLayer.update(updated);}
       if(final&&fig.dataset.endingPhase!==phase){fig.dataset.endingPhase=phase;if(phase==='done'&&!visualState.completed){visualState.completed=true;fig.dispatchEvent(new CustomEvent('foolendingcomplete',{bubbles:true}));}}
-      const busy = !blocked() && (phase === 'ammo' || (!reduced && (final ? phase !== 'done' : phase === 'capture' || (moving && elapsed < ADVANCE_SECONDS))));
+      const busy = !!tie?.sample().blocking || (!blocked() && (phase === 'ammo' || (!reduced && (final ? phase !== 'done' : phase === 'capture' || (moving && elapsed < ADVANCE_SECONDS)))));
       if(fig.dataset.animationBusy !== String(busy)) {
         fig.dataset.animationBusy = String(busy);
         fig.dispatchEvent(new CustomEvent('foolanimationchange',{bubbles:true,detail:{busy,phase}}));
       }
-      if (live === record && (ammo?.current() || (!reduced && (!final || phase!=='done')))) record.frame = root.requestAnimationFrame(draw);
+      const complete=tie?.takeCompletion();
+      if(complete)fig.dispatchEvent(new CustomEvent('fooltiecomplete',{bubbles:true,detail:complete}));
+      if (live === record && (tie?.sample().blocking || ammo?.current() || (!reduced && (!final || phase!=='done')))) record.frame = root.requestAnimationFrame(draw);
     };
     record.redraw = () => {
       if (live !== record || !canvas.isConnected) return;
@@ -664,5 +682,8 @@
     return fig;
   }
   root.FoolHellRace = { createStage, vehiclePreview };
+  root.FoolHellRace.beginTie = state => tie?.begin(state) ?? false;
+  root.FoolHellRace.tieStatus = () => tie?.sample() ?? {blocking:false};
+  root.FoolHellRace.pauseTie = () => {tie?.togglePause();live?.redraw?.();};
   root.FoolHellRace.motionSnapshot = () => clock.snapshot();
 })(window);

@@ -41,6 +41,7 @@ npm run test:terrain    # progressione del terreno su desktop e Android
 npm run build           # dist/site, pubblicabile su hosting statico
 npm run test:offline    # genera e verifica dist/Hellscape-offline.html
 npm run test:quality    # audit offline di dieci schermate, cinque viewport, DPR 1/2
+npm run test:ties       # intro, eliminazioni, nuovi giri e ripresa dello spareggio
 npm run test:motion     # locomozione offline, pausa e clock a 30/60/144 FPS
 npm run test:layout     # testo e controlli nativi, 4:3, orientamento e fullscreen
 ```
@@ -67,6 +68,12 @@ usano lo stesso adattamento. Questo intervento precede le nuove cinematiche.
 La [PR A di locomozione](docs/HELLSCAPE_MOTION.md) collega strada, passi e
 polvere allo stesso clock di scena; il pannello di revisione include lo scenario
 **Corsa / locomozione** con domanda non svelata e timer fermo.
+
+La [PR B dello spareggio](docs/HELLSCAPE_TIE.md) introduce finalisti e regole
+solo dopo il comando successivo all’ultimo esito ordinario. Avvisi di eliminazione
+precedono le catture, i nuovi giri hanno un richiamo breve e la prima domanda
+rimane non svelata a timer fermo. Il pannello di revisione offre le introduzioni
+a due/tre giocatori, il nuovo giro e un’eliminazione in pausa.
 
 L’anteprima include home, gioco, regole, entrambi i dataset, script, CSS, immagini e font in **un solo HTML**. Le pagine sono incorporate in un iframe che viene ricreato alla navigazione, così timer ed eventi della pagina precedente vengono chiusi. La chiave delle partite esportate è `hellscape-offline-v1:fool-v1`; quella dei profili è `hellscape-offline-v1:fool-settings-v1`. Non legge o sovrascrive i salvataggi del sito. Il meta `hellscape-revision` e `dist/revision.json` identificano il commit generatore; gli output sono ignorati da Git e vanno rigenerati dopo ogni modifica, senza correggerli a mano.
 
