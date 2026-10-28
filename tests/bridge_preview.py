@@ -6,7 +6,7 @@ from playwright.sync_api import sync_playwright
 from PIL import Image
 from io import BytesIO
 import threading,json,os,subprocess,hashlib
-ROOT=Path(__file__).resolve().parent.parent;ART=ROOT/'artifacts/black-bridge';ART.mkdir(parents=True,exist_ok=True)
+ROOT=Path(__file__).resolve().parent.parent;ART=ROOT/'artifacts/black-bridge-v2';ART.mkdir(parents=True,exist_ok=True)
 class Quiet(SimpleHTTPRequestHandler):
  def log_message(self,*args):pass
 server=ThreadingHTTPServer(('127.0.0.1',0),partial(Quiet,directory=str(ROOT)))
@@ -18,6 +18,23 @@ with sync_playwright() as p:
  page.goto(f'http://127.0.0.1:{server.server_port}/Fool.html?start=1');page.get_by_role('button',name='Inizia partita',exact=False).click()
  page.wait_for_function('FoolBridge.load()?.complete && FoolBridge.load().naturalWidth===2172 && FoolEnding.prepare(FoolEnding.load(()=>{}))!==null')
  page.evaluate('document.fonts.ready');page.clock.install();page.clock.pause_at(page.evaluate('Date.now()+1000'));page.clock.run_for(200)
+ checks=page.evaluate('''()=>{
+  const render=(distance,effectTime)=>{const c=document.createElement('canvas');c.width=768;c.height=576;const ctx=c.getContext('2d');
+   FoolBridge.environment(ctx,768,576,distance/48,effectTime);FoolBridge.draw(ctx,768,distance/48,0,null,effectTime);FoolBridge.front(ctx,768,{distance});return ctx};
+  const first=render(24,.5);let compared=0;
+  for(const [distance,time]of [[72,1.5],[120,4.2]]){
+   const next=render(distance,time);
+   for(const [y,h]of [[350,150],[540,30]]){
+    const a=first.getImageData(160,y,400,h).data,b=next.getImageData(160-(distance-24),y,400,h).data;
+    for(let i=0;i<a.length;i++){if(a[i]!==b[i])throw Error('Lava slides relative to the bridge');compared++}
+   }
+  }
+  const widths=[44,58,62,54,56,40],vehicles=FoolHellRace.presentationSnapshot().frame.positions;
+  for(const v of vehicles){if(Math.abs(v.width-widths[v.row]*.62*2)>1e-9)throw Error('Vehicle is not doubled');
+   if(v.ground<=FoolBridge.TOP||v.ground>=FoolBridge.BOTTOM)throw Error('Tyres are off the deck')}
+  return {world_lock_channels_compared:compared,vehicles:vehicles.map(v=>({row:v.row,width:v.width,height:v.height,ground:v.ground})),vehicle_scale_vs_v1:2};
+ }''')
+ report.update(checks)
  page.screenshot(path=str(ART/'inspection.png'),scale='css')
  state=page.evaluate('JSON.stringify(HellscapeUI.game.snapshot())');start=page.evaluate('FoolHellRace.motionSnapshot()');frames=[]
  for i in range(72):
@@ -36,7 +53,7 @@ with sync_playwright() as p:
  palette=frames[0].quantize(colors=128,method=Image.Quantize.MEDIANCUT)
  encoded=[f.quantize(palette=palette,dither=Image.Dither.NONE) for f in frames]
  durations=[(round((i+1)*100/12)-round(i*100/12))*10 for i in range(72)]
- file=ART/'gameplay-black-bridge.gif';encoded[0].save(file,save_all=True,append_images=encoded[1:],duration=durations,loop=0,disposal=1,optimize=False)
+ file=ART/'gameplay-black-bridge-v2.gif';encoded[0].save(file,save_all=True,append_images=encoded[1:],duration=durations,loop=0,disposal=1,optimize=False)
  gif=Image.open(file);duration=0
  for i in range(gif.n_frames):gif.seek(i);duration+=gif.info.get('duration',0)
  assert gif.n_frames==72 and duration==6000

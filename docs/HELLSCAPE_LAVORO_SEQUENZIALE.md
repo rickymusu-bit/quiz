@@ -13,3 +13,5 @@ Le colonne proposte sono **scartate** e rimosse dall’intervento. La richiesta 
 Le consegne precedenti con soli PNG restano documentazione storica, non sono sufficienti per giudicare le nuove modifiche dinamiche.
 
 Proposta corrente della strada: [ponte nero, concept v1](design/black-stone-bridge/README.md), in attesa di approvazione.
+
+Riscontro sulla prima GIF: eliminare l’effetto del ponte che scivola sulla lava e ingrandire i veicoli almeno del doppio. La seconda verifica usa lava e ponte nello stesso riferimento di camera e veicoli al 200% di larghezza e altezza, con appoggi nelle corsie e ordine di profondità. Le modifiche successive restano in attesa.

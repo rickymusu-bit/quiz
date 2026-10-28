@@ -2,7 +2,7 @@
 (function(root){
   'use strict';
   const motion = typeof module !== 'undefined' ? require('./hell-motion.js') : root.FoolMotion;
-  const TOP=228,BOTTOM=338,GAP=4,RACE_SCALE=.62;
+  const TOP=228,BOTTOM=338,GAP=4,RACE_SCALE=1.24;
   // Oblique deck coordinates: x along travel, depth across the deck, z up.
   // Transverse joints share the same oblique projection.
   const DEPTH=BOTTOM-TOP,SHEAR=.72;
@@ -24,9 +24,9 @@
     return art;
   }
   function grounds(heights){
-    const occupied=heights.reduce((a,b)=>a+b,0)+GAP*(heights.length-1);
-    let y=TOP+(BOTTOM-TOP-occupied)/2;
-    return heights.map(h=>{y+=h;const ground=y;y+=GAP;return ground;});
+    // Lane depth locates tyre contacts, not the top of a tall vehicle.
+    // Bodies can overlap in projection; paint far-to-near instead of shrinking them.
+    return heights.map((_,index)=>TOP+DEPTH*(index+.5)/heights.length);
   }
   function polygon(c,points){c.beginPath();points.forEach((v,i)=>i?c.lineTo(v.x,v.y):c.moveTo(v.x,v.y));c.closePath();}
   function footprint(d,points){return points.map(([x,depth,z=0])=>project(d.anchorX+x,depth,z,d.camera));}
@@ -58,7 +58,9 @@
     const skyCamera={distance:time*motion.ROAD_SPEED*.035};
     for(const tile of tiles(width,skyCamera))texture(c,lake,tile,tile.x,0,TILE,height,0,0,lake.naturalWidth,lake.naturalHeight);
     if(water){
-      const seaCamera={distance:time*motion.ROAD_SPEED*.12+effectTime*5};
+      // Lava and piers share world coordinates. Independent horizontal drift
+      // makes the bridge look as though it is sliding across its foundations.
+      const seaCamera={distance:time*motion.ROAD_SPEED};
       for(const tile of tiles(width,seaCamera))texture(c,water,tile,tile.x,0,TILE,height,0,0,water.width,water.height);
     }
     return true;

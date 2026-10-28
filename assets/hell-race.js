@@ -99,7 +99,7 @@
   }
   function vehicleSize(row, scale = 2) {
     const frame = vehicleRow(row)[0];
-    const width = vehicleWidths[row] * (scale < 2 ? .65 : (root.FoolBridge?.RACE_SCALE ?? .62));
+    const width = vehicleWidths[row] * (scale < 2 ? .65 : (root.FoolBridge?.RACE_SCALE ?? 1.24));
     return { width, height: width * frame.height / frame.width };
   }
   function drawVehicle(c, row, frame, x, ground, scale = 2) {
@@ -114,7 +114,7 @@
     canvas.width=320;canvas.height=180;
     const paint=()=>{const c=canvas.getContext('2d');c.setTransform(2,0,0,2,0,0);c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';c.clearRect(0,0,160,90);const row=Math.max(0,VEHICLES.indexOf(id)),size=vehicleSize(row);
       // One common preview scale retains the same relative sizes as the race.
-      const zoom=1.35/(root.FoolBridge?.RACE_SCALE ?? .62); sprite(c,'vehicles',8,6,row,0,80-size.width*zoom/2,86-size.height*zoom,size.width*zoom,size.height*zoom)};
+      const zoom=1.35/(root.FoolBridge?.RACE_SCALE ?? 1.24); sprite(c,'vehicles',8,6,row,0,80-size.width*zoom/2,86-size.height*zoom,size.width*zoom,size.height*zoom)};
     if(imageReady(sheets.vehicles))paint();else sheets.vehicles?.addEventListener('load',paint,{once:true});
     return canvas;
   }
@@ -581,7 +581,7 @@
     }
     backgroundAt(travel.distance);
     const movement=reduced?0:travel.roadTime;
-    const order=state.groups.map((g,i)=>i).filter(i=>i!==state.respondent);order.push(state.respondent);
+    const order=state.groups.map((g,i)=>i).sort((a,b)=>positions[a].y-positions[b].y);
     for(const i of order){
       const group=state.groups[i],awaitingCapture=hold&&queue.some(q=>q.index===i);
       if(group.out&&!awaitingCapture&&!(shot?.type==='ira'&&shot.targets.includes(i)))continue;
