@@ -26,6 +26,10 @@ Applicare la preferenza «GIF per la dinamica, screenshot per gli stati statici,
 - Il portale di taglio con dettagli dorati e crollo in rocce è approvato («Ok bellissimo. Vai avanti»). La successiva richiesta autorizza la consegna delle regole Ammo: Antisigillo 20%; Sacrificio 5%, −1 vita e +777 punti; Tributo trasferisce il 33% esatto dei punti attuali dell’avversario e chi lo usa rinuncia subito al turno corrente (chiarimento esplicito dell’utente).
 - I dettagli del portale restano dorati: verificare che l’esportazione GIF non li sposti verso l’arancione della lava. Il crollo produce rocce e blocchi di pietra volumetrici, con gravità, piccoli rimbalzi e macerie permanenti; non fogli o ritagli piatti della facciata.
 
+## Regola aggiornata di Malocchio
+
+- La consegna di Sacrificio, Tributo e probabilità è approvata («Ok va bene»). Malocchio ora mostra testo e valore senza alternative; chi risponde bene tiene punti e Ammo, chi sbaglia o lascia scadere il tempo perde il valore della domanda con minimo zero (chiarimento esplicito). La rotazione riparte da chi segue l’utilizzatore, anche dopo il passaggio a un altro gruppo, rispettando Catene ed eliminazioni. Salvare autore e rischio della domanda senza riapplicare esiti già registrati.
+
 ## Refactoring e manutenzione del progetto
 
 Queste istruzioni si applicano a **qualsiasi agente o strumento** che modifichi il repository, inclusi ChatGPT Work, Codex e interventi manuali assistiti. Non dipendono dall'ambiente di sviluppo.

@@ -4,7 +4,7 @@
   const labels = { salta: "CATENE", ruba: "TRIBUTO", svela: "MALOCCHIO",
     aura: "SIGILLO", karma: "CONTRAPPASSO", marx: "LIVELLA", ira: "FLAGELLO", antisigillo: "ANTISIGILLO", sacrificio: "SACRIFICIO" };
   const details = { salta: "Prossimo turno saltato", ruba: "33% dei punti · turno corrente ceduto",
-    svela: "Scelta del destinatario", aura: "Protezione attiva", karma: "Munizione trasformata",
+    svela: "Errore: perde il valore · minimo zero", aura: "Protezione attiva", karma: "Munizione trasformata",
     marx: "Punti divisi in parti uguali", ira: "−1 vita · tutte le Ammo · fino a −666 pt", antisigillo: "Sigillo dissipato · bersaglio vulnerabile", sacrificio: "−1 vita · +777 punti" };
   function plans(events, state) {
     const result = [];
