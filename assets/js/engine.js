@@ -392,7 +392,14 @@
           { type: "aura-block", target, source, ammo: type, turn: s.turn });
         return false;
       }
-      if (type !== "svela") s.effects.push({ id, type, source, target });
+      if (type === "ruba") {
+        const amount = rational(BigInt(g.score.n) * 33n, BigInt(g.score.d) * 100n);
+        g.score = add(g.score, rational(-BigInt(amount.n), BigInt(amount.d)));
+        s.groups[source].score = add(s.groups[source].score, amount);
+        this.log("Tributo: " + s.groups[source].name + " prende il 33% dei punti di " + g.name + " (" + exact(amount) + ")", {
+          type: "tribute-transfer", source, target, amount: clone(amount), turn: s.turn,
+        });
+      } else if (type !== "svela") s.effects.push({ id, type, source, target });
       const karma = g.inventory.find((c) => c.type === "karma");
       if (karma) {
         karma.type = type;
@@ -452,7 +459,7 @@
         need(s.groups[target].aura !== null, "Scegliere un avversario con Sigillo attivo");
       if (copy.type === "svela" && copy.target !== null)
         need(!s.groups[copy.target].out, "Il bersaglio vincolato è eliminato");
-      if (["marx", "ira"].includes(copy.type))
+      if (["marx", "ira", "sacrificio"].includes(copy.type))
         need(target == null, LABELS[copy.type] + " non richiede un bersaglio");
       g.inventory = g.inventory.filter((c) => c.id !== copyId);
       s.usedBonus = true;
@@ -498,6 +505,15 @@
             total: clone(total),
           },
         );
+      } else if (copy.type === "sacrificio") {
+        const source = s.respondent, before = clone(g.score), lives = remainingLives(s, source);
+        g.score = add(g.score, rational(777));
+        g.damage++;
+        this.log("Sacrificio: " + g.name + " perde una vita e riceve 777 punti", {
+          type: "sacrifice", source, target: source, before, after: clone(g.score), livesBefore: lives, livesAfter: lives - 1, turn: s.turn,
+        });
+        if (remainingLives(s, source) === 0) this.eliminate(source, "Sacrificio");
+        this.resolveEliminations();
       } else if (copy.type === "ira") {
         const active = this.active();
         // Resolve the shared hit before checking for a winner: the owner is hit too.
@@ -514,7 +530,25 @@
           type: "divine-wrath", groups: active, losses,
         });
         this.resolveEliminations();
-      } else this.attack(copy.type, s.respondent, target, id);
+      } else {
+        const source = s.respondent;
+        this.attack(copy.type, source, target, id);
+        if (copy.type === "ruba") this.forfeitTurn(source);
+      }
+    }
+    forfeitTurn(source) {
+      const s = this.s;
+      this.stop();
+      // An unseen question can go to the next player. A revealed one is retired.
+      if (s.current) {
+        if (s.seen.includes(s.current.id)) s.cancelled.push(s.current.id);
+        else s.queue.unshift(s.current);
+      }
+      this.log(s.groups[source].name + " rinuncia al turno corrente per Tributo", {
+        type: "turn-forfeited", source, target: source, ammo: "ruba", turn: s.turn,
+      });
+      this.newTurn(source);
+      if (s.suspendAfter) { s.suspended = true; s.suspendAfter = false; }
     }
     pass(target, expected) {
       this.guard();
@@ -571,6 +605,7 @@
         bonus: null,
       };
       if (s.phase === "ordinaria") {
+        // Legacy deferred Tributi are settled once; new attacks transfer immediately.
         const beneficiaries = [
           ...new Set(
             s.effects
@@ -838,7 +873,7 @@
       return s;
     }
     static restore(raw, deps = {}) {
-      const s = clone(raw), legacyDamage = s.version !== VERSION;
+      const s = clone(raw), legacyDamage = ["1.2.0", "2.0.0", "2.1.0", "2.2.0", "2.2.1", "2.3.0"].includes(s.version);
       if (
         s.version === "1.2.0" &&
         s.rules === "18.2.0" &&
@@ -872,6 +907,12 @@
             g.damage = Math.max(g.damage ?? 0, 2 - g.sanctions);
         s.version = VERSION;
         s.rules = RULES;
+      }
+      if (s.version === "2.4.0" && s.rules === "21.0.0") {
+        s.version = VERSION;
+        s.rules = RULES;
+        // Replace the former default; explicit alternative probabilities survive.
+        if (s.config?.bonusWeights?.antisigillo === 30) s.config.bonusWeights.antisigillo = 20;
       }
       if (s.version === VERSION && s.rules === RULES) {
         s.config.bonusWeights = {

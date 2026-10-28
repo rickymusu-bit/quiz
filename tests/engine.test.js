@@ -27,18 +27,7 @@ test('Malocchio bypasses a pending Catene once but the skipped ordinary turn rem
  assert.equal(g.s.valid,3);
  F.Game.restore(g.snapshot());
 });
-test('Two Tributo from one attacker do not grant duplicate shares',()=>{
- const g=game(33,0),[victim,attacker,other]=g.s.order;
- for(const source of [attacker,attacker,other])
-  g.attack('ruba',source,victim,g.uid());
- const points=g.s.config.bases[g.s.current.difficulty];
- reply(g,true);
- const each=F.rational(BigInt(points),3n);
- for(const i of [victim,attacker,other])assert.equal(F.exact(g.s.groups[i].score),F.exact(each));
- F.Game.restore(g.snapshot());
-});
-
-test('Rules and names: Tributo, Livella and no multiplier',()=>{assert.equal(F.RULES,'21.0.0');assert.equal(F.LABELS.ruba,'Tributo');assert.equal(F.LABELS.marx,'Livella');assert.equal(F.TYPES.length,8);assert.equal(F.VERSION,'2.4.0')});
+test('Rules and names: Tributo, Livella and no multiplier',()=>{assert.equal(F.RULES,'22.0.0');assert.equal(F.LABELS.ruba,'Tributo');assert.equal(F.LABELS.marx,'Livella');assert.equal(F.TYPES.length,9);assert.equal(F.VERSION,'2.5.0')});
 test('Six unique junkpunk vehicles and backward-compatible legacy games',()=>{
  const cfg=settings();
  const selected=['ape','chopper','truck'];
@@ -54,7 +43,7 @@ test('Default settings keep 33 questions and Livella at 15 percent',()=>{
  const cfg=settings();delete cfg.questionCount;delete cfg.bonusWeights.marx;
  const validated=F.config(cfg);assert.equal(validated.questionCount,33);
  assert.equal(validated.bonusWeights.marx,15);
- for(const type of F.TYPES.filter(t=>!['marx','ira'].includes(t)))assert.equal(F.DEFAULT_BONUS_WEIGHTS[type],30);
+ for(const type of F.TYPES.filter(t=>!['marx','ira','antisigillo','sacrificio'].includes(t)))assert.equal(F.DEFAULT_BONUS_WEIGHTS[type],30);
 });
 test('Restore an existing 2.1.0 game while retaining chosen probabilities and points',()=>{
  const g=game(33,0);g.s.groups[0].score=F.rational(305);
@@ -93,11 +82,10 @@ test('2.2.0 ordinary saved games restore without resetting their progress',()=>{
 test('3–99 questions: multiples of 3, unique, exact topic quotas',()=>{for(let n=3;n<=99;n+=3){const p=F.prepare(bank,settings(n));assert.equal(p.chosen.length,n);assert.equal(new Set(p.chosen.map(q=>q.id)).size,n);for(const [t,c]of Object.entries(p.config.quotas))assert.equal(p.chosen.filter(q=>q.topic===t).length,c)}});
 test('Invalid counts and probabilities are rejected',()=>{for(const n of [0,1,4,100,102,3.5])assert.throws(()=>F.prepare(bank,settings(n)));for(const v of [-1,101,NaN,'30']){const cfg=settings();cfg.bonusWeights.aura=v;assert.throws(()=>F.prepare(bank,cfg))}});
 test('Base points stay constant when a group answers correctly again',()=>{const g=game(33,0),first=g.s.order[0];let expected=F.rational(0);for(let n=0;n<4;n++){const q=g.s.current;if(g.s.respondent===first)expected=F.add(expected,F.rational(g.s.config.bases[q.difficulty]));reply(g,true);if(n<3)g.next()}assert.equal(F.exact(g.s.groups[first].score),F.exact(expected));assert.equal(g.s.groups[first].streak,undefined)});
-test('Tributo divides only base points',()=>{const g=game(33,0),receiver=g.s.respondent,beneficiary=g.s.order[1],amount=g.s.config.bases[g.s.current.difficulty];g.s.effects.push({id:g.uid(),type:'ruba',source:beneficiary,target:receiver});reply(g,true);assert.equal(F.exact(g.s.groups[receiver].score),F.exact(F.rational(BigInt(amount),2n)));assert.equal(F.exact(g.s.groups[beneficiary].score),F.exact(F.rational(BigInt(amount),2n)))});
 test('Livella redistributes all accumulated points exactly without rounding',()=>{const g=game(33,0);g.s.groups.forEach((team,i)=>team.score=F.rational([101,200,1][i]));const owner=g.s.respondent;const copy={id:g.uid(),type:'marx',target:null,origin:'test'};g.s.groups[owner].inventory.push(copy);g.use(copy.id,null);for(const team of g.s.groups)assert.equal(F.exact(team.score),'302/3');assert.equal(g.s.groups[owner].inventory.length,0);assert(g.s.events.some(e=>e.type==='marx-redistribution'));F.Game.restore(g.snapshot())});
 test('Livella excludes eliminated teams and ignores Sigillo while keeping history',()=>{const g=game(33,0);g.s.groups[0].score=F.rational(101);g.s.groups[1].score=F.rational(200);g.s.groups[2].score=F.rational(999);g.eliminate(2,'Tre sanzioni');g.s.groups[1].aura=g.s.turn;const copy={id:g.uid(),type:'marx',target:null,origin:'test'};g.s.groups[g.s.respondent].inventory.push(copy);g.use(copy.id,null);assert.equal(F.exact(g.s.groups[0].score),'301/2');assert.equal(F.exact(g.s.groups[1].score),'301/2');assert.equal(F.exact(g.s.groups[2].score),'999');assert.equal(g.s.groups[1].aura,g.s.turn);F.Game.restore(g.snapshot())});
 test('Livella awards at 100% and preserved probability is added to previous save formats',()=>{const g=game(33,100);reply(g,true);assert(g.s.result.bonuses.some(b=>b.type==='marx'));const saved=g.snapshot();saved.version='2.0.0';saved.rules='19.0.0';delete saved.config.bonusWeights.marx;const restored=F.Game.restore(saved);assert.equal(restored.s.config.bonusWeights.marx,15);assert.equal(restored.s.version,F.VERSION);assert.equal(restored.s.rules,F.RULES)});
-test('Independent bonus awards',()=>{for(const chance of [0,100]){const g=game(33,chance);reply(g,true);assert.equal(g.s.result.bonuses.length,chance===100?8:0);F.Game.restore(g.snapshot())}});
+test('Independent bonus awards',()=>{for(const chance of [0,100]){const g=game(33,chance);reply(g,true);assert.equal(g.s.result.bonuses.length,chance===100?9:0);F.Game.restore(g.snapshot())}});
 test('At the end of ordinary questions a single score leader wins without a tie',()=>{const g=game(3,0);reply(g,true);g.next();reply(g,false);g.next();reply(g,false);assert.equal(g.s.phase,'conclusa');assert.equal(g.s.winner,g.s.order[0])});
 test('Only the top-score tied groups enter the elimination tie-break',()=>{const cfg=settings(3,0);cfg.bases={facile:100,media:100,difficile:100};const g=game(3,0,'misto',cfg);g.s.groups.forEach(t=>t.damage=2);reply(g,true);g.next();reply(g,true);g.next();reply(g,false);assert.equal(g.s.phase,'pareggio');assert.equal(g.s.tieOrder.length,2);assert.equal(g.s.groups[g.s.order[2]].out,true);g.next();reply(g,false);assert.equal(g.s.phase,'pareggio');g.next();reply(g,true);assert.equal(g.s.phase,'conclusa');assert.equal(g.s.winner,g.s.order[1])});
 test('Last group gets its question even when first two are eliminated',()=>{const g=game(3,0);g.s.groups.forEach(t=>t.damage=2);finishOrdinary(g);assert.equal(g.s.phase,'pareggio');g.next();reply(g,false);assert.equal(g.s.phase,'pareggio');g.next();reply(g,false);assert.equal(g.s.phase,'pareggio');g.next();reply(g,true);assert.equal(g.s.phase,'conclusa');assert.equal(g.s.winner,g.s.order[2])});

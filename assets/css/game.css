@@ -377,3 +377,5 @@ button.ammo-round:focus-visible{outline:2px solid #ffe044;outline-offset:2px}
 .ammo-description{font-size:18px;line-height:1.45}
 
 @media(max-height:500px){.ammo-info .ammo-detail-art{width:48px;height:48px;float:right;margin:0 0 6px 12px}.ammo-info h2{margin:0 0 10px}.ammo-info .ammo-description{font-size:16px;line-height:1.3}.ammo-info p{margin:8px 0}}
+
+.ammo-round[data-ammo="sacrificio"]{background-image:url('../hell-race/sacrificio-v1.png');background-size:contain;background-position:center;image-rendering:auto}

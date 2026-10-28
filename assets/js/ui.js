@@ -966,8 +966,8 @@
   }
   function ammoImpact(s) {
     // Solo gli eventi del turno attuale: nessuna notifica storica ripetuta.
-    const event = [...s.events].reverse().find(e => e.turn === s.turn &&
-      (e.activation || ["aura-block", "karma-trigger", "spoiler-pass", "turn-skipped"].includes(e.type)));
+    const event = [...s.events].reverse().find(e => (e.turn === s.turn || (e.type === "turn-forfeited" && e.turn === s.turn - 1)) &&
+      (e.activation || ["aura-block", "karma-trigger", "spoiler-pass", "turn-skipped", "turn-forfeited"].includes(e.type)));
     if (!event) return null;
     const name = index => s.groups[index]?.name ?? "Giocatore";
     const ammo = event.copy?.type;
@@ -980,10 +980,12 @@
       description = name(event.target) + ": riceve la domanda con Malocchio";
     else if (event.type === "turn-skipped")
       description = name(event.target) + ": turno saltato per Catene";
+    else if (event.type === "turn-forfeited")
+      description = name(event.source) + ": rinuncia al turno corrente per Tributo";
     else if (ammo === "salta")
       description = name(event.target) + ": Catene, salterà il prossimo turno";
     else if (ammo === "ruba")
-      description = name(event.target) + ": Tributo, prossimo guadagno condiviso";
+      description = name(event.source) + ": Tributo, 33% dei punti sottratto; turno ceduto";
     else if (ammo === "svela")
       description = name(event.source) + ": Malocchio, scelta del destinatario";
     else if (ammo === "aura")
@@ -992,6 +994,8 @@
       description = "Tutti: Livella redistribuisce i punti";
     else if (ammo === "ira")
       description = "Tutti: −1 vita, inventari distrutti, fino a −666 punti";
+    else if (ammo === "sacrificio")
+      description = name(event.source) + ": −1 vita, +777 punti";
     else if (ammo === "antisigillo")
       description = name(event.target) + ": Sigillo dissipato, protezione annullata";
     if (!description) return null;
@@ -1033,7 +1037,7 @@
         for (const effect of effects) {
           const label = effect.type === "salta"
             ? "Catene: prossimo turno saltato"
-            : "Tributo: prossimi punti condivisi";
+            : "Tributo pendente: prossimo guadagno condiviso";
           const status = node("span", label, "effect-chip");
           status.title = label + " · da " + s.groups[effect.source].name;
           statuses.append(status);
@@ -2022,6 +2026,11 @@
               " punti ciascuno. I giocatori eliminati restano esclusi.",
           ),
         );
+      } else if (copy.type === "sacrificio") {
+        const i = s.respondent, before = F.remainingLives(s, i), after = before - 1;
+        d.append(node("p", s.groups[i].name + ": " + before + " → " + after +
+          (after === 0 ? " vite · ELIMINAZIONE" : " vite") + " · punti " +
+          F.formatScore(s.groups[i].score) + " → " + F.formatScore(F.add(s.groups[i].score, F.rational(777)))));
       } else if (copy.type === "ira") {
         const affected = node("ul", undefined, "divine-targets");
         for (const i of game.active()) {

@@ -106,3 +106,12 @@ Il renderer non modifica stato, punteggi, vite o inventari. Le regole esistenti
 restano invariate: un solo avversario protetto, una copia consumata, rimozione
 del Sigillo senza danni né Contrappasso. Entrambi i PNG sono incorporati
 anche nelle versioni offline. Il vecchio SVG non referenziato è rimosso.
+
+## Sacrificio — regole 22.0.0
+
+`sacrificio-v1.png` è un PNG RGBA nativo, generato con imagegen e copiato senza
+ritocchi da `exec-403cb37b-4f72-4d25-ae2f-159ce7fbea77.png`: calice di ferro,
+oro antico, osso e cuore cremisi. È usato in inventario, scheda e cinematica,
+e incorporato nell’export offline. La sequenza mostra il calice sopra chi lo
+usa e il costo/ricavo −1 vita, +777 punti. Tributo mostra il trasferimento e
+il costo del turno corrente; le animazioni non modificano lo stato del motore.

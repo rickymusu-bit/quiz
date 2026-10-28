@@ -1,4 +1,19 @@
-# Correzioni v1.3.0 · motore 2.4.0 / regole 21.0.0
+# Aggiornamento Ammo · motore 2.5.0 / regole 22.0.0
+
+La richiesta aggiornata dell’utente prevale sulle specifiche storiche sotto:
+
+- **Antisigillo:** probabilità indipendente predefinita del **20%**.
+- **Sacrificio:** probabilità indipendente del **5%**; chi lo usa perde una vita e riceve **777 punti**, anche se la perdita dell’ultima vita lo elimina. Se sopravvive continua il turno.
+- **Tributo:** trasferisce subito il **33% esatto dei punti attuali** dell’avversario, conservando il totale. Chi lo usa rinuncia subito al turno corrente. Sigillo blocca il furto ma il turno è comunque ceduto; Contrappasso reagisce agli attacchi non bloccati. Nessuna condivisione dei guadagni futuri per i nuovi usi.
+
+Le probabilità restano configurabili e indipendenti. Nove tipi di Ammo in totale.
+Le partite 2.4.0 migrano senza perdere vite, punteggi o avanzamento: il precedente
+default Antisigillo del 30% diventa 20%, Sacrificio mancante riceve il 5%; altre
+probabilità personalizzate restano invariate. Eventuali Tributi già pendenti nei
+salvataggi precedenti si risolvono una sola volta secondo la vecchia regola,
+senza creare effetti retroattivi durante il caricamento.
+
+## Storico: correzioni v1.3.0 · motore 2.4.0 / regole 21.0.0
 
 Consegna aggiornata: GIF reali del browser per animazioni e comportamenti dinamici; screenshot per gli stati statici. Vedi [AGENTS.md](AGENTS.md) e gli [interventi da affrontare uno alla volta](docs/HELLSCAPE_LAVORO_SEQUENZIALE.md).
 

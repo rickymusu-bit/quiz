@@ -2,10 +2,10 @@
 (function (root) {
   "use strict";
   const labels = { salta: "CATENE", ruba: "TRIBUTO", svela: "MALOCCHIO",
-    aura: "SIGILLO", karma: "CONTRAPPASSO", marx: "LIVELLA", ira: "FLAGELLO", antisigillo: "ANTISIGILLO" };
-  const details = { salta: "Prossimo turno saltato", ruba: "Prossimo guadagno condiviso",
+    aura: "SIGILLO", karma: "CONTRAPPASSO", marx: "LIVELLA", ira: "FLAGELLO", antisigillo: "ANTISIGILLO", sacrificio: "SACRIFICIO" };
+  const details = { salta: "Prossimo turno saltato", ruba: "33% dei punti · turno corrente ceduto",
     svela: "Scelta del destinatario", aura: "Protezione attiva", karma: "Munizione trasformata",
-    marx: "Punti divisi in parti uguali", ira: "−1 vita · tutte le Ammo · fino a −666 pt", antisigillo: "Sigillo dissipato · bersaglio vulnerabile" };
+    marx: "Punti divisi in parti uguali", ira: "−1 vita · tutte le Ammo · fino a −666 pt", antisigillo: "Sigillo dissipato · bersaglio vulnerabile", sacrificio: "−1 vita · +777 punti" };
   function plans(events, state) {
     const result = [];
     for (let n = 0; n < events.length; n++) {
@@ -57,8 +57,14 @@
   const mix = (a,b,t) => a+(b-a)*t;
   const ANTI_ASSETS=Object.freeze({icon:"assets/hell-race/antisigillo-icon-v1.png",tool:"assets/hell-race/antisigillo-tool-v1.png"});
   let art = null, antiArt = null, antiTool = null;
+  let sacrificeArt = null;
+  const SACRIFICE_ASSET = "assets/hell-race/sacrificio-v1.png";
   const cells = [[0,0],[1,0],[2,0],[0,1],[1,1],[2,1],[0,2],[1,2],[2,2]];
   function load(redraw=()=>{}) {
+    if(!sacrificeArt&&typeof root.Image==="function"){
+      sacrificeArt=new root.Image();sacrificeArt.src=root.HellscapeOffline?.assets?.[SACRIFICE_ASSET]||SACRIFICE_ASSET;
+      sacrificeArt.addEventListener("load",redraw,{once:true});
+    }
     if(!antiArt&&typeof root.Image==="function"){
       antiArt=new root.Image();const path=ANTI_ASSETS.icon;
       antiArt.src=root.HellscapeOffline?.assets?.[path]||path;antiArt.addEventListener("load",redraw,{once:true});
@@ -156,7 +162,7 @@
     c.save();
     const phase=reduced ? .6 : t,fade=reduced?1:Math.min(1,t*8,(1-t)*8);
     c.globalAlpha=fade;
-    const plaqueX=plan.type==="antisigillo"?width-130:width/2;
+    const plaqueX=["antisigillo","sacrificio"].includes(plan.type)?width-130:width/2;
     // A riveted, sooty plaque shares the same iron and bone palette as the relics.
     c.fillStyle="#100e0de8";c.fillRect(plaqueX-112,62,224,55);
     c.strokeStyle="#65513a";c.lineWidth=2;c.strokeRect(plaqueX-112,62,224,55);
@@ -184,6 +190,13 @@
         const close=reduced?1:Math.min(1,t*4);
         relic(c,0,x,y,size+(1-close)*24,size*.8,turn);
         debris(c,x,y+10,phase,8);
+      } else if(plan.type==="sacrificio") {
+        const pulse=reduced?1:1+Math.sin(t*Math.PI*4)*.035;
+        const rise=reduced?1:smooth(t/.28),size=74*pulse;
+        if(sacrificeArt?.complete&&sacrificeArt.naturalWidth)
+          c.drawImage(sacrificeArt,x-size/2,y-88-(1-rise)*12,size,size);
+        c.font="bold 12px monospace";c.fillStyle="#bc5550";c.fillText("−1 VITA",x-31,y+7);
+        c.fillStyle="#dfc59a";c.fillText("+777 PT",x+36,y+7);
       } else if(plan.type==="ruba") {
         relic(c,6,x,y-24,29,25,turn);
         for(let n=0;n<4;n++){
@@ -217,7 +230,7 @@
     }
     c.restore();
   }
-  function ready(){load();return [art,antiArt,antiTool].every(img=>img?.complete&&img.naturalWidth>0);}
+  function ready(){load();return [art,antiArt,antiTool,sacrificeArt].every(img=>img?.complete&&img.naturalWidth>0);}
   const api = { plans, createTracker, render, labels, load, ready, ANTI_ASSETS, ANTI, antisigilloFrame };
   if (typeof module !== "undefined") module.exports = api;
   else root.FoolAmmo = api;
