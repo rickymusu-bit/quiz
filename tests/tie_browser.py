@@ -23,6 +23,16 @@ with sync_playwright() as p:
   return context,page,page.frames[1]
  def snapshot(f):return f.evaluate('JSON.stringify(HellscapeUI.game.snapshot())')
  def run(page,ms):page.clock.run_for(ms)
+ def motion_preference(page,f,value):
+  page.emulate_media(reduced_motion=value)
+  label='Inizia spareggio' if value=='reduce' else 'Salta introduzione'
+  # The media event rebuilds the stage asynchronously. Observe each rendered
+  # preference before changing it again or focusing one of its controls.
+  for attempt in range(20):
+   run(page,100)
+   if f.evaluate("label=>document.querySelector('[data-tie-action=skip]')?.textContent===label",label):
+    run(page,100);return
+  raise AssertionError('Tie controls did not render motion preference '+value)
  def ordinary(page,f,two=False,unique=False):
   f.evaluate('''({two,unique})=>{const ui=HellscapeUI,g=ui.game;g.s.config.bases={facile:100,media:100,difficile:100};g.s.groups.forEach((v,i)=>v.sanctions=i);ui.changed();
    for(let i=0;i<3;i++){g.reveal();g.answer((unique?i===0:two&&i<2)?g.s.current.correct:(g.s.current.correct+1)%4);ui.changed();if(i<2){g.next();ui.changed();}}}''',{'two':two,'unique':unique})
@@ -117,7 +127,7 @@ with sync_playwright() as p:
  before=snapshot(f);image=f.locator('.hell-race canvas').evaluate('c=>c.toDataURL()');run(page,4000)
  assert snapshot(f)==before and f.locator('.hell-race canvas').evaluate('c=>c.toDataURL()')==image
  page.screenshot(path=str(ART/'intro-reduced.png'))
- page.emulate_media(reduced_motion='no-preference');run(page,100);page.emulate_media(reduced_motion='reduce');run(page,100)
+ motion_preference(page,f,'no-preference');motion_preference(page,f,'reduce')
  f.get_by_role('button',name='Pausa scena',exact=True).focus();page.keyboard.press('Enter');run(page,100);assert f.evaluate('FoolHellRace.tieStatus().paused')
  page.keyboard.press(' ');run(page,100);assert not f.evaluate('FoolHellRace.tieStatus().paused')
  f.get_by_role('button',name='Inizia spareggio',exact=True).focus();page.keyboard.press('Enter');run(page,100);ready(f)
