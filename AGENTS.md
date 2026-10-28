@@ -20,7 +20,7 @@ Applicare la preferenza «GIF per la dinamica, screenshot per gli stati statici,
 ## Direzione grafica e fase di approvazione del ponte
 
 - La coerenza fisica della scena prevale sulla leggibilità costante dei veicoli. Strutture in primo piano possono occluderli: rispettare profondità, prospettiva, ombre, materiali e punti d’appoggio, senza spostare o abbassare gli elementi soltanto per lasciare visibili i mezzi.
-- Ripartire dal progetto della strada: un ponte di metallo e pietra neri sopra un **mare di sangue**, in stile junkpunk, gotico e horror. La richiesta del sangue sostituisce la lava nel progetto corrente. Il sangue è liquido e non incandescente: illuminazione e riflessi devono essere fisicamente coerenti. Le colonne decorative proposte sono scartate.
+- Ripartire dal progetto della strada: un ponte di metallo e pietra neri sopra un mare di lava, in stile junkpunk, gotico e horror. Le colonne decorative proposte sono scartate.
 - In questa fase presentare il nuovo progetto del ponte come proposta grafica chiaramente distinta dal gioco implementato. Attendere l’approvazione dell’utente della strada prima di riprendere integrazione e modifiche successive.
 
 ## Refactoring e manutenzione del progetto
