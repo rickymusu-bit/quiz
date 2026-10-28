@@ -19,7 +19,7 @@
           ? (shared?.groups ?? state.groups.map((g, i) => g.out ? null : i).filter(i => i !== null))
           : [Number.isInteger(e.target) ? e.target : e.source];
         result.push({ id: e.id, type: e.copy.type, source: e.source, targets,
-          blocked: !!block, duration: e.copy.type === "ira" ? 2.25 : 1.8 });
+          blocked: !!block, duration: e.copy.type === "antisigillo" ? 2.6 : e.copy.type === "ira" ? 2.25 : 1.8 });
       } else if (e.type === "karma-trigger") {
         result.push({ id: e.id, type: "karma", source: e.source, targets: [e.target],
           detail: "Nuova Ammo: " + labels[e.ammo], duration: 1.5 });
@@ -55,12 +55,17 @@
     };
   }
   const mix = (a,b,t) => a+(b-a)*t;
-  let art = null, antiArt = null;
+  const ANTI_ASSETS=Object.freeze({icon:"assets/hell-race/antisigillo-icon-v1.png",tool:"assets/hell-race/antisigillo-tool-v1.png"});
+  let art = null, antiArt = null, antiTool = null;
   const cells = [[0,0],[1,0],[2,0],[0,1],[1,1],[2,1],[0,2],[1,2],[2,2]];
   function load(redraw=()=>{}) {
     if(!antiArt&&typeof root.Image==="function"){
-      antiArt=new root.Image();const path="assets/antisigillo.svg";
+      antiArt=new root.Image();const path=ANTI_ASSETS.icon;
       antiArt.src=root.HellscapeOffline?.assets?.[path]||path;antiArt.addEventListener("load",redraw,{once:true});
+    }
+    if(!antiTool&&typeof root.Image==="function"){
+      antiTool=new root.Image();antiTool.src=root.HellscapeOffline?.assets?.[ANTI_ASSETS.tool]||ANTI_ASSETS.tool;
+      antiTool.addEventListener("load",redraw,{once:true});
     }
     if (!art && typeof root.Image === "function") {
       art = new root.Image();
@@ -85,20 +90,83 @@
       c.fillStyle=bone?"#b7a078":n%3?"#71402a":"#db6b26";c.fillRect(px-2,py-2,3,2);
     }
   }
+  const clamp01=n=>Math.max(0,Math.min(1,n));
+  const smooth=n=>{n=clamp01(n);return n*n*(3-2*n)};
+  const ANTI=Object.freeze({flight:.14,contact:.40,break:.48,clear:.90,tip:{x:.12,y:.94}});
+  function antisigilloFrame(t,source,target,reduced=false){
+    t=clamp01(t);
+    const size=Math.max(58,(target.width??36)+26),height=size*.94;
+    const center={x:target.x,y:target.y-(target.height??25)/2};
+    const contact={x:center.x+size*.13,y:center.y-height*.43},toolSize=Math.min(76,Math.max(52,size*.72));
+    const minTipY=126+toolSize*ANTI.tip.y;
+    const start={x:source.x-12,y:Math.max(minTipY,source.y-(source.height??25)-10)};
+    const q=smooth((t-ANTI.flight)/(ANTI.contact-ANTI.flight)),v=1-q;
+    const approach={x:v*v*v*start.x+3*v*v*q*(start.x+25)+3*v*q*q*(contact.x+18)+q*q*q*contact.x,
+      y:v*v*v*start.y+3*v*v*q*minTipY+3*v*q*q*minTipY+q*q*q*contact.y};
+    const strike=smooth((t-ANTI.contact)/(ANTI.break-ANTI.contact));
+    const fracture=clamp01((t-ANTI.break)/(.90-ANTI.break)),drop=fracture*fracture*33;
+    const toolTip=t<ANTI.contact?approach:{x:contact.x-5*strike,y:contact.y+6*strike};
+    const phase=reduced?"dissipated":t<ANTI.flight?"protected":t<ANTI.contact?"approach":t<ANTI.break?"contact":t<ANTI.clear?"fracture":"dissipated";
+    return {phase,center,contact,size,height,toolSize,toolTip,
+      toolAngle:t<ANTI.contact?-.18*(1-q):-.12*strike,
+      toolAlpha:smooth((t-.07)/.10)*(1-smooth((t-.65)/.18)),
+      protectionAlpha:1-smooth((t-.72)/.18),separation:fracture*size*.36,drop,
+      leftAngle:-fracture*.55,rightAngle:fracture*.62,
+      impact:smooth((t-ANTI.contact)/.015)*(1-smooth((t-ANTI.break)/.07)),fracture};
+  }
+  function sealHalf(c,f,side){
+    const broken=f.fracture>0,split=f.separation*(side<0?-1:1),angle=side<0?f.leftAngle:f.rightAngle;
+    c.save();c.translate(f.center.x+split,f.center.y+f.drop);c.rotate(angle);c.globalAlpha*=f.protectionAlpha;
+    if(broken){
+      const seam=[[.02,-.55],[-.035,-.32],[.045,-.12],[-.025,.10],[.04,.31],[-.02,.55]];
+      const points=side<0?[[-.6,-.55],...seam,[-.6,.55]]:[[.6,-.55],...seam,[.6,.55]];
+      c.beginPath();points.forEach(([x,y],i)=>i?c.lineTo(x*f.size,y*f.height):c.moveTo(x*f.size,y*f.height));c.closePath();c.clip();
+    }
+    relic(c,1,0,0,f.size,f.height);relic(c,3,0,0,f.size*.96,f.height*.98);c.restore();
+  }
+  function renderAntisigillo(c,t,source,target,reduced){
+    const f=antisigilloFrame(t,source,target,reduced);
+    if(reduced){
+      if(antiArt?.complete&&antiArt.naturalWidth)c.drawImage(antiArt,f.center.x-34,f.center.y-78,68,68);
+      return;
+    }
+    if(f.fracture>0){sealHalf(c,f,-1);sealHalf(c,f,1);}else sealHalf(c,f,0);
+    if(f.impact>0){
+      c.save();c.globalAlpha*=f.impact*.8;c.strokeStyle="#cad6bd";c.lineWidth=1.5;c.beginPath();
+      c.moveTo(f.center.x+2,f.center.y-f.height*.44);c.lineTo(f.center.x-3,f.center.y-f.height*.2);
+      c.lineTo(f.center.x+4,f.center.y);c.lineTo(f.center.x-2,f.center.y+f.height*.4);c.stroke();c.restore();
+    }
+    if(antiTool?.complete&&antiTool.naturalWidth&&f.toolAlpha>0){
+      c.save();c.globalAlpha*=f.toolAlpha;c.translate(f.toolTip.x,f.toolTip.y);c.rotate(f.toolAngle);
+      c.drawImage(antiTool,-ANTI.tip.x*f.toolSize,-ANTI.tip.y*f.toolSize,f.toolSize,f.toolSize);c.restore();
+    }
+    if(f.fracture>0&&f.fracture<1){
+      for(let i=0;i<8;i++){
+        const age=f.fracture,side=i%2?1:-1,x=f.center.x+side*(5+age*(16+i*2)),y=f.center.y-f.height*.3+age*(i%3*7)-Math.sin(age*Math.PI)*(7+i%4*3);
+        c.save();c.globalAlpha*=1-age;c.translate(x,y);c.rotate(side*age*(1+i*.2));c.fillStyle=i%3?"#c7ba9c":"#666358";
+        c.beginPath();c.moveTo(-2,-2);c.lineTo(2.5,-1);c.lineTo(1.8,2.5);c.lineTo(-2,1);c.closePath();c.fill();c.restore();
+      }
+    }
+    if(t>.82){
+      c.save();c.globalAlpha*=smooth((t-.82)/.10);c.fillStyle="#d0c8b0";c.font="bold 10px monospace";c.textAlign="center";
+      c.fillText("SIGILLO DISSIPATO",f.center.x,target.y+14);c.restore();
+    }
+  }
   function render(c,width,state,plan,t,positions,reduced=false) {
     c.save();
     const phase=reduced ? .6 : t,fade=reduced?1:Math.min(1,t*8,(1-t)*8);
     c.globalAlpha=fade;
+    const plaqueX=plan.type==="antisigillo"?width-130:width/2;
     // A riveted, sooty plaque shares the same iron and bone palette as the relics.
-    c.fillStyle="#100e0de8";c.fillRect(width/2-112,62,224,55);
-    c.strokeStyle="#65513a";c.lineWidth=2;c.strokeRect(width/2-112,62,224,55);
-    for(const dx of [-107,107])for(const y of [67,112]){c.fillStyle="#897054";c.fillRect(width/2+dx-1,y-1,3,3);}
+    c.fillStyle="#100e0de8";c.fillRect(plaqueX-112,62,224,55);
+    c.strokeStyle="#65513a";c.lineWidth=2;c.strokeRect(plaqueX-112,62,224,55);
+    for(const dx of [-107,107])for(const y of [67,112]){c.fillStyle="#897054";c.fillRect(plaqueX+dx-1,y-1,3,3);}
     c.textAlign="center";c.font="bold 16px monospace";c.fillStyle="#dfc59a";
-    c.fillText(plan.blocked?"SIGILLO · BLOCCATO":labels[plan.type],width/2,82);
+    c.fillText(plan.blocked?"SIGILLO · BLOCCATO":labels[plan.type],plaqueX,82);
     c.font="10px monospace";c.fillStyle="#bbab91";
-    c.fillText(plan.targets.map(i=>state.groups[i]?.name??"").join(" · "),width/2,98,208);
+    c.fillText(plan.targets.map(i=>state.groups[i]?.name??"").join(" · "),plaqueX,98,208);
     c.font="9px monospace";c.fillStyle="#c6814c";
-    c.fillText(plan.blocked?"Attacco neutralizzato":plan.detail??details[plan.type],width/2,111,208);
+    c.fillText(plan.blocked?"Attacco neutralizzato":plan.detail??details[plan.type],plaqueX,111,208);
     const source=positions[plan.source]??positions[plan.targets[0]];
     for(const index of plan.targets) {
       const p=positions[index];if(!p)continue;
@@ -111,8 +179,7 @@
         relic(c,3,x,y-(1-build)*26,size+5,size*.91,-turn/2);
         if(plan.blocked)debris(c,x-size*.4,y,phase,4);
       } else if(plan.type==="antisigillo") {
-        if(antiArt?.complete&&antiArt.naturalWidth)c.drawImage(antiArt,x-size/2,y-size/2,size,size);
-        debris(c,x,y,phase,19,true);
+        renderAntisigillo(c,phase,source,p,reduced);
       } else if(plan.type==="salta") {
         const close=reduced?1:Math.min(1,t*4);
         relic(c,0,x,y,size+(1-close)*24,size*.8,turn);
@@ -150,7 +217,8 @@
     }
     c.restore();
   }
-  const api = { plans, createTracker, render, labels, load };
+  function ready(){load();return [art,antiArt,antiTool].every(img=>img?.complete&&img.naturalWidth>0);}
+  const api = { plans, createTracker, render, labels, load, ready, ANTI_ASSETS, ANTI, antisigilloFrame };
   if (typeof module !== "undefined") module.exports = api;
   else root.FoolAmmo = api;
 })(globalThis);

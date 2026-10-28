@@ -5,7 +5,7 @@ const F=require('../assets/js/core.js'),root=path.join(__dirname,'..');
 const cells={salta:[0,0],ruba:[0,2],svela:[1,1],aura:[0,1],karma:[2,1],marx:[1,2],ira:[2,2]};
 (async()=>{
  const atlas=await loadImage(path.join(root,'assets/hell-race/ammo-relics-v1.webp'));
- const anti=await loadImage(path.join(root,'assets/antisigillo.svg'));
+ const anti=await loadImage(path.join(root,'assets/hell-race/antisigillo-icon-v1.png'));
  assert(atlas.width/3>=400&&atlas.height/3>=390,'Native icon cells support 88px at DPR 3');
  const css=fs.readFileSync(path.join(root,'assets/css/game.css'),'utf8'),signatures=new Set();
  const out=createCanvas(1024,256),c=out.getContext('2d');c.fillStyle='#111015';c.fillRect(0,0,1024,256);
@@ -20,5 +20,5 @@ const cells={salta:[0,0],ruba:[0,2],svela:[1,1],aura:[0,1],karma:[2,1],marx:[1,2
   c.font='bold 12px monospace';c.fillStyle='#dfc59a';c.fillText(F.LABELS[type],16+i*126,200,120);
  }
  assert.equal(signatures.size,8);fs.mkdirSync(path.join(root,'artifacts'),{recursive:true});fs.writeFileSync(path.join(root,'artifacts/hellscape-ammo-icons.png'),out.toBuffer('image/png'));
- console.log('PASS: eight distinct 48px artifacts, native 400px+ relic cells and vector Antisigillo');
+ console.log('PASS: eight distinct 48px artifacts, native 400px+ relic cells and illustrated Antisigillo');
 })().catch(e=>{console.error(e);process.exitCode=1});
