@@ -84,7 +84,14 @@
       card.append(controls);
       layer.replaceChildren(card);
       if(control)layer.querySelector('[data-tie-action='+control+']')?.focus({preventScroll:true});
-      else if(first&&view.phase!=='capture'){layer.dataset.focusKey=focusKey;root.requestAnimationFrame(()=>{if(heading.isConnected)heading.focus({preventScroll:true});});}
+      else if(first&&view.phase!=='capture') {
+        layer.dataset.focusKey=focusKey;
+        root.requestAnimationFrame(()=>{
+          // A user may select a control before the scheduled title focus runs.
+          if(heading.isConnected&&!document.activeElement?.closest('.tie-controls'))
+            heading.focus({preventScroll:true});
+        });
+      }
     }
     return {update};
   }
