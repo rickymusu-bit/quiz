@@ -1,59 +1,9 @@
 /* Hellscape cinematic: visual timing only. Never writes to game state. */
 (function (root) {
   "use strict";
-  const CAPTURE = 5.2,
-    ESCAPE = 2.2,
-    REACTION = 3.2;
-  const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x)),
-    ease = (x) => {
-      x = clamp(x);
-      return x * x * (3 - 2 * x);
-    },
-    lerp = (a, b, t) => a + (b - a) * t;
-  function plan(state, consumed = [], pending = []) {
-    const eaten = new Set(consumed),
-      winner = state.winner;
-    const victims = [
-      ...new Set([
-        ...pending,
-        ...state.groups
-          .map((g, i) => (!g.out && i !== winner ? i : null))
-          .filter((i) => i !== null),
-      ]),
-    ].filter((i) => i !== winner && !eaten.has(i));
-    if (winner === null && !victims.length && !eaten.has(state.respondent))
-      victims.push(state.respondent);
-    const captureEnd = victims.length * CAPTURE,
-      reactionStart = captureEnd + (winner === null ? 0 : ESCAPE);
-    return {
-      winner,
-      victims,
-      captureEnd,
-      reactionStart,
-      duration: captureEnd + (winner === null ? REACTION : 8.4),
-    };
-  }
-  function sample(p, time) {
-    const t = Math.max(0, time);
-    if (t < p.captureEnd) {
-      const slot = Math.floor(t / CAPTURE);
-      return {
-        phase: "capture",
-        victim: p.victims[slot],
-        local: t - slot * CAPTURE,
-        slot,
-      };
-    }
-    const elapsed = t - p.captureEnd;
-    if (p.winner !== null) {
-      if (elapsed < 0.55) return { phase: "rise", local: elapsed };
-      if (elapsed < 2.2) return { phase: "escape", local: elapsed - 0.55 };
-      if (elapsed < 2.95) return { phase: "roar", local: elapsed - 2.2 };
-      if (elapsed < 4.8) return { phase: "fire", local: elapsed - 2.95 };
-      if (elapsed < 8.4) return { phase: "rage", local: elapsed - 4.8 };
-    } else if (t < p.duration) return { phase: "dance", local: elapsed };
-    return { phase: "done", local: p.winner === null ? REACTION : 3.6 };
-  }
+  const C=typeof module!=="undefined"?require('./hell-chase.js'):root.FoolChase;
+  const CAPTURE=C.T.capture,plan=C.plan,sample=C.sample,captureAction=C.captureAction;
+  const ease=C.ease,lerp=C.lerp;
   // Coordinates in the generated source atlas, mapped into normalized frames.
   const anchors = [
     [405, 205, 311, 122],
@@ -224,40 +174,7 @@
     const point = (p) => ({ x: x + p.x * zoom, y: y + p.y * zoom });
     return { hand: point(f.hand), mouth: point(f.mouth), top: y };
   }
-  const captureAction = (t) =>
-    t < 0.5
-      ? "reach"
-      : t < 0.9
-        ? "grip"
-        : t < 1.75
-          ? "lift"
-          : t < 2.45
-            ? "swallow"
-            : t < 3.4
-              ? "chew"
-              : t < 4.95
-                ? "fire"
-                : "recover";
-  const captureFrame = (t) =>
-    t < 0.5
-      ? 0
-      : t < 0.9
-        ? 1
-        : t < 1.3
-          ? 2
-          : t < 1.75
-            ? 3
-            : t < 2.45
-              ? 4
-              : t < 3.4
-                ? Math.floor(t * 8) % 2
-                  ? 6
-                  : 7
-                : t < 3.7
-                  ? 9
-                  : t < 4.9
-                    ? 10
-                    : 11;
+  const captureFrame=t=>C.capturePose(t).reduce((a,b)=>a.weight>b.weight?a:b).frame;
   function fireBreath(
     c,
     origin,
@@ -360,53 +277,58 @@
     }
     c.restore();
   }
-  function capture(c, W, state, index, t, helpers) {
-    const ground = 332,
-      row = helpers.vehicleIndex(state, index),
-      size = helpers.vehicleSize(row),
-      pose = actor(c, captureFrame(t), W * 0.12, ground);
-    if (!pose) {
-      helpers.demon(c, 0);
-      return;
-    }
-    if (t < 2.45) {
-      const feeding = ease((t - 1.85) / 0.6),
-        p = {
-          x: lerp(pose.hand.x, pose.mouth.x, feeding),
-          y: lerp(pose.hand.y, pose.mouth.y, feeding),
-        };
-      let zoom = 0.88 * (1 - feeding * 0.7),
-        tilt = lerp(-0.12, -0.65, feeding);
-      if (t < 0.5) {
-        const reach = ease(t / 0.5);
-        p.x = lerp(W * 0.575, pose.hand.x, reach);
-        p.y = lerp(ground - size.height / 2, pose.hand.y, reach);
-        zoom = lerp(1, 0.88, reach);
-      }
-      c.save();
-      c.translate(p.x, p.y);
-      c.rotate(tilt);
-      c.scale(zoom, zoom);
-      // Entire vehicle passes into the fire-filled jaws; no abandoned wreck.
-      if (feeding > 0.05) {
-        c.beginPath();
-        c.rect(
-          -size.width / 2,
-          -size.height / 2,
-          size.width * (1 - feeding),
-          size.height,
-        );
-        c.clip();
-      }
-      helpers.drawVehicle(c, row, 0, 0, size.height / 2);
-      c.restore();
-      if (t >= 0.5 && t < 1.9) {
-        c.fillStyle = "#221b1a";
-        for (let j = 0; j < 3; j++)
-          c.fillRect(Math.round(p.x - 6 + j * 5), Math.round(p.y - 3), 2, 7);
-      }
-    }
-    fireBreath(c, pose.mouth, t - 3.65);
+  function poseMetrics() {
+    const frames=prepare(art);
+    if(!frames)return null;
+    return frames.map(f=>({height:f.canvas.height/f.canvas.width,
+      hand:{x:f.hand.x/f.canvas.width,y:f.hand.y/f.canvas.width},
+      mouth:{x:f.mouth.x/f.canvas.width,y:f.mouth.y/f.canvas.width}}));
+  }
+  let actorBuffer=null;
+  function paintActor(c,W,demon,h,travel) {
+    const frames=prepare(art);if(!frames)return h.demon?.(c,0);
+    if(!actorBuffer){actorBuffer=document.createElement('canvas');actorBuffer.height=384;}
+    if(actorBuffer.width!==W)actorBuffer.width=W;
+    const work=actorBuffer.getContext('2d');work.clearRect(0,0,W,384);work.save();work.globalCompositeOperation='lighter';
+    const run=Math.max(0,Math.min(1,demon.runWeight??0));
+    for(const p of demon.pose){work.globalAlpha=p.weight*(1-run);const frame=frames[p.frame].canvas,scale=demon.width/frame.width;
+      work.drawImage(frame,Math.round(demon.left),Math.round(demon.ground-frame.height*scale),Math.round(demon.width),Math.round(frame.height*scale));}
+    if(run){work.globalAlpha=run;if(h.chaser)h.chaser(work,demon,travel);else actor(work,8,demon.left,demon.ground,demon.width);}
+    work.restore();c.drawImage(actorBuffer,0,0);
+  }
+  function paintVehicle(c,state,v,h,travel) {
+    if(v.visible===false)return;
+    c.save();
+    if(v.clip!==undefined){c.beginPath();c.rect(v.clip,0,1024,384);c.clip();}
+    c.translate(v.x,v.ground-v.height/2);c.rotate(v.rotation||0);
+    h.drawVehicle(c,v.row,Math.floor((travel?.roadTime??0)*10+v.index*2)%8,0,v.height/2);
+    c.restore();
+  }
+  function paintPart(c,W,demon,h,travel,point,width,height){
+    c.save();c.beginPath();c.rect(point.x-width/2,point.y-height/2,width,height);c.clip();paintActor(c,W,demon,h,travel);c.restore();
+  }
+  function paintFrame(c,W,state,f,h){
+    const travel=h.travelFor?.(f.time,f.demon.worldDistance)??{time:f.time,distance:f.demon.worldDistance,roadTime:f.demon.worldDistance/48,footfalls:[]};
+    const held=f.victim!==undefined&&(f.touching||f.action==='swallow');
+    const cars=f.positions.filter(v=>v.visible!==false&&!(held&&v.index===f.victim));
+    for(const v of cars.filter(v=>v.ground<=f.demon.ground))paintVehicle(c,state,v,h,travel);
+    h.runDust?.(c,f.demon,travel);
+    paintActor(c,W,f.demon,h,travel);
+    if(held){const v=f.positions[f.victim];paintVehicle(c,state,v,h,travel);
+      if(f.touching)paintPart(c,W,f.demon,h,travel,f.anchors.hand,Math.min(9,v.width*.32),Math.min(12,v.height*.5));
+      else if(f.swallowing)paintPart(c,W,f.demon,h,travel,f.anchors.mouth,7,v.height+5);}
+    for(const v of cars.filter(v=>v.ground>f.demon.ground))paintVehicle(c,state,v,h,travel);
+    if(f.flameAge!==null&&f.flameAge!==undefined)fireBreath(c,f.anchors.mouth,f.flameAge,undefined,1.2);
+    h.onFrame?.(f,travel);return f;
+  }
+  function capturePlan(entry,index){return C.captureRoute(entry,index,poseMetrics());}
+  function renderCapture(c,W,state,route,time,h){return paintFrame(c,W,state,C.captureFrame(route,time),h);}
+  // Public single-capture entry point; normal play supplies its actual previous frame.
+  const standaloneCaptures=new WeakMap();
+  function capture(c,W,state,index,t,h){
+    let routes=standaloneCaptures.get(state);if(!routes){routes=new Map();standaloneCaptures.set(state,routes);}
+    if(!routes.has(index))routes.set(index,capturePlan(h.entry??C.defaultEntry(state,h),index));
+    return renderCapture(c,W,state,routes.get(index),t,h);
   }
   function portalMotion(time) {
     return {
@@ -454,106 +376,45 @@
       c.restore();
     }
   }
-  function render(c, W, state, p, time, h) {
-    const s = sample(p, time),
-      ground = 332,
-      winner = p.winner,
-      seq = Math.max(0, time - p.captureEnd);
-    if (s.phase === "capture") {
-      if (winner !== null)
-        h.drawVehicle(
-          c,
-          h.vehicleIndex(state, winner),
-          Math.floor(time * 10) % 8,
-          W * 0.72,
-          ground,
-        );
-      capture(c, W, state, s.victim, s.local, h);
-      return s.phase;
-    }
-    if (winner !== null) {
-      drawPortal(c, W, seq, ground, h);
-      // Exactly one configured vehicle can enter: the declared winner.
-      if (seq < 2.2) {
-        const center = lerp(W * 0.72, W + 45, ease((seq - 0.55) / 1.5));
-        c.save();
-        c.beginPath();
-        c.rect(0, 0, W - 55, 384);
-        c.clip();
-        h.drawVehicle(
-          c,
-          h.vehicleIndex(state, winner),
-          Math.floor(time * 10) % 8,
-          center,
-          ground,
-        );
-        c.restore();
+  const sceneRoutes=new WeakMap();
+  function resolve(p,state,h){
+    if(!sceneRoutes.has(p))sceneRoutes.set(p,C.prepare(p,p.entry??h.entry??C.defaultEntry(state,h),poseMetrics()));
+    return sceneRoutes.get(p);
+  }
+  function frame(p,state,time,h={}){return C.frame(resolve(p,state,h),time);}
+  function render(c,W,state,p,time,h){
+    const route=resolve(p,state,h),f=C.frame(route,time),s=sample(p,time),seq=Math.max(0,time-p.chaseEnd);
+    if(['lineup','capture','winner-chase'].includes(s.phase)){paintFrame(c,W,state,f,h);return s.phase;}
+    const d=f.demon,ground=d.ground,winner=p.winner;
+    if(winner!==null){
+      drawPortal(c,W,seq,332,h);
+      if(seq<2.2){
+        const v=f.positions[winner],center=v.x;v.ground=route.ground;
+        c.save();c.beginPath();c.rect(0,0,W-55,384);c.clip();
+        h.drawVehicle(c,h.vehicleIndex(state,winner),Math.floor(time*10)%8,center,route.ground);c.restore();
+      }else f.positions[winner].visible=false;
+      if(s.phase==='rise'||s.phase==='escape'){
+        d.pose=C.pose(8);d.runWeight=1;
+      }else if(s.phase==='roar'){
+        d.runWeight=1-ease(s.local/.6);d.pose=C.mixPoses(C.pose(8),C.pose(10),ease(s.local/.6));
+      }else if(s.phase==='fire'){
+        d.runWeight=0;d.pose=C.pose(0);
+      }else{
+        const motion=s.phase==='done'?{frame:7,lift:0,impact:0,cycle:1.1}:rageMotion(s.local);
+        d.runWeight=0;d.pose=C.pose(motion.frame);d.ground=ground-motion.lift*d.width/260;
+        if(s.phase==='rage'&&motion.impact>0){c.save();c.translate(0,ground-133);h.demonDust(c,d.left+60,time,'attack',Math.max(-1,motion.cycle-.42));c.restore();}
       }
-      const x = lerp(W * 0.12, W * 0.22, ease((seq - 2.2) / 0.6));
-      if (s.phase === "rise" || s.phase === "escape") actor(c, 8, x, ground);
-      else if (s.phase === "roar")
-        actor(c, s.local < 0.15 ? 8 : s.local < 0.4 ? 9 : 10, x, ground);
-      else if (s.phase === "fire") {
-        const pose = actor(c, 0, x, ground),
-          portal = portalMotion(seq);
-        if (pose && portal.visible)
-          fireBreath(
-            c,
-            pose.mouth,
-            s.local,
-            { x: W - 55, y: ground - Math.max(3, (190 - portal.offset) * 0.5) },
-            1.85,
-          );
-      } else {
-        const motion =
-          s.phase === "done"
-            ? { frame: 7, lift: 0, impact: 0, cycle: 1.1 }
-            : rageMotion(s.local);
-        const pose = actor(c, motion.frame, x, ground - motion.lift);
-        if (pose && s.phase === "rage") {
-          c.save();
-          c.translate(0, ground - 133);
-          h.demonDust(
-            c,
-            pose.hand.x - 76,
-            time,
-            "attack",
-            Math.max(-1, motion.cycle - 0.42),
-          );
-          c.restore();
-          if (motion.impact > 0) {
-            c.save();
-            c.globalAlpha = motion.impact * 0.65;
-            c.fillStyle = "#9b7552";
-            for (let j = 0; j < 8; j++) {
-              const side = j % 2 ? -1 : 1;
-              c.fillRect(
-                Math.round(
-                  pose.hand.x + side * (5 + j * 3) * (1 - motion.impact),
-                ),
-                Math.round(ground - 3 - (j % 3) * motion.impact * 5),
-                2 + (j % 2),
-                2,
-              );
-            }
-            c.restore();
-          }
-        }
-      }
-    } else {
-      const frame =
-          s.phase === "done" ? 15 : 12 + (Math.floor(s.local * 5) % 4),
-        bounce =
-          s.phase === "done"
-            ? 0
-            : Math.abs(Math.sin(s.local * Math.PI * 5)) * 7;
-      actor(
-        c,
-        frame,
-        lerp(W * 0.12, W * 0.3, ease(s.local / 0.6)),
-        ground - bounce,
-      );
-      if (s.phase === "dance") h.demonDust(c, W * 0.3, time, "chase", 0);
+      d.worldDistance=f.camera.distance+d.left-8;
+      const travel=h.travelFor?.(f.time,d.worldDistance);
+      if(d.runWeight)h.runDust?.(c,d,travel);paintActor(c,W,d,h,travel);
+      if(s.phase==='fire'){const mouth=C.actorPoints(d,poseMetrics()).mouth,portal=portalMotion(seq);
+        if(portal.visible)fireBreath(c,mouth,s.local,{x:W-55,y:332-Math.max(3,(190-portal.offset)*.5)},1.85);}
+      h.onFrame?.(f,travel);
+    }else{
+      const index=s.phase==='done'?15:12+Math.floor(s.local*5)%4;
+      d.pose=C.mixPoses(d.pose,C.pose(index),ease(s.local/.4));d.runWeight=(d.runWeight??1)*(1-ease(s.local/.4));
+      d.ground=ground-(s.phase==='done'?0:Math.abs(Math.sin(s.local*Math.PI*5))*7);
+      const travel=h.travelFor?.(f.time,d.worldDistance);paintActor(c,W,d,h,travel);h.onFrame?.(f,travel);
     }
     return s.phase;
   }
@@ -569,6 +430,10 @@
     load,
     prepare,
     actor,
+    poseMetrics,
+    capturePlan,
+    renderCapture,
+    frame,
     capture,
     render,
   };

@@ -20,7 +20,8 @@ Il sito funziona direttamente come archivio statico, senza compilazione obbligat
 - `assets/js/ui.js`: configurazione, impostazioni, schermate, dialoghi, comandi e adattamento del palco. Lo stato dell’interfaccia è racchiuso nel modulo; `HellscapeUI` è la facciata esplicita usata dalle regressioni browser.
 - `assets/css/game.css` e `assets/hellscape.css`: stili di base estratti e stili della grafica esistente, nello stesso ordine di cascata. `assets/home.css` contiene la schermata iniziale illustrata.
 - `assets/hell-terrain.js`: basalto continuo, degradazione per domande completate, ossa, teschi umani e demoniaci, rottami di veicoli e geyser di lava, senza corsie visibili.
-- `assets/hell-ending.js`: timeline e pose per presa, inghiottimento del veicolo, fiammata, portale, ruggito e danza, senza modificare il modello.
+- `assets/hell-chase.js`: traiettorie pure di mondo/telecamera, fila e catture ancorate alle pose; usa la geometria condivisa del ponte.
+- `assets/hell-ending.js`: composizione delle pose, occlusioni e rendering di catture, inseguimento ed epilogo, senza modificare il modello.
 - `assets/hell-ammo.js`: timeline degli eventi Ammo ed effetti Canvas sui veicoli; conserva la coda visiva fra i ridisegni e ignora gli eventi storici alla ripresa di un salvataggio.
 - `assets/hell-race.js`: componente Canvas separato; legge lo stato senza applicare transizioni al motore.
 - `assets/vendor/katex.js` e `katex.css`: KaTeX 0.16.22 e font incorporati estratti senza riscrittura; licenza in `assets/vendor/README.md` e nell’HTML.
@@ -42,6 +43,7 @@ npm run build           # dist/site, pubblicabile su hosting statico
 npm run test:offline    # genera e verifica dist/Hellscape-offline.html
 npm run test:quality    # audit offline di dieci schermate, cinque viewport, DPR 1/2
 npm run test:ties       # intro, eliminazioni, nuovi giri e ripresa dello spareggio
+npm run test:chase      # fila, ancoraggi, catture e inseguimento offline, cinque viewport a DPR 1/2
 npm run test:motion     # locomozione offline, pausa e clock a 30/60/144 FPS
 npm run test:layout     # testo e controlli nativi, 4:3, orientamento e fullscreen
 ```
@@ -75,6 +77,13 @@ precedono le catture, i nuovi giri hanno un richiamo breve e la prima domanda
 rimane non svelata a timer fermo. Il pannello di revisione offre le introduzioni
 a due/tre giocatori, il nuovo giro e un’eliminazione in pausa.
 
+La [PR C di inseguimento e catture](docs/HELLSCAPE_CHASE.md) parte dalle posizioni
+realmente mostrate, dispone i mezzi in fila e cattura prima il perdente arretrato.
+Il veicolo segue mano e bocca senza cambiare scala; strada e passi derivano dalle
+coordinate del mondo. Dopo le catture il demone recupera sul vincitore. L'export
+include filmati con zero, uno o due perdenti e fotogrammi di fila, presa e bocca.
+Il portale monumentale e il nuovo epilogo restano nella PR D.
+
 L’anteprima include home, gioco, regole, entrambi i dataset, script, CSS, immagini e font in **un solo HTML**. Le pagine sono incorporate in un iframe che viene ricreato alla navigazione, così timer ed eventi della pagina precedente vengono chiusi. La chiave delle partite esportate è `hellscape-offline-v1:fool-v1`; quella dei profili è `hellscape-offline-v1:fool-settings-v1`. Non legge o sovrascrive i salvataggi del sito. Il meta `hellscape-revision` e `dist/revision.json` identificano il commit generatore; gli output sono ignorati da Git e vanno rigenerati dopo ogni modifica, senza correggerli a mano.
 
 `tests/offline.py` carica gli esatti byte dell’HTML in un contesto Chromium senza rete, controlla entrambe le banche, risposte, regole, ripresa, isolamento dei salvataggi, assenza di richieste esterne ed errori JavaScript a 1440×900, 390×844 e 844×390. Il browser gestito di questa sessione blocca gli URL `file://`: il test usa una sola risposta locale intercettata per fornire il documento e non certifica l’apertura diretta da file in quel browser. Gli screenshot vengono scritti in `artifacts/`.
@@ -103,7 +112,7 @@ Le domande dello spareggio sono estratte fra **tutte quelle nuove del dataset**,
 
 ## Fuga dall'Inferno — scena animata v1.5.0
 
-Durante il quiz la scena occupa l’intero palco fisso 4:3 (1024×768): tre piloti su veicoli junkpunk/dieselpunk attraversano un paesaggio di lava inseguiti da un demone horror. Lo sfondo scorre autonomamente; quando i punti cambiano, i veicoli avanzano e possono superarsi. Le posizioni sono una rappresentazione visiva dei punteggi esatti, anche razionali dopo Livella, **non un punteggio parallelo**. I veicoli dei giocatori eliminati vengono afferrati e inghiottiti dal demone, seguiti da una fiammata verso l’alto.
+Durante il quiz la scena occupa l’intero palco fisso 4:3 (1024×768): tre piloti su veicoli junkpunk/dieselpunk attraversano un paesaggio di lava inseguiti da un demone horror. Lo sfondo scorre autonomamente; quando i punti cambiano, i veicoli avanzano e possono superarsi. Le posizioni sono una rappresentazione visiva dei punteggi esatti, anche razionali dopo Livella, **non un punteggio parallelo**. I veicoli dei giocatori eliminati vengono afferrati e inghiottiti dal demone. La fiammata verso l’alto precede la danza nel Game Over.
 
 Il portale emerge dal terreno quando il vincitore è l’unico veicolo rimasto: lo attraversa, poi il varco sprofonda. Il demone ruggisce, spara un getto di fuoco verso il portale ancora in discesa e, quando è sparito, salta e batte i pugni a terra. Se il motore decreta una vittoria per punteggio lasciando altri giocatori attivi, il demone li rimuove prima di aprire il portale. Con Game Over inghiotte l’ultimo mezzo, sputa fuoco e fa una danza di vittoria. I giocatori già mangiati durante la partita non ricompaiono. I finali anticipati per eliminazione funzionano senza attendere l’ultima domanda.
 

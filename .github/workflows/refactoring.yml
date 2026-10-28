@@ -30,6 +30,7 @@ jobs:
           echo "CHROMIUM_PATH=$browser_path" >> "$GITHUB_ENV"
       - run: npm test
       - run: npm run test:frames
+      - run: npm run test:chase
       - run: npm run test:ties
       - run: npm run test:motion
       - run: npm run test:layout
@@ -53,3 +54,4 @@ jobs:
             artifacts/layout/
             artifacts/motion/
             artifacts/tie/
+            artifacts/chase/

@@ -7,7 +7,7 @@ from functools import partial
 from playwright.sync_api import sync_playwright,expect
 from PIL import Image
 from io import BytesIO
-import os,threading,json,sys,base64
+import os,threading,json,sys,base64,math
 ROOT=Path(__file__).resolve().parent.parent;ART=ROOT/'artifacts';ART.mkdir(exist_ok=True)
 class Quiet(SimpleHTTPRequestHandler):
  def log_message(self,*args):pass
@@ -25,8 +25,8 @@ with sync_playwright() as p:
  def raw(page):return page.locator('.hell-race-final canvas').evaluate('c=>c.toDataURL()')
  for winner,name in [(0,'escape-roar'),(None,'eat-fire-dance')]:
   page=start();finish(page,winner);before=page.evaluate('JSON.stringify(HellscapeUI.game.snapshot())');frames=[];phase_set=set()
-  duration=8.7 if winner==0 else 8.6
-  for step in range(round(duration*10)):
+  page.clock.run_for(100);duration=page.evaluate('FoolHellRace.presentationSnapshot().plan.duration')+.3
+  for step in range(math.ceil(duration*10)):
    page.clock.run_for(100);phase=page.locator('.hell-race-final').get_attribute('data-ending-phase');phase_set.add(phase)
    if '--gifs' in sys.argv:
     image=Image.open(BytesIO(base64.b64decode(raw(page).split(',')[1]))).convert('RGB');frames.append(image)
@@ -56,7 +56,7 @@ with sync_playwright() as p:
   page=start(True);finish(page,winner);page.clock.run_for(200);assert page.locator('.hell-race-final').get_attribute('data-ending-phase')=='done';a=raw(page);page.clock.run_for(500);assert raw(page)==a;expect(page.locator('.final-title')).to_be_visible();page.close()
  for width,height in [(390,844),(844,390)]:
   for winner in [0,None]:
-   page=start(viewport={'width':width,'height':height});finish(page,winner);page.clock.run_for(9000)
+   page=start(viewport={'width':width,'height':height});finish(page,winner);page.clock.run_for(100);page.clock.run_for(math.ceil(page.evaluate('FoolHellRace.presentationSnapshot().plan.duration')*1000)+200)
    assert page.locator('.hell-race-final').get_attribute('data-ending-phase')=='done'
    assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+1 && document.documentElement.scrollHeight<=innerHeight+1')
    page.screenshot(path=str(ART/f'ending-{width}x{height}-{"win" if winner==0 else "over"}.png'));page.close()

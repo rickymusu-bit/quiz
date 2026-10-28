@@ -102,7 +102,7 @@ assert(!selected||[...types,...modes,'reload'].includes(selected),'Unknown Ammo 
         if(mode==='shield')assert.match(await view.locator('.ammo-status').textContent(),/bloccato/);
         if(mode==='lethal')assert.equal(await view.locator('.hell-race').getAttribute('data-ending-phase'),'ammo');
         await page.screenshot({path:`artifacts/ammo-motion-${mode}${offline?'-offline':''}.png`});
-        await page.clock.runFor(mode==='lethal'?21000:3000);
+        await page.clock.runFor(mode==='lethal'?Math.ceil((await view.evaluate('FoolHellRace.presentationSnapshot().plan.duration')+3)*1000):3000);
         assert.equal(await view.locator('.hell-race').getAttribute('data-ammo'),'');
         if(mode==='lethal')assert.equal(await view.locator('.hell-race').getAttribute('data-ending-phase'),'done');
       }

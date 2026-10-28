@@ -11,19 +11,19 @@ test("Only survivor uses a rising portal before roar, fire and ground-pounding r
   const s = state(2, [true, true, false]),
     p = E.plan(s, [0, 1]);
   assert.deepEqual(p.victims, []);
-  assert.equal(E.sample(p, 0).phase, "rise");
-  assert.equal(E.sample(p, 0.8).phase, "escape");
-  assert.equal(E.sample(p, 2.4).phase, "roar");
-  assert.equal(E.sample(p, 3.4).phase, "fire");
-  assert.equal(E.sample(p, 5.1).phase, "rage");
+  assert.equal(E.sample(p, 0).phase, "lineup");
+  assert.equal(E.sample(p, p.chaseEnd + 0.8).phase, "escape");
+  assert.equal(E.sample(p, p.chaseEnd + 2.4).phase, "roar");
+  assert.equal(E.sample(p, p.chaseEnd + 3.4).phase, "fire");
+  assert.equal(E.sample(p, p.chaseEnd + 5.1).phase, "rage");
   assert.equal(E.sample(p, p.duration).phase, "done");
 });
 test("Score victory removes remaining opponents before opening the portal", () => {
   const p = E.plan(state());
   assert.deepEqual(p.victims, [1, 2]);
-  assert.equal(E.sample(p, 0).victim, 1);
-  assert.equal(E.sample(p, E.CAPTURE + 0.1).victim, 2);
-  assert.equal(E.sample(p, p.captureEnd + 0.1).phase, "rise");
+  assert.equal(E.sample(p, p.lineupEnd).victim, 1);
+  assert.equal(E.sample(p, p.lineupEnd + E.CAPTURE + 0.1).victim, 2);
+  assert.equal(E.sample(p, p.captureEnd + 0.1).phase, "winner-chase");
   assert.equal(E.sample(p, p.reactionStart + 0.1).phase, "roar");
 });
 test("Game Over eats only the last player and then dances without a portal", () => {
@@ -49,12 +49,12 @@ test("Planning and animation sampling preserve the authoritative state", () => {
   assert.equal(E.sample(p, 0).phase, E.sample(p, 0).phase);
 });
 
-test("Vehicle is swallowed and chewed before the upward fire breath", () => {
-  assert.equal(E.captureAction(0.7), "grip");
+test("Vehicle stays gripped through the lift, disappears inside the mouth and recovers", () => {
+  assert.equal(E.captureAction(1), "grip");
   assert.equal(E.captureAction(1.4), "lift");
-  assert.equal(E.captureAction(2.1), "swallow");
-  assert.equal(E.captureAction(2.8), "chew");
-  assert.equal(E.captureAction(4), "fire");
+  assert.equal(E.captureAction(2.7), "swallow");
+  assert.equal(E.captureAction(3.3), "chew");
+  assert.equal(E.captureAction(4), "recover");
   assert.equal(E.captureAction(5.1), "recover");
 });
 

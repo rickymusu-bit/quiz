@@ -1,6 +1,6 @@
 'use strict';
 const {createCanvas,loadImage}=require('@napi-rs/canvas'),vm=require('node:vm'),fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
-(async()=>{const root={};vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../assets/hell-ending.js'),'utf8'),{globalThis:root,document:{createElement:()=>createCanvas(1,1)}});
+(async()=>{const root={FoolChase:require('../assets/hell-chase.js')};vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../assets/hell-ending.js'),'utf8'),{globalThis:root,document:{createElement:()=>createCanvas(1,1)}});
  const image=await loadImage(path.join(__dirname,'../assets/hell-race/demon-ending-v1.webp')),frames=root.FoolEnding.prepare(image);
  assert.equal(frames.length,16);const board=createCanvas(frames[0].canvas.width*4,frames[0].canvas.height*4),ctx=board.getContext('2d');ctx.fillStyle='#171514';ctx.fillRect(0,0,board.width,board.height);
  frames.forEach((f,index)=>{const {width,height}=f.canvas,raw=f.canvas.getContext('2d').getImageData(0,0,width,height).data;let left=width,right=0,top=height,bottom=0,count=0;
