@@ -621,6 +621,7 @@
       const mix = smooth((clock.time-last.at)/ADVANCE_SECONDS);
       last = {key:state.id, x:next, from:last.x.map((ratio,i)=>last.from[i]+(ratio-last.from[i])*mix), at:clock.time};
     }
+    if (reduced) last.from = next; // A static score update is already visually complete.
     const previous = last.from, tweenStart = last.at;
     const moving = !reduced && clock.time - tweenStart < ADVANCE_SECONDS && previous.some((ratio,i)=>Math.abs(ratio-next[i])>.000001);
     const record = { frame: 0, canvas };
