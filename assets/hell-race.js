@@ -121,6 +121,8 @@
   const ammo = root.FoolAmmo?.createTracker();
   let live = null, last = null, clock = new motion.Clock(), clockId = null;
   let visualState = null;
+  // Browsers can suspend RAF even for a brief tab switch; discard that gap explicitly.
+  document.addEventListener?.('visibilitychange', () => clock.rebase(performance.now()));
   function syncVisual(state, final) {
     if (!visualState || visualState.id !== state.id) {
       const consumed = state.groups.map((g,i)=>g.out&&!(final&&state.winner===null&&i===state.respondent)?i:null).filter(i=>i!==null);

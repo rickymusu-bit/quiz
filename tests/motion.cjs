@@ -25,6 +25,7 @@ for(const options of [{blocked:true},{reduced:true},{}]) {
 }
 c.advance(c.last+100);near(c.time,.2);near(c.distance,ROAD_SPEED*.2);
 const travel=c.distance;const t=c.time;near(c.advance(c.last+100,{reduced:true}),.1);near(c.time,t+.1);near(c.distance,travel);
+const active=c.time;c.rebase(c.last+60000);c.advance(c.last+100);near(c.time,active+.1);near(c.distance,travel+ROAD_SPEED*.1);
 assert.equal(gait(0).frame,gait(STRIDE).frame);
 near(gait(STRIDE/8).mix,.5);assert.equal(gait(STRIDE/4).frame,gait(0).next);
 assert(roadTarget(false,'capture')<roadTarget(false,'race'));
