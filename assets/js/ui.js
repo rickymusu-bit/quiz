@@ -1184,8 +1184,15 @@
       }
     }
   }
+  function pauseCinematic(){
+    if(FoolHellRace.tieStatus().blocking){FoolHellRace.pauseTie();return;}
+    if(game?.s.screen==='answer'&&game.s.pauseReason==='animazione'){
+      cinematicPause=null;game.s.pauseReason='manuale';changed();
+    }else FoolHellRace.pauseScene();
+  }
   function gameStage(state, final = false) {
     const stage = FoolHellRace.createStage(state, final);
+    stage.addEventListener("foolscenepause",()=>{if(stage.isConnected)pauseCinematic();});
     stage.addEventListener("fooltiecomplete", event => {
       if(!stage.isConnected || game.s.id!==event.detail.id || game.s.result?.id!==event.detail.result)return;
       advanceQuestion(game.s.revision);
@@ -2380,14 +2387,10 @@
       return;
     if (cinematicActive()) {
       const key = event.key.toLowerCase();
-      if(target?.closest(".tie-controls") && ["enter"," "].includes(key)){if(event.repeat)event.preventDefault();return;}
-      if(key==='p' && FoolHellRace.tieStatus().blocking){
-        event.preventDefault();if(!event.repeat)FoolHellRace.pauseTie();
-      } else if (key === "p" && game?.s.screen === "answer" && game.s.pauseReason === "animazione") {
-        event.preventDefault();
-        cinematicPause = null;
-        game.s.pauseReason = "manuale";
-        changed();
+      if(target?.closest(".tie-controls,.scene-controls") && ["enter"," "].includes(key)){if(event.repeat)event.preventDefault();return;}
+      if(key==='p'&&(FoolHellRace.tieStatus().blocking||FoolHellRace.canPauseScene()||
+          (game?.s.screen==='answer'&&game.s.pauseReason==='animazione'))){
+        event.preventDefault();if(!event.repeat)pauseCinematic();
       } else if (["enter", " ", "a", "b", "c", "d", "i", "s", "v", "l", "o", "arrowleft", "f1", "?"].includes(key))
         event.preventDefault();
       return;

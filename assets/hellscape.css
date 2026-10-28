@@ -24,7 +24,7 @@ main.operational>.hell-race canvas,main.final-screen .hell-race canvas{width:100
 #viewport-stage main.operational>.movement-cue[data-outcome=incorrect]{color:#ff735c;border-color:#bb392c}
 @keyframes outcome-flash{50%{filter:brightness(1.4)}}
 @media(prefers-reduced-motion:reduce){#viewport-stage main.operational>.movement-cue{animation:none}}
-#viewport-stage main.final-screen .ending{height:100%;position:relative;isolation:isolate;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:20px;background:none}#viewport-stage .ending .final-answer{max-width:800px;background:#130d0bd9;padding:12px;font-size:16px}#viewport-stage .ending .game-options{background:#130d0be8;padding:6px}.ending .final-title{margin:0}.ending .end-wordmark{max-height:110px}
+#viewport-stage main.final-screen .ending{width:100%;height:100%;position:relative;isolation:isolate;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:20px;background:none}#viewport-stage .ending .final-answer{max-width:800px;background:#130d0bd9;padding:12px;font-size:16px}#viewport-stage .ending .game-options{background:#130d0be8;padding:6px}.ending .final-title{margin:0}.ending .end-wordmark{max-height:110px}
 dialog .scoreboard{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}dialog .team{background:#1b1714;padding:12px}dialog{overscroll-behavior:contain}dialog button{min-height:44px}
 /* Keep the question and all four alternatives above the explanation. */
 #viewport-stage .operation-body .solution{max-height:none;overflow:visible;margin:12px 0 10px}

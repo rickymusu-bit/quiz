@@ -3,7 +3,7 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 from PIL import Image, ImageDraw
 from io import BytesIO
-import os, json, base64, subprocess
+import os, json, base64, subprocess, math
 ROOT=Path(__file__).resolve().parent.parent
 ART=ROOT/'artifacts/motion';ART.mkdir(parents=True,exist_ok=True)
 HTML=(ROOT/'dist/Hellscape-review.html').read_text()
@@ -23,6 +23,16 @@ with sync_playwright() as p:
   state=lambda:f.evaluate('JSON.stringify(HellscapeUI.game.snapshot())')
   snapshot=lambda:f.evaluate('FoolHellRace.motionSnapshot()')
   raw=lambda:f.locator('.hell-race canvas').evaluate('c=>c.toDataURL()')
+  def motion_preference(value):
+   page.emulate_media(reduced_motion=value)
+   mode='reduced' if value=='reduce' else 'full'
+   # CDP acknowledges the setting before the native media event necessarily
+   # rebuilds the stage. Wait for the rendered scene to adopt the preference.
+   for attempt in range(20):
+    page.clock.run_for(100)
+    if f.locator('.hell-race').get_attribute('data-motion')==mode:
+     page.clock.run_for(100);return
+   raise AssertionError('Scene did not adopt motion preference '+value)
   before=state();initial=snapshot();frames=[]
   for step in range(24):
    page.clock.run_for(100);image=Image.open(BytesIO(base64.b64decode(raw().split(',')[1]))).convert('RGB');frames.append(image)
@@ -51,10 +61,11 @@ with sync_playwright() as p:
    page.clock.run_for(100)
   if width==1366 and not reduced:
    f.evaluate("()=>{HellscapeUI.game.setScore(0,Fool.rational(300));HellscapeUI.changed()}");page.clock.run_for(100)
-   page.emulate_media(reduced_motion='reduce');f.evaluate('HellscapeUI.changed()');page.clock.run_for(100)
+   motion_preference('reduce')
    static=raw();distance=snapshot()['distance'];page.clock.run_for(200)
-   assert raw()==static and snapshot()['distance']==distance,'Switching to reduced motion freezes existing footfall dust too'
-   page.emulate_media(reduced_motion='no-preference');f.evaluate('HellscapeUI.changed()')
+   assert snapshot()['distance']==distance,'Reduced motion freezes road travel'
+   assert raw()==static,'Switching to reduced motion freezes existing footfall dust too'
+   motion_preference('no-preference')
    assert f.locator('.hell-race').get_attribute('data-animation-busy')=='false','A static score update must not rewind after motion is restored'
    page.clock.run_for(100)
    f.evaluate("()=>{HellscapeUI.game.setScore(0,Fool.rational(600));HellscapeUI.changed()}")
@@ -64,7 +75,9 @@ with sync_playwright() as p:
    f.evaluate('HellscapeUI.changed()')
    assert f.locator('.hell-race').get_attribute('data-animation-busy')=='false','Completed tween must never block a later render'
    f.evaluate("()=>{const g=HellscapeUI.game;g.eliminate(1,'test');g.eliminate(2,'test');g.s.id+='-ending';g.complete(0);window.__completions=0;document.addEventListener('foolendingcomplete',()=>__completions++);HellscapeUI.changed()}")
-   page.clock.run_for(8700)
+   page.clock.run_for(100)
+   duration=f.evaluate('FoolHellRace.presentationSnapshot().plan.duration')
+   page.clock.run_for(math.ceil(duration*1000)+200)
    assert f.evaluate('__completions')==1
    f.evaluate('HellscapeUI.changed()');page.clock.run_for(100)
    assert f.evaluate('__completions')==1,'A completed final emits its event once across renders'

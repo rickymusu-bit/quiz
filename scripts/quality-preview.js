@@ -11,7 +11,7 @@
   tools.append(summary);
   const status = document.createElement('p');
   status.setAttribute('role', 'status');
-  status.textContent = 'Anteprima di revisione: locomozione e spareggio. Il nuovo inseguimento finale e il portale sono previsti nelle prossime PR.';
+  status.textContent = 'Anteprima di revisione: locomozione, spareggio e inseguimento. Il nuovo portale e il nuovo epilogo sono previsti nella prossima PR.';
   const waitFor = async test => {
     const deadline = performance.now() + 15000;
     while (!test()) {
@@ -24,7 +24,7 @@
     HellscapePreview.navigate(route);
     await loaded;
   }
-  let rendererDocument = null, endingRender = null, scenarioSerial = 0;
+  let rendererDocument = null, endingRender = null, endingFrame = null, scenarioSerial = 0;
   async function show(scenario) {
     tools.open = false;
     if (scenario === 'home') { await navigate('index.html'); return; }
@@ -40,8 +40,9 @@
     await waitFor(() => w.HellscapeUI?.game);
     const ui = w.HellscapeUI, F = w.Fool;
     ui.game.stop();
-    if (rendererDocument !== d) { rendererDocument = d; endingRender = w.FoolEnding.render; }
+    if (rendererDocument !== d) { rendererDocument = d; endingRender = w.FoolEnding.render; endingFrame = w.FoolEnding.frame; }
     w.FoolEnding.render = endingRender;
+    w.FoolEnding.frame = endingFrame;
     const config = JSON.parse(JSON.stringify(ui.game.s.config));
     config.questionCount = 3;
     Object.keys(config.quotas).forEach(key => config.quotas[key] = 0);
@@ -50,7 +51,19 @@
     ui.game = F.Game.start(F.prepare(ui.game.s.bank, config, () => .25), {random:() => .25});
     const game = ui.game;
     game.s.id += "-review-" + (++scenarioSerial);
-    if (['intro-spareggio','intro-due','giro-spareggio','eliminazione-spareggio'].includes(scenario)) {
+    if(['inseguimento-2','inseguimento-1','inseguimento-0','fila-finale','presa-finale','bocca-finale'].includes(scenario)){
+      game.s.groups.forEach((g,i)=>g.score=F.rational([1000,600,200][i]));
+      if(scenario==='inseguimento-1')game.eliminate(2,'Già divorato nello scenario');
+      if(scenario==='inseguimento-0'){game.eliminate(1,'Già divorato nello scenario');game.eliminate(2,'Già divorato nello scenario');}
+      ui.changed();await new Promise(resolve=>w.requestAnimationFrame(resolve));
+      if(['fila-finale','presa-finale','bocca-finale'].includes(scenario)){
+        const at=p=>p.lineupEnd+(scenario==='fila-finale'?0:scenario==='presa-finale'?1.05:2.75);
+        const render=w.FoolEnding.render,frame=w.FoolEnding.frame;
+        w.FoolEnding.frame=(...args)=>{args[2]=at(args[0]);return frame(...args)};
+        w.FoolEnding.render=(...args)=>{args[4]=at(args[3]);return render(...args)};
+      }
+      game.complete(0);
+    } else if (['intro-spareggio','intro-due','giro-spareggio','eliminazione-spareggio'].includes(scenario)) {
       game.s.config.bases = {facile:100,media:100,difficile:100};
       ui.changed();
       for(let i=0;i<3;i++){
@@ -86,9 +99,10 @@
         game.complete(0);
       }
       if (scenario === 'portale') {
-        const render = w.FoolEnding.render;
+        const render = w.FoolEnding.render, sampleFrame=w.FoolEnding.frame;
+        w.FoolEnding.frame=(...args)=>{args[2]=args[0].chaseEnd+.6;return sampleFrame(...args)};
         w.FoolEnding.render = (...args) => {
-          args[4] = args[3].captureEnd + .6;
+          args[4] = args[3].chaseEnd + .6;
           return render(...args);
         };
       }
@@ -104,7 +118,7 @@
     await d.fonts.ready;
   }
   let busy = false;
-  for (const [key, label] of Object.entries({home:'Home',selezione:'Veicoli',quiz:'Domanda / Ammo',corsa:'Corsa / locomozione',ultima:'Ultimo esito',spareggio:'Primo turno spareggio','intro-spareggio':'Intro spareggio (3)','intro-due':'Intro spareggio (2)','giro-spareggio':'Nuovo giro','eliminazione-spareggio':'Eliminazione (in pausa)',portale:'Portale attuale',vittoria:'Finale attuale',gameover:'Game Over',regole:'Regole'})) {
+  for (const [key, label] of Object.entries({home:'Home',selezione:'Veicoli',quiz:'Domanda / Ammo',corsa:'Corsa / locomozione',ultima:'Ultimo esito',spareggio:'Primo turno spareggio','intro-spareggio':'Intro spareggio (3)','intro-due':'Intro spareggio (2)','giro-spareggio':'Nuovo giro','eliminazione-spareggio':'Eliminazione (in pausa)','inseguimento-2':'Inseguimento: 2 perdenti','inseguimento-1':'Inseguimento: 1 perdente','inseguimento-0':'Inseguimento: solo vincitore','fila-finale':'Fotogramma: fila','presa-finale':'Fotogramma: presa','bocca-finale':'Fotogramma: bocca',portale:'Portale attuale',vittoria:'Finale attuale',gameover:'Game Over',regole:'Regole'})) {
     const button = document.createElement('button');
     button.textContent = label;
     button.style.cssText = 'min-height:44px;padding:8px;margin:4px;font:inherit';

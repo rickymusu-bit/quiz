@@ -52,12 +52,30 @@
       this.footfalls = this.footfalls.filter(e => this.time - e.at < 1.5).slice(-7);
       return dt;
     }
+    adoptTravel(distance, speed, footfalls = []) {
+      this.distance=distance;this.speed=speed;this.footfalls=footfalls.slice(-7);
+    }
     snapshot() {
       return {time:this.time, distance:this.distance, speed:this.speed,
         roadTime:this.distance / ROAD_SPEED, gait:gait(this.distance), footfalls:this.footfalls.slice()};
     }
   }
-  const api = {ROAD_SPEED, STRIDE, MAX_GAP, CHASE, gait, roadTarget, Clock};
+  class ContactTracker {
+    constructor(){this.previous=null;this.footfalls=[];}
+    sample(time,distance){
+      const previous=this.previous;
+      if(previous&&Math.abs(distance-previous.distance)<1e-7)distance=previous.distance;
+      const dt=previous?(time-previous.time):0;
+      if(previous&&dt>0&&dt<=MAX_GAP&&distance>=previous.distance){
+        const step=STRIDE/2;
+        for(let index=Math.floor(previous.distance/step)+1;index<=Math.floor(distance/step);index++)
+          this.footfalls.push({index,at:previous.time+dt*(index*step-previous.distance)/(distance-previous.distance)});
+      }else if(!previous||dt<0||dt>MAX_GAP||distance<previous.distance)this.footfalls=[];
+      this.previous={time,distance};this.footfalls=this.footfalls.filter(e=>time-e.at<1.5).slice(-7);
+      return {time,distance,roadTime:distance/ROAD_SPEED,gait:gait(distance),footfalls:this.footfalls.slice()};
+    }
+  }
+  const api = {ROAD_SPEED, STRIDE, MAX_GAP, CHASE, gait, roadTarget, Clock, ContactTracker};
   if (typeof module !== 'undefined') module.exports = api;
   else root.FoolMotion = api;
 })(globalThis);
