@@ -1,0 +1,191 @@
+{
+  "revision": "44e60317b49c043f4e0c26a82398a6ae26b2680d",
+  "errors": [],
+  "checks": [
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "offline": false,
+      "reduced": false,
+      "correct": false,
+      "hidden_alternatives": "PASS",
+      "zero_floor": "PASS",
+      "retained_rewards": "PASS",
+      "author_rotation": "PASS",
+      "restore_timer_no_replay": "PASS"
+    },
+    {
+      "viewport": [
+        844,
+        390
+      ],
+      "offline": false,
+      "reduced": false,
+      "correct": true,
+      "hidden_alternatives": "PASS",
+      "zero_floor": "PASS",
+      "retained_rewards": "PASS",
+      "author_rotation": "PASS",
+      "restore_timer_no_replay": "PASS"
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "offline": true,
+      "reduced": true,
+      "correct": false,
+      "hidden_alternatives": "PASS",
+      "zero_floor": "PASS",
+      "retained_rewards": "PASS",
+      "author_rotation": "PASS",
+      "restore_timer_no_replay": "PASS"
+    }
+  ],
+  "passed_error": {
+    "owner": 1,
+    "respondent": 0,
+    "turn": 1,
+    "screen": "result",
+    "valid": 1,
+    "scores": [
+      "400",
+      "500",
+      "500"
+    ],
+    "lives": [
+      3,
+      3,
+      3
+    ],
+    "ammo": [
+      [],
+      [],
+      [
+        "svela"
+      ]
+    ],
+    "result": {
+      "id": "e8",
+      "question": "temperatura_equilibrio_v2_008",
+      "respondent": 0,
+      "correct": false,
+      "option": 2,
+      "base": "100",
+      "gross": {
+        "n": "0",
+        "d": "1"
+      },
+      "share": {
+        "n": "0",
+        "d": "1"
+      },
+      "beneficiaries": [],
+      "bonus": null,
+      "penalty": {
+        "n": "100",
+        "d": "1"
+      },
+      "malocchio": {
+        "source": 1,
+        "question": "temperatura_equilibrio_v2_008"
+      }
+    },
+    "malocchio": {
+      "source": 1,
+      "question": "temperatura_equilibrio_v2_008"
+    },
+    "running": false
+  },
+  "correct_rewards": {
+    "owner": 2,
+    "respondent": 2,
+    "turn": 2,
+    "screen": "result",
+    "valid": 2,
+    "scores": [
+      "400",
+      "500",
+      "600"
+    ],
+    "lives": [
+      3,
+      3,
+      3
+    ],
+    "ammo": [
+      [],
+      [],
+      [
+        "aura",
+        "antisigillo"
+      ]
+    ],
+    "result": {
+      "id": "e13",
+      "question": "passaggi_stato_v2_008",
+      "respondent": 2,
+      "correct": true,
+      "option": 1,
+      "base": "100",
+      "gross": {
+        "n": "100",
+        "d": "1"
+      },
+      "share": {
+        "n": "100",
+        "d": "1"
+      },
+      "beneficiaries": [],
+      "bonus": {
+        "id": "e14",
+        "type": "aura",
+        "target": null,
+        "origin": "e13"
+      },
+      "penalty": {
+        "n": "0",
+        "d": "1"
+      },
+      "malocchio": {
+        "source": 2,
+        "question": "passaggi_stato_v2_008"
+      },
+      "bonuses": [
+        {
+          "id": "e14",
+          "type": "aura",
+          "target": null,
+          "origin": "e13"
+        },
+        {
+          "id": "e15",
+          "type": "antisigillo",
+          "target": null,
+          "origin": "e13"
+        }
+      ]
+    },
+    "malocchio": {
+      "source": 2,
+      "question": "passaggi_stato_v2_008"
+    },
+    "running": false
+  },
+  "viewport": [
+    1024,
+    768
+  ],
+  "gif_pixels": [
+    640,
+    480
+  ],
+  "duration_ms": 16000,
+  "capture_fps": 8,
+  "frames": 128,
+  "bytes": 23891294,
+  "sha256": "4b74b41f03359ff032727a801fab7359ff1402bec305c56450ac5c14cb99ed61"
+}
