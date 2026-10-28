@@ -1,4 +1,4 @@
-**Si gioca solo in orizzontale.** In verticale ruota il dispositivo: timer e animazioni restano fermi e la partita conserva i progressi.
+**Si gioca solo in orizzontale.** In verticale ruota il dispositivo: timer e animazioni restano fermi e la partita conserva i progressi. [GIF reale e verifiche](docs/previews/orientation/README.md).
 
 # Contrappasso · motore 2.8.0 / regole 25.0.0
 

@@ -1,0 +1,24 @@
+
+> hellscape@3.9.0 test:browser
+> node tests/hellscape.cjs && node tests/infernal_assets.cjs && python3 tests/hell_race.py && python3 tests/start.py && python3 tests/experience.py && python3 tests/keyboard.py && python3 tests/options.py && python3 tests/configurable.py && python3 tests/ammo.py && python3 tests/cinematic_ui.py && node tests/ux_regressions.cjs
+
+PASS 1440 900
+PASS 667 375
+page.screenshot: Target page, context or browser has been closed
+Call log:
+[2m  - taking page screenshot[22m
+[2m  - waiting for fonts to load...[22m
+[2m  - fonts loaded[22m
+
+    at /workspace/quiz/tests/hellscape.cjs:62:18 {
+  log: [
+    '  - taking page screenshot',
+    '  - waiting for fonts to load...',
+    '  - fonts loaded'
+  ]
+}
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1
+npm notice To update run: npm install -g npm@12.2.1
+npm notice

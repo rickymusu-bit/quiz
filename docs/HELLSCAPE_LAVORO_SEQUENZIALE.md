@@ -4,7 +4,7 @@ Consegne separate, una modifica giudicabile per volta. Per la dinamica si applic
 
 ## Richiesta corrente: gioco solo in orizzontale
 
-La versione verticale è rimossa. In verticale o su finestra quadrata: invito a ruotare, comandi bloccati, timer e animazioni fermi. Stato e menu restano conservati; la domanda si riprende esplicitamente tornando in orizzontale. Questa richiesta precede il residuo dell’audit e supera le vecchie prove di gioco in verticale.
+La versione verticale è rimossa. In verticale o su finestra quadrata: invito a ruotare, comandi bloccati, timer e animazioni fermi. Stato e menu restano conservati; la domanda si riprende esplicitamente tornando in orizzontale. Questa richiesta precede il residuo dell’audit e supera le vecchie prove di gioco in verticale. [Consegna, GIF reale e verifiche](previews/orientation/README.md).
 
 ## Richiesta aggiornata: fermare le colonne e ripartire dalla strada
 
