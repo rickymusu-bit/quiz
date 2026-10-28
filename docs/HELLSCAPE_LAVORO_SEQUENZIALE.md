@@ -8,8 +8,8 @@ Le colonne proposte sono **scartate** e rimosse dall’intervento. La richiesta 
 
 1. **Approvato:** ponte di metallo e pietra neri sopra un mare di lava, in stile junkpunk, gotico e horror. Dare priorità alla coerenza e all’aderenza fisica della grafica. I veicoli possono essere occlusi dagli elementi della scena.
 2. **Approvato:** portale disegnato nativamente di taglio, dettagli dorati e crollo in rocce di pietra. L’utente ha approvato la GIF corretta («Ok bellissimo. Vai avanti»).
-3. **Ora:** nuova icona e animazione Antisigillo, con una GIF reale del browser per questa sola consegna.
-4. **Successiva consegna separata:** nuova Ammo **Sacrificio**, che cede una vita dell’utilizzatore e gli dona **777 punti**. Probabilità indipendente del 5%; Antisigillo passa al 20%. Richiesta aggiornata: Tributo trasferisce il 33% dei punti attuali di un avversario e chi lo usa rinuncia subito al turno corrente.
+3. **Consegnato:** nuova icona e animazione Antisigillo, con GIF reale del browser e PR #39.
+4. **Intervento corrente, implementato e in verifica visiva:** nuova Ammo **Sacrificio**, che cede una vita dell’utilizzatore e gli dona **777 punti**. Probabilità indipendente del 5%; Antisigillo passa al 20%. Richiesta aggiornata: Tributo trasferisce il 33% dei punti attuali di un avversario e chi lo usa rinuncia subito al turno corrente. Consegna e verifiche: [GIF reale di Sacrificio e Tributo](previews/ammo-rules/README.md).
 
 Le consegne precedenti con soli PNG restano documentazione storica, non sono sufficienti per giudicare le nuove modifiche dinamiche.
 
