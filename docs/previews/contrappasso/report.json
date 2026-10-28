@@ -1,0 +1,200 @@
+{
+  "revision": "f7cf667c02e520a4daaa698d80ce59a898e63a88",
+  "errors": [],
+  "checks": [
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "offline": false,
+      "reduced": false,
+      "manual_no_stack": "PASS",
+      "own_risk_through_sigillo": "PASS",
+      "zero_floor_timeout": "PASS",
+      "countdown_restore_3_2_1": "PASS",
+      "expiry_normal_points_and_ammo": "PASS"
+    },
+    {
+      "viewport": [
+        844,
+        390
+      ],
+      "offline": false,
+      "reduced": false,
+      "manual_no_stack": "PASS",
+      "own_risk_through_sigillo": "PASS",
+      "zero_floor_timeout": "PASS",
+      "countdown_restore_3_2_1": "PASS",
+      "expiry_normal_points_and_ammo": "PASS"
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "offline": true,
+      "reduced": true,
+      "manual_no_stack": "PASS",
+      "own_risk_through_sigillo": "PASS",
+      "zero_floor_timeout": "PASS",
+      "countdown_restore_3_2_1": "PASS",
+      "expiry_normal_points_and_ammo": "PASS"
+    }
+  ],
+  "correct": {
+    "owner": 0,
+    "turn": 1,
+    "screen": "result",
+    "contrappasso": [
+      3,
+      null,
+      null
+    ],
+    "auras": [
+      null,
+      null,
+      null
+    ],
+    "scores": [
+      "700",
+      "500",
+      "500"
+    ],
+    "lives": [
+      3,
+      3,
+      3
+    ],
+    "inventory": [
+      [
+        "aura",
+        "antisigillo"
+      ],
+      [],
+      []
+    ],
+    "result": {
+      "id": "e7",
+      "question": "conduzione_v2_010",
+      "respondent": 0,
+      "correct": true,
+      "option": 1,
+      "base": "100",
+      "gross": {
+        "n": "200",
+        "d": "1"
+      },
+      "share": {
+        "n": "200",
+        "d": "1"
+      },
+      "beneficiaries": [],
+      "bonus": {
+        "id": "e8",
+        "type": "aura",
+        "target": null,
+        "origin": "e7"
+      },
+      "penalty": {
+        "n": "0",
+        "d": "1"
+      },
+      "contrappasso": true,
+      "multiplier": 2,
+      "malocchio": null,
+      "beneficiaryShare": {
+        "n": "100",
+        "d": "1"
+      },
+      "bonuses": [
+        {
+          "id": "e8",
+          "type": "aura",
+          "target": null,
+          "origin": "e7"
+        },
+        {
+          "id": "e9",
+          "type": "antisigillo",
+          "target": null,
+          "origin": "e7"
+        }
+      ],
+      "ammoSuppressed": false
+    }
+  },
+  "wrong": {
+    "owner": 0,
+    "turn": 4,
+    "screen": "result",
+    "contrappasso": [
+      2,
+      null,
+      null
+    ],
+    "auras": [
+      null,
+      null,
+      null
+    ],
+    "scores": [
+      "500",
+      "500",
+      "500"
+    ],
+    "lives": [
+      3,
+      3,
+      3
+    ],
+    "inventory": [
+      [
+        "aura",
+        "antisigillo"
+      ],
+      [],
+      []
+    ],
+    "result": {
+      "id": "e18",
+      "question": "sistemi_termodinamici_v2_001",
+      "respondent": 0,
+      "correct": false,
+      "option": 2,
+      "base": "100",
+      "gross": {
+        "n": "0",
+        "d": "1"
+      },
+      "share": {
+        "n": "0",
+        "d": "1"
+      },
+      "beneficiaries": [],
+      "bonus": null,
+      "penalty": {
+        "n": "200",
+        "d": "1"
+      },
+      "contrappasso": true,
+      "multiplier": 2,
+      "malocchio": null,
+      "penaltyCause": "Contrappasso",
+      "penaltyBlocked": false
+    }
+  },
+  "viewport": [
+    1024,
+    768
+  ],
+  "gif_pixels": [
+    640,
+    480
+  ],
+  "duration_ms": 13000,
+  "capture_fps": 8,
+  "frames": 104,
+  "bytes": 20016654,
+  "sha256": "94cc5353bc545c696d228ab46d08dcbe133fe4fa758d3df913820cbf05d18c10"
+}
