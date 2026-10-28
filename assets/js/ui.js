@@ -92,7 +92,7 @@
       b.setAttribute("aria-keyshortcuts", key);
       b.title = text + " (" + key + ")";
     }
-    b.onclick = () => act(fn);
+    b.onclick = () => { if(ui === "game" && FoolHellRace.tieStatus().blocking)return; act(fn); };
     return b;
   }
   function act(fn) {
@@ -1026,6 +1026,7 @@
         (g.out ? " · eliminato" : "") + " · Apri inventario");
       if (i === s.respondent) button.setAttribute("aria-current", "step");
       stats.append(node("strong", F.formatScore(g.score) + " pt", "player-points"), lives(g));
+      if(s.phase==="pareggio")stats.append(node("span","Punti congelati","tie-score-note"));
       button.append(node("span", g.name, "turn-name"), stats);
       const effects = s.effects.filter(e => e.target === i);
       if (effects.length || g.aura !== null) {
@@ -1164,6 +1165,8 @@
   }
   function syncCinematic() {
     const active = cinematicActive();
+    const tieActive = FoolHellRace.tieStatus().blocking;
+    for(const child of main.querySelectorAll(':scope > :not(.hell-race):not(.ending), .ending > :not(.hell-race)'))child.inert=tieActive;
     document.body.classList.toggle("showing-cinematic", active);
     if (active && game.running) {
       cinematicPause = {game, question:game.s.current?.id};
@@ -1183,6 +1186,11 @@
   }
   function gameStage(state, final = false) {
     const stage = FoolHellRace.createStage(state, final);
+    stage.addEventListener("fooltiecomplete", event => {
+      if(!stage.isConnected || game.s.id!==event.detail.id || game.s.result?.id!==event.detail.result)return;
+      advanceQuestion(game.s.revision);
+      changed();
+    });
     stage.addEventListener("foolanimationchange", () => {
       if (stage.isConnected) syncCinematic();
     });
@@ -1198,6 +1206,8 @@
     const r = game?.s.result;
     if (!before || before.game !== game || !r || r.id === before.result) return;
     const epoch = feedbackEpoch;
+    // A tie elimination has its own readable notice before the capture.
+    if(FoolHellRace.tieStatus().kind==='elimination')return;
     // Leave the final portal/capture cinematic unobstructed.
     if (game.s.phase === "conclusa") return;
     main.classList.add("showing-movement");
@@ -1459,22 +1469,21 @@
         btn(
           "Prossima domanda",
           command(() => {
-            const from = Math.max(
-              0,
-              Math.min(1, game.left() / (game.s.config.seconds * 1000)),
-            );
-            game.next(revision);
-            if (game.s.current) preflight([game.s.current]);
-            vialRefillFrom =
-              game.s.screen === "hidden" && game.s.phase !== "conclusa"
-                ? from
-                : null;
+            if(FoolHellRace.beginTie(game.s)){changed();return;}
+            advanceQuestion(revision);
           }),
           "primary",
         ),
       );
     }
     return b;
+  }
+  function advanceQuestion(revision) {
+    const from=Math.max(0,Math.min(1,game.left()/(game.s.config.seconds*1000)));
+    game.next(revision);
+    if(game.s.current)preflight([game.s.current]);
+    vialRefillFrom=game.s.screen==='hidden'&&game.s.phase!=='conclusa'?from:null;
+    requestAnimationFrame(()=>main.querySelector('[data-game-action="reveal"]')?.focus({preventScroll:true}));
   }
   function renderGame() {
     cancelFeedback();
@@ -1607,6 +1616,7 @@
   function revealQuestion() {
     if (
       !game ||
+      FoolHellRace.tieStatus().blocking ||
       game.s.screen !== "hidden" ||
       game.s.suspended ||
       game.s.panel ||
@@ -2346,6 +2356,7 @@
       "Usa i pulsanti del pannello per completare o annullare la decisione.",
     );
   });
+  matchMedia("(prefers-reduced-motion: reduce)").addEventListener("change", () => {if(ui==="game")renderGame();});
   window.addEventListener("resize", () => {
     if (ui === "game") requestAnimationFrame(checkFit);
   });
@@ -2369,7 +2380,10 @@
       return;
     if (cinematicActive()) {
       const key = event.key.toLowerCase();
-      if (key === "p" && game?.s.screen === "answer" && game.s.pauseReason === "animazione") {
+      if(target?.closest(".tie-controls") && ["enter"," "].includes(key)){if(event.repeat)event.preventDefault();return;}
+      if(key==='p' && FoolHellRace.tieStatus().blocking){
+        event.preventDefault();if(!event.repeat)FoolHellRace.pauseTie();
+      } else if (key === "p" && game?.s.screen === "answer" && game.s.pauseReason === "animazione") {
         event.preventDefault();
         cinematicPause = null;
         game.s.pauseReason = "manuale";

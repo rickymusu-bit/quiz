@@ -11,7 +11,7 @@
   tools.append(summary);
   const status = document.createElement('p');
   status.setAttribute('role', 'status');
-  status.textContent = 'Anteprima di audit grafico. Le nuove cinematiche sono previste nelle PR successive.';
+  status.textContent = 'Anteprima di revisione: locomozione e spareggio. Il nuovo inseguimento finale e il portale sono previsti nelle prossime PR.';
   const waitFor = async test => {
     const deadline = performance.now() + 15000;
     while (!test()) {
@@ -24,7 +24,7 @@
     HellscapePreview.navigate(route);
     await loaded;
   }
-  let rendererDocument = null, endingRender = null;
+  let rendererDocument = null, endingRender = null, scenarioSerial = 0;
   async function show(scenario) {
     tools.open = false;
     if (scenario === 'home') { await navigate('index.html'); return; }
@@ -49,7 +49,27 @@
     Object.keys(config.bonusWeights).forEach(key => config.bonusWeights[key] = 0);
     ui.game = F.Game.start(F.prepare(ui.game.s.bank, config, () => .25), {random:() => .25});
     const game = ui.game;
-    if (['ultima', 'spareggio'].includes(scenario)) {
+    game.s.id += "-review-" + (++scenarioSerial);
+    if (['intro-spareggio','intro-due','giro-spareggio','eliminazione-spareggio'].includes(scenario)) {
+      game.s.config.bases = {facile:100,media:100,difficile:100};
+      ui.changed();
+      for(let i=0;i<3;i++){
+        game.reveal();game.answer(scenario==='intro-due'&&i<2?game.s.current.correct:(game.s.current.correct+1)%4);
+        ui.changed();if(i<2){game.next();ui.changed();}
+      }
+      w.FoolHellRace.beginTie(game.s);ui.changed();
+      if(['giro-spareggio','eliminazione-spareggio'].includes(scenario)){
+        await waitFor(()=>d.querySelector('[data-tie-action=skip]'));
+        d.querySelector('[data-tie-action=skip]').click();
+        await waitFor(()=>game.s.screen==='hidden');
+        if(scenario==='giro-spareggio'){
+          for(let i=0;i<3;i++){game.reveal();game.answer(game.s.current.correct);ui.changed();if(i<2){game.next();ui.changed();}}
+          w.FoolHellRace.beginTie(game.s);ui.changed();
+        }else{
+          game.reveal();game.answer((game.s.current.correct+1)%4);ui.changed();w.FoolHellRace.pauseTie();
+        }
+      }
+    } else if (['ultima', 'spareggio'].includes(scenario)) {
       for (let i = 0; i < 3; i++) {
         game.reveal();
         game.answer((game.s.current.correct + 1) % 4);
@@ -84,7 +104,7 @@
     await d.fonts.ready;
   }
   let busy = false;
-  for (const [key, label] of Object.entries({home:'Home',selezione:'Veicoli',quiz:'Domanda / Ammo',corsa:'Corsa / locomozione',ultima:'Ultimo esito',spareggio:'Primo turno spareggio',portale:'Portale attuale',vittoria:'Finale attuale',gameover:'Game Over',regole:'Regole'})) {
+  for (const [key, label] of Object.entries({home:'Home',selezione:'Veicoli',quiz:'Domanda / Ammo',corsa:'Corsa / locomozione',ultima:'Ultimo esito',spareggio:'Primo turno spareggio','intro-spareggio':'Intro spareggio (3)','intro-due':'Intro spareggio (2)','giro-spareggio':'Nuovo giro','eliminazione-spareggio':'Eliminazione (in pausa)',portale:'Portale attuale',vittoria:'Finale attuale',gameover:'Game Over',regole:'Regole'})) {
     const button = document.createElement('button');
     button.textContent = label;
     button.style.cssText = 'min-height:44px;padding:8px;margin:4px;font:inherit';
