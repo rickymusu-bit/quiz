@@ -64,8 +64,7 @@ dimensionamento del renderer in una VM isolata, senza cambiare una partita.
 | Ape | 168 × 149 | 99,2 px | 108 px | 0,643 |
 
 Tutti i 48 fotogrammi mantengono silhouette complete e padding. Le dimensioni
-al doppio approvate dall’utente restano invariate. Non è necessario inventare
-pixel mediante un resize dei file per le dimensioni misurate.
+al doppio approvate dall’utente restano invariate. Le sorgenti dei veicoli coprono le dimensioni misurate, compresa l’anteprima.
 
 Il demone di corsa ha crop 416 × 286: al massimo raster il corpo può raggiungere
 442 px di larghezza, circa **1,063×** la sorgente. Le 16 pose del finale usano
@@ -79,6 +78,14 @@ Il rapporto di timing misura la durata a parete del callback RAF, compresi
 scheduler e GC: non è un profiler della CPU. La misura isolata conclusiva è
 raccolta dopo gli altri test; i campioni preliminari con browser concorrenti
 non vengono usati come prova di prestazioni su un telefono fisico.
+
+La home a 1440 × 1080 misura circa 1162 × 872 CSS per l’illustrazione 1448 × 1086:
+a DPR 2 raggiunge **1,61×** la sorgente. Il logo 2172 × 724 resta entro la sorgente.
+Questo è un residuo concreto del requisito di qualità uniforme, da affrontare
+nel prossimo intervento grafico separato. La profilazione isolata del renderer
+rileva circa 23,9 FPS desktop DPR 1, 15,4 FPS desktop DPR 2 al limite del raster
+e 30,0 FPS sul mobile emulato DPR 2; i callback RAF p95 sono rispettivamente
+8,0 / 6,1 / 1,7 ms. I tempi non comprendono un profiling separato del compositing.
 
 ## Verifiche
 
@@ -97,8 +104,9 @@ Confermate prima della registrazione conclusiva:
 - `python3 tests/portal_browser.py --quick`: attraversamento prima del crollo,
   reazione del demone, pausa/orientamento, Game Over/movimento ridotto e 8 campioni offline.
 
-L’esito delle ultime prove offline, Ultimo Miglio, audit isolato e acquisizione
-GIF viene registrato nella cartella della consegna finale. Non sono state
+Sono passate anche `npm run test:offline`, `python3 tests/tie_browser.py --quick`,
+l’audit isolato e l’acquisizione integrata. Log, misure e GIF reale di 27 secondi
+sono nella [consegna finale](previews/final-review/README.md). Non sono state
 ripetute tutte le matrici di revisione artistica né prove su hardware Android
 fisico. L’URL `file://` è bloccato dal browser gestito: la prova offline carica
 gli stessi byte della build tramite una sola risposta locale intercettata,

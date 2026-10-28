@@ -1,0 +1,48 @@
+{
+  "revision": "3a11c2c99f034f4c5c28f57197c3de2706fff307",
+  "errors": [],
+  "viewport": [
+    1024,
+    768
+  ],
+  "gif_pixels": [
+    640,
+    480
+  ],
+  "capture_fps": 8,
+  "frames": 216,
+  "duration_ms": 27000,
+  "bytes": 50078319,
+  "sha256": "b9c2ce618175127c32560d8fdf8d8782f4b6132565837f135431818f32a93739",
+  "fixture": {
+    "winner": 1,
+    "second": 2,
+    "third": 0
+  },
+  "phases": [
+    "lineup",
+    "capture",
+    "winner-chase",
+    "descent",
+    "open",
+    "escape",
+    "close",
+    "collapse",
+    "rage",
+    "fire",
+    "exhausted",
+    "done"
+  ],
+  "capture_victims": [
+    0,
+    2
+  ],
+  "engine_unchanged": true,
+  "no_resurrection": true,
+  "permanent_rubble": true,
+  "gold_color_check": {
+    "pixels": 2186,
+    "mean_hue_error": 1.738610621450951,
+    "orange_shift_fraction": 0.003202195791399817
+  }
+}

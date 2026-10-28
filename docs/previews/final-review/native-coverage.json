@@ -1,0 +1,113 @@
+{
+  "revision": "3a11c2c99f034f4c5c28f57197c3de2706fff307",
+  "rasterScaleMax": 2,
+  "vehicles": [
+    {
+      "name": "chopper",
+      "frames": 8,
+      "native": [
+        180,
+        146
+      ],
+      "logical": {
+        "width": 54.56,
+        "height": 44.254222222222225
+      },
+      "racePixels": 109.12,
+      "previewPixels": 118.80000000000001,
+      "maxSourceScale": 0.66
+    },
+    {
+      "name": "pickup",
+      "frames": 8,
+      "native": [
+        171,
+        166
+      ],
+      "logical": {
+        "width": 71.92,
+        "height": 69.81707602339182
+      },
+      "racePixels": 143.84,
+      "previewPixels": 156.60000000000002,
+      "maxSourceScale": 0.9157894736842107
+    },
+    {
+      "name": "truck",
+      "frames": 8,
+      "native": [
+        168,
+        158
+      ],
+      "logical": {
+        "width": 76.88,
+        "height": 72.30380952380952
+      },
+      "racePixels": 153.76,
+      "previewPixels": 167.4,
+      "maxSourceScale": 0.9964285714285714
+    },
+    {
+      "name": "coupe",
+      "frames": 8,
+      "native": [
+        179,
+        103
+      ],
+      "logical": {
+        "width": 66.96,
+        "height": 38.53005586592178
+      },
+      "racePixels": 133.92,
+      "previewPixels": 145.8,
+      "maxSourceScale": 0.8145251396648046
+    },
+    {
+      "name": "offroad",
+      "frames": 8,
+      "native": [
+        170,
+        132
+      ],
+      "logical": {
+        "width": 69.44,
+        "height": 53.91811764705882
+      },
+      "racePixels": 138.88,
+      "previewPixels": 151.2,
+      "maxSourceScale": 0.8894117647058822
+    },
+    {
+      "name": "ape",
+      "frames": 8,
+      "native": [
+        168,
+        149
+      ],
+      "logical": {
+        "width": 49.6,
+        "height": 43.990476190476194
+      },
+      "racePixels": 99.2,
+      "previewPixels": 108.00000000000001,
+      "maxSourceScale": 0.6428571428571429
+    }
+  ],
+  "demonRun": {
+    "native": [
+      416,
+      286
+    ],
+    "maxRasterWidth": 442,
+    "maxSourceScale": 1.0625
+  },
+  "demonEnding": {
+    "frames": 16,
+    "native": [
+      438,
+      258
+    ],
+    "maxRasterWidth": 442,
+    "maxSourceScale": 1.0091324200913243
+  }
+}
