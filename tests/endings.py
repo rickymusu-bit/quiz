@@ -1,4 +1,4 @@
-"""Browser contracts for capture, vehicle swallowing/fire breath, escape/roar and Game Over/dance.
+"""Browser contracts for capture, vehicle swallowing/fire breath, portal/crossing/exhaustion and Game Over/dance.
 Pass --gifs to record the actual Canvas timeline for review.
 """
 from pathlib import Path
@@ -23,7 +23,7 @@ with sync_playwright() as p:
  def finish(page,winner):
   page.evaluate('''winner=>{const g=HellscapeUI.game;g.s.id+='-final-'+winner;if(winner===null){g.eliminate(0,'test');g.eliminate(1,'test');g.eliminate(2,'test');g.s.respondent=2;}else{g.eliminate(1,'test');g.eliminate(2,'test');}g.complete(winner);HellscapeUI.changed()}''',winner)
  def raw(page):return page.locator('.hell-race-final canvas').evaluate('c=>c.toDataURL()')
- for winner,name in [(0,'escape-roar'),(None,'eat-fire-dance')]:
+ for winner,name in [(0,'portal-escape'),(None,'eat-fire-dance')]:
   page=start();finish(page,winner);before=page.evaluate('JSON.stringify(HellscapeUI.game.snapshot())');frames=[];phase_set=set()
   page.clock.run_for(100);duration=page.evaluate('FoolHellRace.presentationSnapshot().plan.duration')+.3
   for step in range(math.ceil(duration*10)):
@@ -36,7 +36,9 @@ with sync_playwright() as p:
   assert page.evaluate('JSON.stringify(HellscapeUI.game.snapshot())')==before,'Cinematic must preserve game state'
   assert page.evaluate('window.__endingPlan.victims')==([] if winner==0 else [2])
   assert ('escape' in phase_set)==(winner==0)
-  assert ('roar' in phase_set)==(winner==0)
+  assert 'roar' not in phase_set
+  for phase in ['open','close','sink','exhausted']:
+   assert (phase in phase_set)==(winner==0)
   assert ('rise' in phase_set)==(winner==0)
   assert ('fire' in phase_set)==(winner==0)
   assert ('rage' in phase_set)==(winner==0)

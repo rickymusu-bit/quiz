@@ -1,6 +1,6 @@
 'use strict';
 const {createCanvas,loadImage}=require('@napi-rs/canvas'),vm=require('node:vm'),fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
-(async()=>{const root={FoolChase:require('../assets/hell-chase.js')};vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../assets/hell-ending.js'),'utf8'),{globalThis:root,document:{createElement:()=>createCanvas(1,1)}});
+(async()=>{const root={FoolChase:require('../assets/hell-chase.js'),FoolEpilogue:require('../assets/hell-epilogue.js'),FoolPortal:require('../assets/hell-portal.js'),FoolBridge:require('../assets/hell-bridge.js')};vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../assets/hell-ending.js'),'utf8'),{globalThis:root,document:{createElement:()=>createCanvas(1,1)}});
  const image=await loadImage(path.join(__dirname,'../assets/hell-race/demon-ending-v1.webp')),frames=root.FoolEnding.prepare(image);
  assert.equal(frames.length,16);const board=createCanvas(frames[0].canvas.width*4,frames[0].canvas.height*4),ctx=board.getContext('2d');ctx.fillStyle='#171514';ctx.fillRect(0,0,board.width,board.height);
  frames.forEach((f,index)=>{const {width,height}=f.canvas,raw=f.canvas.getContext('2d').getImageData(0,0,width,height).data;let left=width,right=0,top=height,bottom=0,count=0;
@@ -13,7 +13,7 @@ const {createCanvas,loadImage}=require('@napi-rs/canvas'),vm=require('node:vm'),
  const state={winner:0,respondent:2,groups:[{name:'A',out:false},{name:'B',out:false},{name:'C',out:false}]};
  const helper={vehicleIndex:()=>0,vehicleSize:()=>({width:44,height:36}),drawVehicle:()=>{},gate:()=>{},demonDust:()=>{},nameTag:()=>{throw Error('Names must not be drawn during capture or escape')}};
  const ep=root.FoolEnding.plan(state);for(let t=0;t<ep.duration;t+=.13)root.FoolEnding.render(fc,512,state,ep,t,helper);
- for(const t of [.1,.8,1.6,2.1]){const admitted=[];root.FoolEnding.render(fc,512,state,ep,ep.captureEnd+t,{...helper,vehicleIndex:(s,i)=>i,drawVehicle:(ctx,row)=>admitted.push(row)});assert.deepEqual(admitted,[state.winner],'Only the winner can pass the portal');}
+ for(const t of [.1,.8,1.6,2.1]){const admitted=[];root.FoolEnding.render(fc,512,state,ep,ep.chaseEnd+require('../assets/hell-epilogue.js').T.openEnd+t/4,{...helper,vehicleIndex:(s,i)=>i,drawVehicle:(ctx,row)=>admitted.push(row)});assert.deepEqual(admitted,[state.winner],'Only the winner can pass the portal');}
  fc.clearRect(0,0,240,240);root.FoolEnding.fireBreath(fc,{x:40,y:120},.6,{x:220,y:120},1.85);const jet=fc.getImageData(0,0,240,240).data;let right=0;for(let y=0;y<240;y++)for(let x=0;x<240;x++)if(jet[(y*240+x)*4+3]>100)right=Math.max(right,x);assert(right>210,'Flamethrower must reach its portal target');
  console.log('PASS: no cinematic player names; 16 complete ending poses; mouth/hand anchors; upward flame direction, lifetime and canvas isolation');
 })().catch(e=>{console.error(e);process.exitCode=1});

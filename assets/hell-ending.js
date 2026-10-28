@@ -2,6 +2,9 @@
 (function (root) {
   "use strict";
   const C=typeof module!=="undefined"?require('./hell-chase.js'):root.FoolChase;
+  const F=typeof module!=="undefined"?require('./hell-epilogue.js'):root.FoolEpilogue;
+  const P=typeof module!=="undefined"?require('./hell-portal.js'):root.FoolPortal;
+  const B=typeof module!=="undefined"?require('./hell-bridge.js'):root.FoolBridge;
   const CAPTURE=C.T.capture,plan=C.plan,sample=C.sample,captureAction=C.captureAction;
   const ease=C.ease,lerp=C.lerp;
   // Coordinates in the generated source atlas, mapped into normalized frames.
@@ -140,6 +143,7 @@
     return atlas;
   }
   function load(redraw) {
+    P.load(redraw);
     if (!art && typeof root.Image === "function") {
       art = new root.Image();
       art.decoding = "async";
@@ -292,7 +296,7 @@
     const work=actorBuffer.getContext('2d');work.clearRect(0,0,W,384);work.save();work.globalCompositeOperation='lighter';
     const run=Math.max(0,Math.min(1,demon.runWeight??0));
     for(const p of demon.pose){work.globalAlpha=p.weight*(1-run);const frame=frames[p.frame].canvas,scale=demon.width/frame.width;
-      work.drawImage(frame,Math.round(demon.left),Math.round(demon.ground-frame.height*scale),Math.round(demon.width),Math.round(frame.height*scale));}
+      work.drawImage(frame,Math.round(demon.left),Math.round(demon.ground-frame.height*scale*(demon.breath??1)),Math.round(demon.width),Math.round(frame.height*scale*(demon.breath??1)));}
     if(run){work.globalAlpha=run;if(h.chaser)h.chaser(work,demon,travel);else actor(work,8,demon.left,demon.ground,demon.width);}
     work.restore();c.drawImage(actorBuffer,0,0);
   }
@@ -300,6 +304,7 @@
     if(v.visible===false)return;
     c.save();
     if(v.clip!==undefined){c.beginPath();c.rect(v.clip,0,1024,384);c.clip();}
+    if(v.clipRight!==undefined){c.beginPath();c.rect(0,0,Math.max(0,v.clipRight),384);c.clip();}
     c.translate(v.x,v.ground-v.height/2);c.rotate(v.rotation||0);
     h.drawVehicle(c,v.row,Math.floor((travel?.roadTime??0)*10+v.index*2)%8,0,v.height/2);
     c.restore();
@@ -330,51 +335,16 @@
     if(!routes.has(index))routes.set(index,capturePlan(h.entry??C.defaultEntry(state,h),index));
     return renderCapture(c,W,state,routes.get(index),t,h);
   }
-  function portalMotion(time) {
-    return {
-      visible: time >= 0 && time < 4.8,
-      offset: 190 * (1 - ease(time / 0.55) + ease((time - 2.2) / 2.6)),
-      passed: time >= 2.2,
-    };
-  }
-  function rageMotion(time) {
-    const cycle = time % 1.2,
-      air = cycle >= 0.15 && cycle < 0.52;
-    const impact = Math.max(
-      0,
-      1 - Math.abs(cycle - 0.57) / 0.085,
-      1 - Math.abs(cycle - 0.84) / 0.085,
-    );
-    return {
-      frame: air ? 12 : cycle < 0.15 || (cycle > 0.68 && cycle < 0.78) ? 11 : 7,
-      lift: air
-        ? Math.sin(((cycle - 0.15) / 0.37) * Math.PI) * 28
-        : -impact * 3,
-      impact,
-      cycle,
-    };
-  }
-  function drawPortal(c, W, time, ground, h) {
-    const motion = portalMotion(time);
-    if (!motion.visible) return;
+  const portalMotion=F.portalAt,rageMotion=F.rageAt;
+  function impactDust(c,d,age){
+    if(age===null||age<0||age>.45)return;
+    const hand=C.actorPoints({...d,pose:C.pose(7)},poseMetrics()).hand;
     c.save();
-    c.beginPath();
-    c.rect(0, 0, W, ground + 1);
-    c.clip();
-    c.translate(0, motion.offset);
-    h.gate(c, W - 82, ground - 182, time, true);
-    c.restore();
-    // Rock fragments at the base make the vertical rise and descent explicit.
-    if (time < 0.7 || time > 2.2) {
-      c.save();
-      c.fillStyle = "#806044";
-      for (let i = 0; i < 8; i++) {
-        const x = W - 95 + i * 10,
-          y = ground - 2 - Math.abs(Math.sin(time * 16 + i * 3)) * 3;
-        c.fillRect(Math.round(x), Math.round(y), 3 + (i % 3), 2);
-      }
-      c.restore();
-    }
+    for(const x of [hand.x,hand.x-d.width*.18])for(let i=0;i<14;i++){
+      const spread=(i-6.5)*(2+age*13),y=d.ground-2-Math.sin(age/.45*Math.PI)*(3+i%4*3);
+      c.globalAlpha=(1-age/.45)*.65;c.fillStyle=i%3?'#ae9271':'#544b42';
+      c.fillRect(Math.round(x+spread),Math.round(y),2+i%3,2+i%2);
+    }c.restore();
   }
   const sceneRoutes=new WeakMap();
   function resolve(p,state,h){
@@ -383,32 +353,19 @@
   }
   function frame(p,state,time,h={}){return C.frame(resolve(p,state,h),time);}
   function render(c,W,state,p,time,h){
-    const route=resolve(p,state,h),f=C.frame(route,time),s=sample(p,time),seq=Math.max(0,time-p.chaseEnd);
+    const route=resolve(p,state,h),f=C.frame(route,time),s=sample(p,time);
     if(['lineup','capture','winner-chase'].includes(s.phase)){paintFrame(c,W,state,f,h);return s.phase;}
     const d=f.demon,ground=d.ground,winner=p.winner;
     if(winner!==null){
-      drawPortal(c,W,seq,332,h);
-      if(seq<2.2){
-        const v=f.positions[winner],center=v.x;v.ground=route.ground;
-        c.save();c.beginPath();c.rect(0,0,W-55,384);c.clip();
-        h.drawVehicle(c,h.vehicleIndex(state,winner),Math.floor(time*10)%8,center,route.ground);c.restore();
-      }else f.positions[winner].visible=false;
-      if(s.phase==='rise'||s.phase==='escape'){
-        d.pose=C.pose(8);d.runWeight=1;
-      }else if(s.phase==='roar'){
-        d.runWeight=1-ease(s.local/.6);d.pose=C.mixPoses(C.pose(8),C.pose(10),ease(s.local/.6));
-      }else if(s.phase==='fire'){
-        d.runWeight=0;d.pose=C.pose(0);
-      }else{
-        const motion=s.phase==='done'?{frame:7,lift:0,impact:0,cycle:1.1}:rageMotion(s.local);
-        d.runWeight=0;d.pose=C.pose(motion.frame);d.ground=ground-motion.lift*d.width/260;
-        if(s.phase==='rage'&&motion.impact>0){c.save();c.translate(0,ground-133);h.demonDust(c,d.left+60,time,'attack',Math.max(-1,motion.cycle-.42));c.restore();}
-      }
-      d.worldDistance=f.camera.distance+d.left-8;
       const travel=h.travelFor?.(f.time,d.worldDistance);
-      if(d.runWeight)h.runDust?.(c,d,travel);paintActor(c,W,d,h,travel);
-      if(s.phase==='fire'){const mouth=C.actorPoints(d,poseMetrics()).mouth,portal=portalMotion(seq);
-        if(portal.visible)fireBreath(c,mouth,s.local,{x:W-55,y:332-Math.max(3,(190-portal.offset)*.5)},1.85);}
+      paintVehicle(c,state,f.positions[winner],h,travel);
+      h.runDust?.(c,d,travel);paintActor(c,W,d,h,travel);
+      impactDust(c,d,f.hitAge??null);
+      if(f.fireAge!==null&&f.fireAge!==undefined){
+        const mouth=C.actorPoints(d,poseMetrics()).mouth;
+        fireBreath(c,mouth,f.fireAge,{x:Math.min(W-20,mouth.x+105),y:Math.max(22,mouth.y-125)},F.D.fire-.35);
+      }
+      P.front(c,f.portal);B.debris(c,f.bridge,true);
       h.onFrame?.(f,travel);
     }else{
       const index=s.phase==='done'?15:12+Math.floor(s.local*5)%4;

@@ -5,13 +5,13 @@
   const frame = document.querySelector('iframe');
   const tools = document.createElement('details');
   tools.id = 'quality-tools';
-  tools.style.cssText = 'position:fixed;right:8px;top:8px;z-index:20;max-width:90vw;padding:8px;color:#ffe2a5;background:#160d0bf5;border:1px solid #bf8850;font:16px/1.4 system-ui';
+  tools.style.cssText = 'position:fixed;right:8px;top:8px;z-index:20;max-width:90vw;max-height:calc(100dvh - 16px);overflow:auto;overscroll-behavior:contain;box-sizing:border-box;padding:8px;color:#ffe2a5;background:#160d0bf5;border:1px solid #bf8850;font:16px/1.4 system-ui';
   const summary = document.createElement('summary');
   summary.textContent = 'Scenari di revisione';
   tools.append(summary);
   const status = document.createElement('p');
   status.setAttribute('role', 'status');
-  status.textContent = 'Anteprima di revisione: locomozione, spareggio e inseguimento. Il nuovo portale e il nuovo epilogo sono previsti nella prossima PR.';
+  status.textContent = 'Anteprima completa: locomozione, spareggio, inseguimento, portale e nuovo epilogo.';
   const waitFor = async test => {
     const deadline = performance.now() + 15000;
     while (!test()) {
@@ -89,7 +89,7 @@
         if (i < 2) game.next();
       }
       if (scenario === 'spareggio') game.next();
-    } else if (['portale', 'vittoria', 'gameover'].includes(scenario)) {
+    } else if (['portale','emersione','frattura','attraversamento','sprofondamento','pugni','fiammata-finale','affanno','vittoria','gameover'].includes(scenario)) {
       if (scenario === 'gameover') {
         game.s.groups.forEach((_, i) => game.eliminate(i, 'Scenario di revisione'));
         game.complete(null);
@@ -98,13 +98,12 @@
         game.eliminate(2, 'Scenario di revisione');
         game.complete(0);
       }
-      if (scenario === 'portale') {
-        const render = w.FoolEnding.render, sampleFrame=w.FoolEnding.frame;
-        w.FoolEnding.frame=(...args)=>{args[2]=args[0].chaseEnd+.6;return sampleFrame(...args)};
-        w.FoolEnding.render = (...args) => {
-          args[4] = args[3].chaseEnd + .6;
-          return render(...args);
-        };
+      if (!['vittoria','gameover'].includes(scenario)) {
+        const render=w.FoolEnding.render,sampleFrame=w.FoolEnding.frame,T=w.FoolEpilogue.T;
+        const stamp={emersione:.6,frattura:1.1,portale:T.openEnd+.02,attraversamento:T.openEnd+.6,
+          sprofondamento:T.closeEnd+.7,pugni:T.sinkEnd+.46,'fiammata-finale':T.rageEnd+.8,affanno:T.fireEnd+.65}[scenario];
+        w.FoolEnding.frame=(...args)=>{args[2]=args[0].chaseEnd+stamp;return sampleFrame(...args)};
+        w.FoolEnding.render=(...args)=>{args[4]=args[3].chaseEnd+stamp;return render(...args)};
       }
     } else if (scenario === 'corsa') {
       // The unrevealed question keeps the real timer stopped while the scene runs.
@@ -118,7 +117,7 @@
     await d.fonts.ready;
   }
   let busy = false;
-  for (const [key, label] of Object.entries({home:'Home',selezione:'Veicoli',quiz:'Domanda / Ammo',corsa:'Corsa / locomozione',ultima:'Ultimo esito',spareggio:'Primo turno spareggio','intro-spareggio':'Intro spareggio (3)','intro-due':'Intro spareggio (2)','giro-spareggio':'Nuovo giro','eliminazione-spareggio':'Eliminazione (in pausa)','inseguimento-2':'Inseguimento: 2 perdenti','inseguimento-1':'Inseguimento: 1 perdente','inseguimento-0':'Inseguimento: solo vincitore','fila-finale':'Fotogramma: fila','presa-finale':'Fotogramma: presa','bocca-finale':'Fotogramma: bocca',portale:'Portale attuale',vittoria:'Finale attuale',gameover:'Game Over',regole:'Regole'})) {
+  for (const [key, label] of Object.entries({home:'Home',selezione:'Veicoli',quiz:'Domanda / Ammo',corsa:'Corsa / locomozione',ultima:'Ultimo esito',spareggio:'Primo turno spareggio','intro-spareggio':'Intro spareggio (3)','intro-due':'Intro spareggio (2)','giro-spareggio':'Nuovo giro','eliminazione-spareggio':'Eliminazione (in pausa)','inseguimento-2':'Inseguimento: 2 perdenti','inseguimento-1':'Inseguimento: 1 perdente','inseguimento-0':'Inseguimento: solo vincitore','fila-finale':'Fotogramma: fila','presa-finale':'Fotogramma: presa','bocca-finale':'Fotogramma: bocca',emersione:'Portale: emersione',frattura:'Ponte: frattura',portale:'Portale: aperto',attraversamento:'Portale: attraversamento',sprofondamento:'Portale: sprofondamento',pugni:'Epilogo: pugni','fiammata-finale':'Epilogo: fiammata',affanno:'Epilogo: affanno',vittoria:'Vittoria',gameover:'Game Over',regole:'Regole'})) {
     const button = document.createElement('button');
     button.textContent = label;
     button.style.cssText = 'min-height:44px;padding:8px;margin:4px;font:inherit';

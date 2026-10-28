@@ -9,8 +9,8 @@
   const VEHICLES = ['chopper', 'pickup', 'truck', 'coupe', 'offroad', 'ape'];
   // Widths in logical race pixels; preserve each complete silhouette's aspect ratio.
   const vehicleWidths = [44, 58, 62, 54, 56, 40];
-  const sheets = { vehicles: null, demon: null, world: null, portal: null };
-  const files = { vehicles: 'vehicles-drive-v1.webp', demon: 'demon-actions-v1.webp', world: 'infernal-world-v1.webp', portal: 'portal-flames-v1.webp' };
+  const sheets = { vehicles: null, demon: null, world: null };
+  const files = { vehicles: 'vehicles-drive-v1.webp', demon: 'demon-actions-v1.webp', world: 'infernal-world-v1.webp' };
   // Shared atlases are decoded once; every state uses the same images.
   if (typeof root.Image === 'function') {
     for (const key of Object.keys(sheets)) {
@@ -138,7 +138,7 @@
   function endingHelpers(state) {
     return {vehicleIndex:(s,i)=>Math.max(0,VEHICLES.indexOf(s.config.vehicles?.[i]||['chopper','pickup','ape'][i])),
       vehicleSize:row=>imageReady(sheets.vehicles)?vehicleSize(row):{width:50,height:40},
-      drawVehicle:(...args)=>{if(imageReady(sheets.vehicles))return drawVehicle(...args)},gate,demonDust,
+      drawVehicle:(...args)=>{if(imageReady(sheets.vehicles))return drawVehicle(...args)},demonDust,
       entry:visualState?.entry,
       chaser:(c,d,t)=>drawChaserAt(c,t,d,false),
       runDust:(c,d,t)=>{if(!t)return;const scale=d.width/170;c.save();c.translate(d.left,d.ground-134*scale);c.scale(scale,scale);demonDust(c,40,t.roadTime,'chase',0,t);c.restore();},
@@ -379,7 +379,9 @@
     c.restore();
   }
 
-  function background(c, W, tick, progress, effectTime=tick) {
+  function background(c, W, tick, progress, effectTime=tick, ending=null) {
+    const layers=ending?.bridge?{damage:ending.bridge,
+      behind:()=>root.FoolPortal.back(c,ending.portal),above:()=>root.FoolPortal.surface(c,ending.portal)}:null;
     if(imageReady(sheets.world)){
       const img=sheets.world;
       // Distant architecture and foreground scroll at different velocities.
@@ -388,7 +390,7 @@
         for(let x=-offset;x<W;x+=tw)c.drawImage(img,0,img.naturalHeight*sy,img.naturalWidth,img.naturalHeight*sh,Math.floor(x),dy,tw,dh);
       }
       flyingDevils(c,W,effectTime);
-      if(root.FoolBridge)root.FoolBridge.draw(c,W,tick,progress,img,effectTime);
+      if(root.FoolBridge)root.FoolBridge.draw(c,W,tick,progress,img,effectTime,layers);
       else if(root.FoolTerrain)root.FoolTerrain.draw(c,W,tick,progress,img,effectTime);
       else{c.fillStyle='#161614';c.fillRect(0,184,W,181);}
       return;
@@ -426,26 +428,8 @@
     r(c, 0, 73, W, 156 - 73, '#1c1c24');
     c.restore();
     flyingDevils(c,W,effectTime);
-    if(root.FoolTerrain)root.FoolTerrain.draw(c,W,tick,progress,null,effectTime);
-  }
-  function gate(c, x, y, tick, open) {
-    if(sprite(c,'portal',8,1,0,Math.floor(tick*10)%8,x-15,y-8,85,open?190:145))return;
-
-    // Portale in pietra basalto/ottone, con una luce celeste in contrasto col rosso infernale.
-    r(c, x - 6, y + 8, 70, 128, '#100f1e');
-    r(c, x + 5, y + 18, 46, 118, open ? '#fff0b1' : '#d5632c');
-    r(c, x + 12, y + 24, 31, 110, open ? '#fff6d6' : '#ef9a43');
-    r(c, x - 13, y + 9, 16, 127, '#706968');
-    r(c, x + 53, y + 9, 16, 127, '#706968');
-    r(c, x - 15, y + 3, 83, 15, '#928573');
-    r(c, x - 5, y - 5, 65, 10, '#a89173');
-    for (let j = 0; j < 5; j++) {
-      line(c, x - 13, y + 22 + j * 23, 15, '#352c36');
-      line(c, x + 53, y + 22 + j * 23, 15, '#352c36');
-    }
-    if (open || Math.sin(tick * 5) > .5) {
-      r(c, x + 20, y + 37, 6, 64, '#ffe6aa');
-    }
+    if(root.FoolBridge)root.FoolBridge.draw(c,W,tick,progress,null,effectTime,layers);
+    else if(root.FoolTerrain)root.FoolTerrain.draw(c,W,tick,progress,null,effectTime);
   }
   let chaseBlend = null;
   function blendChase(c, pose, x, y, width, height) {
@@ -553,7 +537,7 @@
     const shot=ammo?.current(),queue=visualState?.queue||[];
     const tieView=tie?.sample({reduced,captures:queue.length>0}),hold=tieView?.holdCapture;
     const E=root.FoolEnding,ready=E&&imageReady(E.load(()=>live?.redraw?.()));
-    const backgroundAt=distance=>background(c,W,reduced?0:distance/motion.ROAD_SPEED,progress,reduced?0:travel.time);
+    const backgroundAt=(distance,frame=null)=>background(c,W,reduced?0:distance/motion.ROAD_SPEED,progress,reduced?0:travel.time,frame);
     if(!hold&&!shot&&final&&E){
       if(!ready){backgroundAt(travel.distance);endingHelpers(state).demon(c,0);return E.load(()=>{})?.failed?'done':'loading';}
       if(!visualState.entry){
@@ -562,8 +546,10 @@
         visualState.plan=E.plan(state,[...visualState.consumed],queue.map(q=>q.index),visualState.entry);
       }
       const time=reduced?visualState.plan.duration:visualState.elapsed,helpers=endingHelpers(state);
-      const sampled=E.frame(visualState.plan,state,time,helpers);backgroundAt(sampled.camera.distance);
-      return E.render(c,W,state,visualState.plan,time,helpers);
+      const sampled=E.frame(visualState.plan,state,time,helpers);
+      c.save();if(!reduced&&sampled.shake)c.translate(sampled.shake.x,sampled.shake.y);
+      backgroundAt(sampled.camera.distance,sampled);
+      const phase=E.render(c,W,state,visualState.plan,time,helpers);c.restore();return phase;
     }
     if(!hold&&!shot&&queue.length&&E){
       if(reduced||E.load(()=>{})?.failed){for(const item of queue)visualState.consumed.add(item.index);queue.length=0;}

@@ -1263,14 +1263,16 @@
     const art = node("img");
     art.className = "end-wordmark";
     const titleAsset =
-      s.winner === null ? "assets/game-over.png" : "assets/wins-yellow.png";
+      s.winner === null ? "assets/game-over.png" : "assets/hell-race/victory-title-v1.webp";
     art.src = window.HellscapeOffline?.assets?.[titleAsset] || titleAsset;
-    art.alt = s.winner === null ? "GAME OVER" : "WINS";
+    art.alt = s.winner === null ? "GAME OVER" : "VITTORIA";
     if (s.winner !== null) b.classList.add("victory");
     art.setAttribute("fetchpriority", "high");
-    if (s.winner !== null)
-      title.append(node("span", s.groups[s.winner].name, "winner-name"));
-    title.append(art);
+    if (s.winner !== null) {
+      const wordmark = node("span", undefined, "victory-wordmark");
+      wordmark.append(art);
+      title.append(wordmark, node("span", s.groups[s.winner].name + " è fuggito dall'inferno!", "winner-name winner-escape"));
+    } else title.append(art);
     const stage = gameStage(s, true);
     stage.addEventListener("foolendingcomplete", () => requestAnimationFrame(() => title.focus({ preventScroll: true })));
     b.append(title, stage);
