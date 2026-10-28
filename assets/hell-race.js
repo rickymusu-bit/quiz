@@ -638,6 +638,7 @@
     ctx.imageSmoothingEnabled = false;
     if (clockId !== state.id) { clock = new motion.Clock(); clockId = state.id; last = null; }
     const start = performance.now(), reduced = reduce.matches;
+    fig.dataset.motion = reduced ? 'reduced' : 'full';
     clock.rebase(start);
     const next = state.groups.map((g, i) => positionScore(state, i));
     // Preserve the displayed position across UI rebuilds, including a partial score tween.

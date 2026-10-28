@@ -23,6 +23,16 @@ with sync_playwright() as p:
   state=lambda:f.evaluate('JSON.stringify(HellscapeUI.game.snapshot())')
   snapshot=lambda:f.evaluate('FoolHellRace.motionSnapshot()')
   raw=lambda:f.locator('.hell-race canvas').evaluate('c=>c.toDataURL()')
+  def motion_preference(value):
+   page.emulate_media(reduced_motion=value)
+   mode='reduced' if value=='reduce' else 'full'
+   # CDP acknowledges the setting before the native media event necessarily
+   # rebuilds the stage. Wait for the rendered scene to adopt the preference.
+   for attempt in range(20):
+    page.clock.run_for(100)
+    if f.locator('.hell-race').get_attribute('data-motion')==mode:
+     page.clock.run_for(100);return
+   raise AssertionError('Scene did not adopt motion preference '+value)
   before=state();initial=snapshot();frames=[]
   for step in range(24):
    page.clock.run_for(100);image=Image.open(BytesIO(base64.b64decode(raw().split(',')[1]))).convert('RGB');frames.append(image)
@@ -51,10 +61,11 @@ with sync_playwright() as p:
    page.clock.run_for(100)
   if width==1366 and not reduced:
    f.evaluate("()=>{HellscapeUI.game.setScore(0,Fool.rational(300));HellscapeUI.changed()}");page.clock.run_for(100)
-   page.emulate_media(reduced_motion='reduce');f.evaluate('HellscapeUI.changed()');page.clock.run_for(100)
+   motion_preference('reduce')
    static=raw();distance=snapshot()['distance'];page.clock.run_for(200)
-   assert raw()==static and snapshot()['distance']==distance,'Switching to reduced motion freezes existing footfall dust too'
-   page.emulate_media(reduced_motion='no-preference');f.evaluate('HellscapeUI.changed()')
+   assert snapshot()['distance']==distance,'Reduced motion freezes road travel'
+   assert raw()==static,'Switching to reduced motion freezes existing footfall dust too'
+   motion_preference('no-preference')
    assert f.locator('.hell-race').get_attribute('data-animation-busy')=='false','A static score update must not rewind after motion is restored'
    page.clock.run_for(100)
    f.evaluate("()=>{HellscapeUI.game.setScore(0,Fool.rational(600));HellscapeUI.changed()}")
