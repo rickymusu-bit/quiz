@@ -21,7 +21,7 @@ Applicare la preferenza «GIF per la dinamica, screenshot per gli stati statici,
 
 - La coerenza fisica della scena prevale sulla leggibilità costante dei veicoli. Strutture in primo piano possono occluderli: rispettare profondità, prospettiva, ombre, materiali e punti d’appoggio, senza spostare o abbassare gli elementi soltanto per lasciare visibili i mezzi.
 - Ripartire dal progetto della strada: un ponte di metallo e pietra neri sopra un mare di lava, in stile junkpunk, gotico e horror. Le colonne decorative proposte sono scartate.
-- In questa fase presentare il nuovo progetto del ponte come proposta grafica chiaramente distinta dal gioco implementato. Attendere l’approvazione dell’utente della strada prima di riprendere integrazione e modifiche successive.
+- L’utente ha richiesto una GIF della schermata di gioco con il nuovo ponte: è autorizzata l’integrazione del ponte per questa verifica nel browser. Presentare la GIF reale e attendere il riscontro sulla strada prima di riprendere le modifiche successive.
 
 ## Refactoring e manutenzione del progetto
 

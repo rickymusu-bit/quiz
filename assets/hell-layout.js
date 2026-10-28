@@ -1,7 +1,7 @@
 /* Shared scene coordinates and responsive UI. Does not read or mutate a match. */
 (function (root) {
   'use strict';
-  const reference = Object.freeze({width:1024, height:768, rasterWidth:512, rasterHeight:384});
+  const reference = Object.freeze({width:1024, height:768, rasterWidth:768, rasterHeight:576});
   function measure(width, height) {
     const scale = Math.min(width / reference.width, height / reference.height);
     return {scale, compact:scale < 1,

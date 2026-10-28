@@ -332,6 +332,7 @@
         glow.addColorStop(0,'#ffb84a66');glow.addColorStop(1,'#ff7b1800');c.save();c.globalCompositeOperation='screen';c.fillStyle=glow;c.fillRect(target.x-48,target.y-48,96,96);c.restore();
       }
     }
+    B.front(c,W,f.camera);
     h.onFrame?.(f,travel);return f;
   }
   function capturePlan(entry,index){return C.captureRoute(entry,index,poseMetrics());}
@@ -374,12 +375,13 @@
         fireBreath(c,mouth,f.fireAge,{x:Math.min(W-20,mouth.x+105),y:Math.max(22,mouth.y-125)},F.D.fire-.35);
       }
       P.front(c,f.portal);B.debris(c,f.bridge,true);
+      B.front(c,W,f.camera);
       h.onFrame?.(f,travel);
     }else{
       const age=Math.max(0,time-p.chaseEnd),cycle=age*5,index=12+Math.floor(cycle)%4,next=12+(Math.floor(cycle)+1)%4;
       d.pose=C.mixPoses(d.pose,C.mixPoses(C.pose(index),C.pose(next),ease(cycle%1)),ease(age/.4));d.runWeight=.12;
       d.ground=ground-Math.abs(Math.sin(age*Math.PI*5))*7;
-      const travel=h.travelFor?.(f.time,d.worldDistance);paintActor(c,W,d,h,travel);h.onFrame?.(f,travel);
+      const travel=h.travelFor?.(f.time,d.worldDistance);paintActor(c,W,d,h,travel);B.front(c,W,f.camera);h.onFrame?.(f,travel);
     }
     return s.phase;
   }

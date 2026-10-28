@@ -383,6 +383,11 @@
   function background(c, W, tick, progress, effectTime=tick, ending=null) {
     const layers=ending?.bridge?{damage:ending.bridge,
       behind:()=>root.FoolPortal.back(c,ending.portal),above:()=>root.FoolPortal.surface(c,ending.portal)}:null;
+    if(root.FoolBridge?.environment(c,W,H,tick,effectTime)){
+      flyingDevils(c,W,effectTime);
+      root.FoolBridge.draw(c,W,tick,progress,null,effectTime,layers);
+      return;
+    }
     if(imageReady(sheets.world)){
       const img=sheets.world;
       // Distant architecture and foreground scroll at different velocities.
@@ -587,7 +592,9 @@
     const staticTravel=reduced?{...travel,time:0,footfalls:[]}:travel;
     drawChaser(c,staticTravel,(tieView?.strength??0)*10);
     if(visualState)visualState.frame=normalFrame(state,positions,travel,(tieView?.strength??0)*10);
-    if(shot){root.FoolAmmo.render(c,W,state,shot,ammo.sample(reduced),positions,reduced);return 'ammo';}
+    if(shot)root.FoolAmmo.render(c,W,state,shot,ammo.sample(reduced),positions,reduced);
+    root.FoolBridge?.front(c,W,{distance:travel.distance});
+    if(shot)return 'ammo';
     if(hold)return tieView.blocking?'eliminated':'race';
     return queue.length?'capture':tieView?.blocking?'tie-intro':'race';
   }
@@ -651,7 +658,7 @@
       lastPaint=now;
       const width = RACE_WIDTH;
       // Match CSS size and effective DPR, bounded to 1536×1152 (7 MiB RGBA).
-      const rasterScale=Math.max(1,Math.min(3,canvas.getBoundingClientRect().width/width*Math.min(2,root.devicePixelRatio||1)));
+      const rasterScale=Math.max(1,Math.min(1536/width,canvas.getBoundingClientRect().width/width*Math.min(2,root.devicePixelRatio||1)));
       const rasterWidth=Math.round(width*rasterScale),rasterHeight=Math.round(H*rasterScale);
       if(canvas.width!==rasterWidth||canvas.height!==rasterHeight){canvas.width=rasterWidth;canvas.height=rasterHeight;}
       ctx.setTransform(canvas.width/width,0,0,canvas.height/H,0,0);

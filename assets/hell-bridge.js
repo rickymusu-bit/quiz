@@ -8,15 +8,17 @@
   const DEPTH=BOTTOM-TOP,SHEAR=.72;
   function project(x,depth,z,camera){return {x:x-camera.distance+SHEAR*(depth-DEPTH/2),y:TOP+depth-z};}
   function worldX(x,depth,camera){return x+camera.distance-SHEAR*(depth-DEPTH/2);}
-  let art=null,lake=null;
+  const TILE=768,ROAD_TOP=110,ROAD_BOTTOM=180,FRONT_RISE=12;
+  const ASSETS=Object.freeze({bridge:'assets/hell-race/black-stone-bridge-v1.png',sea:'assets/hell-race/lava-sea-v2.png'});
+  let art=null,lake=null,water=null;
   function load(redraw=()=>{}){
     if(!art&&typeof root.Image==='function'){
-      art=new root.Image();const path='assets/hell-race/lava-bridge-v1.webp';
+      art=new root.Image();const path=ASSETS.bridge;
       art.src=root.HellscapeOffline?.assets?.[path]||path;
       art.addEventListener('load',redraw,{once:true});
     }
     if(!lake&&typeof root.Image==='function'){
-      lake=new root.Image();const path='assets/hell-race/lava-lake-v1.webp';
+      lake=new root.Image();const path=ASSETS.sea;
       lake.src=root.HellscapeOffline?.assets?.[path]||path;lake.addEventListener('load',redraw,{once:true});
     }
     return art;
@@ -35,28 +37,39 @@
       result.push({id:n,x:n*72+seeded(n)*31,depth:8+seeded(n+67)*94,kind:n%5,height:8+seeded(n+19)*5});
     }return result;
   }
-  function supports(c,width,camera){
-    for(let n=Math.floor((camera.distance-130)/145);n<Math.ceil((camera.distance+width+130)/145);n++){
-      const x=n*145-camera.distance+20;
-      const masonry=c.createLinearGradient(x-18,0,x+20,0);masonry.addColorStop(0,'#74604b');masonry.addColorStop(.3,'#3e362a');masonry.addColorStop(1,'#171614');
-      c.fillStyle=masonry;polygon(c,[{x:x-17,y:351},{x:x+19,y:351},{x:x+13,y:420},{x:x-10,y:420}]);c.fill();
-      c.fillStyle='#756049';c.fillRect(x-18,350,39,5);
-      c.strokeStyle='#25221c';c.lineWidth=2;for(let y=364;y<420;y+=12){c.beginPath();c.moveTo(x-13,y);c.lineTo(x+16,y);c.stroke();}
-    }
+  function tiles(width,camera){
+    const result=[];
+    for(let index=Math.floor((camera.distance-DEPTH*SHEAR)/TILE)-1;index<=Math.ceil((camera.distance+width+DEPTH*SHEAR)/TILE);index++)
+      result.push({index,x:index*TILE-camera.distance,mirror:Math.abs(index%2)===1});
+    return result;
   }
-  function ruins(c,width,camera,near){
-    for(let n=Math.floor((camera.distance-100)/118);n<Math.ceil((camera.distance+width+100)/118);n++){
-      const x=n*118+seeded(n+37)*48-camera.distance,base=near?BOTTOM+13:TOP-4,h=near?12+seeded(n+55)*18:42+seeded(n+55)*26;
-      c.fillStyle='#25231f';c.fillRect(x-10,base-5,24,7);c.fillStyle='#726451';c.fillRect(x-8,base-7,19,3);
-      polygon(c,[{x:x-6,y:base-7},{x:x-5,y:base-h},{x:x-1,y:base-h-5},{x:x+3,y:base-h+3},{x:x+7,y:base-h-2},{x:x+7,y:base-7}]);
-      const stone=c.createLinearGradient(x-6,0,x+7,0);stone.addColorStop(0,'#24231e');stone.addColorStop(.35,'#86765d');stone.addColorStop(.6,'#594f3e');stone.addColorStop(1,'#302e27');c.fillStyle=stone;c.fill();
-      c.strokeStyle='#a19273';c.lineWidth=1;for(let j=-3;j<6;j+=3){c.beginPath();c.moveTo(x+j,base-8);c.lineTo(x+j,base-h+5);c.stroke();}
-      c.strokeStyle='#211e1a';c.beginPath();c.moveTo(x-5,base-h+12);c.lineTo(x+3,base-h+19);c.lineTo(x,base-h+29);c.stroke();
-      for(let j=0;j<22;j++){const px=x-5+seeded(n*31+j)*11,py=base-8-seeded(n*17+j)*Math.max(1,h-12);c.fillStyle=j%3?'#211e1a88':'#b3a17d66';c.fillRect(px,py,.7+seeded(j+n)*1.4,.6);}
-      if(h>40){c.strokeStyle='#302b23';c.beginPath();c.moveTo(x-4,base-10);c.lineTo(x-4,base-24);c.quadraticCurveTo(x-4,base-31,x,base-34);c.quadraticCurveTo(x+4,base-31,x+4,base-24);c.lineTo(x+4,base-10);c.stroke();}
-      if(n%3===0){c.fillStyle='#736953';c.fillRect(x-8,base-h-2,17,4);}
-      c.fillStyle='#5e5444';polygon(c,[{x:x+12,y:base},{x:x+16,y:base-8},{x:x+24,y:base-4},{x:x+28,y:base+1}]);c.fill();
+  function texture(c,image,tile,x,y,w,h,sx,sy,sw,sh){
+    c.save();c.translate(x+(tile.mirror?w:0),y);if(tile.mirror)c.scale(-1,1);
+    c.drawImage(image,sx,sy,sw,sh,0,0,w,h);c.restore();
+  }
+  function environment(c,width,height,time,effectTime=time){
+    load();if(!lake?.complete||!lake.naturalWidth)return false;
+    if(!water&&typeof document!=='undefined'){
+      water=document.createElement('canvas');water.width=lake.naturalWidth;water.height=lake.naturalHeight;
+      const ctx=water.getContext('2d');ctx.drawImage(lake,0,0);ctx.globalCompositeOperation='destination-in';
+      const fade=ctx.createLinearGradient(0,water.height*.17,0,water.height*.32);
+      fade.addColorStop(0,'#0000');fade.addColorStop(1,'#000');ctx.fillStyle=fade;ctx.fillRect(0,0,water.width,water.height);
     }
+    const skyCamera={distance:time*motion.ROAD_SPEED*.035};
+    for(const tile of tiles(width,skyCamera))texture(c,lake,tile,tile.x,0,TILE,height,0,0,lake.naturalWidth,lake.naturalHeight);
+    if(water){
+      const seaCamera={distance:time*motion.ROAD_SPEED*.12+effectTime*5};
+      for(const tile of tiles(width,seaCamera))texture(c,water,tile,tile.x,0,TILE,height,0,0,water.width,water.height);
+    }
+    return true;
+  }
+  function front(c,width,camera){
+    if(!art?.complete||!art.naturalWidth)return;
+    const scale=TILE/art.naturalWidth,sourceY=ROAD_BOTTOM*art.naturalHeight/724;
+    c.save();c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';
+    for(const tile of tiles(width,camera))
+      texture(c,art,tile,tile.x+SHEAR*DEPTH/2,BOTTOM-FRONT_RISE,TILE,(art.naturalHeight-sourceY)*scale,0,sourceY,art.naturalWidth,art.naturalHeight-sourceY);
+    c.restore();
   }
   function roadDebris(c,width,camera){
     for(const f of features(camera.distance,width)){
@@ -95,45 +108,26 @@
     }c.restore();
   }
   function draw(c,width,time,progress,world,effectTime=time,layers=null){
-    c.save();
-    c.fillStyle='#681a0c';c.fillRect(0,184,width,200);
-    // A separate liquid surface remains visible on both sides of the suspended deck.
-    const molten=lake?.complete&&lake.naturalWidth?lake:null;
-    if(molten){
-      const offset=(effectTime*9)%width;
-      for(let x=-offset;x<width;x+=width)c.drawImage(molten,0,0,molten.naturalWidth,molten.naturalHeight,x,184,width,200);
-    }
-    // Slow molten currents and embers, without a flashing full-screen overlay.
-    for(let i=0;i<36;i++){
-      const x=((i*79-effectTime*13)%width+width)%width,y=190+(i*47)%190;
-      c.fillStyle=i%3?'#e95d1a88':'#ffbe5288';c.fillRect(Math.round(x),y,6+i%9,1);
-    }
-    const camera={distance:time*motion.ROAD_SPEED};
-    supports(c,width,camera);ruins(c,width,camera,false);
-    layers?.behind?.();
-    c.save();
-    const image=load();
+    const camera={distance:time*motion.ROAD_SPEED},image=load();
+    c.save();c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';
     if(image?.complete&&image.naturalWidth){
-      const tile=768,offset=(time*motion.ROAD_SPEED)%tile,s=image.naturalHeight/672;
-      for(let x=-offset;x<width;x+=tile){
-        // Driveable charcoal deck and masonry fascia; no railing.
-        for(const [sy,sh,dy,dh] of [[214,123,TOP,BOTTOM-TOP],[337,260,BOTTOM,18]])
-          c.drawImage(image,0,sy*s,image.naturalWidth,sh*s,Math.floor(x),dy,tile+1,dh);
+      const backHeight=ROAD_TOP*image.naturalHeight/724,scale=TILE/image.naturalWidth;
+      for(const tile of tiles(width,camera))
+        texture(c,image,tile,tile.x-SHEAR*DEPTH/2,TOP-backHeight*scale,TILE,backHeight*scale,0,0,image.naturalWidth,backHeight);
+      layers?.behind?.();
+      c.save();c.beginPath();c.rect(0,TOP,width,DEPTH);c.clip();
+      for(const tile of tiles(width,camera)){
+        c.save();c.translate(tile.x-SHEAR*DEPTH/2,TOP);c.transform(1,0,SHEAR,1,0,0);
+        texture(c,image,tile,0,0,TILE,DEPTH,0,backHeight,image.naturalWidth,(ROAD_BOTTOM-ROAD_TOP)*image.naturalHeight/724);
+        c.restore();
       }
-    }else{c.fillStyle='#292722';c.fillRect(0,TOP,width,BOTTOM-TOP);}
-    c.fillStyle='#0b0c0db3';c.fillRect(0,TOP,width,BOTTOM-TOP);
-    // Heat eats through the deck as questions progress, retaining terrain progression.
-    for(let i=0;i<12;i++)if(progress>i/15){
-      const x=((i*97-time*motion.ROAD_SPEED)%width+width)%width,y=TOP+10+(i*23)%86;
-      c.fillStyle='#100e0c';c.fillRect(Math.round(x),y,9,2);
-      c.fillStyle='#bb491e';c.fillRect(Math.round(x)+2,y+1,3,1);
-      if(progress>.6){c.fillStyle='#ff9c3e';c.fillRect(Math.round(x)+3,y-Math.round(2+Math.sin(effectTime*3+i)*2),1,2);}
+      c.restore();
+    }else{
+      layers?.behind?.();c.fillStyle='#171918';c.fillRect(0,TOP,width,DEPTH);
     }
-    c.restore();
-    roadDebris(c,width,camera);ruins(c,width,camera,true);
-    fractures(c,layers?.damage);layers?.above?.();debris(c,layers?.damage,false);
+    roadDebris(c,width,camera);fractures(c,layers?.damage);layers?.above?.();debris(c,layers?.damage,false);
     c.restore();
   }
-  const api={TOP,BOTTOM,GAP,RACE_SCALE,DEPTH,SHEAR,project,worldX,grounds,draw,load,debris,features};
+  const api={TOP,BOTTOM,GAP,RACE_SCALE,DEPTH,SHEAR,project,worldX,grounds,draw,load,debris,features,environment,front,tiles,ASSETS,TILE,FRONT_RISE};
   if(typeof module!=='undefined')module.exports=api;else root.FoolBridge=api;
 })(globalThis);
