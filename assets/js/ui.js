@@ -2388,7 +2388,8 @@
     if (cinematicActive()) {
       const key = event.key.toLowerCase();
       if(target?.closest(".tie-controls,.scene-controls") && ["enter"," "].includes(key)){if(event.repeat)event.preventDefault();return;}
-      if(key==='p'&&(FoolHellRace.tieStatus().blocking||FoolHellRace.canPauseScene())){
+      if(key==='p'&&(FoolHellRace.tieStatus().blocking||FoolHellRace.canPauseScene()||
+          (game?.s.screen==='answer'&&game.s.pauseReason==='animazione'))){
         event.preventDefault();if(!event.repeat)pauseCinematic();
       } else if (["enter", " ", "a", "b", "c", "d", "i", "s", "v", "l", "o", "arrowleft", "f1", "?"].includes(key))
         event.preventDefault();
