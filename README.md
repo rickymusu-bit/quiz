@@ -21,6 +21,8 @@ Il sito funziona direttamente come archivio statico, senza compilazione obbligat
 - `assets/css/game.css` e `assets/hellscape.css`: stili di base estratti e stili della grafica esistente, nello stesso ordine di cascata. `assets/home.css` contiene la schermata iniziale illustrata.
 - `assets/hell-terrain.js`: basalto continuo, degradazione per domande completate, ossa, teschi umani e demoniaci, rottami di veicoli e geyser di lava, senza corsie visibili.
 - `assets/hell-chase.js`: traiettorie pure di mondo/telecamera, fila e catture ancorate alle pose; usa la geometria condivisa del ponte.
+- `assets/hell-epilogue.js`: regia pura di portale, frattura, attraversamento, sprofondamento e reazione.
+- `assets/hell-portal.js`: architettura marmo/oro e luce, proiettata nello spazio del ponte.
 - `assets/hell-ending.js`: composizione delle pose, occlusioni e rendering di catture, inseguimento ed epilogo, senza modificare il modello.
 - `assets/hell-ammo.js`: timeline degli eventi Ammo ed effetti Canvas sui veicoli; conserva la coda visiva fra i ridisegni e ignora gli eventi storici alla ripresa di un salvataggio.
 - `assets/hell-race.js`: componente Canvas separato; legge lo stato senza applicare transizioni al motore.
@@ -43,6 +45,7 @@ npm run build           # dist/site, pubblicabile su hosting statico
 npm run test:offline    # genera e verifica dist/Hellscape-offline.html
 npm run test:quality    # audit offline di dieci schermate, cinque viewport, DPR 1/2
 npm run test:ties       # intro, eliminazioni, nuovi giri e ripresa dello spareggio
+npm run test:portal     # portale nel mondo, ponte, attraversamento ed epilogo offline
 npm run test:chase      # fila, ancoraggi, catture e inseguimento offline, cinque viewport a DPR 1/2
 npm run test:motion     # locomozione offline, pausa e clock a 30/60/144 FPS
 npm run test:layout     # testo e controlli nativi, 4:3, orientamento e fullscreen
@@ -82,7 +85,10 @@ realmente mostrate, dispone i mezzi in fila e cattura prima il perdente arretrat
 Il veicolo segue mano e bocca senza cambiare scala; strada e passi derivano dalle
 coordinate del mondo. Dopo le catture il demone recupera sul vincitore. L'export
 include filmati con zero, uno o due perdenti e fotogrammi di fila, presa e bocca.
-Il portale monumentale e il nuovo epilogo restano nella PR D.
+La [PR D del portale](docs/HELLSCAPE_PORTAL.md) completa l'uscita: architettura
+trasversale in marmo e oro, frattura causata dall'emersione, passaggio dietro
+la soglia, sprofondamento e nuovo epilogo. Solo dopo pugni, fiammata e affanno
+compaiono VITTORIA e il nome reale del fuggitivo.
 
 L’anteprima include home, gioco, regole, entrambi i dataset, script, CSS, immagini e font in **un solo HTML**. Le pagine sono incorporate in un iframe che viene ricreato alla navigazione, così timer ed eventi della pagina precedente vengono chiusi. La chiave delle partite esportate è `hellscape-offline-v1:fool-v1`; quella dei profili è `hellscape-offline-v1:fool-settings-v1`. Non legge o sovrascrive i salvataggi del sito. Il meta `hellscape-revision` e `dist/revision.json` identificano il commit generatore; gli output sono ignorati da Git e vanno rigenerati dopo ogni modifica, senza correggerli a mano.
 
@@ -114,7 +120,7 @@ Le domande dello spareggio sono estratte fra **tutte quelle nuove del dataset**,
 
 Durante il quiz la scena occupa l’intero palco fisso 4:3 (1024×768): tre piloti su veicoli junkpunk/dieselpunk attraversano un paesaggio di lava inseguiti da un demone horror. Lo sfondo scorre autonomamente; quando i punti cambiano, i veicoli avanzano e possono superarsi. Le posizioni sono una rappresentazione visiva dei punteggi esatti, anche razionali dopo Livella, **non un punteggio parallelo**. I veicoli dei giocatori eliminati vengono afferrati e inghiottiti dal demone. La fiammata verso l’alto precede la danza nel Game Over.
 
-Il portale emerge dal terreno quando il vincitore è l’unico veicolo rimasto: lo attraversa, poi il varco sprofonda. Il demone ruggisce, spara un getto di fuoco verso il portale ancora in discesa e, quando è sparito, salta e batte i pugni a terra. Se il motore decreta una vittoria per punteggio lasciando altri giocatori attivi, il demone li rimuove prima di aprire il portale. Con Game Over inghiotte l’ultimo mezzo, sputa fuoco e fa una danza di vittoria. I giocatori già mangiati durante la partita non ricompaiono. I finali anticipati per eliminazione funzionano senza attendere l’ultima domanda.
+Il portale neoclassico bianco e oro emerge dalla lava davanti al vincitore e rompe i bordi del ponte. Il raccordo centrale rimane percorribile; il mezzo e il pilota attraversano la luce azzurra senza cambiare scala. Solo quando l'intera sagoma è oltre la struttura, il portale sprofonda e il raccordo cede. Il demone batte entrambi i pugni tre volte, sputa una fiammata e resta brevemente ansimante; infine compare VITTORIA con il nome reale del fuggitivo. Senza vincitore restano cattura, fiammata e danza del Game Over, senza portale. Gli attori già divorati non ricompaiono.
 
 Il modulo `assets/hell-race.js` è un Canvas pixel-art senza dipendenze, privo di influenza sulle regole, sul timer e sui salvataggi. La grafica si interrompe quando la pagina non è visibile e rispetta la preferenza di sistema per la riduzione del movimento. L'indicazione testuale accessibile integra le figure. I sei veicoli selezionabili sono chopper (con pilota), pick-up, camion, coupé, fuoristrada e Ape a tre ruote. Sono riconoscibili per sagoma e simbolo, non per colori vistosi. Le nuove sprite map animate, il portale e il panorama sono descritti in [assets/hell-race/README.md](assets/hell-race/README.md). Ogni mezzo ha otto pose; il demone ha sequenze distinte di corsa, attacco e morso. I punteggi, le regole e i salvataggi esistenti non vengono modificati.
 

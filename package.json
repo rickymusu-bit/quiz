@@ -18,7 +18,8 @@
     "test:layout": "python3 tests/responsive.py",
     "test:motion": "node tests/motion.cjs && node scripts/build.cjs --quality-preview && python3 tests/motion_browser.py",
     "test:ties": "node --test tests/tie.test.js && node scripts/build.cjs --quality-preview && python3 tests/tie_browser.py",
-    "test:chase": "node --test tests/chase.test.js && node scripts/build.cjs --quality-preview && python3 tests/chase_browser.py"
+    "test:chase": "node --test tests/chase.test.js && node scripts/build.cjs --quality-preview && python3 tests/chase_browser.py",
+    "test:portal": "node --test tests/portal.test.js && node scripts/build.cjs --quality-preview && python3 tests/portal_browser.py"
   },
   "devDependencies": {
     "@napi-rs/canvas": "0.1.100",

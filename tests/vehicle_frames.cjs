@@ -1,8 +1,8 @@
 const {createCanvas,loadImage}=require('@napi-rs/canvas'),vm=require('vm'),fs=require('fs'),path=require('path'),assert=require('node:assert/strict');
 process.chdir(path.resolve(__dirname,'..'));
-(async()=>{const images={};for(const [k,f]of Object.entries({vehicles:'vehicles-drive-v1',demon:'demon-actions-v1',world:'infernal-world-v1',portal:'portal-flames-v1'}))images[k]=await loadImage('assets/hell-race/'+f+'.webp');
+(async()=>{const images={};for(const [k,f]of Object.entries({vehicles:'vehicles-drive-v1',demon:'demon-actions-v1',world:'infernal-world-v1'}))images[k]=await loadImage('assets/hell-race/'+f+'.webp');
 const root={FoolMotion:require('../assets/hell-motion.js'),FoolLayout:require('../assets/hell-layout.js'),__sheets:images,matchMedia:()=>({matches:false})},document={createElement:()=>createCanvas(1,1)};
-let js=fs.readFileSync('assets/hell-race.js','utf8').replace('const sheets = { vehicles: null, demon: null, world: null, portal: null };','const sheets = root.__sheets;').replace('root.FoolHellRace = { createStage, vehiclePreview };','root.FoolHellRace = { createStage, vehiclePreview, vehicleRow };');vm.runInNewContext(js,{window:root,document});
+let js=fs.readFileSync('assets/hell-race.js','utf8').replace('const sheets = { vehicles: null, demon: null, world: null };','const sheets = root.__sheets;').replace('root.FoolHellRace = { createStage, vehiclePreview };','root.FoolHellRace = { createStage, vehiclePreview, vehicleRow };');vm.runInNewContext(js,{window:root,document});
 const board=createCanvas(8*200,6*180),ctx=board.getContext('2d');ctx.fillStyle='#161819';ctx.fillRect(0,0,board.width,board.height);
 for(let row=0;row<6;row++){const frames=root.FoolHellRace.vehicleRow(row);assert.equal(frames.length,8);frames.forEach((img,i)=>{
  assert.equal(img.width,frames[0].width);assert.equal(img.height,frames[0].height);

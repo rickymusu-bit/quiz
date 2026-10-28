@@ -1,6 +1,6 @@
 # Asset della corsa infernale
 
-Versione grafica **1.5.0** — 27/10/2026.
+Versione grafica **1.6.0** — 28/10/2026.
 
 Pixel art infernale dal riferimento approvato: ferro annerito, ruggine, cuoio, emblemi distintivi e luce di lava. Asset raster generati con lo strumento integrato imagegen, convertiti in WebP mantenendo il canale alfa. Specifiche in [PROMPTS-v1.md](PROMPTS-v1.md).
 
@@ -8,7 +8,9 @@ Pixel art infernale dal riferimento approvato: ferro annerito, ruggine, cuoio, e
 | --- | --- | --- |
 | `vehicles-drive-v1.webp` | 8 per mezzo, 6 righe | Chopper con pilota, pick-up, camion, coupé, fuoristrada, Ape |
 | `demon-actions-v1.webp` | 4 per azione, 3 righe | Corsa, attacco, morso |
-| `portal-flames-v1.webp` | 8 | Portale gotico con fiamme arancioni |
+| `portal-flames-v1.webp` | 8 | Portale precedente, conservato e non più caricato |
+| `portal-marble-v1.webp` | Facciata 1086 × 1448, RGBA | Portale neoclassico in marmo e oro, proiettato nel mondo |
+| `victory-title-v1.webp` | 1981 × 793, RGBA | Titolo VITTORIA, trasparente |
 | `infernal-world-v1.webp` | Panorama | Fortezze, strada e lava con velocità di scorrimento diverse |
 
 `assets/hell-race.js` contiene le bande di origine effettive degli atlanti: le righe della tavola veicoli hanno spaziatura irregolare. Il renderer separa le sagome connesse e normalizza gli otto fotogrammi della stessa riga su tele trasparenti con scala comune. La stessa separazione viene applicata ai 12 fotogrammi del demone, con bande reali che includono corna, muso e mandibola. Questo evita tagli e frammenti delle celle vicine; le pose troncate sul bordo destro della sorgente sono sostituite da una posa completa. La strada ha un velo carbone, mentre lava e cielo mantengono i colori originali. I veicoli attivi partono davanti al demone; in caso di cattura la creatura viene disegnata in primo piano. Le anteprime e i riquadri dei giocatori usano gli stessi sprite della corsa.
@@ -58,3 +60,26 @@ La figura espone `data-animation-busy` ed emette `foolanimationchange` durante a
 - `lava-lake-v1.webp`: superficie liquida del lago di lava, separata dal ponte.
 
 Asset generati con imagegen, convertiti in WebP qualità 90 con alfa. Gli originali PNG sono conservati in `/workspace/generated_images/` (exec-648ff1a1-cff7-44ac-9861-1b218517231d, exec-8458c4de-83f5-4838-ba21-499b21c05aa1, exec-3984dcd7-ca3a-4290-844a-160cf1b41f67). La scala di corsa 0,62 e gli appoggi calcolati dalle sagome sostituiscono i vecchi appoggi fissi; corsa e cattura conservano tutte le pose complete.
+
+
+## Portale neoclassico e VITTORIA — v1.6.0 / PR D
+
+I due nuovi asset sono generati con imagegen. I master PNG, conservati senza
+modifiche in `/workspace/generated_images/`, sono rispettivamente
+`exec-c3ec3a2a-21ab-44ee-ae6f-7c8fd5235475.png` e
+`exec-f9f02cd2-ac1b-43ce-9d9d-e36fdd81b7f6.png`. La conversione WebP è lossless
+con conservazione esatta dei pixel RGBA; non si applicano resize o sharpening.
+
+La facciata è un'elevazione ortografica di colonne corinzie, cornici, frontone
+scolpito e basamenti in marmo avorio/oro, con apertura realmente trasparente.
+Il renderer aggiunge luce bianca/azzurra, spessore e immersione tramite la
+stessa proiezione del ponte, invece di sovrapporla frontalmente allo schermo.
+Il titolo VITTORIA mantiene dettaglio illustrato e trasparenza; la UI ritaglia
+soltanto il letterbox trasparente e affianca il sottotitolo nativo con il nome
+reale, leggibile anche su telefono. I precedenti `portal-flames-v1.webp` e
+`assets/wins-yellow.png` sono preservati, ma esclusi dal caricamento corrente.
+
+La regia attuale sostituisce il precedente epilogo: attraversamento completo,
+sprofondamento, pugni piantati, una fiammata, affanno e titolo. Le sezioni
+v1.3–1.5 sopra documentano le versioni precedenti. Geometria e verifiche sono
+in [HELLSCAPE_PORTAL.md](../../docs/HELLSCAPE_PORTAL.md).

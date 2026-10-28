@@ -3,10 +3,10 @@
   'use strict';
   const Motion=typeof module!=='undefined'?require('./hell-motion.js'):root.FoolMotion;
   const Bridge=typeof module!=='undefined'?require('./hell-bridge.js'):root.FoolBridge;
+  const Finale=typeof module!=='undefined'?require('./hell-epilogue.js'):root.FoolEpilogue;
   const T=Object.freeze({lineup:1.1,capture:5.2,pursuit:1.8,grip:.9,lift:1.2,mouth:2.05,swallow:2.45,hidden:3.05,recover:3.7});
   const GAP=74, WIDTH=512;
-  const clamp=x=>Math.max(0,Math.min(1,x)),ease=x=>{x=clamp(x);return x*x*(3-2*x);},lerp=(a,b,t)=>a+(b-a)*t;
-  function travel(t,duration,from,to){const u=clamp(t/duration);return from*duration*u+(to-from)*duration*(u*u*u-.5*u*u*u*u);}
+  const {clamp,ease,lerp,travel}=Motion;
   function speed(t,duration,from,to){return lerp(from,to,ease(t/duration));}
   const pose=frame=>[{frame,weight:1}];
   function mixPoses(a,b,t){const weights=new Map();for(const [list,factor]of [[a,1-t],[b,t]])for(const p of list)weights.set(p.frame,(weights.get(p.frame)||0)+p.weight*factor);return [...weights].filter(([,w])=>w>.00001).map(([frame,weight])=>({frame,weight}));}
@@ -26,15 +26,16 @@
     if(winner===null&&!victims.length&&!eaten.has(state.respondent))victims.push(state.respondent);
     if(positions)victims.sort((a,b)=>positions[a].x-positions[b].x||a-b);
     const lineupEnd=winner!==null||victims.length?T.lineup:0,captureEnd=lineupEnd+victims.length*T.capture,chaseEnd=captureEnd+(winner!==null?T.pursuit:0);
-    return {winner,victims,lineupEnd,captureEnd,chaseEnd,reactionStart:chaseEnd+(winner===null?0:2.2),duration:chaseEnd+(winner===null?3.2:8.4),entry};
+    return {winner,victims,lineupEnd,captureEnd,chaseEnd,reactionStart:chaseEnd+(winner===null?0:Finale.T.sinkEnd),duration:chaseEnd+(winner===null?3.2:Finale.T.duration),entry};
   }
   function sample(p,time){
     const t=Math.max(0,time);
+    if(t>=p.duration)return {phase:'done',local:p.winner===null?3.2:0};
     if(t<p.lineupEnd)return {phase:'lineup',local:t};
     if(t<p.captureEnd){const slot=Math.floor((t-p.lineupEnd)/T.capture);return {phase:'capture',slot,victim:p.victims[slot],local:t-p.lineupEnd-slot*T.capture};}
     if(t<p.chaseEnd)return {phase:'winner-chase',local:t-p.captureEnd};
     const seq=t-p.chaseEnd;
-    if(p.winner!==null){if(seq<.55)return {phase:'rise',local:seq};if(seq<2.2)return {phase:'escape',local:seq-.55};if(seq<2.95)return {phase:'roar',local:seq-2.2};if(seq<4.8)return {phase:'fire',local:seq-2.95};if(seq<8.4)return {phase:'rage',local:seq-4.8};}
+    if(p.winner!==null)return Finale.sample(seq);
     else if(t<p.duration)return {phase:'dance',local:seq};
     return {phase:'done',local:p.winner===null?3.2:3.6};
   }
@@ -80,10 +81,12 @@
     const winner=p.winner===null?null:current.positions[p.winner];
     const escapeX=winner?Math.min(WIDTH-55-winner.width/2-6,Math.max(winner.x,WIDTH*.72)):0;
     const pursuitDemon=winner?{...current.demon,left:escapeX-winner.width/2-current.demon.width-6,ground:Motion.CHASE.ground,runWeight:1}:current.demon;
-    return {p,entry,frames,ids,ground,targets,demonLeft,lineupExtra,lined,routes,afterCaptures:current,escapeX,pursuitDemon};
+    const afterChase={time:entry.time+p.chaseEnd,camera:{distance:current.camera.distance+(winner?travel(T.pursuit,T.pursuit,current.camera.speed,80):0),speed:80},demon:pursuitDemon,positions:current.positions.map(v=>({...v,x:v.index===p.winner?escapeX:v.x}))};
+    return {p,entry,frames,ids,ground,targets,demonLeft,lineupExtra,lined,routes,afterCaptures:current,escapeX,pursuitDemon,epilogue:winner?Finale.prepare(afterChase,p.winner):null};
   }
   function frame(route,time){
     const {p,entry}=route,s=sample(p,time),t=Math.max(0,time);let camera,demon,positions;
+    if(p.winner!==null&&t>=p.chaseEnd)return Finale.frame(route.epilogue,t-p.chaseEnd);
     if(s.phase==='lineup'){
       const x=ease(t/T.lineup),y=ease((t-T.lineup*.45)/(T.lineup*.55)),d=x;
       camera={distance:entry.camera.distance+travel(t,T.lineup,entry.camera.speed,24)+route.lineupExtra*d,speed:speed(t,T.lineup,entry.camera.speed,24)+route.lineupExtra*6*clamp(t/T.lineup)*(1-clamp(t/T.lineup))/T.lineup};
@@ -102,12 +105,6 @@
       if(s.phase!=='winner-chase'){
         const seq=Math.max(0,t-p.chaseEnd);
         if(winner===null){camera.distance+=travel(seq,.6,camera.speed,0);camera.speed=speed(seq,.6,camera.speed,0);}
-        else {
-          if(seq<2.2){camera.distance+=travel(seq,2.2,80,60);camera.speed=speed(seq,2.2,80,60);}
-          else {camera.distance+=travel(2.2,2.2,80,60)+travel(seq-2.2,.6,60,0);camera.speed=speed(seq-2.2,.6,60,0);}
-          const v=positions[winner];v.x=lerp(route.escapeX,WIDTH+45,ease((seq-.55)/1.5));v.visible=seq<2.2&&v.x-v.width/2<WIDTH-55;
-          demon.left=seq<2.2?Math.min(route.pursuitDemon.left+12*ease(seq/2.2),v.x-v.width/2-demon.width-6):route.pursuitDemon.left+12;
-        }
       }
     }
     demon.worldDistance=camera.distance+demon.left-Motion.CHASE.left;

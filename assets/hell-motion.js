@@ -4,6 +4,10 @@
   const ROAD_SPEED = 48, STRIDE = 64, MAX_GAP = .25, RESPONSE = .35;
   const CHASE = Object.freeze({left:8, ground:303, width:221, scale:1.3});
   const ORDER = [0, 3, 2, 1];
+  const clamp=x=>Math.max(0,Math.min(1,x));
+  const ease=x=>{x=clamp(x);return x*x*(3-2*x);};
+  const lerp=(a,b,t)=>a+(b-a)*t;
+  function travel(t,duration,from,to){const u=clamp(t/duration);return from*duration*u+(to-from)*duration*(u*u*u-.5*u*u*u*u);}
   function gait(distance) {
     const cycle = distance / STRIDE, pose = ((cycle * 4) % 4 + 4) % 4,
       index = Math.floor(pose), fraction = pose - index;
@@ -75,7 +79,7 @@
       return {time,distance,roadTime:distance/ROAD_SPEED,gait:gait(distance),footfalls:this.footfalls.slice()};
     }
   }
-  const api = {ROAD_SPEED, STRIDE, MAX_GAP, CHASE, gait, roadTarget, Clock, ContactTracker};
+  const api = {ROAD_SPEED, STRIDE, MAX_GAP, CHASE, clamp, ease, lerp, travel, gait, roadTarget, Clock, ContactTracker};
   if (typeof module !== 'undefined') module.exports = api;
   else root.FoolMotion = api;
 })(globalThis);
