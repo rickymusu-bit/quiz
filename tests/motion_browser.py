@@ -50,6 +50,10 @@ with sync_playwright() as p:
    else:f.evaluate("()=>{HellscapeUI.game.s.paused=false;HellscapeUI.changed()}")
    page.clock.run_for(100)
   if width==1366 and not reduced:
+   page.emulate_media(reduced_motion='reduce');f.evaluate('HellscapeUI.changed()');page.clock.run_for(100)
+   static=raw();distance=snapshot()['distance'];page.clock.run_for(200)
+   assert raw()==static and snapshot()['distance']==distance,'Switching to reduced motion freezes existing footfall dust too'
+   page.emulate_media(reduced_motion='no-preference');f.evaluate('HellscapeUI.changed()');page.clock.run_for(100)
    f.evaluate("()=>{HellscapeUI.game.setScore(0,Fool.rational(300));HellscapeUI.changed()}")
    assert f.locator('.hell-race').get_attribute('data-animation-busy')=='true'
    page.clock.run_for(800);f.evaluate('HellscapeUI.changed()');page.clock.run_for(850)

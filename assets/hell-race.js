@@ -534,6 +534,7 @@
   function scene(c, W, state, sec, final, previous, reduced, travel) {
     const total = Math.max(1, Number(state.config.questionCount || 33));
     const progress = root.FoolTerrain?root.FoolTerrain.progress(state):clamp(state.valid / total, 0, 1);
+    if (reduced) travel = {...travel, time:0, footfalls:[]};
     const motion = reduced ? 0 : travel.roadTime;
     background(c, W, motion, progress, reduced ? 0 : travel.time);
     const shot = ammo?.current();
