@@ -39,6 +39,8 @@ python3 tests/portal_browser.py --quick
 python3 tests/tie_browser.py --quick
 ```
 
+Esiti verificati: `npm test`, suite browser completa, frame, build, offline, accettazione v1.3.0, responsive, finali, inseguimento, portale e Ultimo Miglio superati. I log sono nella cartella `screenshots/v130/logs`.
+
 I test browser usano Chromium reale. Gli scenari v1.3.0 impostano partite controllate con il vero motore e acquisiscono PNG del vero renderer, senza mockup o HTML consegnati come anteprima. I parametri e i risultati sono in [evidence.json](screenshots/v130/evidence.json); i tempi del renderer sono in [render-audit.json](screenshots/v130/render-audit.json).
 
 Il test offline carica gli esatti byte del build tramite intercettazione locale delle richieste, a rete disattivata. L’apertura diretta `file://` è bloccata dalla policy del Chromium gestito; non è stata dichiarata verificata.

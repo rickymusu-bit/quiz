@@ -85,7 +85,7 @@ with sync_playwright() as p:
                     assert f.evaluate('HellscapeUI.game.s.phase') == 'pareggio'
                     assert f.evaluate('HellscapeUI.game.s.screen') == 'hidden'
                     assert not f.evaluate('HellscapeUI.game.running')
-                    assert f.locator('.turn-order .heart:not(.lost)').count() == 3
+                    assert f.locator('.turn-order .heart:not(.lost)').count() == 9
                 if scenario == 'portale':
                     assert f.locator('.hell-race-final').get_attribute('data-ending-phase') == 'escape'
                 if scenario in ['vittoria','gameover']:

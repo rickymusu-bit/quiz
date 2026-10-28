@@ -370,6 +370,8 @@
     "chase": "logs/chase.txt",
     "portal": "logs/portal.txt",
     "tie": "logs/tie.txt",
-    "motion": "logs/motion.txt"
-  }
+    "motion": "logs/motion.txt",
+    "offline": "logs/offline.txt"
+  },
+  "production_diff_from_capture": "none"
 }
