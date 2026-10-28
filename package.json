@@ -1,6 +1,6 @@
 {
   "name": "hellscape",
-  "version": "3.9.0",
+  "version": "3.9.1",
   "private": true,
   "scripts": {
     "dev": "python3 -m http.server 8000 --bind 127.0.0.1",
@@ -21,7 +21,8 @@
     "test:chase": "node --test tests/chase.test.js && node scripts/build.cjs --quality-preview && python3 tests/chase_browser.py",
     "test:portal": "node --test tests/portal.test.js && node scripts/build.cjs --quality-preview && python3 tests/portal_browser.py",
     "test:v130": "node --test tests/v130.test.js && node tests/v130_browser.cjs",
-    "audit:render": "node scripts/render-audit.cjs"
+    "audit:render": "node scripts/render-audit.cjs",
+    "test:columns": "node --test tests/columns.test.js && npm run preview:offline && python3 tests/columns_browser.py"
   },
   "devDependencies": {
     "@napi-rs/canvas": "0.1.100",

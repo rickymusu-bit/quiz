@@ -12,6 +12,9 @@ Pixel art infernale dal riferimento approvato: ferro annerito, ruggine, cuoio, e
 | `portal-marble-v1.webp` | Facciata 1086 × 1448, RGBA | Portale neoclassico in marmo e oro, proiettato nel mondo |
 | `victory-title-v1.webp` | 1981 × 793, RGBA | Titolo VITTORIA, trasparente |
 | `infernal-world-v1.webp` | Panorama | Fortezze, strada e lava con velocità di scorrimento diverse |
+| `gothic-columns-v1.png` | Quattro sagome, RGBA 1254×1254 | Colonne gotiche scolpite, moncone e sezione crollata; crop irregolari dichiarati in `hell-bridge.js` |
+
+Le nuove colonne sono asset illustrati nativi, non forme geometriche ingrandite. L’immagine generata è conservata senza modifiche ai pixel; il renderer campiona quattro rettangoli con margini, conserva le proporzioni e varia la disposizione con un seme stabile. I due bordi condividono materiali e illuminazione; sul bordo anteriore si usano monconi bassi per lasciare leggibili i veicoli. Verifica del risultato: GIF reali dal browser, secondo [AGENTS.md](../../AGENTS.md).
 
 `assets/hell-race.js` contiene le bande di origine effettive degli atlanti: le righe della tavola veicoli hanno spaziatura irregolare. Il renderer separa le sagome connesse e normalizza gli otto fotogrammi della stessa riga su tele trasparenti con scala comune. La stessa separazione viene applicata ai 12 fotogrammi del demone, con bande reali che includono corna, muso e mandibola. Questo evita tagli e frammenti delle celle vicine; le pose troncate sul bordo destro della sorgente sono sostituite da una posa completa. La strada ha un velo carbone, mentre lava e cielo mantengono i colori originali. I veicoli attivi partono davanti al demone; in caso di cattura la creatura viene disegnata in primo piano. Le anteprime e i riquadri dei giocatori usano gli stessi sprite della corsa.
 
