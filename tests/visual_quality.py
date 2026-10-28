@@ -104,7 +104,12 @@ with sync_playwright() as p:
             page.evaluate("HellscapeQuality.show('home')")
             f = page.frames[1]
             page.set_viewport_size({'width':height,'height':width})
-            page.wait_for_timeout(150)
+            f.wait_for_function("""() => {
+              const compact=FoolLayout.measure(innerWidth,innerHeight).compact;
+              if(document.body.dataset.layout!==(compact?'compact':'stage'))return false;
+              const r=document.querySelector(compact?'.home-heading':'#viewport-stage').getBoundingClientRect();
+              return r.width>0 && Math.abs(r.width/r.height-4/3)<.001;
+            }""")
             subject = '.home-heading' if f.evaluate('document.body.dataset.layout') == 'compact' else '#viewport-stage'
             r = f.locator(subject).bounding_box()
             assert abs(r['width']/r['height'] - 4/3) < .001
