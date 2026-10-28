@@ -1,6 +1,7 @@
 /* Narrow suspension deck. Geometry is shared by the race and its layout tests. */
 (function(root){
   'use strict';
+  const motion = typeof module !== 'undefined' ? require('./hell-motion.js') : root.FoolMotion;
   const TOP=228,BOTTOM=338,GAP=4,RACE_SCALE=.62;
   let art=null,lake=null;
   function load(redraw=()=>{}){
@@ -26,17 +27,17 @@
     // A separate liquid surface remains visible on both sides of the suspended deck.
     const molten=lake?.complete&&lake.naturalWidth?lake:null;
     if(molten){
-      const offset=(time*9)%width;
+      const offset=(effectTime*9)%width;
       for(let x=-offset;x<width;x+=width)c.drawImage(molten,0,0,molten.naturalWidth,molten.naturalHeight,x,184,width,200);
     }
     // Slow molten currents and embers, without a flashing full-screen overlay.
     for(let i=0;i<36;i++){
-      const x=((i*79-time*13)%width+width)%width,y=190+(i*47)%190;
+      const x=((i*79-effectTime*13)%width+width)%width,y=190+(i*47)%190;
       c.fillStyle=i%3?'#e95d1a88':'#ffbe5288';c.fillRect(Math.round(x),y,6+i%9,1);
     }
     const image=load();
     if(image?.complete&&image.naturalWidth){
-      const tile=768,offset=(time*48)%tile,s=image.naturalHeight/672;
+      const tile=768,offset=(time*motion.ROAD_SPEED)%tile,s=image.naturalHeight/672;
       for(let x=-offset;x<width;x+=tile){
         // Separate the top rail, driveable deck and suspended masonry fascia.
         for(const [sy,sh,dy,dh] of [[120,94,208,20],[214,123,TOP,BOTTOM-TOP],[337,260,BOTTOM,40]])
@@ -45,7 +46,7 @@
     }else{c.fillStyle='#292722';c.fillRect(0,TOP,width,BOTTOM-TOP);}
     // Heat eats through the deck as questions progress, retaining terrain progression.
     for(let i=0;i<12;i++)if(progress>i/15){
-      const x=((i*97-time*48)%width+width)%width,y=TOP+10+(i*23)%86;
+      const x=((i*97-time*motion.ROAD_SPEED)%width+width)%width,y=TOP+10+(i*23)%86;
       c.fillStyle='#100e0c';c.fillRect(Math.round(x),y,9,2);
       c.fillStyle='#bb491e';c.fillRect(Math.round(x)+2,y+1,3,1);
       if(progress>.6){c.fillStyle='#ff9c3e';c.fillRect(Math.round(x)+3,y-Math.round(2+Math.sin(effectTime*3+i)*2),1,2);}

@@ -72,7 +72,7 @@ const assert = require('node:assert/strict');
       assert(await page.locator('.movement-cue').isVisible());
       fs.mkdirSync('artifacts', {recursive:true});
       await page.screenshot({path:`artifacts/answer-animation-${width}.png`});
-      await page.waitForTimeout(1800);
+      await page.waitForFunction(()=>!document.body.classList.contains('showing-cinematic'),{},{timeout:10000});
       assert.equal(await page.locator('.movement-cue').count(), 0);
       assert.equal(await page.locator('.answer').count(), 4);
       const respondent=await page.evaluate(()=>HellscapeUI.game.s.result.respondent);

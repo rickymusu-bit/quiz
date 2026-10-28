@@ -8,7 +8,10 @@ const {chromium}=require('playwright'),fs=require('node:fs'),assert=require('nod
    await context.route('**/*',r=>{if(r.request().url()==='http://preview.test/')r.fulfill({contentType:'text/html',body:fs.readFileSync('dist/Hellscape-Ammo.html','utf8')});else{requests.push(r.request().url());r.abort()}});
    const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));await page.goto('http://preview.test/');
    await page.waitForFunction('FoolAmmo.load().complete && FoolBridge.load().complete');
-   await page.waitForTimeout(600);await page.clock.install();await page.clock.pauseAt(await page.evaluate('Date.now()+100'));
+   const epoch=new Date('2026-10-28T00:00:00Z');
+   await page.clock.install({time:epoch});
+   // A controlled origin avoids racing a 100 ms deadline across browser round trips.
+   await page.clock.pauseAt(new Date(epoch.getTime()+60000));
    for(const label of ['Catene','Tributo','Malocchio','Sigillo','Contrappasso','Livella','Flagello']){
     await page.getByRole('button',{name:label,exact:true}).click();await page.clock.runFor(650);
     assert.match(await page.locator('#effect-description').innerText(),new RegExp(label));

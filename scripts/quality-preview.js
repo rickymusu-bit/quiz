@@ -72,6 +72,8 @@
           return render(...args);
         };
       }
+    } else if (scenario === 'corsa') {
+      // The unrevealed question keeps the real timer stopped while the scene runs.
     } else {
       game.reveal();
       game.pause('Revisione grafica');
@@ -82,7 +84,7 @@
     await d.fonts.ready;
   }
   let busy = false;
-  for (const [key, label] of Object.entries({home:'Home',selezione:'Veicoli',quiz:'Domanda / Ammo',ultima:'Ultimo esito',spareggio:'Primo turno spareggio',portale:'Portale attuale',vittoria:'Finale attuale',gameover:'Game Over',regole:'Regole'})) {
+  for (const [key, label] of Object.entries({home:'Home',selezione:'Veicoli',quiz:'Domanda / Ammo',corsa:'Corsa / locomozione',ultima:'Ultimo esito',spareggio:'Primo turno spareggio',portale:'Portale attuale',vittoria:'Finale attuale',gameover:'Game Over',regole:'Regole'})) {
     const button = document.createElement('button');
     button.textContent = label;
     button.style.cssText = 'min-height:44px;padding:8px;margin:4px;font:inherit';
