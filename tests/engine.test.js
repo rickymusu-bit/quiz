@@ -27,7 +27,7 @@ test('Malocchio bypasses a pending Catene once but the skipped ordinary turn rem
  assert.equal(g.s.valid,3);
  F.Game.restore(g.snapshot());
 });
-test('Rules and names: Tributo, Livella and no multiplier',()=>{assert.equal(F.RULES,'24.0.0');assert.equal(F.LABELS.ruba,'Tributo');assert.equal(F.LABELS.marx,'Livella');assert.equal(F.TYPES.length,9);assert.equal(F.VERSION,'2.7.0')});
+test('Rules and names: Tributo, Livella and no multiplier',()=>{assert.equal(F.RULES,'25.0.0');assert.equal(F.LABELS.ruba,'Tributo');assert.equal(F.LABELS.marx,'Livella');assert.equal(F.TYPES.length,9);assert.equal(F.VERSION,'2.8.0')});
 test('Six unique junkpunk vehicles and backward-compatible legacy games',()=>{
  const cfg=settings();
  const selected=['ape','chopper','truck'];
@@ -99,13 +99,10 @@ test('Ninety-nine questions transition to tie-break only at 99',()=>{const g=gam
 test('Save and resume during tie-break preserves elimination and timer',()=>{const g=game(3,0);g.s.groups.forEach(t=>t.damage=2);finishOrdinary(g);g.next();reply(g,false);const s=g.snapshot(),r=F.Game.restore(s);assert.equal(r.s.phase,'pareggio');assert.equal(r.s.tieIndex,0);assert.equal(r.s.groups[g.s.order[0]].out,true);r.next();assert.equal(r.s.respondent,g.s.order[1]);F.Game.restore(r.snapshot())});
 test('Previous ordinary saves can be migrated without changing scores',()=>{const g=game(33,0);reply(g,true);const s=g.snapshot();s.version='1.2.0';s.rules='18.2.0';s.groups[0].streak=1;s.drawWins=[0,0,0];const r=F.Game.restore(s);assert.equal(r.s.phase,'ordinaria');assert.equal(r.s.version,F.VERSION);assert.equal(r.s.groups[0].streak,undefined);assert.equal(F.exact(r.s.groups[g.s.respondent].score),F.exact(g.s.groups[g.s.respondent].score))});
 test('Two disciplinary eliminations immediately award the remaining team',()=>{const g=game();g.openSanctions();g.s.panel.counts=[3,3,0];g.closeSanctions(true);assert.equal(g.s.phase,'conclusa');assert.equal(g.s.winner,2)});
-test('One unblocked attack transforms one Contrappasso only, preserving the remaining copies',()=>{
+test('Unblocked attacks never consume or transform stored Contrappasso copies',()=>{
  const g=game(),target=g.s.order[1],source=g.s.owner,items=[0,1,2].map(()=>({id:g.uid(),type:'karma',target:null,origin:'test'}));
- g.s.groups[target].inventory.push(...items);g.attack('ruba',source,target,g.uid());
- assert.equal(g.s.groups[target].inventory.filter(c=>c.type==='karma').length,2);
- assert.equal(items[0].type,'ruba');assert.equal(items[0].target,source);
- g.attack('salta',source,target,g.uid());assert.equal(items[1].type,'salta');assert.equal(items[2].type,'karma');
- F.Game.restore(g.snapshot());
+ g.s.groups[target].inventory.push(...items);const before=copy(items);g.attack('ruba',source,target,g.uid());g.attack('salta',source,target,g.uid());
+ assert.deepEqual(items,before);assert.equal(g.s.groups[target].contrappasso,null);assert(!g.s.events.some(e=>e.type==='karma-trigger'));F.Game.restore(g.snapshot());
 });
 test('An Sigillo-blocked attack leaves every Contrappasso unchanged',()=>{
  const g=game(),target=g.s.order[1];g.s.groups[target].aura=g.s.turn;

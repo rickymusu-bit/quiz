@@ -988,6 +988,8 @@
       description = name(event.source) + ": Tributo, 33% dei punti sottratto; turno ceduto";
     else if (ammo === "svela")
       description = name(event.source) + ": Malocchio, scelta del destinatario";
+    else if (ammo === "karma")
+      description = name(event.source) + ": Contrappasso, 3 turni di punti e rischio doppi";
     else if (ammo === "aura")
       description = name(event.source) + ": Sigillo attivo per 3 turni personali; Ammo bloccate";
     else if (ammo === "marx")
@@ -1032,7 +1034,7 @@
       if(s.phase==="pareggio")stats.append(node("span","Punti congelati","tie-score-note"));
       button.append(node("span", g.name, "turn-name"), stats);
       const effects = s.effects.filter(e => e.target === i);
-      if (effects.length || g.aura !== null) {
+      if (effects.length || g.aura !== null || g.contrappasso !== null) {
         const statuses = node("span", undefined, "active-ammo-effects");
         for (const effect of effects) {
           const label = effect.type === "salta"
@@ -1044,6 +1046,8 @@
         }
         if (g.aura !== null)
           statuses.append(node("span", "Sigillo: " + g.aura + (g.aura === 1 ? " turno" : " turni"), "effect-chip shielded"));
+        if (g.contrappasso !== null)
+          statuses.append(node("span", "Contrappasso: " + g.contrappasso + (g.contrappasso === 1 ? " turno" : " turni") + " · ×2", "effect-chip"));
         button.append(statuses);
       }
       item.append(button);
@@ -1123,7 +1127,7 @@
     return team === s.owner && team === s.respondent && !s.groups[team].out && s.groups[team].aura === null &&
       s.phase === "ordinaria" && ["hidden", "answer"].includes(s.screen) &&
       !(s.screen === "answer" && s.paused && !inventoryCanResume) &&
-      copy.type !== "karma" && !(copy.type === "svela" && s.screen !== "hidden") &&
+      !(copy.type === "karma" && s.groups[team].contrappasso !== null) && !(copy.type === "svela" && s.screen !== "hidden") &&
       (copy.type !== "antisigillo" || s.groups.some((g,i) => i !== team && !g.out && g.aura !== null)) &&
       (copy.target === null || !s.groups[copy.target].out) &&
       s.groups[team].inventory.some(c => c.id === copy.id);
@@ -1153,6 +1157,8 @@
     controls.append(btn("Chiudi", close));
     if (game && Number.isInteger(team) && game.s.groups[team].aura !== null)
       d.append(node("p", "Sigillo attivo: non puoi usare altre Ammo e non ne guadagni dalle risposte corrette.", "shield-restriction"));
+    if (copy?.type === "karma" && Number.isInteger(team) && game.s.groups[team].contrappasso !== null)
+      d.append(node("p", "Contrappasso è già attivo: non si accumula e potrai usarne un’altra copia alla scadenza.", "muted"));
     d.append(controls);
     d.addEventListener("cancel", e => { e.preventDefault(); close(); });
     document.body.append(d);
@@ -1228,7 +1234,7 @@
     main.classList.add("showing-movement");
     const cue = node("div", r.option === null ? "TEMPO SCADUTO" :
       r.correct ? "RISPOSTA CORRETTA" : "RISPOSTA ERRATA", "movement-cue");
-    if (r.malocchio && !r.correct) cue.append(node("span", "−" + F.formatScore(r.penalty) + " PT", "malocchio-loss"));
+    if ((r.malocchio || r.contrappasso) && !r.correct) cue.append(node("span", "−" + F.formatScore(r.penalty) + " PT", "score-loss"));
     cue.dataset.outcome = r.correct ? "correct" : "incorrect";
     cue.setAttribute("role", "status");
     cue.setAttribute("aria-live", "polite");
@@ -1428,7 +1434,10 @@
       });
       b.append(row);
     }
-    if (s.screen === "answer" && s.malocchio)
+    if (s.screen === "answer" && s.groups[s.respondent].contrappasso !== null)
+      b.append(node("p", "Contrappasso · corretta: +" + (s.config.bases[s.current.difficulty] * 2) + " punti; errore o tempo scaduto: −" +
+        (s.config.bases[s.current.difficulty] * 2) + " punti, minimo zero.", "question-risk"));
+    if (s.screen === "answer" && s.malocchio && s.groups[s.respondent].contrappasso === null)
       b.append(node("p", "Malocchio · errore o tempo scaduto: −" + s.config.bases[s.current.difficulty] +
         " punti, minimo zero. Punti e Ammo di una corretta restano a " + s.groups[s.respondent].name + ". La rotazione riparte da chi segue " + s.groups[s.malocchio.source].name + ".", "malocchio-risk"));
     if (s.screen === "answer" && !s.paused)
@@ -1468,14 +1477,17 @@
         ),
         text("p", s.current.explanation),
       );
-      if (r.malocchio && !r.correct)
-        ex.append(node("p", r.penaltyBlocked ? "Sigillo: penalità di Malocchio bloccata." : "Malocchio: −" + F.formatScore(r.penalty) + " punti · minimo zero", r.penaltyBlocked ? "good" : "bad"));
+      if ((r.malocchio || r.contrappasso) && !r.correct)
+        ex.append(node("p", r.penaltyBlocked ? "Sigillo: penalità di Malocchio bloccata." : (r.penaltyCause ?? "Malocchio") + ": −" + F.formatScore(r.penalty) + " punti · minimo zero", r.penaltyBlocked ? "good" : "bad"));
+      else if (r.multiplier === 2 && r.beneficiaries.length)
+        ex.append(node("p", F.formatScore(r.share) + " pt a " + s.groups[r.respondent].name + " · Contrappasso ×2; " +
+          "Tributo pendente: " + F.formatScore(r.beneficiaryShare) + " pt a " + r.beneficiaries.map(i=>s.groups[i].name).join(", ")));
       else if (r.base)
         ex.append(
           node(
             "p",
             F.formatScore(r.gross) +
-              " pt" +
+              " pt" + (r.multiplier === 2 ? " · Contrappasso ×2" : "") +
               (r.beneficiaries.length
                 ? " · quota " +
                   F.formatScore(r.share) +

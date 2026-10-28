@@ -59,10 +59,10 @@ with sync_playwright() as p:
         if i in (18,78):baseline=v.evaluate('JSON.stringify(HellscapeUI.game.snapshot())')
         elif 18<i<60 or i>78:assert baseline==v.evaluate('JSON.stringify(HellscapeUI.game.snapshot())'),'Rendering changed game state'
         frames.append(Image.open(BytesIO(q.screenshot())).convert('RGB').resize((640,480),Image.Resampling.LANCZOS))
-    final=state(v);assert types==['sacrificio','ruba','karma'];assert final['scores'][f['owner']]=='2107' and final['scores'][f['target']]=='670'
+    final=state(v);assert types==['sacrificio','ruba'];assert final['scores'][f['owner']]=='2107' and final['scores'][f['target']]=='670'
     assert final['lives']==report['after_sacrifice']['lives'] and final['owner']==f['target'] and final['valid']==0 and final['turn']==2
     assert final['current']==f['current'] and not final['effects'] and not final['inventory'][f['owner']]
-    assert final['inventory'][f['target']]==[{'type':'ruba','target':f['owner']}];report['after_tribute']=final
+    assert final['inventory'][f['target']]==[{'type':'karma','target':None}];report['after_tribute']=final
     palette=Image.new('P',(1,1));palette.putpalette(frames[32].quantize(colors=128,method=Image.Quantize.MEDIANCUT).getpalette()[:384]+frames[5].crop((150,70,490,390)).quantize(colors=64,method=Image.Quantize.MEDIANCUT).getpalette()[:192]+frames[65].crop((150,70,490,390)).quantize(colors=64,method=Image.Quantize.MEDIANCUT).getpalette()[:192])
     encoded=[im.quantize(palette=palette,dither=Image.Dither.NONE) for im in frames];file=ART/'sacrificio-tributo-gameplay.gif'
     durations=[(round((i+1)*100/12)-round(i*100/12))*10 for i in range(144)]

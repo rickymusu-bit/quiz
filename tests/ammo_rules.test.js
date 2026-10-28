@@ -49,18 +49,18 @@ test('Tributo immediately transfers exactly 33%, preserves total points and forf
   const r=F.Game.restore(g.snapshot());const before=r.s.groups[target].score;answer(r);assert.deepEqual(r.s.groups[target].score,F.add(before,F.rational(300)));
  }
 });
-test('Sigillo blocks Tributo transfer but still charges the turn; Contrappasso only reflects an unblocked attack',()=>{
+test('Sigillo blocks Tributo transfer but still charges the turn; stored Contrappasso stays unchanged',()=>{
  for(const blocked of [false,true]){
   const g=game(),[owner,target]=g.s.order;g.s.groups[target].score=F.rational(100);g.s.groups[target].aura=blocked?g.s.turn:null;
   const karma={id:g.uid(),type:'karma',target:null,origin:'test'};g.s.groups[target].inventory.push(karma);const c=item(g,'ruba');g.use(c.id,target);
   assert.equal(F.exact(g.s.groups[owner].score),blocked?'0':'33');assert.equal(F.exact(g.s.groups[target].score),blocked?'100':'67');assert.equal(g.s.owner,target);
-  assert.equal(karma.type,blocked?'karma':'ruba');assert.equal(karma.target,blocked?null:owner);F.Game.restore(g.snapshot());
+  assert.equal(karma.type,'karma');assert.equal(karma.target,null);F.Game.restore(g.snapshot());
  }
 });
-test('Reflected Tributo respects the bound target, charges its user and can be used repeatedly on current totals',()=>{
+test('A legacy bound Tributo respects its target and charges its user on the current total',()=>{
  const g=game(),[owner,target,third]=g.s.order;g.s.groups[owner].score=F.rational(100);g.s.groups[target].score=F.rational(100);
  g.s.groups[target].inventory.push({id:g.uid(),type:'karma',target:null,origin:'test'});g.use(item(g,'ruba').id,target);
- const c=g.s.groups[target].inventory.find(c=>c.type==='ruba');assert(c);assert.throws(()=>g.use(c.id,third));assert(g.s.groups[target].inventory.includes(c));
+ const c={id:g.uid(),type:'ruba',target:owner,origin:'legacy'};g.s.groups[target].inventory.push(c);assert.throws(()=>g.use(c.id,third));assert(g.s.groups[target].inventory.includes(c));
  g.use(c.id,owner);assert.equal(g.s.owner,third);assert.equal(F.exact(g.s.groups[owner].score),'8911/100');assert.equal(F.exact(g.s.groups[target].score),'11089/100');F.Game.restore(g.snapshot());
 });
 test('A 2.4 save keeps lives/progress, migrates default odds and settles existing deferred Tributi once',()=>{

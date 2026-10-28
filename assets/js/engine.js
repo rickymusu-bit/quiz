@@ -174,6 +174,7 @@
           cause: "",
           inventory: [],
           aura: null,
+          contrappasso: null,
         })),
         order,
         owner: order[0],
@@ -343,6 +344,13 @@
           this.log("Sigillo di " + s.groups[i].name + " scaduto", { type: "seal-expired", target: i, turn: s.turn });
         }
       }
+      if (s.groups[i].contrappasso !== null) {
+        s.groups[i].contrappasso--;
+        if (s.groups[i].contrappasso === 0) {
+          s.groups[i].contrappasso = null;
+          this.log("Contrappasso di " + s.groups[i].name + " scaduto", { type: "karma-expired", target: i, turn: s.turn });
+        }
+      }
       s.usedBonus = false;
       s.draftBonus = null;
       s.malocchio = null;
@@ -408,21 +416,6 @@
           type: "tribute-transfer", source, target, amount: clone(amount), turn: s.turn,
         });
       } else if (type !== "svela") s.effects.push({ id, type, source, target });
-      const karma = g.inventory.find((c) => c.type === "karma");
-      if (karma) {
-        karma.type = type;
-        karma.target = source;
-        karma.origin = id;
-        this.log(
-          "Contrappasso di " +
-            g.name +
-            " diventa " +
-            LABELS[type] +
-            " solo contro " +
-            s.groups[source].name,
-          { type: "karma-trigger", target, source, ammo: type, turn: s.turn },
-        );
-      }
       return true;
     }
     use(copyId, target, expected) {
@@ -446,7 +439,8 @@
       );
       need(g.aura === null, "Sigillo attivo: non puoi usare altre Ammo");
       const copy = g.inventory.find((c) => c.id === copyId);
-      need(copy && copy.type !== "karma", "Contrappasso si trasforma automaticamente");
+      need(copy, "Ammo non disponibile");
+      need(copy.type !== "karma" || g.contrappasso === null, "Contrappasso già attivo");
       need(
         copy.type !== "svela" || s.screen === "hidden",
         "Malocchio richiede domanda nascosta",
@@ -468,7 +462,7 @@
         need(s.groups[target].aura !== null, "Scegliere un avversario con Sigillo attivo");
       if (copy.type === "svela" && copy.target !== null)
         need(!s.groups[copy.target].out, "Il bersaglio vincolato è eliminato");
-      if (["marx", "ira", "sacrificio"].includes(copy.type))
+      if (["marx", "ira", "sacrificio", "karma"].includes(copy.type))
         need(target == null, LABELS[copy.type] + " non richiede un bersaglio");
       g.inventory = g.inventory.filter((c) => c.id !== copyId);
       s.usedBonus = true;
@@ -485,6 +479,11 @@
         s.groups[target].aura = null;
         this.log("Antisigillo: protezione di " + s.groups[target].name + " dissipata", {
           type: "seal-dispelled", source: s.respondent, target, turn: s.turn,
+        });
+      } else if (copy.type === "karma") {
+        g.contrappasso = 3;
+        this.log("Contrappasso: 3 turni personali, punti e rischio raddoppiati", {
+          type: "karma-activated", source: s.respondent, target: s.respondent, remaining: 3, turn: s.turn,
         });
       } else if (copy.type === "aura") {
         g.aura = 3;
@@ -625,6 +624,8 @@
         beneficiaries: [],
         bonus: null,
         penalty: rational(0),
+        contrappasso: g.contrappasso !== null,
+        multiplier: g.contrappasso !== null ? 2 : 1,
         malocchio: s.malocchio ? clone(s.malocchio) : null,
       };
       if (s.phase === "ordinaria") {
@@ -643,17 +644,20 @@
         ];
         if (correct) {
           const base = BigInt(s.config.bases[q.difficulty]);
-          const gross = rational(base),
+          const gross = rational(base * BigInt(result.multiplier)),
             share = rational(
               BigInt(gross.n),
               BigInt(gross.d) * BigInt(beneficiaries.length + 1),
             );
-          for (const id of [i, ...beneficiaries])
-            s.groups[id].score = add(s.groups[id].score, share);
+          const beneficiaryShare = rational(base, BigInt(beneficiaries.length + 1));
+          g.score = add(g.score, share);
+          for (const id of beneficiaries)
+            s.groups[id].score = add(s.groups[id].score, beneficiaryShare);
           Object.assign(result, {
             base: String(base),
             gross,
             share,
+            beneficiaryShare,
             beneficiaries,
           });
           {
@@ -674,14 +678,15 @@
             result.bonus = result.bonuses[0] ?? null;
           }
         }
-        if (!correct && s.malocchio) {
-          const value = rational(s.config.bases[q.difficulty]);
-          result.base = value.n;
-          result.penaltyBlocked = g.aura !== null && s.malocchio.source !== i;
+        if (!correct && (s.malocchio || result.contrappasso)) {
+          const value = rational(BigInt(s.config.bases[q.difficulty]) * BigInt(result.multiplier));
+          result.base = String(s.config.bases[q.difficulty]);
+          result.penaltyCause = result.contrappasso ? "Contrappasso" : "Malocchio";
+          result.penaltyBlocked = !result.contrappasso && g.aura !== null && s.malocchio.source !== i;
           result.penalty = result.penaltyBlocked ? rational(0) : compare(g.score, value) <= 0 ? clone(g.score) : value;
           g.score = add(g.score, rational(-BigInt(result.penalty.n), BigInt(result.penalty.d)));
-          this.log("Malocchio: " + g.name + " perde " + exact(result.penalty) + " punti (valore domanda " + exact(value) + ", minimo zero)", {
-            type: "malocchio-penalty", source: s.malocchio.source, target: i, amount: clone(result.penalty), value, questionId: q.id, turn: s.turn,
+          this.log(result.penaltyCause + ": " + g.name + " perde " + exact(result.penalty) + " punti (penalità prevista " + exact(value) + ", minimo zero)", {
+            type: result.contrappasso ? "karma-penalty" : "malocchio-penalty", source: result.contrappasso ? i : s.malocchio.source, target: i, amount: clone(result.penalty), value, questionId: q.id, turn: s.turn,
           });
         }
         s.effects = s.effects.filter(
@@ -719,6 +724,7 @@
       g.cause = cause;
       g.inventory = [];
       g.aura = null;
+      g.contrappasso = null;
       s.effects = s.effects.filter((e) => e.source !== i && e.target !== i);
     }
     complete(winner) {
@@ -788,6 +794,7 @@
         for (const g of s.groups) {
           g.inventory = [];
           g.aura = null;
+          g.contrappasso = null;
         }
         if (s.result) {
           s.result.bonus = null;
@@ -910,7 +917,10 @@
       return s;
     }
     static restore(raw, deps = {}) {
-      const s = clone(raw), legacyShield = s.version !== VERSION, legacyDamage = ["1.2.0", "2.0.0", "2.1.0", "2.2.0", "2.2.1", "2.3.0"].includes(s.version);
+      const s = clone(raw),
+        legacyKarma = s.version !== VERSION,
+        legacyShield = ["1.2.0", "2.0.0", "2.1.0", "2.2.0", "2.2.1", "2.3.0", "2.4.0", "2.5.0", "2.6.0"].includes(s.version),
+        legacyDamage = ["1.2.0", "2.0.0", "2.1.0", "2.2.0", "2.2.1", "2.3.0"].includes(s.version);
       if (
         s.version === "1.2.0" &&
         s.rules === "18.2.0" &&
@@ -959,7 +969,13 @@
         s.version = VERSION;
         s.rules = RULES;
       }
+      if (s.version === "2.7.0" && s.rules === "24.0.0") {
+        s.version = VERSION;
+        s.rules = RULES;
+      }
       if (s.version === VERSION && s.rules === RULES) {
+        if (Array.isArray(s.groups)) for (const g of s.groups)
+          if (legacyKarma && g.contrappasso === undefined) g.contrappasso = null;
         if (legacyShield && Array.isArray(s.groups)) {
           for (const g of s.groups) if (g.aura !== null) {
             need(Number.isSafeInteger(g.aura) && g.aura > 0 && g.aura <= s.turn, "Sigillo precedente non valido");
@@ -1094,6 +1110,7 @@
           (Number.isInteger(g.aura) && g.aura >= 1 && g.aura <= 3),
         "Sigillo non valida",
       );
+      need(g.contrappasso === null || (Number.isInteger(g.contrappasso) && g.contrappasso >= 1 && g.contrappasso <= 3), "Contrappasso non valido");
       need(Array.isArray(g.inventory), "Inventario non valido");
       for (const c of g.inventory) {
         need(
@@ -1111,7 +1128,7 @@
         );
       }
       need(
-        !g.out || (!g.inventory.length && g.aura === null),
+        !g.out || (!g.inventory.length && g.aura === null && g.contrappasso === null),
         "Eliminato con Ammo",
       );
     }
@@ -1260,7 +1277,7 @@
     );
     need(
       s.phase !== "pareggio" ||
-        (s.groups.every((g) => !g.inventory.length && g.aura === null) &&
+        (s.groups.every((g) => !g.inventory.length && g.aura === null && g.contrappasso === null) &&
           !s.effects.length),
       "Ammo presenti nello Ultimo Miglio",
     );

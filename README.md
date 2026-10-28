@@ -1,4 +1,22 @@
-# Sigillo · motore 2.7.0 / regole 24.0.0
+# Contrappasso · motore 2.8.0 / regole 25.0.0
+
+Contrappasso diventa un’Ammo **attivabile su di sé**: per tre turni personali,
+incluso quello di attivazione, le risposte corrette assegnano il doppio dei punti;
+errore o tempo scaduto sottraggono il doppio del valore della domanda, con
+**minimo zero** e senza perdere vite. Il contatore 3 → 2 → 1 scende solo
+all’inizio dei propri turni e termina all’inizio del quarto.
+
+Non trasforma più le Ammo ricevute. Non si accumula, non è riattivabile finché
+dura, non raddoppia i premi Ammo o i punti delle altre Ammo. Si applica alle
+risposte del giocatore, anche con Malocchio ricevuto: il moltiplicatore appartiene
+al rispondente e la penalità complessiva resta ×2, non ×3. Un Sigillo successivo
+non annulla il rischio proprio; blocca comunque nuove attivazioni e premi Ammo.
+Il contatore persiste, Flagello non lo rimuove ai superstiti, eliminazione e
+Ultimo Miglio lo terminano. I salvataggi precedenti conservano inventari e
+copie già vincolate senza attivare bonus retroattivi; i contatori Sigillo 2/1
+restano invariati nella migrazione da 2.7.0.
+
+## Sigillo · motore 2.7.0 / regole 24.0.0
 
 Sigillo dura **tre turni personali**, incluso quello di attivazione. Il contatore
 3 → 2 → 1 scende soltanto all’inizio dei propri turni; al quarto scade. Protegge

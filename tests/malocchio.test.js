@@ -42,7 +42,7 @@ test('A normal wrong answer after Malocchio has no penalty and normal rotation r
  const g=game(),[source,second,third]=g.s.order;peek(g,third);g.answer(g.s.current.correct);g.next();assert.equal(g.s.owner,second);g.s.groups[second].score=F.rational(600);g.reveal();wrong(g);
  assert.equal(F.exact(g.s.groups[second].score),'600');assert.equal(g.s.result.malocchio,null);assert.equal(g.s.result.penalty.n,'0');g.next();assert.equal(g.s.owner,third);F.Game.restore(g.snapshot());
 });
-test('Sigillo blocks a pass but keeps the risk on its author; Contrappasso constrains only the recipient',()=>{
+test('Sigillo blocks a pass but keeps the risk on its author; legacy copy constraints only limit the recipient',()=>{
  const g=game(),[source,target,third]=g.s.order;g.s.groups[target].aura=g.s.turn;g.s.groups[source].score=F.rational(1000);peek(g,target);assert.equal(g.s.respondent,source);wrong(g);
  assert(F.compare(g.s.groups[source].score,F.rational(1000))<0);assert.equal(g.s.groups[target].score.n,'0');g.next();assert.equal(g.s.owner,target);
  const h=game();peek(h,null,h.s.order[1]);assert.throws(()=>h.pass(h.s.order[2]));assert.equal(h.s.screen,'choice');h.pass(h.s.owner);wrong(h);F.Game.restore(h.snapshot());

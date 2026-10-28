@@ -3,9 +3,9 @@ const { chromium } = require('playwright');
 const assert = require('node:assert/strict');
 const fs = require('node:fs'), path = require('node:path'), http = require('node:http');
 const root = path.resolve(__dirname, '..'), offline = process.argv.includes('--offline');
-const types = ['salta','ruba','svela','aura','marx','ira','sacrificio'];
+const types = ['salta','ruba','svela','aura','marx','ira','sacrificio','karma'];
 const selected = process.argv.find(arg=>arg.startsWith('--case='))?.split('=')[1];
-const modes = ['karma','shield','lethal','timer','reduced'];
+const modes = ['shield','lethal','timer','reduced'];
 assert(!selected||[...types,...modes,'reload'].includes(selected),'Unknown Ammo test case');
 (async () => {
   fs.mkdirSync(path.join(root,'artifacts'), {recursive:true});
@@ -39,16 +39,15 @@ assert(!selected||[...types,...modes,'reload'].includes(selected),'Unknown Ammo 
     await page.clock.runFor(2000);
     return {page,view};
   }
-  async function use(view,type,{answer=false,karma=false,shield=false,lethal=false}={}) {
-    const target = await view.evaluate(({type,karma,shield,lethal})=>{
+  async function use(view,type,{answer=false,shield=false,lethal=false}={}) {
+    const target = await view.evaluate(({type,shield,lethal})=>{
       const g=HellscapeUI.game,s=g.s,target=s.order.find(i=>i!==s.owner);
       s.groups[s.owner].inventory=[{id:g.uid(),type,target:null,origin:'test'}];
-      if(karma)s.groups[target].inventory=[{id:g.uid(),type:'karma',target:null,origin:'test'}];
       if(shield)s.groups[target].aura=s.turn;
       if(lethal)s.groups.forEach(v=>v.damage=2);
       HellscapeUI.changed();
       return target;
-    },{type,karma,shield,lethal});
+    },{type,shield,lethal});
     if(answer)await view.getByRole('button',{name:'Svela e avvia il tempo',exact:true}).click();
     if(answer)await view.locator('body').press('i');
     else await view.getByRole('button',{name:'Inventario',exact:true}).click();
@@ -80,7 +79,7 @@ assert(!selected||[...types,...modes,'reload'].includes(selected),'Unknown Ammo 
     for(const mode of modes.filter(mode=>!selected||selected===mode)){
       const {page,view}=await start(1440,900,mode==='reduced');
       await use(view,mode==='lethal'?'ira':mode==='timer'||mode==='reduced'?'aura':'salta',
-        {karma:mode==='karma',shield:mode==='shield',lethal:mode==='lethal',answer:mode==='timer'});
+        {shield:mode==='shield',lethal:mode==='lethal',answer:mode==='timer'});
       if(mode==='timer'){
         await page.clock.runFor(250);assert.equal(await view.evaluate('HellscapeUI.game.running'),false);
         const left=await view.evaluate('HellscapeUI.game.left()');
@@ -96,8 +95,8 @@ assert(!selected||[...types,...modes,'reload'].includes(selected),'Unknown Ammo 
         await page.clock.runFor(150);assert.equal(await view.locator('.hell-race canvas').evaluate(c=>c.toDataURL()),frame);
         await page.clock.runFor(350);assert.equal(await view.locator('.hell-race').getAttribute('data-ammo'),'');
       }else{
-        await page.clock.runFor(mode==='karma'?2050:650);
-        const type=mode==='karma'?'karma':mode==='shield'?'salta':'ira';
+        await page.clock.runFor(650);
+        const type=mode==='shield'?'salta':'ira';
         assert.equal(await view.locator('.hell-race').getAttribute('data-ammo'),type);
         if(mode==='shield')assert.match(await view.locator('.ammo-status').textContent(),/bloccato/);
         if(mode==='lethal')assert.equal(await view.locator('.hell-race').getAttribute('data-ending-phase'),'ammo');
