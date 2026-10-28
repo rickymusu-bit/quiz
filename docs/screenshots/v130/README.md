@@ -1,6 +1,6 @@
 # Screenshot reali v1.3.0
 
-Revisione del codice acquisito: `28b39ac6ca04524ce9788d0c434f8a81c2dc0337`. Il commit successivo aggiunge evidenze e correzioni alle aspettative dei test; non modifica il codice del gioco. Acquisizione con Chromium reale, motore e renderer di produzione, partite controllate dal test `tests/v130_browser.cjs`. Nessun mockup, immagine generata o HTML di preview.
+Revisione del codice acquisito: `f51aa602ed4d4fec5d225e0104dff618e0f3a8cd`. I commit delle evidenze non modificano il codice del gioco dopo l’acquisizione. Acquisizione con Chromium reale, motore e renderer di produzione, partite controllate dal test `tests/v130_browser.cjs`. Nessun mockup, immagine generata o HTML di preview.
 
 La scena mantiene il rapporto 4:3; sui telefoni verticali i controlli si dispongono fuori dalla scena. Le dimensioni indicate sono quelle del viewport CSS; il DPR indica la densità del PNG.
 

@@ -2,23 +2,24 @@
 > hellscape@3.9.0 test:v130
 > node --test tests/v130.test.js && node tests/v130_browser.cjs
 
-✔ Flagello subtracts exact rational amounts at every boundary, wipes fresh Ammo and preserves seals (56.741852ms)
-✔ Flagello resolves a sole survivor and self-elimination after all effects, leaving the eliminated state unchanged (3.07308ms)
-✔ Antisigillo refuses unprotected, eliminated, missing and self targets without consuming Ammo (5.920707ms)
-✔ Antisigillo dissipates only the protection, bypasses reflection and enables each later attack (10.762029ms)
-✔ Antisigillo uses an independent 30% threshold and migrates old probabilities and stored copies (2.993064ms)
-✔ Ultimo Miglio keeps damage, sanctions and scores; timeout and wrong answer remove exactly one life (12.740547ms)
-✔ Ultimo Miglio completes all due questions, including the last elimination, before Game Over (1.906181ms)
-✔ Exhaustion and supply never fall back to easy/medium; restore keeps the due turn and seen questions (4.203325ms)
-✔ Legacy ties retain their actual one-life budget and retire non-hard open questions without replay (28.969711ms)
-ℹ tests 9
+✔ Flagello subtracts exact rational amounts at every boundary, wipes fresh Ammo and preserves seals (10.44505ms)
+✔ Flagello resolves a sole survivor and self-elimination after all effects, leaving the eliminated state unchanged (2.635371ms)
+✔ Antisigillo refuses unprotected, eliminated, missing and self targets without consuming Ammo (1.267555ms)
+✔ Antisigillo dissipates only the protection, bypasses reflection and enables each later attack (2.264216ms)
+✔ Antisigillo uses an independent 30% threshold and migrates old probabilities and stored copies (6.15303ms)
+✔ Ultimo Miglio keeps damage, sanctions and scores; timeout and wrong answer remove exactly one life (5.071358ms)
+✔ Ultimo Miglio completes all due questions, including the last elimination, before Game Over (1.96918ms)
+✔ Exhaustion and supply never fall back to easy/medium; restore keeps the due turn and seen questions (1.732582ms)
+✔ Legacy ties retain their actual one-life budget and retire non-hard open questions without replay (2.157174ms)
+✔ A current-format tie save rejects an easy queued question before it can bypass the hard-only reserve (1.446131ms)
+ℹ tests 10
 ℹ suites 0
-ℹ pass 9
+ℹ pass 10
 ℹ fail 0
 ℹ cancelled 0
 ℹ skipped 0
 ℹ todo 0
-ℹ duration_ms 269.233851
+ℹ duration_ms 111.866874
 Screenshot: ordinary-1440x1080-dpr1.png
 Screenshot: malocchio-1440x1080-dpr1.png
 Screenshot: antisigillo-1440x1080-dpr1.png

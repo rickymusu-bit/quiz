@@ -19,7 +19,7 @@ La specifica vincolante resta [v1.3.0](HELLSCAPE_CORREZIONI_CODEX_v1.3.0.md).
 
 I salvataggi ordinari precedenti conservano domande, punti, danni, sanzioni e pesi già scelti; il peso Antisigillo mancante riceve 30. Le copie Antisigillo già presenti vengono validate.
 
-Il vecchio spareggio cancellava i danni ordinari e imponeva una vita. Nei salvataggi già entrati in quella fase si conserva quella vita effettiva: i danni cancellati non sono ricostruibili con certezza e gli eliminati non vengono resuscitati. Una domanda facile/media ancora aperta viene ritirata sullo stesso turno, mantenuta fra quelle viste/annullate se già svelata, e sostituita da una difficile nuova. Gli esiti storici conservano il quesito originale. La migrazione è coperta da test.
+Il vecchio spareggio cancellava i danni ordinari e imponeva una vita. Nei salvataggi già entrati in quella fase si conserva quella vita effettiva: i danni cancellati non sono ricostruibili con certezza e gli eliminati non vengono resuscitati. Una domanda facile/media ancora aperta viene ritirata sullo stesso turno, mantenuta fra quelle viste/annullate se già svelata, e sostituita da una difficile nuova. Gli esiti storici conservano il quesito originale. Nei salvataggi correnti una coda con domande facili/medie durante l’Ultimo Miglio viene respinta prima del ripristino. La migrazione è coperta da test.
 
 ## Verifiche riproducibili
 
@@ -39,7 +39,7 @@ python3 tests/portal_browser.py --quick
 python3 tests/tie_browser.py --quick
 ```
 
-Esiti verificati: `npm test`, suite browser completa, frame, build, offline, accettazione v1.3.0, responsive, finali, inseguimento, portale e Ultimo Miglio superati. I log sono nella cartella `screenshots/v130/logs`.
+Esiti verificati: `npm test`, suite browser completa, frame, build, offline, accettazione v1.3.0, responsive, finali, inseguimento, portale e Ultimo Miglio superati. Superati anche 60 scenari dell’audit visuale offline a DPR 1/2, dimostrazione degli otto artefatti, movimento e terreno. I log sono nella cartella `screenshots/v130/logs`.
 
 I test browser usano Chromium reale. Gli scenari v1.3.0 impostano partite controllate con il vero motore e acquisiscono PNG del vero renderer, senza mockup o HTML consegnati come anteprima. I parametri e i risultati sono in [evidence.json](screenshots/v130/evidence.json); i tempi del renderer sono in [render-audit.json](screenshots/v130/render-audit.json).
 

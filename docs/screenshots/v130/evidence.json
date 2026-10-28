@@ -1,5 +1,5 @@
 {
-  "revision": "28b39ac6ca04524ce9788d0c434f8a81c2dc0337",
+  "revision": "f51aa602ed4d4fec5d225e0104dff618e0f3a8cd",
   "checks": [
     {
       "viewport": [
@@ -67,7 +67,7 @@
         1080
       ],
       "dpr": 1,
-      "sha256": "3d6944cbeefa68e0aea1b67e8c989e1c34d1bf22bbf2a23152147b92f5d483fa"
+      "sha256": "a7206d9c337f3fe6560cb7ee4323945e156ac0d0707f1d2fde890ca5327e5df9"
     },
     {
       "file": "malocchio-1440x1080-dpr1.png",
@@ -76,7 +76,7 @@
         1080
       ],
       "dpr": 1,
-      "sha256": "2773a2fc6d02ef1424281750e1c99c1ff2519c49b4149bce61ec2bf4d459d674"
+      "sha256": "62610fd393841a647a16c726479884f887afa238b783a29b4db3d0342838cb3e"
     },
     {
       "file": "antisigillo-1440x1080-dpr1.png",
@@ -85,7 +85,7 @@
         1080
       ],
       "dpr": 1,
-      "sha256": "daf9824f00c2bd17851ec6a9cb6ca982d64d498e6ea6abe8f7acf562dc986ae5"
+      "sha256": "69374292e664752b3d108a442aebd1b8593f130403f142c74a687c3423053dc2"
     },
     {
       "file": "flagello-confirm-1440x1080-dpr1.png",
@@ -94,7 +94,7 @@
         1080
       ],
       "dpr": 1,
-      "sha256": "1b19679ec387006629eb3b8c8fae523432aba0edf985454b9b0dbec7d58b6b40"
+      "sha256": "407761c60926e9cb61bddebb534a895d2dc3fc8a9b41742e96f37f5f7026ba9a"
     },
     {
       "file": "flagello-result-1440x1080-dpr1.png",
@@ -103,7 +103,7 @@
         1080
       ],
       "dpr": 1,
-      "sha256": "a73ef6fd83d14fa093feae8497d948a290b7cf065d058ac1789c39d5bdb4d848"
+      "sha256": "afbb3e4bfe2e832bced8529c6d8b70ce32f8909114761db67b3fe5c97f78f8f0"
     },
     {
       "file": "ultimo-miglio-1440x1080-dpr1.png",
@@ -112,7 +112,7 @@
         1080
       ],
       "dpr": 1,
-      "sha256": "c6ef8a8ab66f3e5096137d68a7e01d55f46c87e44e00c8a5d3d8020fba954a05"
+      "sha256": "b739246dda5832e6315dc575557c38e922f380217477bf22c68dd78d92feca8c"
     },
     {
       "file": "capture-flame-1440x1080-dpr1.png",
@@ -121,7 +121,7 @@
         1080
       ],
       "dpr": 1,
-      "sha256": "77845313e83e3ea8aa3196121add39ed6fb884fa90eb10e22267f19b9dd55c37"
+      "sha256": "1c970e25f54d3a1064776606b9582aa01af27d07e9aaa3ea9578e379734220f0"
     },
     {
       "file": "portal-descent-1440x1080-dpr1.png",
@@ -130,7 +130,7 @@
         1080
       ],
       "dpr": 1,
-      "sha256": "bab746e32a25b7468be58c13958d779f23931b1e63d2394bff15f5c73fea2346"
+      "sha256": "46eb4ace72d701041a60fe9a04836f4e2384cf268009395cf8c8d47780e5874e"
     },
     {
       "file": "portal-impact-1440x1080-dpr1.png",
@@ -139,7 +139,7 @@
         1080
       ],
       "dpr": 1,
-      "sha256": "85d2920e7533e3c0770c9b6ce8e535f8735efa54f26e0c9018fdfcd9c0545245"
+      "sha256": "4f1efbbc9724bcf7d8e936a572391a09a05b5e536f9b7c7a97a01f983910ea59"
     },
     {
       "file": "portal-crossing-1440x1080-dpr1.png",
@@ -148,7 +148,7 @@
         1080
       ],
       "dpr": 1,
-      "sha256": "1ff981a1d95466d36e5c9ccf3c59c84e9d3d1978073ee4b7d7e1d3f3702f949c"
+      "sha256": "62e301d7b59f9a1e0d5b0b8a290fe2eca50869a0e1f1f53915d9e90df717d7d3"
     },
     {
       "file": "portal-rubble-1440x1080-dpr1.png",
@@ -157,7 +157,7 @@
         1080
       ],
       "dpr": 1,
-      "sha256": "eb0d2068a9fcadb7b9d904999e6df7077b69e4f8d3e989c26c59fd8ad8bb8d0a"
+      "sha256": "1319cdd9ce1eb07e65a652a67262e4a2d0f9d21127fdb0b0bb34dd65aa05ea2d"
     },
     {
       "file": "ordinary-390x844-dpr2.png",
@@ -166,7 +166,7 @@
         844
       ],
       "dpr": 2,
-      "sha256": "a407a02ae0a5ebcf71588816f4eb96cfb0b3c7779c0b9aeba94fc71ee33184b8"
+      "sha256": "d0400275e212f6a2f0be6c1695ead5f463ee1adead65f3e932012fb098506648"
     },
     {
       "file": "malocchio-390x844-dpr2.png",
@@ -175,7 +175,7 @@
         844
       ],
       "dpr": 2,
-      "sha256": "a7f3c13ad15ea0bfb92a6c8842c80c9e8244238549d6550869e5ef5a84995f93"
+      "sha256": "6252d3c79fbaab6adcfa8ae049b3e70ffb4be761620c2c9d3be7ec08dcce0be4"
     },
     {
       "file": "antisigillo-390x844-dpr2.png",
@@ -184,7 +184,7 @@
         844
       ],
       "dpr": 2,
-      "sha256": "c0b0cf7f66156c6ac7d4217e78a8b5de4ca26f89bf1e897a5ccc3f0ca156623f"
+      "sha256": "228465bb4826c199877a99cf7c69b102f124173bd135b8ee00807a13d4e8986d"
     },
     {
       "file": "flagello-confirm-390x844-dpr2.png",
@@ -193,7 +193,7 @@
         844
       ],
       "dpr": 2,
-      "sha256": "d203cdcc76a5f48cb04dd0b12f745ab1263c6cb8ebaa1fe05048acb398659d4d"
+      "sha256": "bc6d96853086929ad6868ef3fa640e4ddc14045f7880fbd8b72fd48fb16145cc"
     },
     {
       "file": "flagello-result-390x844-dpr2.png",
@@ -202,7 +202,7 @@
         844
       ],
       "dpr": 2,
-      "sha256": "63041bb8f80a814c4d3cb16497ffdc0675cfdfaebdc887fa6358e1f50603374a"
+      "sha256": "255828485be2e6c10155347e8f9a7a6d27633478982ad3d59254756204ba6be8"
     },
     {
       "file": "ultimo-miglio-390x844-dpr2.png",
@@ -211,7 +211,7 @@
         844
       ],
       "dpr": 2,
-      "sha256": "4eba17fe2fdd83de91807cef97641f4e1583108f6b8d21a36887272f2f54a1a7"
+      "sha256": "3e0c8835970c10646f4e55af0334cda1eaf668e634f6b210d2a3ebe6f69c9f87"
     },
     {
       "file": "capture-flame-390x844-dpr2.png",
@@ -220,7 +220,7 @@
         844
       ],
       "dpr": 2,
-      "sha256": "cfb005b2538bf699cf421e3e43186f638c120722e7002b981ffa15b7996bb625"
+      "sha256": "5a339510aae02c60beea25c8062dc543ecb544bfcd32d997e84424119a5e4fb2"
     },
     {
       "file": "portal-descent-390x844-dpr2.png",
@@ -229,7 +229,7 @@
         844
       ],
       "dpr": 2,
-      "sha256": "ccacd02c5950a61b8a02b2419980a0eccc7cb209c628fb5f4362972c78b40155"
+      "sha256": "f0a9a27a1912f091759e95f8a6e3b04e1c20d7bc71fb9931e4eb50ad60f99a7b"
     },
     {
       "file": "portal-impact-390x844-dpr2.png",
@@ -238,7 +238,7 @@
         844
       ],
       "dpr": 2,
-      "sha256": "42baa88a41c5ba2348da7d33c5f6994072211450c298b446725e27796675f8d0"
+      "sha256": "e150ed2d0e69ba2345e25c1443eaa92e6680d5616f025fb429816542e5bf8fc6"
     },
     {
       "file": "portal-crossing-390x844-dpr2.png",
@@ -247,7 +247,7 @@
         844
       ],
       "dpr": 2,
-      "sha256": "ca42dc0f82c12d83d53cad2b9387d6f2d72e59869e236f2266b2eebe01ca1999"
+      "sha256": "eb7758a9c4a75e76bd96a53a90c2ffe4a885ad931b18a5753acd90c1f263ad88"
     },
     {
       "file": "portal-rubble-390x844-dpr2.png",
@@ -256,7 +256,7 @@
         844
       ],
       "dpr": 2,
-      "sha256": "543d08b2b2f32ff48640b980bcfa67ffe78c4fa8e9bda4f4f2430a94401ca4e2"
+      "sha256": "7c332dfe388d961736783fcb15c457d0f20957de9b591e2698413bbafdc1b975"
     },
     {
       "file": "ordinary-844x390-dpr2.png",
@@ -265,7 +265,7 @@
         390
       ],
       "dpr": 2,
-      "sha256": "35adbae8f5b03f97abbb304148c73ee4497f47b5eb7997dbd82ae556974d262b"
+      "sha256": "90e874f6fb8358e16f7104da2edabfd6734a3809a688621c25d30f4d7d331f46"
     },
     {
       "file": "malocchio-844x390-dpr2.png",
@@ -274,7 +274,7 @@
         390
       ],
       "dpr": 2,
-      "sha256": "8a90157a196e2512272dabcb74fe2c355fc46ca353c477a02e1dce6ac4bac280"
+      "sha256": "d94b22e2cc6744c6311c122fd9dd2b5c732e7fab5d4f6b2748402c18fb8b80d2"
     },
     {
       "file": "antisigillo-844x390-dpr2.png",
@@ -283,7 +283,7 @@
         390
       ],
       "dpr": 2,
-      "sha256": "841a0eb3c12e1de72133c211f942fbf44333f58ea220f2ab709104334be31f21"
+      "sha256": "c2e2d831b9a385a2fa341f4ebc05d315eea9e25fb2033d8feba96f39b5bee8bd"
     },
     {
       "file": "flagello-confirm-844x390-dpr2.png",
@@ -292,7 +292,7 @@
         390
       ],
       "dpr": 2,
-      "sha256": "f34bf4ee829f679e7790f37f0e8918b306c719eee6f1ab6514a793ff5161d37f"
+      "sha256": "b54368cab83b9b9a968731403e9e631cf1c8a2ccb359dd24a0e1ef4075bcb19f"
     },
     {
       "file": "flagello-result-844x390-dpr2.png",
@@ -301,7 +301,7 @@
         390
       ],
       "dpr": 2,
-      "sha256": "e35488217738b92a4b8ecf19d4aec358fa492ce0670ae617986aa47b132bb4a7"
+      "sha256": "6fa4178dbb60e8f2aa1d4cbdb7f489e63a9b000d6616fd2b60ff3655ddce6a68"
     },
     {
       "file": "ultimo-miglio-844x390-dpr2.png",
@@ -319,7 +319,7 @@
         390
       ],
       "dpr": 2,
-      "sha256": "b5e5a81d6ac580555fce225ca2b353071d5d66b8ecb9b97742b79402f4c6e63c"
+      "sha256": "76cee1949cdc9d939ce9fe60f0288f5be750d778ec94c27654958214a0b9ae9a"
     },
     {
       "file": "portal-descent-844x390-dpr2.png",
@@ -328,7 +328,7 @@
         390
       ],
       "dpr": 2,
-      "sha256": "2ed3105907fc9662dd7b9e2352cc701ad1745bc96ec933e3262ad954f9fa6428"
+      "sha256": "ee8f1192ce96411fcb4786eff7bbda0c532825d42f135dd92033886e8b2c44ce"
     },
     {
       "file": "portal-impact-844x390-dpr2.png",
@@ -337,7 +337,7 @@
         390
       ],
       "dpr": 2,
-      "sha256": "9bfce94b6eb616dca9b06e2f3830adb8b73cf3050a50fa0d5a95a933dceb7977"
+      "sha256": "3ab75ae955c2c8eb2be56592768fbf362267f6d6e79a0590ff1593435eaf3541"
     },
     {
       "file": "portal-crossing-844x390-dpr2.png",
@@ -346,7 +346,7 @@
         390
       ],
       "dpr": 2,
-      "sha256": "397feb2272e4d8a3f790cf122178b6e35a7fd8301f1d1203e6f386b24a3ad770"
+      "sha256": "76079fe95f9efc57e95bd5176123ef7da7871ef9e94c4d8e8c144dbe88d28fb3"
     },
     {
       "file": "portal-rubble-844x390-dpr2.png",
@@ -355,7 +355,7 @@
         390
       ],
       "dpr": 2,
-      "sha256": "cb29a1f8d4b3787325462f3223f33a66630e034dbe78a3de6e6e47c66b5d57fd"
+      "sha256": "cb990cbaad908411d9616776b8adee6edb4f3b6f08c024b0e7cbb8cbdad43435"
     }
   ],
   "errors": [],
@@ -371,7 +371,11 @@
     "portal": "logs/portal.txt",
     "tie": "logs/tie.txt",
     "motion": "logs/motion.txt",
-    "offline": "logs/offline.txt"
+    "offline": "logs/offline.txt",
+    "quality": "logs/quality.txt",
+    "motion-browser": "logs/motion-browser.txt",
+    "terrain": "logs/terrain.txt",
+    "gothic": "logs/gothic.txt"
   },
   "production_diff_from_capture": "none"
 }
