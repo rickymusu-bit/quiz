@@ -1369,26 +1369,30 @@
       if (s.screen === "hidden" && s.phase === "ordinaria")
         b.append(btn("Inventario", showInventory, "bonus-action"));
       b.append(text("div", s.current.body, "question"));
-      const answers = node("div", undefined, "answers");
-      s.current.options.forEach((a, i) => {
-        const ab = btn(
-          "",
-          command(() => game.answer(i, revision)),
-          "answer" +
-            (s.result && i === s.current.correct ? " correct" : "") +
-            (s.result && i === s.result.option ? " selected" : ""),
-          s.screen !== "answer" || s.paused || !!s.panel || fitBlocked,
-        );
-        ab.setAttribute("aria-keyshortcuts", "ABCD"[i]);
-        if (s.result && i === s.result.option)
-          ab.setAttribute(
-            "aria-label",
-            "Risposta scelta " + "ABCD"[i] + ": " + a,
+      // Malocchio svela esclusivamente testo e valore della domanda:
+      // le alternative restano assenti dal DOM fino alla conferma della scelta.
+      if (s.screen !== "choice") {
+        const answers = node("div", undefined, "answers");
+        s.current.options.forEach((a, i) => {
+          const ab = btn(
+            "",
+            command(() => game.answer(i, revision)),
+            "answer" +
+              (s.result && i === s.current.correct ? " correct" : "") +
+              (s.result && i === s.result.option ? " selected" : ""),
+            s.screen !== "answer" || s.paused || !!s.panel || fitBlocked,
           );
-        ab.append(node("span", "ABCD"[i], "letter"), text("span", a));
-        answers.append(ab);
-      });
-      b.append(answers);
+          ab.setAttribute("aria-keyshortcuts", "ABCD"[i]);
+          if (s.result && i === s.result.option)
+            ab.setAttribute(
+              "aria-label",
+              "Risposta scelta " + "ABCD"[i] + ": " + a,
+            );
+          ab.append(node("span", "ABCD"[i], "letter"), text("span", a));
+          answers.append(ab);
+        });
+        b.append(answers);
+      }
     }
     if (s.screen === "choice") {
       b.append(
