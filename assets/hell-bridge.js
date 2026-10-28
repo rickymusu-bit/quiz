@@ -116,7 +116,6 @@
       const backHeight=ROAD_TOP*image.naturalHeight/724,scale=TILE/image.naturalWidth;
       for(const tile of tiles(width,camera))
         texture(c,image,tile,tile.x-SHEAR*DEPTH/2,TOP-backHeight*scale,TILE,backHeight*scale,0,0,image.naturalWidth,backHeight);
-      layers?.behind?.();
       c.save();c.beginPath();c.rect(0,TOP,width,DEPTH);c.clip();
       for(const tile of tiles(width,camera)){
         c.save();c.translate(tile.x-SHEAR*DEPTH/2,TOP);c.transform(1,0,SHEAR,1,0,0);
@@ -125,9 +124,9 @@
       }
       c.restore();
     }else{
-      layers?.behind?.();c.fillStyle='#171918';c.fillRect(0,TOP,width,DEPTH);
+      c.fillStyle='#171918';c.fillRect(0,TOP,width,DEPTH);
     }
-    roadDebris(c,width,camera);fractures(c,layers?.damage);layers?.above?.();debris(c,layers?.damage,false);
+    roadDebris(c,width,camera);fractures(c,layers?.damage);layers?.behind?.();layers?.above?.();debris(c,layers?.damage,false);
     c.restore();
   }
   const api={TOP,BOTTOM,GAP,RACE_SCALE,DEPTH,SHEAR,project,worldX,grounds,draw,load,debris,features,environment,front,tiles,ASSETS,TILE,FRONT_RISE};

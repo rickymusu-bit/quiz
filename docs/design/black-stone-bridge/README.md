@@ -1,6 +1,6 @@
 # Nuovo ponte — proposta da approvare
 
-**Stato: ponte integrato per la verifica richiesta dall’utente, in attesa di approvazione.** La [GIF aggiornata della schermata di gioco](../../previews/black-bridge-v2/gameplay-black-bridge-v2.gif) è acquisita dal browser; il concept seguente resta un riferimento grafico statico.
+**Stato: ponte approvato dall’utente dopo la seconda GIF.** La [GIF aggiornata della schermata di gioco](../../previews/black-bridge-v2/gameplay-black-bridge-v2.gif) è acquisita dal browser; il concept seguente resta un riferimento grafico statico.
 
 ![Proposta del ponte nero sopra il mare di lava](concept-v1.png)
 
@@ -12,6 +12,6 @@ Coerenza fisica, prospettiva e appoggi prevalgono sulla visibilità costante dei
 
 Correzione dopo la prima GIF: lava sotto il ponte e struttura condividono lo stesso spostamento della camera, senza deriva orizzontale indipendente. I veicoli hanno larghezza e altezza doppie rispetto alla prima GIF; le ruote restano nelle corsie del piano carrabile e le sagome vengono disegnate dal fondo verso il primo piano, consentendo sovrapposizioni fisiche.
 
-La richiesta della GIF autorizza l’integrazione per la verifica nel gioco. Non riprendere portale, Antisigillo o Sacrificio prima dell’approvazione della strada da parte dell’utente.
+L’utente ha approvato il risultato («Ok è perfetto. Prosegui con gli altri modifiche»). Proseguire una consegna per volta: portale, Antisigillo e Sacrificio.
 
 Il concept e gli asset di pietra/ferro e lava sono generati con imagegen. La GIF documenta invece il renderer effettivo, con HUD e veicoli, senza sostituirlo con un’animazione illustrativa.

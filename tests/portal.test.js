@@ -1,6 +1,6 @@
 'use strict';
 const {test}=require('node:test'),assert=require('node:assert/strict');
-const C=require('../assets/hell-chase.js'),F=require('../assets/hell-epilogue.js'),B=require('../assets/hell-bridge.js'),P=require('../assets/hell-portal.js');
+const C=require('../assets/hell-chase.js'),F=require('../assets/hell-epilogue.js'),B=require('../assets/hell-bridge.js'),P=require('../assets/hell-portal.js'),L=require('../assets/hell-layout.js');
 const near=(a,b,tol=1e-6)=>assert(Math.abs(a-b)<tol,`${a} != ${b}`);
 function fixture(width=36,ground=300){
  const e={time:8,camera:{distance:170,speed:80},demon:{left:410-width/2-221-6,width:221,ground:303,pose:C.pose(8),runWeight:1},positions:[{index:0,row:0,x:410,width,height:32,ground}]};
@@ -12,9 +12,13 @@ test('Portal occupies a single lane in its shared transverse projection and stay
  near(B.worldX(a.x,72,{distance:200}),900);
  const far=B.project(900,F.GATE.far,0,{distance:200}),last=B.project(900,F.GATE.near,0,{distance:200});
  near((last.x-far.x)/(last.y-far.y),B.SHEAR);
+ const p=F.frame(fixture(),F.IMPACT).portal,g=p.geometry;
+ const aFace=P.point(p,0,g.far,0),bFace=P.point(p,0,g.near,0),back=P.point(p,g.thickness,g.far,0);
+ near((bFace.x-aFace.x)/(bFace.y-aFace.y),B.SHEAR+g.skew);
+ near(back.x-aFace.x,g.thickness);near(back.y,aFace.y);
 });
 test('All six full-size silhouettes cross one plane; no fade, scale, turn or premature sinking',()=>{
- for(const width of [27.28,35.96,38.44,33.48,34.72,24.8,50]){
+ for(const width of [54.56,71.92,76.88,66.96,69.44,49.6]){
   const route=fixture(width);let prev=F.frame(route,0);
   for(let t=0;t<=F.T.duration;t+=.01){
    const f=F.frame(route,t),v=f.positions[0];near(v.width,width);near(v.height,32);near(v.ground,300);
@@ -34,7 +38,33 @@ test('Architecture keeps its proportions during both vertical movements; complet
  const pa=P.vertices(a.portal,model),pb=P.vertices({...b.portal,offset:0},model);
  near(pa[1].x-pa[0].x,pb[1].x-pb[0].x);near(pa[0].y-pa[3].y,150);
  const full=P.vertices(a.portal,[[0,F.GATE.far,204],[F.GATE.thickness,F.GATE.near,204],[F.GATE.thickness,F.GATE.near,-16],[0,F.GATE.far,-16]]);
- for(const p of full)assert(p.x>=0&&p.x<=512&&p.y>=0&&p.y<=384,JSON.stringify(p));
+ for(const p of full)assert(p.x>=0&&p.x<=L.reference.rasterWidth&&p.y>=0&&p.y<=L.reference.rasterHeight,JSON.stringify(p));
+});
+test('Footings stay on the approved bridge and the winner approaches the aperture smoothly in every lane',()=>{
+ for(const ground of B.grounds([44,70,44])){
+  const r=fixture(72,ground);let previous=F.frame(r,0);
+  for(let t=0;t<F.T.closeEnd;t+=.01){
+   const f=F.frame(r,t),g=f.portal.geometry,v=f.positions[0];
+   assert(g.far>=0&&g.near<=B.DEPTH);assert(g.near-g.far<B.DEPTH);
+   assert(Math.abs(v.ground-previous.positions[0].ground)<.2,'No snap towards the portal');
+   if(t>=F.T.riseEnd)near(v.ground-B.TOP,(g.openingFar+g.openingNear)/2);
+   previous=f;
+  }
+ }
+});
+test('Masonry falls without fading, lands on the deck and remains at the same world coordinates',()=>{
+ const r=fixture(76.88),falling=P.pieces(F.frame(r,F.T.closeEnd+.2).portal),landed=P.pieces(F.frame(r,F.T.duration).portal);
+ assert(falling.some(p=>!p.settled));assert(landed.every(p=>p.settled));
+ assert(landed.every(p=>p.depth>=0&&p.depth<=B.DEPTH));
+ assert.deepEqual(landed,P.pieces(F.frame(r,F.T.duration+3).portal));
+ assert(landed.some(p=>Math.abs(p.angle)>1),'Blocks rotate while falling');
+});
+test('The new native facade contains real transparent doorway space and solid marble piers',async()=>{
+ const {loadImage,createCanvas}=require('@napi-rs/canvas'),image=await loadImage(P.ASSET);
+ assert.equal(image.width,948);assert.equal(image.height,1659);
+ const c=createCanvas(image.width,image.height).getContext('2d');c.drawImage(image,0,0);
+ assert.equal(c.getImageData(474,1200,1,1).data[3],0);
+ assert(c.getImageData(140,1000,1,1).data[3]>240);
 });
 test('Water clipping occurs in world height, including the extruded foundations',()=>{
  const clipped=P.aboveWater([{x:0,depth:20,z:10},{x:16,depth:20,z:10},{x:16,depth:20,z:-30},{x:0,depth:20,z:-30}],-16);
