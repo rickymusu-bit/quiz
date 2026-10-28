@@ -17,6 +17,12 @@ Per ogni modifica visiva o funzionale a Hellscape/Fool:
 
 Applicare la preferenza «GIF per la dinamica, screenshot per gli stati statici, nessun HTML embedded» anche agli altri siti e alle altre interfacce sviluppati per l'utente.
 
+## Direzione grafica e fase di approvazione del ponte
+
+- La coerenza fisica della scena prevale sulla leggibilità costante dei veicoli. Strutture in primo piano possono occluderli: rispettare profondità, prospettiva, ombre, materiali e punti d’appoggio, senza spostare o abbassare gli elementi soltanto per lasciare visibili i mezzi.
+- Ripartire dal progetto della strada: un ponte di metallo e pietra neri sopra un mare di lava, in stile junkpunk, gotico e horror. Le colonne decorative proposte sono scartate.
+- In questa fase presentare il nuovo progetto del ponte come proposta grafica chiaramente distinta dal gioco implementato. Attendere l’approvazione dell’utente della strada prima di riprendere integrazione e modifiche successive.
+
 ## Refactoring e manutenzione del progetto
 
 Queste istruzioni si applicano a **qualsiasi agente o strumento** che modifichi il repository, inclusi ChatGPT Work, Codex e interventi manuali assistiti. Non dipendono dall'ambiente di sviluppo.

@@ -8,24 +8,8 @@
   const DEPTH=BOTTOM-TOP,SHEAR=.72;
   function project(x,depth,z,camera){return {x:x-camera.distance+SHEAR*(depth-DEPTH/2),y:TOP+depth-z};}
   function worldX(x,depth,camera){return x+camera.distance-SHEAR*(depth-DEPTH/2);}
-  const COLUMN_ATLAS='assets/hell-race/gothic-columns-v1.png';
-  // Native 1254×1254 art uses irregular bands, not four equal grid cells.
-  // Whole silhouettes include the broken capitals, plinths and fallen shaft.
-  const COLUMN_FRAMES=Object.freeze([
-    Object.freeze([158,2,344,744]),Object.freeze([767,6,359,740]),
-    Object.freeze([95,778,477,456]),Object.freeze([661,883,581,342]),
-  ]);
-  let art=null,lake=null,columnArt=null;
-  function loadColumns(redraw=()=>{}){
-    if(!columnArt&&typeof root.Image==='function'){
-      columnArt=new root.Image();columnArt.decoding='async';
-      columnArt.src=root.HellscapeOffline?.assets?.[COLUMN_ATLAS]||COLUMN_ATLAS;
-      columnArt.addEventListener('load',redraw,{once:true});
-    }
-    return columnArt;
-  }
+  let art=null,lake=null;
   function load(redraw=()=>{}){
-    loadColumns(redraw);
     if(!art&&typeof root.Image==='function'){
       art=new root.Image();const path='assets/hell-race/lava-bridge-v1.webp';
       art.src=root.HellscapeOffline?.assets?.[path]||path;
@@ -60,28 +44,18 @@
       c.strokeStyle='#25221c';c.lineWidth=2;for(let y=364;y<420;y+=12){c.beginPath();c.moveTo(x-13,y);c.lineTo(x+16,y);c.stroke();}
     }
   }
-  function columnLayout(width,camera,near){
-    const columns=[],spacing=154;
-    for(let n=Math.floor((camera.distance-140)/spacing);n<Math.ceil((camera.distance+width+140)/spacing);n++){
-      const variation=seeded(n+(near?149:73));
-      const frame=near?(variation<.5?2:3):(variation<.25?2:variation<.62?0:1);
-      const height=near?(frame===2?23+variation*8:14+variation*7):(frame===2?47+variation*20:76+variation*24);
-      const crop=COLUMN_FRAMES[frame],world=n*spacing+seeded(n+37)*48+(near?58:0);
-      const foot=project(world,near?DEPTH+13:2,0,camera),w=height*crop[2]/crop[3];
-      columns.push({id:n,near,frame,world,foot,x:foot.x-w/2,y:foot.y-height,width:w,height});
-    }
-    return columns;
-  }
   function ruins(c,width,camera,near){
-    const image=loadColumns();if(!image?.complete||!image.naturalWidth)return;
-    const sx=image.naturalWidth/1254,sy=image.naturalHeight/1254;
-    for(const column of columnLayout(width,camera,near)){
-      const [x,y,w,h]=COLUMN_FRAMES[column.frame];
-      c.save();c.fillStyle='#0b0c0bb3';c.beginPath();
-      c.ellipse(column.foot.x,column.foot.y-1,column.width*.42,2,0,0,Math.PI*2);c.fill();
-      c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';
-      c.drawImage(image,x*sx,y*sy,w*sx,h*sy,column.x,column.y,column.width,column.height);
-      c.restore();
+    for(let n=Math.floor((camera.distance-100)/118);n<Math.ceil((camera.distance+width+100)/118);n++){
+      const x=n*118+seeded(n+37)*48-camera.distance,base=near?BOTTOM+13:TOP-4,h=near?12+seeded(n+55)*18:42+seeded(n+55)*26;
+      c.fillStyle='#25231f';c.fillRect(x-10,base-5,24,7);c.fillStyle='#726451';c.fillRect(x-8,base-7,19,3);
+      polygon(c,[{x:x-6,y:base-7},{x:x-5,y:base-h},{x:x-1,y:base-h-5},{x:x+3,y:base-h+3},{x:x+7,y:base-h-2},{x:x+7,y:base-7}]);
+      const stone=c.createLinearGradient(x-6,0,x+7,0);stone.addColorStop(0,'#24231e');stone.addColorStop(.35,'#86765d');stone.addColorStop(.6,'#594f3e');stone.addColorStop(1,'#302e27');c.fillStyle=stone;c.fill();
+      c.strokeStyle='#a19273';c.lineWidth=1;for(let j=-3;j<6;j+=3){c.beginPath();c.moveTo(x+j,base-8);c.lineTo(x+j,base-h+5);c.stroke();}
+      c.strokeStyle='#211e1a';c.beginPath();c.moveTo(x-5,base-h+12);c.lineTo(x+3,base-h+19);c.lineTo(x,base-h+29);c.stroke();
+      for(let j=0;j<22;j++){const px=x-5+seeded(n*31+j)*11,py=base-8-seeded(n*17+j)*Math.max(1,h-12);c.fillStyle=j%3?'#211e1a88':'#b3a17d66';c.fillRect(px,py,.7+seeded(j+n)*1.4,.6);}
+      if(h>40){c.strokeStyle='#302b23';c.beginPath();c.moveTo(x-4,base-10);c.lineTo(x-4,base-24);c.quadraticCurveTo(x-4,base-31,x,base-34);c.quadraticCurveTo(x+4,base-31,x+4,base-24);c.lineTo(x+4,base-10);c.stroke();}
+      if(n%3===0){c.fillStyle='#736953';c.fillRect(x-8,base-h-2,17,4);}
+      c.fillStyle='#5e5444';polygon(c,[{x:x+12,y:base},{x:x+16,y:base-8},{x:x+24,y:base-4},{x:x+28,y:base+1}]);c.fill();
     }
   }
   function roadDebris(c,width,camera){
@@ -160,6 +134,6 @@
     fractures(c,layers?.damage);layers?.above?.();debris(c,layers?.damage,false);
     c.restore();
   }
-  const api={TOP,BOTTOM,GAP,RACE_SCALE,DEPTH,SHEAR,project,worldX,grounds,draw,load,debris,features,loadColumns,columnLayout,COLUMN_ATLAS,COLUMN_FRAMES};
+  const api={TOP,BOTTOM,GAP,RACE_SCALE,DEPTH,SHEAR,project,worldX,grounds,draw,load,debris,features};
   if(typeof module!=='undefined')module.exports=api;else root.FoolBridge=api;
 })(globalThis);
