@@ -3,7 +3,7 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 from PIL import Image, ImageDraw
 from io import BytesIO
-import os, json, base64, subprocess
+import os, json, base64, subprocess, math
 ROOT=Path(__file__).resolve().parent.parent
 ART=ROOT/'artifacts/motion';ART.mkdir(parents=True,exist_ok=True)
 HTML=(ROOT/'dist/Hellscape-review.html').read_text()
@@ -64,7 +64,9 @@ with sync_playwright() as p:
    f.evaluate('HellscapeUI.changed()')
    assert f.locator('.hell-race').get_attribute('data-animation-busy')=='false','Completed tween must never block a later render'
    f.evaluate("()=>{const g=HellscapeUI.game;g.eliminate(1,'test');g.eliminate(2,'test');g.s.id+='-ending';g.complete(0);window.__completions=0;document.addEventListener('foolendingcomplete',()=>__completions++);HellscapeUI.changed()}")
-   page.clock.run_for(8700)
+   page.clock.run_for(100)
+   duration=f.evaluate('FoolHellRace.presentationSnapshot().plan.duration')
+   page.clock.run_for(math.ceil(duration*1000)+200)
    assert f.evaluate('__completions')==1
    f.evaluate('HellscapeUI.changed()');page.clock.run_for(100)
    assert f.evaluate('__completions')==1,'A completed final emits its event once across renders'
