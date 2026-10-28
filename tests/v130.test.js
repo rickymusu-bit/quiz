@@ -14,9 +14,9 @@ function tie(g){for(let i=0;i<3;i++){answer(g);if(i<2)g.next();}}
 
 test('Flagello subtracts exact rational amounts at every boundary, wipes fresh Ammo and preserves seals',()=>{
   for(const [score,expected] of [[F.rational(0),'0'],[F.rational(1,3),'0'],[F.rational(666),'0'],[F.rational(1999,3),'1/3'],[F.rational(1000),'334']]){
-    const g=game();g.s.groups.forEach(p=>{p.score=F.clone(score);p.aura=g.s.turn;p.inventory.push({id:g.uid(),type:'karma',target:null,origin:'just-awarded'});});
+    const g=game();g.s.groups.forEach(p=>{p.score=F.clone(score);p.aura=p===g.s.groups[g.s.owner]?null:3;p.inventory.push({id:g.uid(),type:'karma',target:null,origin:'just-awarded'});});
     const c=item(g,'ira');g.use(c.id,null);
-    for(let i=0;i<3;i++){assert.equal(F.exact(g.s.groups[i].score),expected);assert.equal(F.remainingLives(g.s,i),2);assert.equal(g.s.groups[i].inventory.length,0);assert.equal(g.s.groups[i].aura,g.s.turn);}
+    for(let i=0;i<3;i++){assert.equal(F.exact(g.s.groups[i].score),expected);assert.equal(F.remainingLives(g.s,i),2);assert.equal(g.s.groups[i].inventory.length,0);assert.equal(g.s.groups[i].aura,i===g.s.owner?null:3);}
     assert(!g.s.events.some(e=>e.type==='karma-trigger'));F.Game.restore(g.snapshot());
   }
 });

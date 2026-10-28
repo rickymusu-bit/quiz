@@ -18,10 +18,10 @@ test('Antisigillo 20% and Sacrificio 5% use independent exact thresholds',()=>{
  assert.deepEqual(g.s.result.bonuses.map(c=>c.type),['antisigillo','sacrificio']);
 });
 test('Sacrificio adds 777 exactly, costs a life, consumes one copy and preserves other protections',()=>{
- const g=game(),owner=g.s.owner,target=g.s.order[1];g.s.groups[owner].score=F.rational(1,3);g.s.groups[owner].sanctions=1;g.s.groups[owner].aura=g.s.turn;
+ const g=game(),owner=g.s.owner,target=g.s.order[1];g.s.groups[owner].score=F.rational(1,3);g.s.groups[owner].sanctions=1;g.s.groups[target].aura=3;
  const c=item(g,'sacrificio'),spare=item(g,'sacrificio'),karma=item(g,'karma');const other=F.clone(g.s.groups[target]),question=g.s.current.id;
  g.use(c.id,null);assert.equal(F.exact(g.s.groups[owner].score),'2332/3');assert.equal(F.remainingLives(g.s,owner),1);
- assert.equal(g.s.groups[owner].aura,g.s.turn);assert.deepEqual(g.s.groups[owner].inventory.map(c=>c.id),[spare.id,karma.id]);
+ assert.equal(g.s.groups[owner].aura,null);assert.deepEqual(g.s.groups[owner].inventory.map(c=>c.id),[spare.id,karma.id]);
  assert.deepEqual(g.s.groups[target],other);assert.equal(g.s.owner,owner);assert.equal(g.s.current.id,question);assert.equal(g.s.valid,0);
  assert(!g.s.events.some(e=>e.type==='karma-trigger'));const r=F.Game.restore(g.snapshot());assert.equal(F.remainingLives(r.s,owner),1);
  assert.throws(()=>g.use(spare.id,target));assert(g.s.groups[owner].inventory.some(c=>c.id===spare.id));

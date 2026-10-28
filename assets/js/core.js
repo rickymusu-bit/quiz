@@ -1,8 +1,8 @@
 /* Hellscape: core. Shared by the static site, Node tests and offline export. */
 (function (root) {
   "use strict";
-  const RULES = "23.0.0",
-    VERSION = "2.6.0",
+  const RULES = "24.0.0",
+    VERSION = "2.7.0",
     TYPES = ["salta", "ruba", "svela", "aura", "karma", "marx", "ira", "antisigillo", "sacrificio"];
   const LABELS = {
     salta: "Catene",
@@ -19,11 +19,11 @@
     salta: "Le catene immobilizzano un avversario attivo e gli fanno saltare il prossimo turno ordinario. Più Catene si sommano, una per turno. Se riceve una domanda tramite Malocchio, risponde subito, ma le Catene restano pendenti. Nessuna vita viene tolta.",
     ruba: "Prendi immediatamente il 33% esatto dei punti attuali di un avversario e rinunci subito al turno corrente, senza rispondere alla domanda. Il Sigillo blocca il furto ma non il costo del turno. Contrappasso reagisce al furto non bloccato. Non toglie vite; i punti futuri non vengono condivisi.",
     svela: "Svela soltanto il testo della domanda e il suo valore, senza alternative e a timer fermo. Puoi tenerla o passarla a un altro gruppo attivo: il tempo intero parte alla conferma. Chi risponde correttamente tiene tutti i punti e le Ammo guadagnate; se sbaglia o scade il tempo perde il valore della domanda, fermandosi a zero punti. Chi la riceve non può usare Ammo o ripassarla. La rotazione riparte dal gruppo successivo a chi ha usato Malocchio, rispettando Catene ed eliminazioni.",
-    aura: "Attiva il sigillo nel tuo turno per bloccare i nuovi attacchi Catene, Tributo e Malocchio fino al tuo prossimo turno. Non cancella effetti già pendenti, non si accumula e non protegge da Livella, Flagello, Sacrificio, sanzioni o errori.",
+    aura: "Per 3 turni personali, incluso quello di attivazione, sei immune agli effetti negativi delle Ammo altrui. Le Catene e i Tributi pendenti su di te vengono rimossi; Livella non modifica i tuoi punti. Mentre è attivo non puoi usare altre Ammo, nemmeno un altro Sigillo, e le risposte corrette danno punti ma nessuna Ammo. Flagello ignora l’immunità. Un avversario può distruggere il Sigillo con Antisigillo, rimuovendo subito anche le restrizioni. Non protegge da sanzioni, errori ordinari o costi delle proprie Ammo.",
     karma: "Contrappasso agisce passivamente: quando subisci un nuovo attacco non bloccato, una copia si trasforma in quell’Ammo, utilizzabile solo contro l’aggressore. Ogni attacco trasforma al massimo una copia. Non reagisce a Livella, Flagello, Antisigillo o Sacrificio.",
-    marx: "Livella redistribuisce immediatamente in parti uguali i punti di tutti i dannati ancora in gara, compreso chi la usa. Il totale resta identico anche con frazioni. Non agisce sugli eliminati, non viene bloccata da Sigillo e non attiva Contrappasso.",
+    marx: "Livella redistribuisce immediatamente in parti uguali i punti di tutti i dannati ancora in gara, compreso chi la usa. Il totale resta identico anche con frazioni. Esclude gli eliminati e i protetti da Sigillo, i cui punti restano invariati. Non attiva Contrappasso.",
     ira: "Flagello travolge contemporaneamente tutti i dannati ancora in gara, compreso chi lo evoca: ciascuno perde una vita, tutte le Ammo in inventario e fino a 666 punti, senza scendere sotto zero. Chi raggiunge zero vite è eliminato. Il Sigillo attivo resta, ma non protegge; Contrappasso non reagisce. Se nessuno sopravvive, è Game Over.",
-    antisigillo: "Dissipa immediatamente il Sigillo attivo di un solo avversario. Scegli un dannato ancora in gara e protetto: torna vulnerabile a Catene, Tributo e Malocchio. Non rimuove altri effetti e non toglie punti o vite. Il Sigillo non lo blocca e Contrappasso non reagisce.",
+    antisigillo: "Dissipa immediatamente il Sigillo attivo di un solo avversario. Scegli un dannato ancora in gara e protetto: torna vulnerabile a Catene, Tributo e Malocchio. Rimuove subito anche i blocchi di Sigillo sull’uso e sul guadagno di Ammo. Non toglie punti o vite. Il Sigillo non lo blocca e Contrappasso non reagisce.",
     sacrificio: "Sacrifichi una vita e ottieni immediatamente 777 punti. Si applica solo a te: il Sigillo non protegge e Contrappasso non reagisce. Se era la tua ultima vita sei eliminato comunque, anche dopo aver ricevuto i punti; altrimenti puoi continuare il turno.",
   };
   const DEFAULT_BONUS_WEIGHTS = Object.fromEntries(

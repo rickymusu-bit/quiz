@@ -36,7 +36,7 @@ with sync_playwright() as p:
           s.groups[owner].name='Incisore';s.groups[target].name='Dannato protetto';s.groups[other].name='Testimone';
           s.config.vehicles[owner]='chopper';s.config.vehicles[target]='pickup';s.config.vehicles[other]='ape';
           s.groups[owner].score=Fool.rational(300);s.groups[target].score=Fool.rational(900);s.groups[other].score=Fool.rational(600);
-          s.groups[owner].aura=s.turn;s.groups[target].aura=s.turn;s.groups[other].aura=null;
+          s.groups[owner].aura=null;s.groups[target].aura=3;s.groups[other].aura=null;
           s.groups[owner].inventory=[{id:g.uid(),type:'antisigillo',target:null,origin:'preview'},{id:g.uid(),type:'aura',target:null,origin:'preview'}];
           s.groups[target].inventory=[{id:g.uid(),type:'karma',target:null,origin:'preview'}];HellscapeUI.changed();
           return {owner,target,other,scores:s.groups.map(p=>Fool.exact(p.score)),lives:s.groups.map((_,i)=>Fool.remainingLives(s,i))}}''')
@@ -56,7 +56,7 @@ with sync_playwright() as p:
           activations:s.events.filter(e=>e.activation&&e.copy?.type==='antisigillo').length,dispel:s.events.filter(e=>e.type==='seal-dispelled').length,
           reflections:s.events.filter(e=>e.type==='karma-trigger').length}}''')
         assert result['scores']==setup['scores'] and result['lives']==setup['lives']
-        assert result['auras'][setup['owner']] and not result['auras'][setup['target']]
+        assert not result['auras'][setup['owner']] and not result['auras'][setup['target']]
         assert result['inventories'][setup['owner']]==['aura'] and result['inventories'][setup['target']]==['karma']
         assert (result['activations'],result['dispel'],result['reflections'])==(1,1,0)
         return result
