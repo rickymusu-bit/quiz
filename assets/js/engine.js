@@ -1076,6 +1076,8 @@
       );
     };
     for (const q of s.queue) checkQ(q);
+    if (s.phase === "pareggio")
+      need(s.queue.every(q => q.difficulty === "difficile"), "Ultimo Miglio: coda con domande non difficili");
     if (s.current) checkQ(s.current);
     if (s.phase === "pareggio" && ["hidden", "answer"].includes(s.screen))
       need(s.current?.difficulty === "difficile", "Ultimo Miglio: domanda non difficile");

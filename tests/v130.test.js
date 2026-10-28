@@ -89,3 +89,8 @@ test('Legacy ties retain their actual one-life budget and retire non-hard open q
     assert.deepEqual(r.s.seen,seen);if(screen==='answer')assert(r.s.cancelled.includes(retired));assert.equal(r.running,false);F.Game.restore(r.snapshot());
   }
 });
+test('A current-format tie save rejects an easy queued question before it can bypass the hard-only reserve',()=>{
+  const g=game();tie(g);const save=g.snapshot();
+  save.queue=[F.mix(save.bank.find(q=>q.difficulty==='facile'&&!save.seen.includes(q.id)),()=>.25)];
+  assert.throws(()=>F.Game.restore(save),/coda con domande non difficili/);
+});
