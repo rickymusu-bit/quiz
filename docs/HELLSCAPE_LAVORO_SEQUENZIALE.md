@@ -17,3 +17,5 @@ Strada approvata: [ponte nero e correzioni della seconda GIF](design/black-stone
 Riscontro sulla prima GIF: eliminare l’effetto del ponte che scivola sulla lava e ingrandire i veicoli almeno del doppio. La seconda verifica, approvata, usa lava e ponte nello stesso riferimento di camera e veicoli al 200% di larghezza e altezza, con appoggi nelle corsie e ordine di profondità.
 
 Riscontro sul portale: animazione approvata; la facciata frontale deformata per simularne la vista laterale è rifiutata. Sostituirla con uno sprite disegnato nativamente di taglio, con stipiti, fiancata e tetto coerenti. Preservare i tempi della sequenza e mostrare la nuova GIF nel gioco prima della consegna successiva.
+
+Ulteriore correzione: i dettagli devono restare dorati nella GIF, senza virare verso l’arancione della lava. Il portale crolla come pietra: distacco progressivo di rocce volumetriche, caduta, piccoli rimbalzi, polvere e macerie permanenti. Eliminare l’effetto di fogli e frammenti piatti decorati.

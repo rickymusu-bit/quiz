@@ -1,6 +1,6 @@
 # Asset della corsa infernale
 
-Versione grafica **1.7.1** — 28/10/2026.
+Versione grafica **1.7.2** — 28/10/2026.
 
 Direzione corrente: ponte nero approvato e veicoli al doppio della prima GIF; lava e struttura condividono la camera. Il portale `portal-side-v3.png` è disegnato nativamente di taglio, in marmo bianco, azzurro e oro, con stipiti, tetto e fiancata già presenti nei pixel. Il renderer lo posiziona con sola traslazione e scala uniforme; non deforma una facciata frontale. Discesa, impatto, passaggio e crollo mantengono la timeline approvata. Le macerie restano nel mondo. Le sezioni delle versioni precedenti sotto sono storiche e non prevalgono su [v1.3.0](../../docs/HELLSCAPE_CORREZIONI_CODEX_v1.3.0.md) e sulle correzioni approvate dall’utente.
 
@@ -12,6 +12,7 @@ Pixel art infernale dal riferimento approvato: ferro annerito, ruggine, cuoio, e
 | `demon-actions-v1.webp` | 4 per azione, 3 righe | Corsa, attacco, morso |
 | `portal-flames-v1.webp` | 8 | Portale precedente, conservato e non più caricato |
 | `portal-side-v3.png` | Vista nativa di taglio 1024 × 1536, RGBA | Portale volumetrico in marmo bianco, azzurro e oro; angolo e spessore disegnati nello sprite |
+| `portal-rocks-v1.png` | 6 rocce, atlante 1536 × 1024, RGBA | Frammenti di marmo grigio/bianco, superfici di frattura e volume nativo; usati durante caduta e riposo |
 | `black-stone-bridge-v1.png` | 2172 × 724, RGBA | Ponte approvato, pietra e metallo neri, archi trasparenti |
 | `lava-sea-v2.png` | 1448 × 1086, RGB | Lava sotto il ponte, nello stesso riferimento della struttura |
 | `victory-title-v1.webp` | 1981 × 793, RGBA | Titolo VITTORIA, trasparente |

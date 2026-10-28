@@ -23,6 +23,7 @@ Applicare la preferenza «GIF per la dinamica, screenshot per gli stati statici,
 - Ripartire dal progetto della strada: un ponte di metallo e pietra neri sopra un mare di lava, in stile junkpunk, gotico e horror. Le colonne decorative proposte sono scartate.
 - Il ponte della seconda GIF è approvato dall’utente: preservare lava e struttura nello stesso riferimento di camera e i veicoli ingranditi al doppio. È autorizzata la prosecuzione delle altre modifiche, una consegna per volta: portale, poi icona/animazione Antisigillo, poi Sacrificio.
 - L’animazione del portale è approvata. Il suo sprite deve essere disegnato nativamente di taglio, con spessore e prospettiva coerenti: non deformare una facciata frontale per simulare la vista laterale. Posizionare lo sprite con traslazione e scala uniforme, preservando i tempi della sequenza.
+- I dettagli del portale restano dorati: verificare che l’esportazione GIF non li sposti verso l’arancione della lava. Il crollo produce rocce e blocchi di pietra volumetrici, con gravità, piccoli rimbalzi e macerie permanenti; non fogli o ritagli piatti della facciata.
 
 ## Refactoring e manutenzione del progetto
 

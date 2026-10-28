@@ -10,8 +10,18 @@
     near:[[495,0],[1024,0],[1024,1536],[440,1536],[440,1330],[475,1200],[520,1130],[520,600],[495,540]],
     feet:[[[186,1142],[280,1222],[343,1233],[451,1155]],[[456,1417],[579,1526],[648,1514],[692,1518],[850,1451],[850,1428]]],
     fragments:[[1,262,104,79,88],[2,341,8,171,184],[3,512,86,145,106],[7,226,192,115,192],[8,341,192,171,192],[9,512,192,170,192],[10,682,210,136,174],[13,230,384,111,192],[14,341,384,171,192],[15,512,384,170,192],[16,682,384,137,192],[19,252,576,89,192],[20,341,576,89,192],[21,528,576,154,192],[22,682,576,118,192],[25,195,768,146,192],[26,341,768,89,192],[27,539,768,143,192],[28,682,768,118,192],[31,186,960,155,192],[32,341,960,111,192],[33,513,960,169,192],[34,682,960,128,192],[37,191,1152,150,81],[38,341,1152,171,192],[39,512,1152,170,192],[40,682,1152,156,192],[44,455,1344,57,120],[45,512,1344,170,184],[46,682,1344,169,176]]});
+  const ROCK_ASSET='assets/hell-race/portal-rocks-v1.png';
+  const ROCK_FRAMES=Object.freeze([[32,49,466,422],[542,24,463,451],[1054,25,458,458],[26,543,485,447],[561,533,407,468],[1044,537,469,452]]);
   let art=null;
+  let stone=null;
+  function loadRocks(redraw=()=>{}){
+    if(!stone&&typeof root.Image==='function'){
+      stone=new root.Image();stone.decoding='async';stone.src=root.HellscapeOffline?.assets?.[ROCK_ASSET]||ROCK_ASSET;
+      stone.addEventListener('load',redraw,{once:true});stone.addEventListener('error',()=>{stone.failed=true;redraw();},{once:true});
+    }return stone;
+  }
   function load(redraw=()=>{}){
+    loadRocks(redraw);
     if(!art&&typeof root.Image==='function'){
       art=new root.Image();art.decoding='async';art.src=root.HellscapeOffline?.assets?.[ASSET]||ASSET;
       art.addEventListener('load',redraw,{once:true});art.addEventListener('error',()=>{art.failed=true;redraw();},{once:true});
@@ -51,46 +61,61 @@
   function seed(i){return ((Math.imul(i+17,1103515245)>>>0)%997)/997;}
   function pieces(p){
     const g=p.geometry,mid=(g.far+g.near)/2,scale=g.height/SPRITE.rise;
-    return SPRITE.fragments.map(([id,sx,sy,sw,sh])=>{
-      const age=Math.max(0,Math.min(1.65,p.collapseAge)-Math.floor(id/6)*.022-seed(id)*.08);
-      const width=sw*scale,height=sh*scale,centerX=sx+sw/2,centerY=sy+sh/2;
+    return SPRITE.fragments.map(([id,sx,sy,sw,sh],index)=>{
+      const delay=Math.floor(id/6)*.035+seed(id)*.06,released=p.collapseAge>=delay;
+      const age=Math.max(0,Math.min(1.65,p.collapseAge)-delay),width=sw*scale,height=sh*scale,centerX=sx+sw/2,centerY=sy+sh/2;
       const initialDepth=g.far+Math.max(0,Math.min(1,(centerX-186)/(851-186)))*(g.near-g.far);
       const initialX=(centerX-SPRITE.anchorX)*scale-(B.SHEAR+g.skew)*(initialDepth-mid);
-      const initialZ=initialDepth-mid-(centerY-SPRITE.anchorY)*scale;
-      const settledZ=height*.16,z=Math.max(settledZ,initialZ-220*age*age),fall=Math.min(1,age/1.1);
-      const padding=Math.hypot(width,height)/2+2,targetDepth=Math.max(padding,Math.min(B.DEPTH-padding,initialDepth+(seed(id+7)-.5)*30));
-      return {id,sx,sy,sw,sh,near:centerX>=495,width,height,
-        depth:initialDepth+(targetDepth-initialDepth)*fall,
-        x:initialX+((seed(id+13)-.5)*62-initialX)*fall,z,
-        angle:(seed(id+23)-.5)*3*Math.min(1,age*2),settled:z===settledZ};
+      const diameter=Math.max(10,Math.min(30,Math.sqrt(width*height)*1.12));
+      const initialZ=Math.max(0,initialDepth-mid-(centerY-SPRITE.anchorY)*scale-diameter*.46);
+      const impactTime=Math.sqrt(initialZ/320),impactAge=age-impactTime;
+      let z=0,settled=false;
+      if(age<impactTime)z=initialZ-320*age*age;
+      else if(impactAge<.18){const u=impactAge/.18;z=diameter*.14*4*u*(1-u);}
+      else if(impactAge<.28){const u=(impactAge-.18)/.10;z=diameter*.025*4*u*(1-u);}
+      else settled=true;
+      const progress=Math.min(1,age/(impactTime+.28)),drift=1-Math.pow(1-progress,3),padding=diameter*.55+2;
+      const targetDepth=Math.max(padding,Math.min(B.DEPTH-padding,initialDepth+(seed(id+7)-.5)*24));
+      const spin=(seed(id+23)-.5)*4.5,finalAngle=(seed(id+31)-.5)*.45;
+      const angle=impactAge<0?spin*age:finalAngle+(spin*impactTime-finalAngle)*Math.pow(Math.max(0,1-impactAge/.28),2);
+      return {id,sx,sy,sw,sh,near:centerX>=495,width,height,diameter,rock:index%ROCK_FRAMES.length,
+        material:'stone',released,age,impactTime,impactAge,settled,z,
+        depth:initialDepth+(targetDepth-initialDepth)*drift,x:initialX+(seed(id+13)-.5)*42*drift,angle};
     });
   }
-  function rubble(c,p,near){
-    const image=load();
-    for(const piece of pieces(p).filter(v=>v.near===near).sort((a,b)=>a.depth-b.depth)){
-      if(piece.settled){block(c,p,piece,image);continue;}
-      const at=point({...p,offset:0},piece.x,piece.depth,piece.z);
-      c.save();c.translate(at.x,at.y);c.rotate(piece.angle);
-      if(image?.complete&&image.naturalWidth)
-        c.drawImage(image,piece.sx,piece.sy,piece.sw,piece.sh,-piece.width/2,-piece.height/2,piece.width,piece.height);
-      c.restore();
-    }
+  function rockShadow(c,p,piece){
+    const at=point({...p,offset:0},piece.x,piece.depth,0),opacity=.34/(1+piece.z*.025);
+    c.save();c.globalAlpha=opacity;c.fillStyle='#080b0e';c.beginPath();c.ellipse(at.x,at.y,piece.diameter*.48,piece.diameter*.12,0,0,Math.PI*2);c.fill();c.restore();
   }
-  function block(c,p,piece,image){
-    const g=p.geometry,cos=Math.cos(piece.angle),sin=Math.sin(piece.angle),length=piece.height*.84,width=piece.width;
-    const height=4+seed(piece.id+41)*5;
-    const at=(x,depth,z)=>point({...p,offset:0},piece.x+x*cos-depth*sin,piece.depth+x*sin+depth*cos,z);
-    const a=at(-length/2,-width/2,height),b=at(length/2,-width/2,height),d=at(-length/2,width/2,height),e=at(length/2,width/2,height);
-    const floorB=at(length/2,-width/2,0),floorD=at(-length/2,width/2,0),floorE=at(length/2,width/2,0);
-    c.save();path(c,[at(-length/2,-width/2,0),floorB,floorE,floorD]);c.fillStyle='#0a111955';c.fill();
-    path(c,[b,e,floorE,floorB]);c.fillStyle='#a5b3b6';c.fill();
-    path(c,[d,e,floorE,floorD]);c.fillStyle='#d1dbd9';c.fill();
-    path(c,[a,b,e,d]);c.fillStyle=piece.id%3?'#e8ece4':'#86b6c7';c.fill();c.strokeStyle='#566166';c.lineWidth=.5;c.stroke();
-    if(image?.complete&&image.naturalWidth){
-      path(c,[a,b,e,d]);c.clip();
-      c.transform((B.SHEAR+g.skew)*cos-sin,cos,(B.SHEAR+g.skew)*sin+cos,sin,a.x,a.y);
-      c.drawImage(image,piece.sx,piece.sy,piece.sw,piece.sh,0,0,width,length);
+  function rockDust(c,p,piece){
+    const age=piece.impactAge;if(age<0||age>.42)return;
+    const at=point({...p,offset:0},piece.x,piece.depth,0),fade=1-age/.42;
+    c.save();
+    for(let i=0;i<4;i++){
+      c.globalAlpha=fade*.13;c.fillStyle=i%2?'#b5b8b0':'#d4d4c9';c.beginPath();
+      c.ellipse(at.x+(seed(piece.id+i+81)-.5)*age*32,at.y-1-Math.sin(age/.42*Math.PI)*3,
+        2+age*15+piece.diameter*.12,1+age*5,0,0,Math.PI*2);c.fill();
     }c.restore();
+  }
+  function rubble(c,p,near){
+    const image=load(),rocks=loadRocks();
+    for(const piece of pieces(p).filter(v=>v.near===near).sort((a,b)=>a.depth-b.depth)){
+      if(!piece.released){
+        if(image?.complete&&image.naturalWidth){
+          const f=spriteFrame({...p,offset:0});
+          c.drawImage(image,piece.sx,piece.sy,piece.sw,piece.sh,f.x+piece.sx*f.scale,f.y+piece.sy*f.scale,piece.sw*f.scale,piece.sh*f.scale);
+        }continue;
+      }
+      rockShadow(c,p,piece);rockDust(c,p,piece);
+      const [sx,sy,sw,sh]=ROCK_FRAMES[piece.rock],scale=piece.diameter/Math.max(sw,sh),w=sw*scale,h=sh*scale;
+      const at=point({...p,offset:0},piece.x,piece.depth,piece.z);
+      const support=(Math.abs(Math.sin(piece.angle))*w+Math.abs(Math.cos(piece.angle))*h)/2;
+      c.save();c.translate(at.x,at.y-support+.8);c.rotate(piece.angle);
+      if(rocks?.complete&&rocks.naturalWidth)c.drawImage(rocks,sx,sy,sw,sh,-w/2,-h/2,w,h);
+      else{
+        c.fillStyle='#bfc1b8';path(c,[{x:-w*.45,y:h*.3},{x:-w*.4,y:-h*.3},{x:0,y:-h*.48},{x:w*.44,y:-h*.18},{x:w*.37,y:h*.4},{x:0,y:h*.48}]);c.fill();
+      }c.restore();
+    }
   }
   function ground(c,p){
     const g=p.geometry,floor={...p,offset:0},contact=Math.max(0,Math.min(1,p.descent));
@@ -128,6 +153,6 @@
   }
   function back(c,p){if(!p)return;ground(c,p);surface(c,p);architecture(c,p,false);}
   function front(c,p){if(p)architecture(c,p,true);}
-  const api={load,ASSET,SPRITE,spriteFrame,aboveWater,vertices,point,pieces,back,front,geometry:F.GATE};
+  const api={load,loadRocks,ASSET,ROCK_ASSET,ROCK_FRAMES,SPRITE,spriteFrame,aboveWater,vertices,point,pieces,back,front,geometry:F.GATE};
   if(typeof module!=='undefined')module.exports=api;else root.FoolPortal=api;
 })(globalThis);

@@ -21,7 +21,7 @@ const root=path.resolve(__dirname,'..');
     const start=performance.now();await new Promise(resolve=>setTimeout(resolve,2500));const elapsed=performance.now()-start;
     window.requestAnimationFrame=raf;ctx.setTransform=transform;
     const sorted=costs.slice().sort((a,b)=>a-b),frames=FoolEnding.prepare(FoolEnding.load(()=>{}));
-    const sourceFiles=['vehicles-drive-v1.webp','demon-actions-v1.webp','demon-ending-v1.webp','ammo-relics-v1.webp','black-stone-bridge-v1.png','lava-sea-v2.png','portal-side-v3.png','victory-title-v1.webp'];
+    const sourceFiles=['vehicles-drive-v1.webp','demon-actions-v1.webp','demon-ending-v1.webp','ammo-relics-v1.webp','black-stone-bridge-v1.png','lava-sea-v2.png','portal-side-v3.png','portal-rocks-v1.png','victory-title-v1.webp'];
     const sources=await Promise.all(sourceFiles.map(async name=>{const img=new Image();img.src='assets/hell-race/'+name;await img.decode();return {name,width:img.naturalWidth,height:img.naturalHeight};}));
     return {raster:[canvas.width,canvas.height],rgbaBytes:canvas.width*canvas.height*4,cssWidth:canvas.getBoundingClientRect().width,smoothing:ctx.imageSmoothingEnabled,frames:times.length,elapsedMs:elapsed,paintFPS:times.length*1000/elapsed,cpuP95ms:sorted[Math.floor(sorted.length*.95)]??null,endingCrop:[frames[0].canvas.width,frames[0].canvas.height],sources};
    });samples.push({viewport:[width,height],dpr,...sample});await page.close();

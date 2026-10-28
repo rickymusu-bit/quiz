@@ -57,7 +57,34 @@ test('Masonry falls without fading, lands on the deck and remains at the same wo
  assert(falling.some(p=>!p.settled));assert(landed.every(p=>p.settled));
  assert(landed.every(p=>p.depth>=0&&p.depth<=B.DEPTH));
  assert.deepEqual(landed,P.pieces(F.frame(r,F.T.duration+3).portal));
- assert(landed.some(p=>Math.abs(p.angle)>1),'Blocks rotate while falling');
+ assert(falling.some(p=>Math.abs(p.angle)>.05),'Rocks rotate while falling');
+});
+test('Collapse releases heavy rocks, bounces with little energy and settles without hovering',()=>{
+ const r=fixture(),early=P.pieces(F.frame(r,F.T.closeEnd+.10).portal),late=P.pieces(F.frame(r,F.T.closeEnd+.4).portal);
+ assert(early.some(p=>p.released)&&early.some(p=>!p.released),'Stone detaches progressively');
+ assert(late.every(p=>p.released&&p.material==='stone'));
+ for(let t=.01;t<1.65;t+=.01){
+  for(const piece of P.pieces(F.frame(r,F.T.closeEnd+t).portal)){
+   assert(piece.z>=0,'Stone cannot sink through the bridge');
+   if(piece.impactAge>=0)assert(piece.z<=piece.diameter*.14+1e-8,'Dense stone has only a small rebound');
+  }
+ }
+ const final=P.pieces(F.frame(r,F.T.duration).portal);
+ assert(final.every(p=>p.settled&&p.z===0));assert.equal(new Set(final.map(p=>p.rock)).size,6);
+});
+test('Released debris uses solid rock sprites with uniform scale rather than flat pieces of the facade',async()=>{
+ const {loadImage,createCanvas}=require('@napi-rs/canvas'),fs=require('node:fs'),vm=require('node:vm');
+ const image=await loadImage(P.ASSET),rocks=await loadImage(P.ROCK_ASSET);
+ assert.equal(rocks.width,1536);assert.equal(rocks.height,1024);
+ const root={FoolBridge:B,FoolEpilogue:F,__art:image,__rocks:rocks};
+ const source=fs.readFileSync('assets/hell-portal.js','utf8').replace('let art=null;','let art=root.__art;').replace('let stone=null;','let stone=root.__rocks;');
+ vm.runInNewContext(source,root);const ctx=createCanvas(768,576).getContext('2d'),draw=ctx.drawImage.bind(ctx),calls=[];
+ ctx.drawImage=(...args)=>{calls.push(args);return draw(...args)};
+ for(const time of [F.T.closeEnd+.45,F.T.duration]){
+  calls.length=0;const p=F.frame(fixture(),time).portal;root.FoolPortal.back(ctx,p);root.FoolPortal.front(ctx,p);
+  assert(calls.length>20);
+  for(const args of calls){assert.equal(args[0],rocks);assert.equal(args.length,9);near(args[7]/args[3],args[8]/args[4]);}
+ }
 });
 test('The native side-view sprite contains transparent doorway space and solid marble piers',async()=>{
  const {loadImage,createCanvas}=require('@napi-rs/canvas'),image=await loadImage(P.ASSET);
