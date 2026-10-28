@@ -18,7 +18,10 @@ with sync_playwright() as p:
    if r.request.url=='http://portal.test/preview':r.fulfill(content_type='text/html',body=HTML)
    else:report['external_requests'].append(r.request.url);r.abort()
   context.route('**/*',route);page=context.new_page();page.set_default_timeout(120000);page.on('pageerror',lambda e:report['errors'].append(str(e)))
-  page.goto('http://portal.test/preview');page.evaluate("HellscapeQuality.show('corsa')");page.locator('#quality-tools').evaluate('e=>e.style.display="none"');f=page.frames[1]
+  page.goto('http://portal.test/preview');page.evaluate("HellscapeQuality.show('corsa')")
+  page.locator('#quality-tools').evaluate('e=>e.open=true');last=page.get_by_role('button',name='Regole',exact=True);last.scroll_into_view_if_needed();box=last.bounding_box()
+  assert box['x']>=0 and box['y']>=0 and box['x']+box['width']<=width+1 and box['y']+box['height']<=height+1,'Every review scenario must be reachable on mobile'
+  page.locator('#quality-tools').evaluate('e=>e.style.display="none"');f=page.frames[1]
   f.wait_for_function('FoolPortal.load()?.complete && FoolEnding.prepare(FoolEnding.load(()=>{}))!==null')
   page.clock.install();page.clock.pause_at(page.evaluate('Date.now()+1000'))
   return context,page,f

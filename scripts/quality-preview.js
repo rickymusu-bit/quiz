@@ -5,7 +5,7 @@
   const frame = document.querySelector('iframe');
   const tools = document.createElement('details');
   tools.id = 'quality-tools';
-  tools.style.cssText = 'position:fixed;right:8px;top:8px;z-index:20;max-width:90vw;padding:8px;color:#ffe2a5;background:#160d0bf5;border:1px solid #bf8850;font:16px/1.4 system-ui';
+  tools.style.cssText = 'position:fixed;right:8px;top:8px;z-index:20;max-width:90vw;max-height:calc(100dvh - 16px);overflow:auto;overscroll-behavior:contain;box-sizing:border-box;padding:8px;color:#ffe2a5;background:#160d0bf5;border:1px solid #bf8850;font:16px/1.4 system-ui';
   const summary = document.createElement('summary');
   summary.textContent = 'Scenari di revisione';
   tools.append(summary);
