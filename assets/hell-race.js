@@ -633,7 +633,7 @@
       const stop = blocked() || document.hidden;
       const delta = clock.advance(now, {blocked:stop || (final && visualState?.completed), reduced,
         target:motion.roadTarget(final, phase)});
-      if(ammo?.current()&&!stop)ammo.advance(reduced ? 0 : delta,reduced);
+      if(ammo?.current()&&!stop)ammo.advance(delta,reduced);
       const shot = ammo?.current();
       fig.dataset.ammo = shot?.type ?? '';
       if(ammoStatus.dataset.event !== (shot?.id ?? '')) {
@@ -642,7 +642,7 @@
       }
       if(final&&visualState?.plan&&!shot&&!stop&&imageReady(root.FoolEnding.load(()=>live?.redraw?.())))visualState.elapsed+=delta;
       const elapsed = clock.time - tweenStart;
-      phase=scene(ctx, width, state, elapsed, final, previous, reduced, clock.snapshot());
+      phase=scene(ctx, width, state, reduced ? ADVANCE_SECONDS : elapsed, final, previous, reduced, clock.snapshot());
       if(final&&fig.dataset.endingPhase!==phase){fig.dataset.endingPhase=phase;if(phase==='done'&&!visualState.completed){visualState.completed=true;fig.dispatchEvent(new CustomEvent('foolendingcomplete',{bubbles:true}));}}
       const busy = !blocked() && (phase === 'ammo' || (!reduced && (final ? phase !== 'done' : phase === 'capture' || (moving && elapsed < ADVANCE_SECONDS))));
       if(fig.dataset.animationBusy !== String(busy)) {

@@ -27,7 +27,7 @@ with sync_playwright() as p:
   for step in range(24):
    page.clock.run_for(100);image=Image.open(BytesIO(base64.b64decode(raw().split(',')[1]))).convert('RGB');frames.append(image)
   after=snapshot();assert state()==before,'Presentation must preserve engine and timer'
-  if reduced:assert after==initial and all(im.tobytes()==frames[0].tobytes() for im in frames)
+  if reduced:assert after['distance']==initial['distance'] and after['gait']==initial['gait'] and all(im.tobytes()==frames[0].tobytes() for im in frames)
   else:
    assert abs(after['distance']-initial['distance']-48*(after['time']-initial['time']))<1e-7
    assert len({im.tobytes() for im in frames})==24,'Every sampled frame evolves'

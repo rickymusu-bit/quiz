@@ -25,13 +25,16 @@
     advance(now, {blocked = false, reduced = false, target = ROAD_SPEED} = {}) {
       const dt = this.last === null ? 0 : (now - this.last) / 1000;
       this.last = now;
-      if (blocked || reduced || dt <= 0 || dt > MAX_GAP) return 0;
-      const oldTime = this.time, oldDistance = this.distance,
+      if (blocked || dt <= 0 || dt > MAX_GAP) return 0;
+      const oldTime = this.time;
+      this.time += dt;
+      // Static notices still need active time to expire in reduced-motion mode.
+      if (reduced) return dt;
+      const oldDistance = this.distance,
         decay = Math.exp(-dt / RESPONSE);
       // Exact integral: acceleration and travel do not depend on refresh rate.
       this.distance += target * dt + (this.speed - target) * RESPONSE * (1 - decay);
       this.speed = target + (this.speed - target) * decay;
-      this.time += dt;
       const step = STRIDE / 2, first = Math.floor(oldDistance / step) + 1,
         last = Math.floor(this.distance / step);
       for (let index = first; index <= last; index++) {

@@ -16,8 +16,9 @@ ambientali usano lo stesso tempo attivo senza sommare un secondo timer finale.
 
 Il clock resta associato alla partita attraverso i render della UI; pause,
 schede nascoste e delta oltre 250 ms non producono recuperi o salti. La modalità
-movimento ridotto mantiene una posa statica e conserva il percorso accessibile
-di Ammo e finali. Il clock non viene scritto nei salvataggi. Anche l'avanzamento
+movimento ridotto mantiene una posa statica e mostra subito la posizione di
+punteggio aggiornata. Il tempo attivo continua a far scadere gli avvisi statici
+Ammo; i finali conservano il percorso accessibile immediato. Il clock non viene scritto nei salvataggi. Anche l'avanzamento
 visivo del punteggio riparte dalla posizione visualizzata quando cambia il
 bersaglio durante un'interpolazione.
 

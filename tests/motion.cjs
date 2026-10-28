@@ -24,8 +24,9 @@ for(const options of [{blocked:true},{reduced:true},{}]) {
   c.advance(c.last+10000,options);assert.deepEqual(c.snapshot(),before,'Pause, reduced motion and abnormal gaps freeze travel');
 }
 c.advance(c.last+100);near(c.time,.2);near(c.distance,ROAD_SPEED*.2);
+const travel=c.distance;const t=c.time;near(c.advance(c.last+100,{reduced:true}),.1);near(c.time,t+.1);near(c.distance,travel);
 assert.equal(gait(0).frame,gait(STRIDE).frame);
 near(gait(STRIDE/8).mix,.5);assert.equal(gait(STRIDE/4).frame,gait(0).next);
 assert(roadTarget(false,'capture')<roadTarget(false,'race'));
 assert(roadTarget(true,'escape')>roadTarget(false,'race'));assert.equal(roadTarget(true,'rage'),0);
-console.log('PASS: distance, gait, acceleration and exact footfalls agree at 30/60/144 FPS; pause, reduced motion and long gaps freeze');
+console.log('PASS: distance, gait, acceleration and exact footfalls agree at 30/60/144 FPS; pause/long gaps freeze; reduced motion freezes travel while notices expire');
