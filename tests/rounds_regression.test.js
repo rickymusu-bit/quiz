@@ -82,3 +82,16 @@ test("Round config requires the full three-question-per-round reserve", () => {
   assert.throws(() => F.prepare(bank, {...base, roundCount: 13, questionCount: 13, quotas: {t: 13}}), /incoerenti/);
   assert.throws(() => F.prepare(bank, {...base, roundCount: 101, questionCount: 303, quotas: {t: 303}}), /Massimo 100 turni/);
 });
+
+test("An eliminated player's empty slot still advances the round", () => {
+  const g = match(2);
+  g.eliminate(g.s.order[2], "test");
+  g.s.groups[g.s.order[0]].score = F.rational(10000);
+  for (let i = 1; i <= 4; i++) {
+    miss(g);
+    if (i < 4) g.next();
+  }
+  assert.equal(g.s.phase, "conclusa");
+  assert.equal(g.s.completedTurns, 6);
+  assert.equal(g.s.valid, 4);
+});
