@@ -30,7 +30,10 @@ La home usa `assets/hellscape-cerbero-home.webp`, nuova illustrazione dal riferi
 - `npm run test:frames`: sagome, articolazioni, veicoli rigidi ed effetti.
 - `python3 tests/configurable.py`: impostazioni su due banche e due viewport, durate 1/4/13/99, probabilità e vecchi profili.
 - `python3 tests/tie_browser.py --quick`: Ultimo Miglio offline, avanzamento, input, pausa e ripresa.
+- `python3 tests/periodic_fire.py`: tre emettitori effettivi in corsa, pausa/ripresa della fiammata e movimento ridotto; incluso in `test:motion`.
 - `node scripts/build.cjs --offline` e `--quality-preview`: asset incorporati e scenari di verifica aggiornati.
 - `python3 scripts/review-turns-cerbero.py`: acquisizioni reali Chromium e controlli sito/offline di Malocchio, pausa, ripresa, orientamento e chiusura al tredicesimo turno.
 
 Le GIF sono registrazioni reali del browser a 20 FPS. `fuoco-periodico.gif` mostra 3,8 secondi della corsa ordinaria. `malocchio-scadenza.gif` mostra gli ultimi 2 secondi della scelta e l’avvio del tempo intero per rispondere, configurato a 90 secondi per distinguere i due conti alla rovescia: il tempo precedente viene saltato **prima** dell’acquisizione. La finestra desktop è 1366×768, export GIF 640×360; il controllo offline usa 844×390. Revisione e impronte dei file sono nel rapporto.
+
+Acquisizioni dal runtime `2638fd45aaab2ad0a105226bd9a1749355e94a78`. Il commit degli allegati aggiunge anche il controllo browser delle fiammate alla suite motion, senza modificare i file runtime. Esiti locali: 170 test Node e dataset, suite frame, configurazione e Ultimo Miglio, verifica browser di Malocchio/Flagello/catture/portale, acquisizioni sito/offline e controllo degli emettitori durante pausa/ripresa riusciti.

@@ -1,0 +1,10 @@
+{
+  "core_node_tests": 170,
+  "datasets": "PASS",
+  "frames": "PASS",
+  "configuration": "PASS: two banks, desktop/mobile, 1/4/13/99 total turns, legacy profile migration",
+  "tie": "PASS: two offline viewport cases, pause/resume, elimination and game over",
+  "v130_browser": "PASS: Malocchio, Flagello, Ultimo Miglio, capture and portal",
+  "periodic_fire_browser": "PASS: three real emitters; pause freezes rendered pixels, clock and response timer; resume continues; reduced motion suppresses fire",
+  "runtime": "2638fd45aaab2ad0a105226bd9a1749355e94a78"
+}
