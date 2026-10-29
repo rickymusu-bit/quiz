@@ -1,4 +1,5 @@
 """Real offline portal: geometry, passage, destruction, epilogue and native title."""
+from browser_viewport import set_viewport
 from pathlib import Path
 from playwright.sync_api import sync_playwright,expect
 from PIL import Image
@@ -48,8 +49,8 @@ with sync_playwright() as p:
    assert snap(f)['frame']['time']==time
    assert raw(f)==image, {'phase':phase,'paused':snap(f).get('paused'),'time':time,'raster':f.locator('.hell-race canvas').evaluate('c=>[c.width,c.height]')}
    f.evaluate('HellscapeUI.changed()');page.clock.run_for(100);assert snap(f)['frame']['time']==time
-   page.set_viewport_size({'width':768,'height':1366});page.clock.run_for(100);assert snap(f)['frame']['time']==time
-   page.set_viewport_size({'width':1366,'height':768});page.clock.run_for(100);image=raw(f)
+   set_viewport(page,f,768,1366);page.clock.run_for(100);assert snap(f)['frame']['time']==time
+   set_viewport(page,f,1366,768);page.clock.run_for(100);image=raw(f)
    f.evaluate("Object.defineProperty(document,'hidden',{configurable:true,get:()=>true});document.dispatchEvent(new Event('visibilitychange'))");page.clock.run_for(500);assert raw(f)==image
    f.evaluate("Object.defineProperty(document,'hidden',{configurable:true,get:()=>false});document.dispatchEvent(new Event('visibilitychange'))")
    f.get_by_role('button',name='Riprendi scena',exact=True).focus();page.keyboard.press('Enter');page.clock.run_for(100)

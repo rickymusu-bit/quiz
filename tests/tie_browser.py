@@ -1,4 +1,5 @@
 """Real offline tie transitions: input/focus, invariant engine, capture order, rounds and resume."""
+from browser_viewport import set_viewport
 from pathlib import Path
 from playwright.sync_api import sync_playwright,expect
 from PIL import Image
@@ -58,17 +59,12 @@ with sync_playwright() as p:
    elapsed=f.evaluate('FoolHellRace.tieStatus().elapsed');f.evaluate('HellscapeUI.changed()');assert f.evaluate('FoolHellRace.tieStatus().elapsed')==elapsed
    run(page,100);page.keyboard.press('p');run(page,50);frozen=f.locator('.hell-race canvas').evaluate('c=>c.toDataURL()');run(page,500)
    assert f.locator('.hell-race canvas').evaluate('c=>c.toDataURL()')==frozen;assert snapshot(f)==before
-   page.set_viewport_size({'width':height,'height':width})
-   expect(f.locator('#orientation-note')).to_be_visible()
+   set_viewport(page,f,height,width)
    run(page,50)
    assert snapshot(f)==before
    assert f.locator('.hell-race canvas').evaluate('c=>c.toDataURL()')==frozen
    assert f.locator('.hell-race canvas').evaluate('c=>c.width<=1536')
-   page.set_viewport_size({'width':width,'height':height})
-   # CDP acknowledges the outer viewport before the iframe resize is delivered.
-   # Await the real orientation gate instead of sampling hidden scene geometry.
-   expect(f.locator('#orientation-note')).to_be_hidden()
-   expect(f.locator('.hell-race')).to_be_visible()
+   set_viewport(page,f,width,height)
    run(page,50)
    box=f.locator('.hell-race').bounding_box();assert abs(box['width']/box['height']-4/3)<.001
    assert f.evaluate('document.documentElement.scrollWidth<=innerWidth+1')

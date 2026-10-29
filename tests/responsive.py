@@ -1,4 +1,5 @@
 """Scene geometry, native-size controls, scroll, focus and unchanged saved state."""
+from browser_viewport import set_viewport
 from pathlib import Path
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 from functools import partial
@@ -69,7 +70,7 @@ try:
                 page.screenshot(path=str(ART/f'question-{width}-dpr{dpr}.png'))
                 canvas.screenshot(path=str(ART/f'scene-{width}-dpr{dpr}.png'))
                 # Portrait gates play without changing a manually paused match.
-                page.set_viewport_size({'width':height,'height':width})
+                set_viewport(page,page,height,width)
                 page.wait_for_timeout(150)
                 assert canvas.evaluate('c=>c.width<=1536 && Math.abs(c.width/c.height-4/3)<.005')
                 assert page.evaluate('JSON.stringify(HellscapeUI.game.snapshot())') == before
@@ -78,7 +79,7 @@ try:
                 assert canvas.evaluate('c=>c.toDataURL()') == pixels
                 assert page.locator('#fit-warning').is_hidden()
                 assert page.evaluate('document.querySelector("#viewport-stage").scrollWidth<=document.querySelector("#viewport-stage").clientWidth+1')
-                page.set_viewport_size({'width':width,'height':height})
+                set_viewport(page,page,width,height)
                 page.get_by_role('button', name='Opzioni', exact=True).click()
                 page.get_by_role('button', name='Schermo intero', exact=True).click()
                 page.wait_for_function('!!document.fullscreenElement')
