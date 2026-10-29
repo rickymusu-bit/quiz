@@ -131,6 +131,8 @@ body[data-layout="compact"] .turn-order ol {grid-template-columns:1fr;gap:4px;}
   position:static;display:block;padding:0;margin:0 0 8px;min-height:28px;
   background:none;border:0;box-shadow:none;
 }
+/* Centered hidden-question children must not shrink the progress bar. */
+#viewport-stage .operation-body.hidden-question>.statusline {width:100%;}
 #viewport-stage main.operational>.operation-body,
 body[data-layout="compact"] #viewport-stage main.operational>.operation-body {
   position:absolute;top:auto;bottom:var(--game-gap);left:calc(var(--hud-width) + 2*var(--game-gap));right:var(--game-gap);

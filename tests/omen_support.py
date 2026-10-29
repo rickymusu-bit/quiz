@@ -23,6 +23,7 @@ def layout(v,w,h):
  timer=v.locator('.statusline').bounding_box()
  options=v.locator('.options-toggle').bounding_box()
  stage=v.locator('#viewport-stage').bounding_box()
+ assert timer['width']>box['width']*.6
  assert box['y']<=timer['y'] and timer['y']+timer['height']<=box['y']+box['height']
  question=v.locator('.question')
  if question.count() and question.is_visible():
