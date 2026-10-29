@@ -263,11 +263,11 @@
       questionCount: total,
       selectedTopics: Object.keys(F.topicCounts(bank.bank)),
       bases: { ...F.DEFAULT_BASE_POINTS },
-      quotas: balancedQuotas("misto", total),
+      quotas: balancedQuotas(total),
     };
   }
-  function balancedQuotas(filter, total = F.DEFAULT_TURN_COUNT, selected = null) {
-    const available = F.topicCounts(bank.bank, filter),
+  function balancedQuotas(total = F.DEFAULT_TURN_COUNT, selected = null) {
+    const available = F.topicCounts(bank.bank),
       topics = Object.keys(available),
       counts = topics.map(t => !selected || selected.has(t) ? available[t] : 0),
       values = topics.map(() => 0);
@@ -290,7 +290,7 @@
         ...F.DEFAULT_BONUS_WEIGHTS,
         ...(value.bonusWeights ?? {}),
       },
-      difficulty: value.difficulty,
+      difficulty: "misto",
       turnCount: value.turnCount ?? F.DEFAULT_TURN_COUNT,
       questionCount: value.turnCount ?? F.DEFAULT_TURN_COUNT,
       bases: value.bases,
@@ -304,7 +304,7 @@
   function migrateQuotas(value, total) {
     const entries = Object.entries(value.quotas ?? {}).filter(([, n]) => n > 0);
     const sum = entries.reduce((n, [, weight]) => n + weight, 0);
-    if (!sum) return balancedQuotas(value.difficulty, total);
+    if (!sum) return balancedQuotas(total, new Set(value.selectedTopics ?? Object.keys(F.topicCounts(bank.bank))));
     const quotas = Object.fromEntries(Object.keys(value.quotas).map(t => [t, 0]));
     const fractions = entries.map(([topic, weight]) => {
       const exact = weight / sum * total;
@@ -325,9 +325,11 @@
           ...value, turnCount: total, questionCount: total,
           quotas: migrateQuotas(value, total),
         };
+        // Normalize previously filtered profiles only for new games.
+        // Already-started games keep their original filter when restored.
+        safe = {...safe, difficulty: "misto"};
         const topics = safe.selectedTopics ?? Object.keys(safe.quotas).filter(t => safe.quotas[t] > 0),
-          counts = F.topicCounts(bank.bank, safe.difficulty),
-          maximum = Math.floor(topics.reduce((sum,t) => sum + (counts[t] ?? 0),0) / teamDraft.names.length);
+          maximum = F.turnCapacity(bank.bank, topics, teamDraft.names.length);
         if (maximum > 0 && safe.turnCount > maximum)
           safe = {...safe, turnCount:maximum, questionCount:maximum, quotas:migrateQuotas(safe,maximum)};
         F.prepare(
@@ -505,17 +507,6 @@
         "number",
       ),
       input("Secondi per domanda", "seconds", value.seconds, "number"),
-      select(
-        "Difficoltà",
-        "difficulty",
-        [
-          ["misto", "Misto"],
-          ["facile", "Facile"],
-          ["media", "Media"],
-          ["difficile", "Difficile"],
-        ],
-        value.difficulty,
-      ),
     );
     grid.append(time);
     const bonusPanel = node("section", undefined, "panel");
@@ -548,7 +539,7 @@
       node("h3", "Distribuzione delle domande"),
       node(
         "p",
-        "Massimo turni = domande disponibili negli argomenti e nella difficoltà scelti ÷ numero di giocatori, arrotondato per difetto. Le quote devono sommare ai turni. Turni saltati o ceduti contano comunque; Malocchio non aggiunge un turno.",
+        "Massimo turni = tutte le domande (facili + medie + difficili) negli argomenti selezionati ÷ numero di giocatori, arrotondato per difetto. Le quote devono sommare ai turni. Turni saltati o ceduti contano comunque; Malocchio non aggiunge un turno.",
         "muted",
       ),
     );
@@ -558,7 +549,6 @@
     p.append(topics);
     settingsTopics = new Set(value.selectedTopics ?? Object.keys(value.quotas).filter(t => value.quotas[t] > 0));
     drawQuotas(value.quotas);
-    $("difficulty").onchange = () => act(rebalance);
     $("turn-count").onchange = () => act(rebalance);
     $("turn-count").step = "1";
     $("turn-count").min = "1";
@@ -613,7 +603,7 @@
 
   function drawQuotas(quotas) {
     const list = $("quotas"),
-      counts = F.topicCounts(bank.bank, $("difficulty").value),
+      counts = F.topicCounts(bank.bank),
       previousPage = Number(main.querySelector(".quota-pages")?.dataset.page ?? 0);
     list.replaceChildren();
     main.querySelector(".quota-pages")?.remove();
@@ -677,12 +667,12 @@
     const total = number("turn-count");
     if (!Number.isInteger(total) || total < 1)
       throw Error("Scegli un numero intero di turni compreso tra 1 e " + maximum);
-    drawQuotas(balancedQuotas($("difficulty").value, total, settingsTopics));
+    drawQuotas(balancedQuotas(total, settingsTopics));
   }
   function updateTurnLimit() {
-    const counts = F.topicCounts(bank.bank, $("difficulty").value),
+    const counts = F.topicCounts(bank.bank),
       available = [...settingsTopics].reduce((sum, t) => sum + (counts[t] ?? 0), 0),
-      maximum = Math.floor(available / teamDraft.names.length),
+      maximum = F.turnCapacity(bank.bank, settingsTopics, teamDraft.names.length),
       field = $("turn-count"),
       wasDisabled = field.disabled;
     field.max = String(maximum);
@@ -703,13 +693,13 @@
   }
   function readSettings() {
     if ($("turn-count").disabled)
-      throw Error("Seleziona argomenti con almeno " + teamDraft.names.length + " domande disponibili alla difficoltà scelta");
+      throw Error("Seleziona argomenti con almeno " + teamDraft.names.length + " domande disponibili");
     return {
       seconds: number("seconds"),
       bonusWeights: Object.fromEntries(
         F.TYPES.map((type) => [type, number("weight-" + type)]),
       ),
-      difficulty: $("difficulty").value,
+      difficulty: "misto",
       selectedTopics: [...settingsTopics],
       turnCount: number("turn-count"),
       questionCount: number("turn-count"),
