@@ -59,7 +59,7 @@ function offline(review = false) {
   for (const bank of catalog.banche) texts[bank.url] = read(bank.url);
   const assets = {};
 
-  for(const name of ["black-stone-bridge-v1.png","lava-sea-v2.png","portal-side-v3.png","portal-rocks-v1.png","antisigillo-icon-v1.png","antisigillo-tool-v1.png"])
+  for(const name of ["black-stone-bridge-v1.png","lava-sea-v2.png","portal-side-v3.png","portal-rocks-v1.png","antisigillo-icon-v1.png","antisigillo-tool-v1.png","sacrificio-v1.png"])
     assets["assets/hell-race/"+name]=data("assets/hell-race/"+name);
   for (const name of fs.readdirSync(path.join(root, "assets/hell-race")))
     if (name.endsWith(".webp") && name !== 'portal-flames-v1.webp')
@@ -90,7 +90,7 @@ function offline(review = false) {
 function ammoPreview(){
   const assets={};
 
-  for(const name of ['vehicles-drive-v1.webp','demon-actions-v1.webp','infernal-world-v1.webp','ammo-relics-v1.webp','lava-bridge-v1.webp','lava-lake-v1.webp','black-stone-bridge-v1.png','lava-sea-v2.png','antisigillo-icon-v1.png','antisigillo-tool-v1.png']){
+  for(const name of ['vehicles-drive-v1.webp','demon-actions-v1.webp','infernal-world-v1.webp','ammo-relics-v1.webp','lava-bridge-v1.webp','lava-lake-v1.webp','black-stone-bridge-v1.png','lava-sea-v2.png','antisigillo-icon-v1.png','antisigillo-tool-v1.png','sacrificio-v1.png']){
     const p='assets/hell-race/'+name;assets[p]=data(p);
   }
   const html=inline('Ammo-preview.html').replace('<head>','<head><meta name="hellscape-revision" content="'+revision+'"><script>window.HellscapeOffline={assets:'+safe(assets)+'};</script>');

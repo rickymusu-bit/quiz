@@ -47,11 +47,11 @@ test('Antisigillo dissipates only the protection, bypasses reflection and enable
     assert(g.attack(attack,g.s.owner,target,g.uid()));assert.equal(karma.type,attack);
   }
 });
-test('Antisigillo uses an independent 30% threshold and migrates old probabilities and stored copies',()=>{
-  for(const [roll,awarded] of [[.299,true],[.3,false]]){
+test('Antisigillo uses an independent 20% threshold and migrates old probabilities and stored copies',()=>{
+  for(const [roll,awarded] of [[.199,true],[.2,false]]){
     const g=game();delete g.s.config.bonusWeights.antisigillo;
     const old=g.snapshot();old.version='2.3.0';old.rules='20.0.0';old.config.bonusWeights.ruba=17;item(g,'antisigillo');old.groups=F.clone(g.s.groups);
-    const r=F.Game.restore(old);assert.equal(r.s.config.bonusWeights.antisigillo,30);assert.equal(r.s.config.bonusWeights.ruba,17);
+    const r=F.Game.restore(old);assert.equal(r.s.config.bonusWeights.antisigillo,20);assert.equal(r.s.config.bonusWeights.ruba,17);
     r.random=()=>roll;answer(r,true);assert.equal(r.s.result.bonuses.some(c=>c.type==='antisigillo'),awarded);assert.equal(r.s.result.bonuses.length,Number(awarded));
   }
 });

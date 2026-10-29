@@ -3,7 +3,7 @@ const { chromium } = require('playwright');
 const assert = require('node:assert/strict');
 const fs = require('node:fs'), path = require('node:path'), http = require('node:http');
 const root = path.resolve(__dirname, '..'), offline = process.argv.includes('--offline');
-const types = ['salta','ruba','svela','aura','marx','ira'];
+const types = ['salta','ruba','svela','aura','marx','ira','sacrificio'];
 const selected = process.argv.find(arg=>arg.startsWith('--case='))?.split('=')[1];
 const modes = ['karma','shield','lethal','timer','reduced'];
 assert(!selected||[...types,...modes,'reload'].includes(selected),'Unknown Ammo test case');

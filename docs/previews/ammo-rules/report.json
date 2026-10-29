@@ -1,0 +1,131 @@
+{
+  "revision": "ea074108c503226e96c0143c6a443fe260c54668",
+  "errors": [],
+  "checks": [
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "offline": false,
+      "reduced": false,
+      "timer_pause_resume": "PASS",
+      "revealed_tribute": "PASS",
+      "restore_no_replay": "PASS"
+    },
+    {
+      "viewport": [
+        844,
+        390
+      ],
+      "offline": false,
+      "reduced": false,
+      "timer_pause_resume": "PASS",
+      "revealed_tribute": "PASS",
+      "restore_no_replay": "PASS"
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "offline": true,
+      "reduced": true,
+      "timer_pause_resume": "PASS",
+      "revealed_tribute": "PASS",
+      "restore_no_replay": "PASS"
+    }
+  ],
+  "after_sacrifice": {
+    "owner": 0,
+    "turn": 1,
+    "screen": "hidden",
+    "valid": 0,
+    "scores": [
+      "1777",
+      "1000",
+      "1000"
+    ],
+    "lives": [
+      2,
+      3,
+      3
+    ],
+    "out": [
+      false,
+      false,
+      false
+    ],
+    "inventory": [
+      [
+        {
+          "type": "ruba",
+          "target": null
+        }
+      ],
+      [],
+      [
+        {
+          "type": "karma",
+          "target": null
+        }
+      ]
+    ],
+    "effects": [],
+    "current": "irraggiamento_v2_005",
+    "cancelled": [],
+    "running": false,
+    "phase": "ordinaria"
+  },
+  "after_tribute": {
+    "owner": 2,
+    "turn": 2,
+    "screen": "hidden",
+    "valid": 0,
+    "scores": [
+      "2107",
+      "1000",
+      "670"
+    ],
+    "lives": [
+      2,
+      3,
+      3
+    ],
+    "out": [
+      false,
+      false,
+      false
+    ],
+    "inventory": [
+      [],
+      [],
+      [
+        {
+          "type": "ruba",
+          "target": 0
+        }
+      ]
+    ],
+    "effects": [],
+    "current": "irraggiamento_v2_005",
+    "cancelled": [],
+    "running": false,
+    "phase": "ordinaria"
+  },
+  "viewport": [
+    1024,
+    768
+  ],
+  "gif_pixels": [
+    640,
+    480
+  ],
+  "duration_ms": 12000,
+  "capture_fps": 12,
+  "frames": 144,
+  "bytes": 24648158,
+  "sha256": "99f872ef0fe3a63c16b9713baa388ab84c707d49aca8006abd8078182b8801f7",
+  "last_life": "PASS",
+  "settings_defaults": "PASS"
+}
