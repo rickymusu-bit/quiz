@@ -314,17 +314,26 @@
     };
   }
   function migrateQuotas(value, total) {
-    const entries = Object.entries(value.quotas ?? {}).filter(([, n]) => n > 0);
-    const sum = entries.reduce((n, [, weight]) => n + weight, 0);
-    if (!sum) return balancedQuotas(total, new Set(value.selectedTopics ?? Object.keys(F.topicCounts(bank.bank))));
-    const quotas = Object.fromEntries(Object.keys(value.quotas).map(t => [t, 0]));
-    const fractions = entries.map(([topic, weight]) => {
-      const exact = weight / sum * total;
-      quotas[topic] = Math.floor(exact);
-      return {topic, fraction: exact - Math.floor(exact)};
-    }).sort((a,b) => b.fraction - a.fraction);
-    let left = total - Object.values(quotas).reduce((a,b) => a+b, 0);
-    for (const item of fractions) if (left-- > 0) quotas[item.topic]++;
+    const counts = F.topicCounts(bank.bank);
+    const selected = new Set(value.selectedTopics ??
+      Object.keys(value.quotas ?? {}).filter(t => value.quotas[t] > 0));
+    const topics = Object.keys(counts).filter(t => selected.has(t));
+    const quotas = Object.fromEntries(Object.keys(counts).map(t => [t, 0]));
+    const weights = Object.fromEntries(topics.map(t => [t, Math.max(0, value.quotas?.[t] ?? 0)]));
+    const weightSum = Object.values(weights).reduce((a, b) => a + b, 0);
+    if (!weightSum) return balancedQuotas(total, selected);
+    for (const t of topics)
+      quotas[t] = Math.min(counts[t], Math.floor(total * weights[t] / weightSum));
+    let left = total - Object.values(quotas).reduce((a, b) => a + b, 0);
+    while (left > 0) {
+      const possible = topics.filter(t => quotas[t] < counts[t]);
+      if (!possible.length) break;
+      possible.sort((a, b) =>
+        (total * weights[b] / weightSum - quotas[b]) -
+        (total * weights[a] / weightSum - quotas[a]));
+      quotas[possible[0]]++;
+      left--;
+    }
     return quotas;
   }
   function savedSettings() {
