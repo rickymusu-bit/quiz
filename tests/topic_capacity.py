@@ -88,9 +88,9 @@ try:
             q.get_by_role('button', name='Salva impostazioni', exact=True).click()
             q.goto(base + 'Fool.html?start=1')
             q.locator('#bank-choice').select_option(bank)
-            q.get_by_role('button', name=f'Inizia partita ({single * 2} turni)', exact=True).click()
+            q.get_by_role('button', name=f'Inizia partita ({single * 2} turni per giocatore)', exact=True).click()
             assert q.evaluate('HellscapeUI.game.s.config.selectedTopics.length') == 2
-            assert q.evaluate('HellscapeUI.game.s.config.turnCount') == single * 2
+            assert q.evaluate('HellscapeUI.game.s.config.roundCount') == single * 2
             # Adapting a previously longer profile must preserve custom settings.
             q.evaluate('''()=>{
                 const data=JSON.parse(localStorage.getItem('fool-settings-v1'));
