@@ -46,8 +46,8 @@
       // Exact integral: acceleration and travel do not depend on refresh rate.
       this.distance += target * dt + (this.speed - target) * RESPONSE * (1 - decay);
       this.speed = target + (this.speed - target) * decay;
-      const step = STRIDE / 2, first = Math.floor(oldDistance / step) + 1,
-        last = Math.floor(this.distance / step);
+      const step = STRIDE / 2, first = Math.floor((oldDistance + 1e-7) / step) + 1,
+        last = Math.floor((this.distance + 1e-7) / step);
       for (let index = first; index <= last; index++) {
         // Invert the same distance integral so impacts do not drift with FPS.
         const targetDistance = index * step - oldDistance;
@@ -79,7 +79,7 @@
       const dt=previous?(time-previous.time):0;
       if(previous&&dt>0&&dt<=MAX_GAP&&distance>=previous.distance){
         const step=STRIDE/2;
-        for(let index=Math.floor(previous.distance/step)+1;index<=Math.floor(distance/step);index++)
+        for(let index=Math.floor((previous.distance+1e-7)/step)+1;index<=Math.floor((distance+1e-7)/step);index++)
           this.footfalls.push({index,at:previous.time+dt*(index*step-previous.distance)/(distance-previous.distance)});
       }else if(!previous||dt<0||dt>MAX_GAP||distance<previous.distance)this.footfalls=[];
       this.previous={time,distance};this.footfalls=this.footfalls.filter(e=>time-e.at<1.5).slice(-7);
