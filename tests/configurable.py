@@ -23,7 +23,7 @@ with sync_playwright() as p:
   for count in [3,6,99]:
    page.locator('#question-count').fill(str(count));page.locator('#seconds').click()
    assert sum(page.locator('#quotas input').evaluate_all('(els)=>els.map(e=>Number(e.value))'))==count
-   for kind in ['salta','ruba','svela','aura','karma','marx','ira']:page.locator('#weight-'+kind).fill('100')
+   for kind in ['salta','ruba','svela','aura','karma','marx','ira','antisigillo']:page.locator('#weight-'+kind).fill('100')
    page.get_by_role('button',name='Salva impostazioni').click();expect(page.locator('#message')).to_contain_text('Impostazioni salvate');fits(page)
    expect(page.get_by_role('button',name='Anteprima',exact=True)).to_have_count(0)
    expect(page.locator('#teacher-preview')).to_have_count(0)
@@ -38,15 +38,17 @@ with sync_playwright() as p:
   page.goto(base+'Fool.html');page.locator('#bank-choice').select_option(bank);expect(page.get_by_role('button',name='Inizia partita (3 domande)',exact=True)).to_be_enabled();page.get_by_role('button',name='Inizia partita (3 domande)',exact=True).click()
   assert page.evaluate('HellscapeUI.game.s.config.questionCount')==3 and page.evaluate('HellscapeUI.game.s.queue.length')==2
   page.get_by_role('button',name='Svela e avvia il tempo').click();assert page.get_by_role('button',name='Inventario',exact=True).count()==0
-  page.locator('.answer').nth(page.evaluate('HellscapeUI.game.s.current.correct')).click();assert page.evaluate('HellscapeUI.game.s.result.bonuses.length')==7
-  for kind in ['salta','ruba','svela','aura','karma','marx','ira']:expect(page.locator(f'.solution .ammo-round[data-ammo="{kind}"]')).to_have_count(1)
+  page.locator('.answer').nth(page.evaluate('HellscapeUI.game.s.current.correct')).click();assert page.evaluate('HellscapeUI.game.s.result.bonuses.length')==8
+  for kind in ['salta','ruba','svela','aura','karma','marx','ira','antisigillo']:expect(page.locator(f'.solution .ammo-round[data-ammo="{kind}"]')).to_have_count(1)
   expect(page.locator('.answer-feedback')).to_have_count(0)
   assert page.locator('.multiplier-value').count()==0
   team=page.evaluate('HellscapeUI.game.s.result.respondent')
   page.locator(f'.turn-order [data-team="{team}"]').click()
   assert page.locator('.bonus-inventory-list .bonus-group').count()==7
-  assert 'ammo-hellscape-v2.png' in page.locator('.ammo-round').first.evaluate('(el)=>getComputedStyle(el).backgroundImage')
-  assert page.evaluate('HellscapeUI.game.s.groups[HellscapeUI.game.s.result.respondent].inventory.length')==7
+  page.get_by_role('button',name='Successivi',exact=True).click();expect(page.locator('.bonus-inventory-list [data-ammo="antisigillo"]')).to_have_count(1)
+  page.get_by_role('button',name='Precedenti',exact=True).click()
+  assert 'ammo-relics-v1.webp' in page.locator('.ammo-round').first.evaluate('(el)=>getComputedStyle(el).backgroundImage')
+  assert page.evaluate('HellscapeUI.game.s.groups[HellscapeUI.game.s.result.respondent].inventory.length')==8
   page.get_by_role('button',name='Chiudi',exact=True).click()
   page.get_by_role('button',name='Prossima domanda',exact=True).click()
   page.evaluate('()=>{for(let n=0;n<2;n++)HellscapeUI.game.s.groups[HellscapeUI.game.s.owner].inventory.push({id:HellscapeUI.game.uid(),type:"aura",target:null,origin:"test"});HellscapeUI.changed()}')
@@ -72,6 +74,6 @@ with sync_playwright() as p:
   expect(page.locator('#weight-marx')).to_have_value('15');expect(page.locator('#weight-ira')).to_have_value('5')
   page.goto(base+'Fool_regole.html')
   for section in range(22):page.locator('#section').select_option(str(section));fits(page)
-  checks.append({'bank':bank,'size':[width,height],'counts':[3,6,99],'awards':7,'uses':2});page.close()
+  checks.append({'bank':bank,'size':[width,height],'counts':[3,6,99],'awards':8,'uses':2});page.close()
  assert not errors,errors;b.close();print(json.dumps({'configurable':checks,'errors':errors}))
 if 'server' in globals():server.shutdown()

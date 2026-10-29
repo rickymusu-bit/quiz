@@ -6,8 +6,8 @@ function fixture(width=36,ground=300){
  const e={time:8,camera:{distance:170,speed:80},demon:{left:410-width/2-221-6,width:221,ground:303,pose:C.pose(8),runWeight:1},positions:[{index:0,row:0,x:410,width,height:32,ground}]};
  return F.prepare(e,0);
 }
-test('Portal spans the deck in its shared transverse projection and stays anchored to the world',()=>{
- assert(F.GATE.near-F.GATE.far>B.DEPTH);
+test('Portal occupies a single lane in its shared transverse projection and stays anchored to the world',()=>{
+ assert(F.GATE.near-F.GATE.far<B.DEPTH);assert(F.GATE.openingNear-F.GATE.openingFar<40);
  const a=B.project(900,72,0,{distance:200}),b=B.project(900,72,0,{distance:235});near(a.x-b.x,35);near(a.y,b.y);
  near(B.worldX(a.x,72,{distance:200}),900);
  const far=B.project(900,F.GATE.far,0,{distance:200}),last=B.project(900,F.GATE.near,0,{distance:200});
@@ -40,19 +40,19 @@ test('Water clipping occurs in world height, including the extruded foundations'
  const clipped=P.aboveWater([{x:0,depth:20,z:10},{x:16,depth:20,z:10},{x:16,depth:20,z:-30},{x:0,depth:20,z:-30}],-16);
  assert.equal(clipped.length,4);assert(clipped.every(v=>v.z>=-16));assert.equal(clipped.filter(v=>v.z===-16).length,2);
 });
-test('Fracture follows physical roof contact; the middle route collapses only after passage and stays broken',()=>{
+test('Impact grooves the deck; the architecture collapses after passage and leaves permanent rubble',()=>{
  const r=fixture();assert.equal(F.frame(r,F.IMPACT-.01).bridge.damage,0);assert(F.frame(r,F.IMPACT+.2).bridge.damage>0);
- near(F.portalAt(F.IMPACT).offset,F.GATE.height-F.GATE.water);
+ assert(F.portalAt(0).offset<0);near(F.portalAt(F.IMPACT).offset,0);
  for(let t=F.IMPACT;t<F.T.escapeEnd;t+=.01)assert.equal(F.frame(r,t).bridge.collapse,0);
  const end=F.frame(r,F.T.duration);assert.equal(end.bridge.damage,1);assert.equal(end.bridge.collapse,1);assert.equal(end.portal.visible,false);
 });
 test('The old roar is replaced by planted fists, one flame and exhaustion before the title',()=>{
  const r=fixture(),order=[];
  for(let t=0;t<F.T.duration;t+=.01){const f=F.frame(r,t);if(order.at(-1)!==f.phase)order.push(f.phase);if(f.phase==='rage')assert(!f.portal.visible);}
- assert.deepEqual(order,['rise','open','escape','close','sink','rage','fire','exhausted']);
+ assert.deepEqual(order,['descent','open','escape','close','collapse','rage','fire','exhausted']);
  for(const t of [.46,1.46,2.46]){const f=F.frame(r,F.T.sinkEnd+t);assert(f.impact>.99);near(f.demon.ground,303);}
- const fire=F.frame(r,F.T.rageEnd+.8);assert(fire.fireAge>0);assert.equal(fire.demon.runWeight,0);
- const done=F.frame(r,F.T.duration);assert.equal(done.phase,'done');assert.equal(done.fireAge,null);assert.equal(done.demon.runWeight,0);
+ const fire=F.frame(r,F.T.rageEnd+.8);assert(fire.fireAge>0);assert(fire.demon.runWeight>0);
+ const done=F.frame(r,F.T.duration);assert.equal(done.phase,'done');assert.equal(done.fireAge,null);assert(done.demon.runWeight>0);
 });
 test('Sampling preserves the incoming state and is independent of frame rate, pause and seeking',()=>{
  const r=fixture(),before=JSON.stringify(r);const reference=F.frame(r,F.T.escapeEnd);
@@ -62,4 +62,15 @@ test('Sampling preserves the incoming state and is independent of frame rate, pa
 test('Game Over never acquires a portal or a damaged bridge',()=>{
  const state={winner:null,respondent:2,groups:[{out:true},{out:true},{out:true}]},p=C.plan(state,[0,1],[2]),r=C.prepare(p,C.defaultEntry(state));
  for(let t=0;t<=p.duration;t+=.01){const f=C.frame(r,t);assert.equal(f.portal,undefined);assert.equal(f.bridge,undefined);}
+});
+test('The environment continues after the verdict; rubble and grooves remain in world coordinates',()=>{
+ const r=fixture(),a=F.frame(r,F.T.duration),b=F.frame(r,F.T.duration+2);
+ assert(b.camera.distance>a.camera.distance);assert.equal(b.bridge.anchorX,a.bridge.anchorX);
+ assert.equal(b.bridge.damage,1);assert(b.bridge.rubble);assert(!b.portal.visible);
+ assert(b.demon.left+b.camera.distance+b.demon.width<r.gateX);
+});
+test('Seeded roadway features preserve their world positions as the camera advances',()=>{
+ const a=B.features(0,512),b=B.features(48,512),byId=new Map(a.map(f=>[f.id,f]));
+ for(const f of b)if(byId.has(f.id))assert.deepEqual(f,byId.get(f.id));
+ assert.deepEqual(a,B.features(0,512));assert(a.some(f=>f.kind===0));
 });

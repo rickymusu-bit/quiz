@@ -1,4 +1,4 @@
-/* Fool — Fuga dall'Inferno v1.5.0 (2026-10-27): scena pixel-art illustrativa.
+/* Hellscape — scena continua con raster adattivo e atlanti nativi.
    Nessuna modifica al motore, ai punteggi o ai salvataggi. */
 (function (root) {
   'use strict';
@@ -95,7 +95,7 @@
     const image=animated?atlasRow(key,row)[frame]:sheets[key];
     const rect=animated?[0,0,image.width,image.height]:frameRect(key,columns,rows,row,frame),scale=Math.min(width/rect[2],height/rect[3]);
     const w=rect[2]*scale,h=rect[3]*scale;
-    c.drawImage(image,...rect,Math.round(x+(width-w)/2),Math.round(y+height-h),Math.round(w),Math.round(h));return true;
+    c.drawImage(image,...rect,x+(width-w)/2,y+height-h,w,h);return true;
   }
   function vehicleSize(row, scale = 2) {
     const frame = vehicleRow(row)[0];
@@ -104,14 +104,15 @@
   }
   function drawVehicle(c, row, frame, x, ground, scale = 2) {
     const size = vehicleSize(row, scale);
-    const bounds = { x: Math.round(x - size.width / 2), y: Math.round(ground - size.height),
-      width: Math.round(size.width), height: Math.round(size.height) };
+    const bounds = { x: x - size.width / 2, y: ground - size.height,
+      width: size.width, height: size.height };
     sprite(c, 'vehicles', 8, 6, row, frame, bounds.x, bounds.y, bounds.width, bounds.height);
     return bounds;
   }
   function vehiclePreview(id){
     const canvas=document.createElement('canvas');canvas.width=160;canvas.height=90;
-    const paint=()=>{const c=canvas.getContext('2d');c.imageSmoothingEnabled=false;c.clearRect(0,0,160,90);const row=Math.max(0,VEHICLES.indexOf(id)),size=vehicleSize(row);
+    canvas.width=320;canvas.height=180;
+    const paint=()=>{const c=canvas.getContext('2d');c.setTransform(2,0,0,2,0,0);c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';c.clearRect(0,0,160,90);const row=Math.max(0,VEHICLES.indexOf(id)),size=vehicleSize(row);
       // One common preview scale retains the same relative sizes as the race.
       const zoom=1.35/(root.FoolBridge?.RACE_SCALE ?? .62); sprite(c,'vehicles',8,6,row,0,80-size.width*zoom/2,86-size.height*zoom,size.width*zoom,size.height*zoom)};
     if(imageReady(sheets.vehicles))paint();else sheets.vehicles?.addEventListener('load',paint,{once:true});
@@ -448,7 +449,7 @@
     mix.restore();
     const scale = Math.min(width / source.width, height / source.height),
       w = source.width * scale, h = source.height * scale;
-    c.drawImage(chaseBlend, Math.round(x+(width-w)/2), Math.round(y+height-h), Math.round(w), Math.round(h));
+    c.drawImage(chaseBlend, x+(width-w)/2, y+height-h, w, h);
   }
   function drawChaser(c, travel, advance = 0) {
     drawChaserAt(c,travel,{...motion.CHASE,left:motion.CHASE.left+advance});
@@ -642,13 +643,21 @@
     const blocked = () => state.suspended || (state.paused && state.pauseReason !== 'animazione');
     fig.dataset.animationBusy = String(!blocked() && (!!tie?.sample().blocking || !!ammo?.current() || (!reduced && ((final && !visualState?.completed) || (!tie?.sample().holdCapture && visualState?.queue.length > 0) || moving))));
     let phase = final ? 'loading' : visualState?.queue.length ? 'capture' : 'race';
+    let lastPaint=null;
     const draw = now => {
       if (live !== record || !canvas.isConnected) return;
+      // Bound fill rate on DPR displays; all motion still uses elapsed time.
+      if(lastPaint!==null&&now-lastPaint<1000/30-.5){record.frame=root.requestAnimationFrame(draw);return;}
+      lastPaint=now;
       const width = RACE_WIDTH;
-      if (canvas.width !== width) canvas.width = width;
-      ctx.imageSmoothingEnabled = false;
+      // Match CSS size and effective DPR, bounded to 1536×1152 (7 MiB RGBA).
+      const rasterScale=Math.max(1,Math.min(3,canvas.getBoundingClientRect().width/width*Math.min(2,root.devicePixelRatio||1)));
+      const rasterWidth=Math.round(width*rasterScale),rasterHeight=Math.round(H*rasterScale);
+      if(canvas.width!==rasterWidth||canvas.height!==rasterHeight){canvas.width=rasterWidth;canvas.height=rasterHeight;}
+      ctx.setTransform(canvas.width/width,0,0,canvas.height/H,0,0);
+      ctx.imageSmoothingEnabled = true;ctx.imageSmoothingQuality='high';
       const stop = blocked() || document.hidden || tie?.sample().paused || visualState?.paused;
-      const delta = clock.advance(now, {blocked:stop || (final && visualState?.completed), reduced,
+      const delta = clock.advance(now, {blocked:stop, reduced,
         target:tie?.sample().blocking&&phase!=='capture'?motion.ROAD_SPEED*.35:motion.roadTarget(final, phase)});
       if(ammo?.current()&&!stop)ammo.advance(delta,reduced);
       const shot = ammo?.current();
@@ -682,7 +691,7 @@
       if(pauseButton.textContent!==label)pauseButton.textContent=label;
       const complete=tie?.takeCompletion();
       if(complete)fig.dispatchEvent(new CustomEvent('fooltiecomplete',{bubbles:true,detail:complete}));
-      if (live === record && (tie?.sample().blocking || ammo?.current() || (!reduced && (!final || phase!=='done')))) record.frame = root.requestAnimationFrame(draw);
+      if (live === record && (tie?.sample().blocking || ammo?.current() || !reduced)) record.frame = root.requestAnimationFrame(draw);
     };
     record.redraw = () => {
       if (live !== record || !canvas.isConnected) return;

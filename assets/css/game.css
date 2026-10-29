@@ -241,18 +241,18 @@ dialog .columns { margin: 1rem 0; }
 .bonus-inventory-list .bonus-group { display: list-item; }
 .bonus-inventory-list .bonus-group button { margin: .4rem 0 .2rem .6rem; }
 
-/* Seven infernal pixel-art icons, one sprite per collectible Ammo. */
+/* Native-resolution relic atlas with a dedicated vector Antisigillo. */
 .ammo-item { display:flex; align-items:center; flex-wrap:wrap; gap:.3rem .48rem; margin:.2rem 0; min-width:0; }
 .ammo-label { white-space:normal; }
 .ammo-heading { display:flex; flex-wrap:wrap; align-items:center; gap:.35rem .55rem; flex:1 1 auto; min-width:0; }
 .ammo-rounds { display:inline-flex; align-items:center; flex-wrap:wrap; gap:.1rem; max-width:100%; }
-.ammo-round { display:inline-block; flex:0 0 auto; width:1.55rem; height:1.55rem; background-image:url('../ammo-hellscape-v2.png'); background-repeat:no-repeat; background-size:700% 100%; background-position:var(--ammo-position,0%) center; image-rendering:pixelated; }
-[data-ammo="salta"] { --ammo-position:0%; }
-[data-ammo="ruba"]  { --ammo-position:16.66667%; }
-[data-ammo="svela"] { --ammo-position:33.33333%; }
-[data-ammo="aura"]  { --ammo-position:50%; }
-[data-ammo="karma"] { --ammo-position:66.66667%; }
-[data-ammo="marx"]  { --ammo-position:83.33333%; }
+.ammo-round { display:inline-block; flex:0 0 auto; width:1.55rem; height:1.55rem; background-image:url('../hell-race/ammo-relics-v1.webp'); background-repeat:no-repeat; background-size:300% 300%; background-position:var(--ammo-x,0%) var(--ammo-y,0%); image-rendering:auto; }
+[data-ammo="salta"] { --ammo-x:0%; --ammo-y:0%; }
+[data-ammo="ruba"] { --ammo-x:0%; --ammo-y:100%; }
+[data-ammo="svela"] { --ammo-x:50%; --ammo-y:50%; }
+[data-ammo="aura"] { --ammo-x:0%; --ammo-y:50%; }
+[data-ammo="karma"] { --ammo-x:100%; --ammo-y:50%; }
+[data-ammo="marx"] { --ammo-x:50%; --ammo-y:100%; }
 .bonus-list { display:flex; flex-direction:column; align-items:flex-start; }
 .bonus-inventory-list .ammo-heading { min-width:0; }
 @media(max-width:650px) { .ammo-round { width:1.4rem; height:1.4rem; } }
@@ -361,10 +361,10 @@ body.portrait #orientation-note { position: fixed; inset: 0; display: grid; alig
 
 
 /* Ammo are interactive icons; names and rules live in the item popup. */
-button.ammo-round{background-image:url('../ammo-hellscape-v2.png');background-repeat:no-repeat;background-size:700% 100%;background-position:var(--ammo-position) center;width:48px;height:48px;min-width:48px;min-height:48px;padding:0;border:0;background-color:transparent;box-shadow:none;cursor:pointer;image-rendering:pixelated;touch-action:manipulation}
+button.ammo-round{background-image:url('../hell-race/ammo-relics-v1.webp');background-repeat:no-repeat;background-size:300% 300%;background-position:var(--ammo-x,0%) var(--ammo-y,0%);width:48px;height:48px;min-width:48px;min-height:48px;padding:0;border:0;background-color:transparent;box-shadow:none;cursor:pointer;image-rendering:auto;touch-action:manipulation}
 button.ammo-round:hover{filter:brightness(1.25)}
 button.ammo-round:focus-visible{outline:2px solid #ffe044;outline-offset:2px}
-.ammo-round[data-ammo="ira"]{--ammo-position:100%}
+.ammo-round[data-ammo="ira"]{--ammo-x:100%;--ammo-y:100%}
 .ammo-rounds{gap:6px}
 .ammo-rewards{display:flex;align-items:center;flex-wrap:wrap;gap:5px 8px}
 .ammo-setting{display:flex;align-items:center;gap:12px;margin:10px 0}.ammo-setting label{flex:1}
@@ -372,7 +372,8 @@ button.ammo-round:focus-visible{outline:2px solid #ffe044;outline-offset:2px}
 .bonus-inventory-list .bonus-group{margin:0;padding:6px;border:1px solid #644630;background:#1b1512}
 .bonus-inventory-list .bonus-group button{margin:0}
 .ammo-info{width:480px;max-width:calc(100vw - 24px)}
-.ammo-detail-art{display:block;width:88px;height:88px;margin:0 auto;image-rendering:pixelated}
+.ammo-detail-art{display:block;width:88px;height:88px;margin:0 auto;image-rendering:auto}
+.ammo-round[data-ammo="antisigillo"]{background-image:url('../antisigillo.svg');background-size:contain;background-position:center;image-rendering:auto}
 .ammo-description{font-size:18px;line-height:1.45}
 
 @media(max-height:500px){.ammo-info .ammo-detail-art{width:48px;height:48px;float:right;margin:0 0 6px 12px}.ammo-info h2{margin:0 0 10px}.ammo-info .ammo-description{font-size:16px;line-height:1.3}.ammo-info p{margin:8px 0}}

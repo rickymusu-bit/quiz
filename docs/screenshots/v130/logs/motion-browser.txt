@@ -1,0 +1,1 @@
+PASS: offline motion on desktop and Android portrait/landscape DPR 1/2; pause/visibility, rebuild continuity, reduced motion, engine invariance

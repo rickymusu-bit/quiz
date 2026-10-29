@@ -1,0 +1,121 @@
+
+> hellscape@3.9.0 test:offline
+> npm run preview:offline && python3 tests/offline.py && node tests/ammo_animation.cjs --offline
+
+
+> hellscape@3.9.0 preview:offline
+> node scripts/build.cjs --offline
+
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1
+npm notice To update run: npm install -g npm@12.2.1
+npm notice
+{
+  "offline": [
+    {
+      "viewport": [
+        1440,
+        900
+      ],
+      "banks": 2,
+      "errors": [],
+      "external_requests": []
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "banks": 2,
+      "errors": [],
+      "external_requests": []
+    },
+    {
+      "viewport": [
+        844,
+        390
+      ],
+      "banks": 2,
+      "errors": [],
+      "external_requests": []
+    }
+  ],
+  "file_url_check": "file:// blocked by managed Chromium URL policy; exact bytes supplied by local request interception"
+}
+{
+  "offline": true,
+  "checks": [
+    {
+      "viewport": [
+        1440,
+        900
+      ],
+      "activations": [
+        "salta",
+        "ruba",
+        "svela",
+        "aura",
+        "marx",
+        "ira"
+      ],
+      "result": "PASS"
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "activations": [
+        "salta",
+        "ruba",
+        "svela",
+        "aura",
+        "marx",
+        "ira"
+      ],
+      "result": "PASS"
+    },
+    {
+      "viewport": [
+        844,
+        390
+      ],
+      "activations": [
+        "salta",
+        "ruba",
+        "svela",
+        "aura",
+        "marx",
+        "ira"
+      ],
+      "result": "PASS"
+    },
+    {
+      "mode": "karma",
+      "result": "PASS"
+    },
+    {
+      "mode": "shield",
+      "result": "PASS"
+    },
+    {
+      "mode": "lethal",
+      "result": "PASS"
+    },
+    {
+      "mode": "timer",
+      "result": "PASS"
+    },
+    {
+      "mode": "reduced",
+      "result": "PASS"
+    }
+  ],
+  "errors": []
+}
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1
+npm notice To update run: npm install -g npm@12.2.1
+npm notice

@@ -1,9 +1,9 @@
 /* Hellscape: core. Shared by the static site, Node tests and offline export. */
 (function (root) {
   "use strict";
-  const RULES = "20.0.0",
-    VERSION = "2.3.0",
-    TYPES = ["salta", "ruba", "svela", "aura", "karma", "marx", "ira"];
+  const RULES = "21.0.0",
+    VERSION = "2.4.0",
+    TYPES = ["salta", "ruba", "svela", "aura", "karma", "marx", "ira", "antisigillo"];
   const LABELS = {
     salta: "Catene",
     ruba: "Tributo",
@@ -12,15 +12,17 @@
     karma: "Contrappasso",
     marx: "Livella",
     ira: "Flagello",
+    antisigillo: "Antisigillo",
   };
   const AMMO_HELP = {
     salta: "Le catene immobilizzano un avversario attivo e gli fanno saltare il prossimo turno ordinario. Più Catene si sommano, una per turno. Se riceve una domanda tramite Malocchio, risponde subito, ma le Catene restano pendenti. Nessuna vita viene tolta.",
     ruba: "Esigi un tributo dal prossimo guadagno del bersaglio: dopo una risposta corretta, lui e gli attaccanti distinti si dividono i nuovi punti in parti uguali. Più Tributi dello stesso autore valgono una sola quota. L’effetto finisce anche se il bersaglio sbaglia o scade il tempo.",
     svela: "Scruti soltanto il testo della domanda e il punteggio, senza vedere le quattro alternative, a timer fermo. Puoi affrontarla oppure passarla immediatamente a un altro dannato attivo: il timer intero parte alla conferma. Chi la riceve non può usare Ammo o passarla di nuovo. Le Catene già pendenti sul bersaglio non vengono consumate.",
     aura: "Attiva il sigillo nel tuo turno per bloccare i nuovi attacchi Catene, Tributo e Malocchio fino al tuo prossimo turno. Non cancella effetti già pendenti, non si accumula e non protegge da Livella, Flagello, sanzioni o errori.",
-    karma: "Contrappasso agisce passivamente: quando subisci un nuovo attacco non bloccato, una copia si trasforma in quell’Ammo, utilizzabile solo contro l’aggressore. Ogni attacco trasforma al massimo una copia. Non reagisce a Livella o Flagello.",
+    karma: "Contrappasso agisce passivamente: quando subisci un nuovo attacco non bloccato, una copia si trasforma in quell’Ammo, utilizzabile solo contro l’aggressore. Ogni attacco trasforma al massimo una copia. Non reagisce a Livella, Flagello o Antisigillo.",
     marx: "Livella redistribuisce immediatamente in parti uguali i punti di tutti i dannati ancora in gara, compreso chi la usa. Il totale resta identico anche con frazioni. Non agisce sugli eliminati, non viene bloccata da Sigillo e non attiva Contrappasso.",
-    ira: "Flagello travolge contemporaneamente tutti i dannati ancora in gara, compreso chi lo evoca: ciascuno perde una vita. Chi raggiunge zero è eliminato; i punti restano invariati. Sigillo non protegge e Contrappasso non reagisce. Se nessuno sopravvive, è Game Over.",
+    ira: "Flagello travolge contemporaneamente tutti i dannati ancora in gara, compreso chi lo evoca: ciascuno perde una vita, tutte le Ammo in inventario e fino a 666 punti, senza scendere sotto zero. Chi raggiunge zero vite è eliminato. Il Sigillo attivo resta, ma non protegge; Contrappasso non reagisce. Se nessuno sopravvive, è Game Over.",
+    antisigillo: "Dissipa immediatamente il Sigillo attivo di un solo avversario. Scegli un dannato ancora in gara e protetto: torna vulnerabile a Catene, Tributo e Malocchio. Non rimuove altri effetti e non toglie punti o vite. Il Sigillo non lo blocca e Contrappasso non reagisce.",
   };
   const DEFAULT_BONUS_WEIGHTS = Object.fromEntries(
     TYPES.map((type) => [type, type === "ira" ? 5 : type === "marx" ? 15 : 30]),
@@ -71,7 +73,7 @@
   }
   function remainingLives(s, index) {
     const g = s.groups[index];
-    return g.out ? 0 : s.tieRound > 0 ? 1 : Math.max(0, 3 - g.sanctions - (g.damage ?? 0));
+    return g.out ? 0 : Math.max(0, 3 - g.sanctions - (g.damage ?? 0));
   }
   function shuffle(a, random) {
     a = a.slice();

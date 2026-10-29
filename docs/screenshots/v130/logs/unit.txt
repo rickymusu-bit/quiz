@@ -1,0 +1,146 @@
+
+> hellscape@3.9.0 test
+> node --test tests/*.test.js && python3 tests/verify_datasets.py
+
+✔ Opening or reloading a save consumes history without replay; redraws preserve the current shot (1.127672ms)
+✔ A blocked attack plays one shield reaction; Contrappasso follows a successful attack (0.906389ms)
+✔ Flagello keeps all affected vehicles in the shot, including eliminated players (0.221752ms)
+✔ Reduced motion has a brief static pose; a new game clears any pending shot (0.169925ms)
+✔ All actors retain their lanes while the hunter captures without resurrected actors (22.983976ms)
+✔ Grip matches the actual hand, feeding reaches the mouth before geometric occlusion hides the vehicle (0.785777ms)
+✔ Hunter advances throughout the capture; recovery and camera never reverse world travel (68.982419ms)
+✔ The winner is never gripped and the final pursuit closes to a visible gap before escape (13.770759ms)
+✔ One ordinary capture preserves bystanders and returns to the exact chase geometry without rewinding the camera (11.117054ms)
+✔ Gait and trajectories use distance at 30/60/144 FPS; footfall tracking stays bounded and freezes (6.705663ms)
+✔ Only survivor crosses the descending portal before collapse, fists, flame and exhaustion (5.627409ms)
+✔ Score victory removes remaining opponents before opening the portal (0.286807ms)
+✔ Game Over eats only the last player and then dances without a portal (0.539229ms)
+✔ Previously consumed players never reappear or get eaten twice (0.222846ms)
+✔ Planning and animation sampling preserve the authoritative state (0.238735ms)
+✔ Vehicle stays gripped through the lift, disappears inside the mouth and recovers (0.214486ms)
+✔ Portal opens after impact and collapses only after the crossing (0.275235ms)
+✔ Rage plants the feet and anticipates three heavy fist impacts (0.323096ms)
+✔ Malocchio bypasses a pending Catene once but the skipped ordinary turn remains queued (9.762522ms)
+✔ Two Tributo from one attacker do not grant duplicate shares (4.613131ms)
+✔ Rules and names: Tributo, Livella and no multiplier (0.1891ms)
+✔ Six unique junkpunk vehicles and backward-compatible legacy games (2.547862ms)
+✔ Default settings keep 33 questions and Livella at 15 percent (0.283711ms)
+✔ Restore an existing 2.1.0 game while retaining chosen probabilities and points (4.288695ms)
+✔ Each Ammo type has its own distinct high-resolution artifact (0.23756ms)
+✔ New ordinary game starts with 33 questions even when all scores are zero (1.356332ms)
+✔ Tiebreak requires exhaustion of ordinary questions and ignores difficulty points (2.577555ms)
+✔ 2.2.0 ordinary saved games restore without resetting their progress (3.459559ms)
+✔ 3–99 questions: multiples of 3, unique, exact topic quotas (19.66079ms)
+✔ Invalid counts and probabilities are rejected (0.458739ms)
+✔ Base points stay constant when a group answers correctly again (1.502807ms)
+✔ Tributo divides only base points (1.744527ms)
+✔ Livella redistributes all accumulated points exactly without rounding (3.243091ms)
+✔ Livella excludes eliminated teams and ignores Sigillo while keeping history (2.859071ms)
+✔ Livella awards at 100% and preserved probability is added to previous save formats (3.370866ms)
+✔ Independent bonus awards (6.116112ms)
+✔ At the end of ordinary questions a single score leader wins without a tie (0.883543ms)
+✔ Only the top-score tied groups enter the elimination tie-break (0.928551ms)
+✔ Last group gets its question even when first two are eliminated (0.903103ms)
+✔ All groups wrong in tie-break yields Game Over only after last answer (1.00694ms)
+✔ A complete successful Ultimo Miglio round uses unseen difficult questions (2.100121ms)
+✔ Ninety-nine questions transition to tie-break only at 99 (5.418703ms)
+✔ Save and resume during tie-break preserves elimination and timer (5.304633ms)
+✔ Previous ordinary saves can be migrated without changing scores (3.408399ms)
+✔ Two disciplinary eliminations immediately award the remaining team (1.444338ms)
+✔ One unblocked attack transforms one Contrappasso only, preserving the remaining copies (3.149916ms)
+✔ An Sigillo-blocked attack leaves every Contrappasso unchanged (0.98172ms)
+✔ Livella changes points while leaving other players Sigillo and Contrappasso untouched (2.268699ms)
+✔ Answered questions retain their displayed option order for read-only review and restore (2.37759ms)
+✔ Scientific notation uses fractions and subscripts without altering saved question strings (0.490639ms)
+✔ Ultimo Miglio preserves sanctions and removes one remaining life per error (2.459157ms)
+✔ Only tied leaders retain their residual hearts (0.852335ms)
+✔ Removed refusal methods are unavailable and pending legacy requests restore the same question (3.119231ms)
+✔ Timer preserves exact remaining time across pause and restored games, then expires once (2.970741ms)
+✔ Flagello defaults to 5 percent, with an independent exact threshold (1.538782ms)
+✔ Flagello hits everyone, preserves active seals and destroys inventories and low scores (2.601142ms)
+✔ Three uses remove all players simultaneously with no premature winner (3.224442ms)
+✔ A self-eliminating Flagello cancels an open question and advances safely (2.561147ms)
+✔ Flagello awards the sole survivor after every victim has been processed (2.679307ms)
+✔ Flagello skips eliminated players and damage combines with later sanctions (3.119958ms)
+✔ Legacy 2.2.1 saves gain the new Ammo without changing lives, points or chosen settings (2.454994ms)
+✔ Persisted Ira damage survives restore and rejects malformed life counters (7.607166ms)
+✔ Ultimo Miglio preserves ordinary damage and forbids Ammo (2.497845ms)
+✔ Flagello has no target and validates before consuming a copy (1.817601ms)
+✔ A sanction always removes exactly one life, including the last tie-break heart (2.298892ms)
+✔ Published keys and raw JSON survive save, restore and removal (1.764366ms)
+✔ Offline game/settings cannot overwrite, resume or delete site saves (0.543349ms)
+✔ Malformed and unavailable storage is surfaced to UI error handling (0.685983ms)
+✔ Portal occupies a single lane in its shared transverse projection and stays anchored to the world (1.223749ms)
+✔ All six full-size silhouettes cross one plane; no fade, scale, turn or premature sinking (32.204899ms)
+✔ Architecture keeps its proportions during both vertical movements; complete framing at full emergence (0.645234ms)
+✔ Water clipping occurs in world height, including the extruded foundations (0.252584ms)
+✔ Impact grooves the deck; the architecture collapses after passage and leaves permanent rubble (1.071388ms)
+✔ The old roar is replaced by planted fists, one flame and exhaustion before the title (6.404564ms)
+✔ Sampling preserves the incoming state and is independent of frame rate, pause and seeking (1.623007ms)
+✔ Game Over never acquires a portal or a damaged bridge (6.745389ms)
+✔ The environment continues after the verdict; rubble and grooves remain in world coordinates (0.555144ms)
+✔ Seeded roadway features preserve their world positions as the camera advances (1.099193ms)
+✔ Scores display nearest integers while retaining exact arithmetic (0.856517ms)
+✔ Terrain follows completed questions, not points or early victory (0.76474ms)
+✔ Legacy defaults and bounds are stable without mutating saved state (0.19723ms)
+✔ Only an observed ordinary-to-tie transition arms an intro; the last result waits for Next (5.25305ms)
+✔ A restored tie skips historical intros; reduced motion waits for an accessible continuation (1.229704ms)
+✔ Each final-life wrong answer has one notice; remaining players still answer and successful rounds use a short intro (3.041905ms)
+✔ A unique score leader never triggers a tie intro (1.343405ms)
+✔ Pause remains available through a capture without holding its approach forever (1.392664ms)
+✔ Flagello subtracts exact rational amounts at every boundary, wipes fresh Ammo and preserves seals (9.662233ms)
+✔ Flagello resolves a sole survivor and self-elimination after all effects, leaving the eliminated state unchanged (1.765994ms)
+✔ Antisigillo refuses unprotected, eliminated, missing and self targets without consuming Ammo (2.113674ms)
+✔ Antisigillo dissipates only the protection, bypasses reflection and enables each later attack (2.97567ms)
+✔ Antisigillo uses an independent 30% threshold and migrates old probabilities and stored copies (2.822861ms)
+✔ Ultimo Miglio keeps damage, sanctions and scores; timeout and wrong answer remove exactly one life (4.106537ms)
+✔ Ultimo Miglio completes all due questions, including the last elimination, before Game Over (1.477695ms)
+✔ Exhaustion and supply never fall back to easy/medium; restore keeps the due turn and seen questions (2.023344ms)
+✔ Legacy ties retain their actual one-life budget and retire non-hard open questions without replay (2.297065ms)
+✔ A current-format tie save rejects an easy queued question before it can bypass the hard-only reserve (1.154724ms)
+ℹ tests 96
+ℹ suites 0
+ℹ pass 96
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1038.602855
+{
+  "verifica": "OK",
+  "risultati": [
+    {
+      "banca": "termologia",
+      "domande": 100,
+      "difficolta": {
+        "difficile": 30,
+        "facile": 30,
+        "media": 40
+      },
+      "tipologie": {
+        "calcolo": 23,
+        "conoscenza": 30,
+        "ragionamento": 47
+      }
+    },
+    {
+      "banca": "introduzione-fisica-misura",
+      "domande": 100,
+      "difficolta": {
+        "difficile": 27,
+        "facile": 32,
+        "media": 41
+      },
+      "tipologie": {
+        "calcolo": 33,
+        "conoscenza": 24,
+        "ragionamento": 43
+      }
+    }
+  ]
+}
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1
+npm notice To update run: npm install -g npm@12.2.1
+npm notice

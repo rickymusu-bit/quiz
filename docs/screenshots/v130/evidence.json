@@ -1,0 +1,381 @@
+{
+  "revision": "f51aa602ed4d4fec5d225e0104dff618e0f3a8cd",
+  "checks": [
+    {
+      "viewport": [
+        1440,
+        1080
+      ],
+      "dpr": 1,
+      "raster": {
+        "width": 1440,
+        "height": 1080,
+        "css": 1440,
+        "smoothing": true
+      },
+      "malocchio": "PASS",
+      "antisigillo": "PASS",
+      "flagello": "PASS",
+      "ultimoMiglio": "PASS",
+      "capture": "PASS",
+      "portal": "PASS"
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 2,
+      "raster": {
+        "width": 780,
+        "height": 585,
+        "css": 390,
+        "smoothing": true
+      },
+      "malocchio": "PASS",
+      "antisigillo": "PASS",
+      "flagello": "PASS",
+      "ultimoMiglio": "PASS",
+      "capture": "PASS",
+      "portal": "PASS"
+    },
+    {
+      "viewport": [
+        844,
+        390
+      ],
+      "dpr": 2,
+      "raster": {
+        "width": 1040,
+        "height": 780,
+        "css": 520,
+        "smoothing": true
+      },
+      "malocchio": "PASS",
+      "antisigillo": "PASS",
+      "flagello": "PASS",
+      "ultimoMiglio": "PASS",
+      "capture": "PASS",
+      "portal": "PASS"
+    }
+  ],
+  "screenshots": [
+    {
+      "file": "ordinary-1440x1080-dpr1.png",
+      "viewport": [
+        1440,
+        1080
+      ],
+      "dpr": 1,
+      "sha256": "a7206d9c337f3fe6560cb7ee4323945e156ac0d0707f1d2fde890ca5327e5df9"
+    },
+    {
+      "file": "malocchio-1440x1080-dpr1.png",
+      "viewport": [
+        1440,
+        1080
+      ],
+      "dpr": 1,
+      "sha256": "62610fd393841a647a16c726479884f887afa238b783a29b4db3d0342838cb3e"
+    },
+    {
+      "file": "antisigillo-1440x1080-dpr1.png",
+      "viewport": [
+        1440,
+        1080
+      ],
+      "dpr": 1,
+      "sha256": "69374292e664752b3d108a442aebd1b8593f130403f142c74a687c3423053dc2"
+    },
+    {
+      "file": "flagello-confirm-1440x1080-dpr1.png",
+      "viewport": [
+        1440,
+        1080
+      ],
+      "dpr": 1,
+      "sha256": "407761c60926e9cb61bddebb534a895d2dc3fc8a9b41742e96f37f5f7026ba9a"
+    },
+    {
+      "file": "flagello-result-1440x1080-dpr1.png",
+      "viewport": [
+        1440,
+        1080
+      ],
+      "dpr": 1,
+      "sha256": "afbb3e4bfe2e832bced8529c6d8b70ce32f8909114761db67b3fe5c97f78f8f0"
+    },
+    {
+      "file": "ultimo-miglio-1440x1080-dpr1.png",
+      "viewport": [
+        1440,
+        1080
+      ],
+      "dpr": 1,
+      "sha256": "b739246dda5832e6315dc575557c38e922f380217477bf22c68dd78d92feca8c"
+    },
+    {
+      "file": "capture-flame-1440x1080-dpr1.png",
+      "viewport": [
+        1440,
+        1080
+      ],
+      "dpr": 1,
+      "sha256": "1c970e25f54d3a1064776606b9582aa01af27d07e9aaa3ea9578e379734220f0"
+    },
+    {
+      "file": "portal-descent-1440x1080-dpr1.png",
+      "viewport": [
+        1440,
+        1080
+      ],
+      "dpr": 1,
+      "sha256": "46eb4ace72d701041a60fe9a04836f4e2384cf268009395cf8c8d47780e5874e"
+    },
+    {
+      "file": "portal-impact-1440x1080-dpr1.png",
+      "viewport": [
+        1440,
+        1080
+      ],
+      "dpr": 1,
+      "sha256": "4f1efbbc9724bcf7d8e936a572391a09a05b5e536f9b7c7a97a01f983910ea59"
+    },
+    {
+      "file": "portal-crossing-1440x1080-dpr1.png",
+      "viewport": [
+        1440,
+        1080
+      ],
+      "dpr": 1,
+      "sha256": "62e301d7b59f9a1e0d5b0b8a290fe2eca50869a0e1f1f53915d9e90df717d7d3"
+    },
+    {
+      "file": "portal-rubble-1440x1080-dpr1.png",
+      "viewport": [
+        1440,
+        1080
+      ],
+      "dpr": 1,
+      "sha256": "1319cdd9ce1eb07e65a652a67262e4a2d0f9d21127fdb0b0bb34dd65aa05ea2d"
+    },
+    {
+      "file": "ordinary-390x844-dpr2.png",
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 2,
+      "sha256": "d0400275e212f6a2f0be6c1695ead5f463ee1adead65f3e932012fb098506648"
+    },
+    {
+      "file": "malocchio-390x844-dpr2.png",
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 2,
+      "sha256": "6252d3c79fbaab6adcfa8ae049b3e70ffb4be761620c2c9d3be7ec08dcce0be4"
+    },
+    {
+      "file": "antisigillo-390x844-dpr2.png",
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 2,
+      "sha256": "228465bb4826c199877a99cf7c69b102f124173bd135b8ee00807a13d4e8986d"
+    },
+    {
+      "file": "flagello-confirm-390x844-dpr2.png",
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 2,
+      "sha256": "bc6d96853086929ad6868ef3fa640e4ddc14045f7880fbd8b72fd48fb16145cc"
+    },
+    {
+      "file": "flagello-result-390x844-dpr2.png",
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 2,
+      "sha256": "255828485be2e6c10155347e8f9a7a6d27633478982ad3d59254756204ba6be8"
+    },
+    {
+      "file": "ultimo-miglio-390x844-dpr2.png",
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 2,
+      "sha256": "3e0c8835970c10646f4e55af0334cda1eaf668e634f6b210d2a3ebe6f69c9f87"
+    },
+    {
+      "file": "capture-flame-390x844-dpr2.png",
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 2,
+      "sha256": "5a339510aae02c60beea25c8062dc543ecb544bfcd32d997e84424119a5e4fb2"
+    },
+    {
+      "file": "portal-descent-390x844-dpr2.png",
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 2,
+      "sha256": "f0a9a27a1912f091759e95f8a6e3b04e1c20d7bc71fb9931e4eb50ad60f99a7b"
+    },
+    {
+      "file": "portal-impact-390x844-dpr2.png",
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 2,
+      "sha256": "e150ed2d0e69ba2345e25c1443eaa92e6680d5616f025fb429816542e5bf8fc6"
+    },
+    {
+      "file": "portal-crossing-390x844-dpr2.png",
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 2,
+      "sha256": "eb7758a9c4a75e76bd96a53a90c2ffe4a885ad931b18a5753acd90c1f263ad88"
+    },
+    {
+      "file": "portal-rubble-390x844-dpr2.png",
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 2,
+      "sha256": "7c332dfe388d961736783fcb15c457d0f20957de9b591e2698413bbafdc1b975"
+    },
+    {
+      "file": "ordinary-844x390-dpr2.png",
+      "viewport": [
+        844,
+        390
+      ],
+      "dpr": 2,
+      "sha256": "90e874f6fb8358e16f7104da2edabfd6734a3809a688621c25d30f4d7d331f46"
+    },
+    {
+      "file": "malocchio-844x390-dpr2.png",
+      "viewport": [
+        844,
+        390
+      ],
+      "dpr": 2,
+      "sha256": "d94b22e2cc6744c6311c122fd9dd2b5c732e7fab5d4f6b2748402c18fb8b80d2"
+    },
+    {
+      "file": "antisigillo-844x390-dpr2.png",
+      "viewport": [
+        844,
+        390
+      ],
+      "dpr": 2,
+      "sha256": "c2e2d831b9a385a2fa341f4ebc05d315eea9e25fb2033d8feba96f39b5bee8bd"
+    },
+    {
+      "file": "flagello-confirm-844x390-dpr2.png",
+      "viewport": [
+        844,
+        390
+      ],
+      "dpr": 2,
+      "sha256": "b54368cab83b9b9a968731403e9e631cf1c8a2ccb359dd24a0e1ef4075bcb19f"
+    },
+    {
+      "file": "flagello-result-844x390-dpr2.png",
+      "viewport": [
+        844,
+        390
+      ],
+      "dpr": 2,
+      "sha256": "6fa4178dbb60e8f2aa1d4cbdb7f489e63a9b000d6616fd2b60ff3655ddce6a68"
+    },
+    {
+      "file": "ultimo-miglio-844x390-dpr2.png",
+      "viewport": [
+        844,
+        390
+      ],
+      "dpr": 2,
+      "sha256": "324078db03d19c7cbc707e7693d288654d200c81b924a8a805e578533abe126d"
+    },
+    {
+      "file": "capture-flame-844x390-dpr2.png",
+      "viewport": [
+        844,
+        390
+      ],
+      "dpr": 2,
+      "sha256": "76cee1949cdc9d939ce9fe60f0288f5be750d778ec94c27654958214a0b9ae9a"
+    },
+    {
+      "file": "portal-descent-844x390-dpr2.png",
+      "viewport": [
+        844,
+        390
+      ],
+      "dpr": 2,
+      "sha256": "ee8f1192ce96411fcb4786eff7bbda0c532825d42f135dd92033886e8b2c44ce"
+    },
+    {
+      "file": "portal-impact-844x390-dpr2.png",
+      "viewport": [
+        844,
+        390
+      ],
+      "dpr": 2,
+      "sha256": "3ab75ae955c2c8eb2be56592768fbf362267f6d6e79a0590ff1593435eaf3541"
+    },
+    {
+      "file": "portal-crossing-844x390-dpr2.png",
+      "viewport": [
+        844,
+        390
+      ],
+      "dpr": 2,
+      "sha256": "76079fe95f9efc57e95bd5176123ef7da7871ef9e94c4d8e8c144dbe88d28fb3"
+    },
+    {
+      "file": "portal-rubble-844x390-dpr2.png",
+      "viewport": [
+        844,
+        390
+      ],
+      "dpr": 2,
+      "sha256": "cb990cbaad908411d9616776b8adee6edb4f3b6f08c024b0e7cbb8cbdad43435"
+    }
+  ],
+  "errors": [],
+  "validation": {
+    "unit": "logs/unit.txt",
+    "datasets": "logs/datasets.txt",
+    "browser": "logs/browser.txt",
+    "frames": "logs/frames.txt",
+    "v130": "logs/v130.txt",
+    "responsive": "logs/responsive.txt",
+    "endings": "logs/endings.txt",
+    "chase": "logs/chase.txt",
+    "portal": "logs/portal.txt",
+    "tie": "logs/tie.txt",
+    "motion": "logs/motion.txt",
+    "offline": "logs/offline.txt",
+    "quality": "logs/quality.txt",
+    "motion-browser": "logs/motion-browser.txt",
+    "terrain": "logs/terrain.txt",
+    "gothic": "logs/gothic.txt"
+  },
+  "production_diff_from_capture": "none"
+}

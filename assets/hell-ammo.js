@@ -2,10 +2,10 @@
 (function (root) {
   "use strict";
   const labels = { salta: "CATENE", ruba: "TRIBUTO", svela: "MALOCCHIO",
-    aura: "SIGILLO", karma: "CONTRAPPASSO", marx: "LIVELLA", ira: "FLAGELLO" };
+    aura: "SIGILLO", karma: "CONTRAPPASSO", marx: "LIVELLA", ira: "FLAGELLO", antisigillo: "ANTISIGILLO" };
   const details = { salta: "Prossimo turno saltato", ruba: "Prossimo guadagno condiviso",
     svela: "Scelta del destinatario", aura: "Protezione attiva", karma: "Munizione trasformata",
-    marx: "Punti divisi in parti uguali", ira: "Tutti perdono una vita" };
+    marx: "Punti divisi in parti uguali", ira: "−1 vita · tutte le Ammo · fino a −666 pt", antisigillo: "Sigillo dissipato · bersaglio vulnerabile" };
   function plans(events, state) {
     const result = [];
     for (let n = 0; n < events.length; n++) {
@@ -55,9 +55,13 @@
     };
   }
   const mix = (a,b,t) => a+(b-a)*t;
-  let art = null;
+  let art = null, antiArt = null;
   const cells = [[0,0],[1,0],[2,0],[0,1],[1,1],[2,1],[0,2],[1,2],[2,2]];
   function load(redraw=()=>{}) {
+    if(!antiArt&&typeof root.Image==="function"){
+      antiArt=new root.Image();const path="assets/antisigillo.svg";
+      antiArt.src=root.HellscapeOffline?.assets?.[path]||path;antiArt.addEventListener("load",redraw,{once:true});
+    }
     if (!art && typeof root.Image === "function") {
       art = new root.Image();
       const path="assets/hell-race/ammo-relics-v1.webp";
@@ -106,6 +110,9 @@
         relic(c,1,x,y,(size+14)*(1.3-.3*build),size*.83,turn-(1-build)*.4);
         relic(c,3,x,y-(1-build)*26,size+5,size*.91,-turn/2);
         if(plan.blocked)debris(c,x-size*.4,y,phase,4);
+      } else if(plan.type==="antisigillo") {
+        if(antiArt?.complete&&antiArt.naturalWidth)c.drawImage(antiArt,x-size/2,y-size/2,size,size);
+        debris(c,x,y,phase,19,true);
       } else if(plan.type==="salta") {
         const close=reduced?1:Math.min(1,t*4);
         relic(c,0,x,y,size+(1-close)*24,size*.8,turn);

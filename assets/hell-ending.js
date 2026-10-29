@@ -291,14 +291,15 @@
   let actorBuffer=null;
   function paintActor(c,W,demon,h,travel) {
     const frames=prepare(art);if(!frames)return h.demon?.(c,0);
-    if(!actorBuffer){actorBuffer=document.createElement('canvas');actorBuffer.height=384;}
-    if(actorBuffer.width!==W)actorBuffer.width=W;
-    const work=actorBuffer.getContext('2d');work.clearRect(0,0,W,384);work.save();work.globalCompositeOperation='lighter';
+    if(!actorBuffer)actorBuffer=document.createElement('canvas');
+    const scale=Math.min(3,Math.max(1,Math.abs(c.getTransform().a)));
+    if(actorBuffer.width!==Math.round(W*scale)||actorBuffer.height!==Math.round(384*scale)){actorBuffer.width=Math.round(W*scale);actorBuffer.height=Math.round(384*scale);}
+    const work=actorBuffer.getContext('2d');work.setTransform(scale,0,0,scale,0,0);work.clearRect(0,0,W,384);work.save();work.globalCompositeOperation='lighter';work.imageSmoothingEnabled=true;work.imageSmoothingQuality='high';
     const run=Math.max(0,Math.min(1,demon.runWeight??0));
     for(const p of demon.pose){work.globalAlpha=p.weight*(1-run);const frame=frames[p.frame].canvas,scale=demon.width/frame.width;
-      work.drawImage(frame,Math.round(demon.left),Math.round(demon.ground-frame.height*scale*(demon.breath??1)),Math.round(demon.width),Math.round(frame.height*scale*(demon.breath??1)));}
+      work.drawImage(frame,demon.left,demon.ground-frame.height*scale*(demon.breath??1),demon.width,frame.height*scale*(demon.breath??1));}
     if(run){work.globalAlpha=run;if(h.chaser)h.chaser(work,demon,travel);else actor(work,8,demon.left,demon.ground,demon.width);}
-    work.restore();c.drawImage(actorBuffer,0,0);
+    work.restore();c.drawImage(actorBuffer,0,0,actorBuffer.width,actorBuffer.height,0,0,W,384);
   }
   function paintVehicle(c,state,v,h,travel) {
     if(v.visible===false)return;
@@ -323,7 +324,14 @@
       if(f.touching)paintPart(c,W,f.demon,h,travel,f.anchors.hand,Math.min(9,v.width*.32),Math.min(12,v.height*.5));
       else if(f.swallowing)paintPart(c,W,f.demon,h,travel,f.anchors.mouth,7,v.height+5);}
     for(const v of cars.filter(v=>v.ground>f.demon.ground))paintVehicle(c,state,v,h,travel);
-    if(f.flameAge!==null&&f.flameAge!==undefined)fireBreath(c,f.anchors.mouth,f.flameAge,undefined,1.2);
+    if(f.flameAge!==null&&f.flameAge!==undefined){
+      const duration=f.flameDuration??1.2;
+      fireBreath(c,f.anchors.mouth,f.flameAge,f.flameAim,duration);
+      if(f.flameAge>0&&f.flameAge<duration){
+        const target=f.flameAim,glow=c.createRadialGradient(target.x,target.y,0,target.x,target.y,48);
+        glow.addColorStop(0,'#ffb84a66');glow.addColorStop(1,'#ff7b1800');c.save();c.globalCompositeOperation='screen';c.fillStyle=glow;c.fillRect(target.x-48,target.y-48,96,96);c.restore();
+      }
+    }
     h.onFrame?.(f,travel);return f;
   }
   function capturePlan(entry,index){return C.captureRoute(entry,index,poseMetrics());}
@@ -368,9 +376,9 @@
       P.front(c,f.portal);B.debris(c,f.bridge,true);
       h.onFrame?.(f,travel);
     }else{
-      const index=s.phase==='done'?15:12+Math.floor(s.local*5)%4;
-      d.pose=C.mixPoses(d.pose,C.pose(index),ease(s.local/.4));d.runWeight=(d.runWeight??1)*(1-ease(s.local/.4));
-      d.ground=ground-(s.phase==='done'?0:Math.abs(Math.sin(s.local*Math.PI*5))*7);
+      const age=Math.max(0,time-p.chaseEnd),cycle=age*5,index=12+Math.floor(cycle)%4,next=12+(Math.floor(cycle)+1)%4;
+      d.pose=C.mixPoses(d.pose,C.mixPoses(C.pose(index),C.pose(next),ease(cycle%1)),ease(age/.4));d.runWeight=.12;
+      d.ground=ground-Math.abs(Math.sin(age*Math.PI*5))*7;
       const travel=h.travelFor?.(f.time,d.worldDistance);paintActor(c,W,d,h,travel);h.onFrame?.(f,travel);
     }
     return s.phase;

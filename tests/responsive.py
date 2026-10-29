@@ -63,15 +63,15 @@ try:
                 r = canvas.bounding_box()
                 assert abs(r['width']/r['height']-4/3) < .001
                 assert r['width'] <= width + 1 and r['height'] <= height + 1
-                assert canvas.evaluate('c=>c.width===FoolLayout.reference.rasterWidth && c.height===FoolLayout.reference.rasterHeight')
+                assert canvas.evaluate('c=>c.width>=512 && c.width<=1536 && Math.abs(c.width/c.height-4/3)<.005')
                 before = page.evaluate('JSON.stringify(HellscapeUI.game.snapshot())')
                 pixels = canvas.evaluate('c=>c.toDataURL()')
                 page.screenshot(path=str(ART/f'question-{width}-dpr{dpr}.png'))
                 canvas.screenshot(path=str(ART/f'scene-{width}-dpr{dpr}.png'))
-                # Reflow changes CSS geometry, not the raster or the game state.
+                # Reflow reallocates the bounded DPR raster while preserving game state.
                 page.set_viewport_size({'width':height,'height':width})
                 page.wait_for_timeout(150)
-                assert canvas.evaluate('c=>c.toDataURL()') == pixels
+                assert canvas.evaluate('c=>c.width<=1536 && Math.abs(c.width/c.height-4/3)<.005')
                 assert page.evaluate('JSON.stringify(HellscapeUI.game.snapshot())') == before
                 assert page.locator('#fit-warning').is_hidden()
                 assert page.evaluate('document.querySelector("#viewport-stage").scrollWidth<=document.querySelector("#viewport-stage").clientWidth+1')

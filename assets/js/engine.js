@@ -280,7 +280,7 @@
       if (this.s.current) used.add(this.s.current.id);
       return this.s.bank.filter(
         (q) =>
-          (this.s.phase === "pareggio" || this.s.eligible.includes(q.id)) &&
+          (this.s.phase === "pareggio" ? q.difficulty === "difficile" : this.s.eligible.includes(q.id)) &&
           !used.has(q.id),
       );
     }
@@ -327,7 +327,7 @@
         while (pos < s.tieOrder.length && s.groups[s.tieOrder[pos]].out) pos++;
         need(
           pos < s.tieOrder.length,
-          "Nessun giocatore disponibile nello spareggio",
+          "Nessun giocatore disponibile nello Ultimo Miglio",
         );
         s.tieIndex = pos;
         i = s.tieOrder[pos];
@@ -435,7 +435,7 @@
         copy.type !== "svela" || s.screen === "hidden",
         "Malocchio richiede domanda nascosta",
       );
-      if (["salta", "ruba"].includes(copy.type)) {
+      if (["salta", "ruba", "antisigillo"].includes(copy.type)) {
         need(
           Number.isInteger(target) &&
             target !== s.respondent &&
@@ -448,6 +448,8 @@
           "Bersaglio Contrappasso vincolato",
         );
       }
+      if (copy.type === "antisigillo")
+        need(s.groups[target].aura !== null, "Scegliere un avversario con Sigillo attivo");
       if (copy.type === "svela" && copy.target !== null)
         need(!s.groups[copy.target].out, "Il bersaglio vincolato è eliminato");
       if (["marx", "ira"].includes(copy.type))
@@ -463,7 +465,12 @@
         source: s.respondent,
         turn: s.turn,
       });
-      if (copy.type === "aura") g.aura = s.turn;
+      if (copy.type === "antisigillo") {
+        s.groups[target].aura = null;
+        this.log("Antisigillo: protezione di " + s.groups[target].name + " dissipata", {
+          type: "seal-dispelled", source: s.respondent, target, turn: s.turn,
+        });
+      } else if (copy.type === "aura") g.aura = s.turn;
       else if (copy.type === "svela") {
         s.passLock = copy.target;
         s.seen.push(s.current.id);
@@ -494,11 +501,17 @@
       } else if (copy.type === "ira") {
         const active = this.active();
         // Resolve the shared hit before checking for a winner: the owner is hit too.
-        for (const i of active) s.groups[i].damage = (s.groups[i].damage ?? 0) + 1;
+        const losses = active.map((i) => {
+          const player = s.groups[i], before = clone(player.score);
+          player.damage++;
+          player.inventory = [];
+          player.score = compare(before, rational(666)) <= 0 ? rational(0) : add(before, rational(-666));
+          return { group: i, before, after: clone(player.score) };
+        });
         for (const i of active)
           if (remainingLives(s, i) === 0) this.eliminate(i, "Flagello");
-        this.log("Flagello: tutti i dannati in gara perdono una vita", {
-          type: "divine-wrath", groups: active,
+        this.log("Flagello: tutti i dannati in gara perdono una vita, tutte le Ammo e fino a 666 punti", {
+          type: "divine-wrath", groups: active, losses,
         });
         this.resolveEliminations();
       } else this.attack(copy.type, s.respondent, target, id);
@@ -608,12 +621,13 @@
         s.valid++;
       } else {
         s.extra++;
-        if (!correct)
+        if (!correct) g.damage++;
+        if (remainingLives(s, i) === 0)
           this.eliminate(
             i,
             option === null
-              ? "Tempo scaduto nello spareggio"
-              : "Errore nello spareggio",
+              ? "Tempo scaduto nello Ultimo Miglio"
+              : "Errore nello Ultimo Miglio",
           );
       }
       s.result = result;
@@ -667,7 +681,7 @@
         s.tieIndex = -1;
         s.tieRound++;
         this.log(
-          "Spareggio: nuovo giro per " +
+          "Ultimo Miglio: nuovo giro per " +
             survivors.map((i) => s.groups[i].name).join(", "),
         );
         return;
@@ -703,14 +717,13 @@
         for (const g of s.groups) {
           g.inventory = [];
           g.aura = null;
-          if (!g.out) g.damage = 0;
         }
         if (s.result) {
           s.result.bonus = null;
           s.result.bonuses = [];
         }
         this.log(
-          "Spareggio a eliminazione: " +
+          "Ultimo Miglio: " +
             s.tieOrder.map((i) => s.groups[i].name).join(" → "),
         );
       }
@@ -807,8 +820,8 @@
             s.config.difficulty === q.difficulty),
       );
       need(
-        s.phase === "pareggio" ? parsed.bank.length > 0 : eligible.length > 0,
-        "Nessuna domanda compatibile con la partita",
+        s.phase === "pareggio" ? parsed.bank.some(q => q.difficulty === "difficile") : eligible.length > 0,
+        s.phase === "pareggio" ? "Ultimo Miglio: servono nuove domande difficili mai viste" : "Nessuna domanda compatibile con la partita",
       );
       s.bank.push(...clone(parsed.bank));
       s.eligible.push(...eligible.map((q) => q.id));
@@ -847,10 +860,16 @@
         for (const g of s.groups) delete g.streak;
       }
       if (
+        (s.version === "2.3.0" && s.rules === "20.0.0") ||
         (s.version === "2.0.0" && s.rules === "19.0.0") ||
         (s.version === "2.1.0" && s.rules === "19.1.0") ||
         (["2.2.0", "2.2.1"].includes(s.version) && s.rules === "19.2.0")
       ) {
+        // Old ties really had one life. Preserve that effective life budget:
+        // lost ordinary damage cannot reliably be reconstructed from old saves.
+        if (s.tieRound > 0 && Array.isArray(s.groups))
+          for (const g of s.groups) if (!g.out)
+            g.damage = Math.max(g.damage ?? 0, 2 - g.sanctions);
         s.version = VERSION;
         s.rules = RULES;
       }
@@ -861,6 +880,12 @@
         };
         if (Array.isArray(s.groups))
           for (const g of s.groups) if (legacyDamage && g && g.damage === undefined) g.damage = 0;
+        if (legacyDamage) {
+          for (const e of s.events ?? []) if (typeof e.message === "string")
+            e.message = e.message.replace(/spareggio/gi, "Ultimo Miglio");
+          for (const g of s.groups ?? []) if (typeof g.cause === "string")
+            g.cause = g.cause.replace(/spareggio/gi, "Ultimo Miglio");
+        }
       }
       if (s.panel?.type === "refusal") {
         need(
@@ -869,6 +894,16 @@
         );
         s.screen = s.panel.from;
         s.panel = null;
+      }
+      if (legacyDamage && s.phase === "pareggio") {
+        s.queue = [];
+        // Retire a legacy easy/medium open question without replaying it or
+        // advancing the roster. Historical results keep their original question.
+        if (["hidden", "answer"].includes(s.screen) && s.current?.difficulty !== "difficile") {
+          if (s.seen.includes(s.current?.id) && !s.cancelled.includes(s.current.id)) s.cancelled.push(s.current.id);
+          s.current = null;
+          new Game(s, deps).take();
+        }
       }
       validateSave(s);
       for (const e of s.events)
@@ -1041,7 +1076,11 @@
       );
     };
     for (const q of s.queue) checkQ(q);
+    if (s.phase === "pareggio")
+      need(s.queue.every(q => q.difficulty === "difficile"), "Ultimo Miglio: coda con domande non difficili");
     if (s.current) checkQ(s.current);
+    if (s.phase === "pareggio" && ["hidden", "answer"].includes(s.screen))
+      need(s.current?.difficulty === "difficile", "Ultimo Miglio: domanda non difficile");
     need(
       !["hidden", "answer", "choice", "result"].includes(s.screen) || s.current,
       "Domanda mancante",
@@ -1119,28 +1158,28 @@
       s.phase !== "pareggio" ||
         (s.groups.every((g) => !g.inventory.length && g.aura === null) &&
           !s.effects.length),
-      "Ammo presenti nello spareggio",
+      "Ammo presenti nello Ultimo Miglio",
     );
     need(
       Array.isArray(s.tieOrder) &&
         new Set(s.tieOrder).size === s.tieOrder.length &&
         s.tieOrder.every(group),
-      "Partecipanti spareggio non validi",
+      "Partecipanti Ultimo Miglio non validi",
     );
-    integer(s.tieIndex, -1, 2, "Indice spareggio");
-    integer(s.tieRound, 0, 1000000, "Giro spareggio");
+    integer(s.tieIndex, -1, 2, "Indice Ultimo Miglio");
+    integer(s.tieRound, 0, 1000000, "Giro Ultimo Miglio");
     need(
       s.phase !== "pareggio" ||
         (s.tieRound >= 1 &&
           s.tieOrder.length >= 2 &&
           s.tieIndex < s.tieOrder.length &&
           s.tieOrder.every((i) => s.order.includes(i))),
-      "Rotazione spareggio non valida",
+      "Rotazione Ultimo Miglio non valida",
     );
     if (s.phase === "pareggio" && s.tieIndex >= 0)
       need(
         s.respondent === s.tieOrder[s.tieIndex],
-        "Rispondente spareggio non valido",
+        "Rispondente Ultimo Miglio non valido",
       );
     need(
       Array.isArray(s.events) &&

@@ -1,0 +1,7 @@
+PASS offline visual audit 1366 768 DPR 1
+PASS offline visual audit 390 844 DPR 1
+PASS offline visual audit 844 390 DPR 1
+PASS offline visual audit 1366 768 DPR 2
+PASS offline visual audit 390 844 DPR 2
+PASS offline visual audit 844 390 DPR 2
+PASS: 60 rendered scenarios, original logos, no external requests or JS errors

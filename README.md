@@ -1,3 +1,13 @@
+# Correzioni v1.3.0 · motore 2.4.0 / regole 21.0.0
+
+La specifica corrente è [HELLSCAPE_CORREZIONI_CODEX_v1.3.0](docs/HELLSCAPE_CORREZIONI_CODEX_v1.3.0.md). Le note storiche più sotto non prevalgono su questa specifica. Stato e verifiche: [rapporto v1.3.0](docs/HELLSCAPE_VERIFICA_v1.3.0.md).
+
+Antisigillo dissipa soltanto un Sigillo attivo avversario; non è riflesso da Contrappasso. Flagello applica simultaneamente −1 vita, inventario vuoto e fino a −666 punti a tutti gli attivi. L’Ultimo Miglio conserva le vite rimaste e usa solo domande difficili nuove; ogni errore/timeout toglie una vita, completando il giro prima del verdetto.
+
+Nei vecchi salvataggi creati durante il precedente spareggio si mantiene la vita effettiva già disponibile, senza riportare in gara gli eliminati. I danni ordinari azzerati dal vecchio motore non sono ricostruibili. Un quesito facile/medio ancora aperto viene ritirato (se svelato resta in `seen` e `cancelled`) e sostituito da uno difficile sullo stesso turno, senza risposta ripetuta. I salvataggi ordinari mantengono danni, sanzioni, punteggi, domande e probabilità; Antisigillo mancante riceve il 30%.
+
+`npm run test:v130` verifica nel browser inventario, Malocchio senza opzioni nel DOM/accessibilità, timer, Flagello, Antisigillo, cuori residui, cattura in corsia e portale. Produce screenshot PNG reali in `artifacts/v130`, con viewport e DPR nel rapporto. Non consegnare gli HTML di build come anteprima.
+
 # Hellscape - Fuga dall’inferno
 
 Sito: https://rickymusu-bit.github.io/quiz/
@@ -13,7 +23,7 @@ Il refactoring parte dalla head `f2a2458` della PR #17, ancora aperta al momento
 Il sito funziona direttamente come archivio statico, senza compilazione obbligatoria, framework o dipendenze JavaScript scaricate a runtime. I moduli usano IIFE con esportazioni CommonJS per i test Node: `core` → `datasets` → `engine`; `loader` dipende da `datasets`; `persistence` riceve storage e motore; `ui` coordina questi moduli. Non ci sono dipendenze circolari.
 
 - `assets/js/core.js`: costanti, frazioni esatte e funzioni condivise.
-- `assets/js/engine.js`: partita, turni, timer, punteggi, Ammo, sanzioni, spareggio, finali e validazione/migrazione dello stato. Si importa in Node senza DOM; l’API pubblica `Fool` resta disponibile.
+- `assets/js/engine.js`: partita, turni, timer, punteggi, Ammo, sanzioni, Ultimo Miglio, finali e validazione/migrazione dello stato. Si importa in Node senza DOM; l’API pubblica `Fool` resta disponibile.
 - `assets/js/datasets.js`: parsing, validazione delle banche e notazione scientifica.
 - `assets/js/loader.js`: catalogo e caricamento dal sito o dalle risorse incorporate nell’export.
 - `assets/js/persistence.js`: accesso iniettato a storage, lettura/scrittura dei profili e ripresa attraverso il motore. Il sito conserva `fool-v1`, `fool-settings-v1` e il JSON esistente.
@@ -44,7 +54,7 @@ npm run test:terrain    # progressione del terreno su desktop e Android
 npm run build           # dist/site, pubblicabile su hosting statico
 npm run test:offline    # genera e verifica dist/Hellscape-offline.html
 npm run test:quality    # audit offline di dieci schermate, cinque viewport, DPR 1/2
-npm run test:ties       # intro, eliminazioni, nuovi giri e ripresa dello spareggio
+npm run test:ties       # intro, eliminazioni, nuovi giri e ripresa dell’Ultimo Miglio
 npm run test:portal     # portale nel mondo, ponte, attraversamento ed epilogo offline
 npm run test:chase      # fila, ancoraggi, catture e inseguimento offline, cinque viewport a DPR 1/2
 npm run test:motion     # locomozione offline, pausa e clock a 30/60/144 FPS
@@ -60,7 +70,7 @@ la correzione del ricampionamento del logo e i successivi interventi di layout
 e cinematiche. Il logo illustrato viene visualizzato alla risoluzione originale,
 senza la precedente conversione a 256/68 pixel. `npm run test:quality` genera
 anche `dist/Hellscape-review.html`: un export autonomo con un pannello per
-aprire direttamente gli scenari di revisione, compresi spareggio e finali.
+aprire direttamente gli scenari di revisione, compresi Ultimo Miglio e finali.
 Gli scenari sostituiscono la partita dell'anteprima, nelle sole chiavi offline.
 La UI del sito e il regolamento non includono quel pannello.
 
@@ -74,7 +84,7 @@ La [PR A di locomozione](docs/HELLSCAPE_MOTION.md) collega strada, passi e
 polvere allo stesso clock di scena; il pannello di revisione include lo scenario
 **Corsa / locomozione** con domanda non svelata e timer fermo.
 
-La [PR B dello spareggio](docs/HELLSCAPE_TIE.md) introduce finalisti e regole
+La [PR B dell’Ultimo Miglio](docs/HELLSCAPE_TIE.md) introduce finalisti e regole
 solo dopo il comando successivo all’ultimo esito ordinario. Avvisi di eliminazione
 precedono le catture, i nuovi giri hanno un richiamo breve e la prima domanda
 rimane non svelata a timer fermo. Il pannello di revisione offre le introduzioni
@@ -98,9 +108,9 @@ Per confrontare la grafica con la base della PR #17, preparare un checkout e ind
 
 ## Partita ordinaria
 
-L’arbitro infernale configura nomi, simboli e tre veicoli distinti per i giocatori, tempo, punteggi, difficoltà, argomenti e numero di domande (multiplo di tre da 3 a 99, predefinito 33). All'avvio viene indicato esplicitamente il numero di domande della **partita ordinaria**: lo spareggio non è un'alternativa all'inizio della partita. I vecchi profili salvati con meno di 33 domande, non marcati come scelta esplicita, vengono riportati a 33; una nuova scelta di partita breve, salvata dalle impostazioni, resta valida. Se si riprende una partita già salvata con meno di 33 domande, viene mostrato un avviso; la partita esistente non viene modificata automaticamente. Una risposta corretta assegna i **punti base della difficoltà**, senza moltiplicatori o serie; una risposta errata non sottrae punti. I punti possono essere condivisi tramite Tributo. L'ordine dei giocatori è sorteggiato e poi fisso.
+L’arbitro infernale configura nomi, simboli e tre veicoli distinti per i giocatori, tempo, punteggi, difficoltà, argomenti e numero di domande (multiplo di tre da 3 a 99, predefinito 33). All'avvio viene indicato esplicitamente il numero di domande della **partita ordinaria**: l’Ultimo Miglio non è un'alternativa all'inizio della partita. I vecchi profili salvati con meno di 33 domande, non marcati come scelta esplicita, vengono riportati a 33; una nuova scelta di partita breve, salvata dalle impostazioni, resta valida. Se si riprende una partita già salvata con meno di 33 domande, viene mostrato un avviso; la partita esistente non viene modificata automaticamente. Una risposta corretta assegna i **punti base della difficoltà**, senza moltiplicatori o serie; una risposta errata non sottrae punti. I punti possono essere condivisi tramite Tributo. L'ordine dei giocatori è sorteggiato e poi fisso.
 
-Le sette **Ammo** sono **Catene, Tributo, Malocchio, Sigillo, Contrappasso, Livella e Flagello**. La probabilità di estrazione è indipendente per ogni tipo: 30% predefinito per i primi cinque, **15% per Livella e 5% per Flagello**. Le probabilità sono configurabili singolarmente. Tributo mantiene la precedente logica di divisione del guadagno fra il rispondente e i beneficiari; l'identificativo interno `ruba` resta invariato per compatibilità. **Livella** ridistribuisce immediatamente tutti i punti già accumulati in parti identiche fra i giocatori ancora attivi, compreso quello che lo utilizza, senza creare o eliminare punti. I punteggi dei giocatori eliminati rimangono invariati. Quando il totale non è divisibile, il gioco conserva frazioni esatte. Livella non è un attacco: Sigillo non lo blocca e Contrappasso non reagisce. Dopo una risposta corretta possono essere assegnate più Ammo indipendenti; nello stesso turno è possibile usarne più di una.
+Le otto **Ammo** sono **Catene, Tributo, Malocchio, Sigillo, Contrappasso, Livella, Flagello e Antisigillo**. La probabilità di estrazione è indipendente per ogni tipo: 30% predefinito per i primi cinque, **15% per Livella e 5% per Flagello**. Antisigillo ha una probabilità indipendente predefinita del 30%. Le probabilità sono configurabili singolarmente. Tributo mantiene la precedente logica di divisione del guadagno fra il rispondente e i beneficiari; l'identificativo interno `ruba` resta invariato per compatibilità. **Livella** ridistribuisce immediatamente tutti i punti già accumulati in parti identiche fra i giocatori ancora attivi, compreso quello che lo utilizza, senza creare o eliminare punti. I punteggi dei giocatori eliminati rimangono invariati. Quando il totale non è divisibile, il gioco conserva frazioni esatte. Livella non è un attacco: Sigillo non lo blocca e Contrappasso non reagisce. Dopo una risposta corretta possono essere assegnate più Ammo indipendenti; nello stesso turno è possibile usarne più di una.
 
 Alla fine delle domande previste **vince il giocatore attivo con più punti**. Se resta un solo giocatore attivo prima della fine, vince immediatamente; se tutti vengono eliminati, è Game Over.
 
@@ -110,11 +120,11 @@ Ogni uso confermato mostra materiali illustrati horror, gotici e junkpunk, ricav
 
 Durante gli effetti i pannelli lasciano visibile la corsa e il timer resta fermo; `P` permette la pausa manuale durante una domanda aperta. Con movimento ridotto viene mostrata una posa statica per 450 ms. Le animazioni leggono gli eventi già risolti dal motore: non consumano altre munizioni e non vengono ripetute ricaricando un salvataggio. `npm run test:ammo` controlla desktop, Android verticale e orizzontale; `node tests/ammo_animation.cjs --offline` verifica gli stessi effetti nell'HTML esportato senza rete.
 
-## Spareggio a eliminazione
+## Ultimo Miglio
 
-Lo spareggio si apre **solo in caso di parità al primo posto dopo tutte le domande della partita ordinaria**. I giocatori in testa rispondono una domanda ciascuno nell'ordine di rotazione originario. Ogni risposta errata o tempo scaduto elimina il giocatore. Il giro termina **solo dopo che tutti i giocatori ancora presenti nel giro hanno risposto**, anche quando il primo viene eliminato. Alla fine del giro, un solo superstite vince; nessun superstite produce Game Over; più superstiti iniziano un nuovo giro.
+L’Ultimo Miglio si apre **solo in caso di parità al primo posto dopo tutte le domande della partita ordinaria**. I giocatori in testa rispondono una domanda ciascuno nell'ordine di rotazione originario. Ogni risposta errata o tempo scaduto sottrae esattamente una vita; il giocatore è eliminato solo a zero. Le vite residue, sanzioni e danni ordinari restano invariati all’ingresso. Il giro termina **solo dopo che tutti i giocatori ancora presenti nel giro hanno risposto**, anche quando il primo viene eliminato. Alla fine del giro, un solo superstite vince; nessun superstite produce Game Over; più superstiti iniziano un nuovo giro.
 
-Le domande dello spareggio sono estratte fra **tutte quelle nuove del dataset**, senza vincoli di difficoltà, mantenendo il tempo della partita. Non si ripetono quesiti già mostrati; se la banca non basta, la partita attende l'aggiunta di nuovi quesiti. Durante lo spareggio il tabellone segnala che i punteggi sono congelati; non si assegnano punti né Ammo e l'esito dipende esclusivamente da risposte corrette o eliminazioni; si disattivano tutti gli effetti delle Ammo della fase ordinaria. Sanzioni, timer e sospensione restano disponibili.
+Le domande dell’Ultimo Miglio sono estratte fra **quelle difficili mai viste del dataset**, indipendentemente dal filtro ordinario, mantenendo il tempo della partita. Non si ripetono quesiti già mostrati; se la banca non basta, la partita attende l'aggiunta di nuovi quesiti difficili. Durante l’Ultimo Miglio il tabellone segnala che i punteggi sono congelati; non si assegnano punti né Ammo e l'esito dipende esclusivamente da risposte corrette o eliminazioni; si disattivano tutti gli effetti delle Ammo della fase ordinaria. Sanzioni, timer e sospensione restano disponibili.
 
 ## Fuga dall'Inferno — scena animata v1.5.0
 
@@ -130,7 +140,7 @@ La home, la schermata di gioco e le regole sono responsive per desktop, tablet e
 
 La schermata iniziale offre **Nuova partita** e mostra **Riprendi partita** quando in questo browser è presente una partita salvata ancora in corso. La ripresa apre direttamente il gioco, mantenendo il timer fermo. Preparare una nuova partita conserva il salvataggio precedente fino alla conferma di **Inizia partita**.
 
-La partita viene salvata automaticamente in `localStorage` nello stesso browser. La versione 2.3.0 migra i salvataggi 2.0.0, 2.1.0, 2.2.0 e 2.2.1, conservando i punteggi e le probabilità già impostate. Quando una probabilità Livella non è presente, viene applicato il nuovo valore di default del **15%**; una probabilità già salvata (anche 30%) non viene sovrascritta. Quando Flagello manca, viene aggiunta al 5%; i vecchi salvataggi ricevono zero danni da Ammo e conservano le vite effettive. Il numero di domande predefinito resta **33**. Le partite precedenti in fase ordinaria (motore 1.2.0 / regole 18.2.0) possono essere riprese conservando punteggi e domande, senza moltiplicatori futuri. I vecchi spareggi del Massacro non vengono convertiti, perché hanno regole incompatibili.
+La partita viene salvata automaticamente in `localStorage` nello stesso browser. La versione 2.4.0 migra i salvataggi 2.3.0 e 2.0.0, 2.1.0, 2.2.0 e 2.2.1, conservando i punteggi e le probabilità già impostate. Quando una probabilità Livella non è presente, viene applicato il nuovo valore di default del **15%**; una probabilità già salvata (anche 30%) non viene sovrascritta. Quando Flagello manca, viene aggiunta al 5%; i vecchi salvataggi ricevono zero danni da Ammo e conservano le vite effettive. Il numero di domande predefinito resta **33**. Le partite precedenti in fase ordinaria (motore 1.2.0 / regole 18.2.0) possono essere riprese conservando punteggi e domande, senza moltiplicatori futuri. I vecchi spareggi del Massacro non vengono convertiti, perché hanno regole incompatibili.
 
 ## Contenuto e verifiche
 
@@ -139,7 +149,7 @@ La partita viene salvata automaticamente in `localStorage` nello stesso browser.
 - `Fool_regole.html`: regolamento della gara dei dannati.
 - `dataset/`, `datasets.json`: banche pubblicate e catalogo.
 - `docs/PROMPT_GENERAZIONE_DOMANDE.md`: istruzioni per creare quesiti.
-- `tests/engine.test.js`: test del motore, del nuovo spareggio e delle estrazioni.
+- `tests/engine.test.js`: test del motore, del nuovo Ultimo Miglio e delle estrazioni.
 - `tests/configurable.py`, `tests/options.py`, `tests/keyboard.py`, `tests/start.py`: test di interfaccia (richiedono Playwright/Chromium per la modalità browser).
 - `tests/verify_datasets.py`: controlli di conformità delle banche.
 
@@ -147,7 +157,7 @@ Eseguire `node --test tests/engine.test.js` e `python3 tests/verify_datasets.py`
 
 ## Comandi e lettura delle domande
 
-Ogni giocatore sceglie nome e stemma; i personaggi sono temporaneamente esclusi dalla preparazione e dal gioco. Nella fase ordinaria le tre vite sono rappresentate da cuori: ogni sanzione spegne un cuore; a zero il giocatore è eliminato. All’ingresso nello spareggio, ogni partecipante a pari merito mostra un solo cuore, che perde quando è eliminato per risposta errata o tempo scaduto. Le sanzioni disciplinari già ricevute restano registrate.
+Ogni giocatore sceglie nome e stemma; i personaggi sono temporaneamente esclusi dalla preparazione e dal gioco. Nella fase ordinaria le tre vite sono rappresentate da cuori: ogni sanzione spegne un cuore; a zero il giocatore è eliminato. All’ingresso nell’Ultimo Miglio, ogni partecipante mantiene i cuori rimasti: un errore o timeout ne spegne esattamente uno, con eliminazione soltanto a zero. Le sanzioni disciplinari già ricevute restano registrate.
 
 Dopo l’esito restano evidenti la risposta scelta e quella corretta. In **Opzioni** si trovano **Scorciatoie da tastiera** e **Domanda precedente**. Quest’ultimo comando permette di consultare gli esiti già registrati senza cambiare punti, turni o Ammo; ferma il timer, che si riprende esplicitamente. L’ordine delle alternative viene conservato nei nuovi esiti salvati. Per i vecchi salvataggi si recupera la domanda corrente, mentre gli esiti più vecchi privi dell’ordine delle alternative non sono ricostruibili.
 
@@ -198,11 +208,11 @@ Per ogni modifica all’interfaccia consegnare un’anteprima HTML offline e all
 
 La schermata iniziale usa `assets/hellscape-chase.webp`: i sei veicoli selezionabili sono visti frontalmente mentre fuggono verso chi guarda, con il demone alle loro spalle e proporzioni e sagome distinte. `assets/hellscape-logo.webp` è il titolo HELLSCAPE in metallo scolpito e incandescente, nello stile Doom del precedente logo FOOL, con sfondo trasparente. Lo stesso titolo compare nelle intestazioni di preparazione e regolamento. Illustrazione e logo sono generati dai riferimenti del gioco e convertiti in WebP senza perdita; gli originali sono conservati nell’ambiente di lavoro. Il sottotitolo «fuggi dall'inferno» è centrato sopra HELLSCAPE. I comandi della home rimangono sotto la scena, compreso Riprendi quando è disponibile un salvataggio. Tutte le immagini e il font del menu sono incorporati nell’HTML offline dagli stessi sorgenti.
 
-Le regole raccontano la gara organizzata dai diavoli per diletto: tre dannati su veicoli scassati fuggono da un demone brutale e famelico verso un portale che riporta nel mondo dei viventi, ma lascia passare una sola persona. Rimossi voti, registro e riferimenti scolastici; le decisioni di gara fanno capo all’arbitro infernale. Punti, vite, turni, Ammo, sanzioni e spareggio mantengono gli stessi effetti. Le impostazioni contengono soltanto Generali e Argomenti: l’anteprima delle soluzioni per il docente e il relativo codice sono rimossi.
+Le regole raccontano la gara organizzata dai diavoli per diletto: tre dannati su veicoli scassati fuggono da un demone brutale e famelico verso un portale che riporta nel mondo dei viventi, ma lascia passare una sola persona. Rimossi voti, registro e riferimenti scolastici; le decisioni di gara fanno capo all’arbitro infernale. Punti, vite, turni, Ammo, sanzioni e Ultimo Miglio mantengono gli stessi effetti. Le impostazioni contengono soltanto Generali e Argomenti: l’anteprima delle soluzioni per il docente e il relativo codice sono rimossi.
 
 Il comando **Riprendi partita** è presente soltanto nella home quando esiste un salvataggio valido. La preparazione di una nuova partita non mostra un secondo pulsante di ripresa e conserva la partita già salvata.
 
-**Flagello** consuma una munizione e toglie simultaneamente una vita a ogni dannato ancora in gara, compreso chi la usa. Sanzione e Flagello consumano la stessa riserva di cuori: la sanzione colpisce un solo giocatore, Flagello tutti. Non cambia punti, non richiede bersaglio e non viene bloccata da Sigillo né trasformata da Contrappasso. Tutte le eliminazioni si risolvono prima di decretare il vincitore; se non resta nessuno, è Game Over. Se chi la usa perde l’ultimo cuore durante una domanda, la domanda viene annullata senza esito e il turno avanza. Nello spareggio non si usano Ammo e una sanzione elimina chi ha il suo unico cuore.
+**Flagello** consuma una munizione e toglie simultaneamente una vita a ogni dannato ancora in gara, compreso chi la usa. Sanzione e Flagello consumano la stessa riserva di cuori: la sanzione colpisce un solo giocatore, Flagello tutti. Distrugge tutte le Ammo di ciascun giocatore attivo e sottrae fino a 666 punti senza scendere sotto zero; conserva il Sigillo attivo dei superstiti. Non richiede bersaglio e non viene bloccata da Sigillo né trasformata da Contrappasso. Tutte le eliminazioni si risolvono prima di decretare il vincitore; se non resta nessuno, è Game Over. Se chi la usa perde l’ultimo cuore durante una domanda, la domanda viene annullata senza esito e il turno avanza. Nell’Ultimo Miglio non si usano Ammo e una sanzione sottrae una vita e si viene eliminati soltanto a zero.
 
 Otto diavoli in silhouette animano il cielo lontano della corsa, con sagome di pochi pixel, battito d’ali lento e deriva leggera. La loro animazione usa soltanto l’orologio grafico, resta sopra il terreno e rispetta pausa, scheda nascosta e movimento ridotto. Non usa il generatore casuale del gioco. `tests/hell_dust.cjs` verifica anche questi spettatori; `tests/ammo.py` verifica descrizioni al tocco/clic, consumo solo dopo conferma, vite condivise, ripresa e blocco delle scorciatoie dietro la finestra.
 

@@ -453,7 +453,7 @@
           "p",
           "Partita ordinaria: " +
             count +
-            " domande. Lo spareggio si apre soltanto alla fine, in caso di parità al primo posto.",
+            " domande. Lo Ultimo Miglio si apre soltanto alla fine, in caso di parità al primo posto.",
           "help",
         ),
       );
@@ -539,7 +539,7 @@
       node("h3", "Distribuzione delle domande"),
       node(
         "p",
-        "Le quote devono sommare al numero di domande scelto. Le altre domande restano in riserva per sostituzioni e spareggio.",
+        "Le quote devono sommare al numero di domande scelto. Le altre domande restano in riserva per sostituzioni e Ultimo Miglio.",
         "muted",
       ),
     );
@@ -694,7 +694,7 @@
   }
   function lives(g) {
     const s = game.s,
-      max = s.tieRound > 0 ? 1 : 3,
+      max = 3,
       count = F.remainingLives(s, s.groups.indexOf(g)),
       row = node("span", undefined, "lives");
     row.setAttribute("role", "img");
@@ -702,10 +702,7 @@
       "aria-label",
       count + " " + (count === 1 ? "vita" : "vite") + " su " + max,
     );
-    row.title =
-      max === 1
-        ? "Spareggio: un errore o il tempo scaduto eliminano."
-        : count + " vite su 3 · ogni sanzione o Flagello toglie un cuore";
+    row.title = count + " vite su 3 · errori e timeout nell’Ultimo Miglio, sanzioni e Flagello tolgono un cuore";
     for (let i = 0; i < max; i++) {
       const heart = node(
         "span",
@@ -994,7 +991,9 @@
     else if (ammo === "marx")
       description = "Tutti: Livella redistribuisce i punti";
     else if (ammo === "ira")
-      description = "Tutti: Flagello toglie una vita";
+      description = "Tutti: −1 vita, inventari distrutti, fino a −666 punti";
+    else if (ammo === "antisigillo")
+      description = name(event.target) + ": Sigillo dissipato, protezione annullata";
     if (!description) return null;
     const panel = node("section", undefined, "ammo-impact");
     panel.setAttribute("aria-label", "Ultimo effetto Ammo");
@@ -1121,6 +1120,7 @@
       s.phase === "ordinaria" && ["hidden", "answer"].includes(s.screen) &&
       !(s.screen === "answer" && s.paused && !inventoryCanResume) &&
       copy.type !== "karma" && !(copy.type === "svela" && s.screen !== "hidden") &&
+      (copy.type !== "antisigillo" || s.groups.some((g,i) => i !== team && !g.out && g.aura !== null)) &&
       (copy.target === null || !s.groups[copy.target].out) &&
       s.groups[team].inventory.some(c => c.id === copy.id);
   }
@@ -1164,7 +1164,10 @@
       main.querySelector('.hell-race[data-animation-busy="true"]') !== null);
   }
   function syncCinematic() {
-    const active = cinematicActive();
+    const malocchioAnswer = game?.s.screen === "answer" && game.s.events.some(e =>
+      e.turn === game.s.turn && e.activation && e.copy?.type === "svela");
+    // The full response timer starts at confirmation, including a passed question.
+    const active = cinematicActive() && !malocchioAnswer;
     const tieActive = FoolHellRace.tieStatus().blocking;
     for(const child of main.querySelectorAll(':scope > :not(.hell-race):not(.ending), .ending > :not(.hell-race)'))child.inert=tieActive;
     document.body.classList.toggle("showing-cinematic", active);
@@ -1251,7 +1254,7 @@
       "p",
       game.s.phase === "ordinaria"
         ? game.s.config.bases[game.s.current.difficulty] + " punti"
-        : "Spareggio a eliminazione",
+        : "Ultimo Miglio",
       "question-points",
     );
   }
@@ -1337,7 +1340,9 @@
         node("h2", "Riserva esaurita"),
         node(
           "p",
-          "La partita resta salvata. Controlla se sono state aggiunte nuove domande sul sito: punti e turni restano invariati.",
+          s.phase === "pareggio"
+            ? "Ultimo Miglio: servono nuove domande difficili mai viste. Punti, vite e turno restano salvati."
+            : "La partita resta salvata. Controlla se sono state aggiunte nuove domande sul sito: punti e turni restano invariati.",
         ),
         btn("Cerca nuove domande", refreshSupply, "primary"),
       );
@@ -1348,7 +1353,7 @@
         node(
           "div",
           s.phase === "pareggio"
-            ? "Spareggio · Giro " +
+            ? "Ultimo Miglio · Giro " +
                 s.tieRound +
                 " · " +
                 (s.tieIndex < 0 ? 1 : s.tieIndex + 1) +
@@ -1973,13 +1978,14 @@
     dialog("Attiva " + F.LABELS[copy.type], (d) => {
       d.append(node("p", F.AMMO_HELP[copy.type]));
       let target = null;
-      if (["salta", "ruba"].includes(copy.type)) {
+      if (["salta", "ruba", "antisigillo"].includes(copy.type)) {
         const candidates = s.groups
           .map((g, i) => [i, g])
           .filter(
             ([i, g]) =>
               i !== s.owner &&
               !g.out &&
+              (copy.type !== "antisigillo" || g.aura !== null) &&
               (copy.target === null || copy.target === i),
           );
         if (!candidates.length) throw Error("Nessun bersaglio valido");
@@ -2021,7 +2027,8 @@
         for (const i of game.active()) {
           const before = F.remainingLives(s, i), after = Math.max(0, before - 1);
           affected.append(node("li", s.groups[i].name + ": " + before + " → " + after +
-            (after === 0 ? " · eliminazione" : " vite")));
+            (after === 0 ? " · eliminazione" : " vite") + " · tutte le Ammo distrutte · punti " +
+            F.formatScore(s.groups[i].score) + " → " + F.formatScore(F.compare(s.groups[i].score, F.rational(666)) <= 0 ? F.rational(0) : F.add(s.groups[i].score,F.rational(-666)))));
         }
         d.append(affected);
       }
@@ -2238,10 +2245,10 @@
     if (game !== currentGame || game.s.screen !== "supply") return;
     const bank = [...additions.values()].filter(
       (q) =>
-        game.s.phase === "pareggio" ||
+        (game.s.phase === "pareggio" ? q.difficulty === "difficile" :
         (game.s.config.quotas[q.topic] > 0 &&
           (game.s.config.difficulty === "misto" ||
-            game.s.config.difficulty === q.difficulty)),
+            game.s.config.difficulty === q.difficulty))),
     );
     if (!bank.length)
       throw Error(

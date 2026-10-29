@@ -1,0 +1,33 @@
+{
+  "verifica": "OK",
+  "risultati": [
+    {
+      "banca": "termologia",
+      "domande": 100,
+      "difficolta": {
+        "difficile": 30,
+        "facile": 30,
+        "media": 40
+      },
+      "tipologie": {
+        "calcolo": 23,
+        "conoscenza": 30,
+        "ragionamento": 47
+      }
+    },
+    {
+      "banca": "introduzione-fisica-misura",
+      "domande": 100,
+      "difficolta": {
+        "difficile": 27,
+        "facile": 32,
+        "media": 41
+      },
+      "tipologie": {
+        "calcolo": 33,
+        "conoscenza": 24,
+        "ragionamento": 43
+      }
+    }
+  ]
+}

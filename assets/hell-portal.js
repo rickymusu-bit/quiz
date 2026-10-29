@@ -11,8 +11,7 @@
       art.addEventListener('load',redraw,{once:true});art.addEventListener('error',()=>{art.failed=true;redraw();},{once:true});
     }return art;
   }
-  // Clip in world height before projection. Foundations stay submerged while
-  // the same rigid structure rises/sinks, including its extruded side walls.
+  // Architecture is projected on the winner’s lane and translated from the sky.
   function aboveWater(vertices,water){
     const out=[];
     for(let i=0;i<vertices.length;i++){
@@ -25,7 +24,7 @@
   function path(c,points){c.beginPath();points.forEach((v,i)=>i?c.lineTo(v.x,v.y):c.moveTo(v.x,v.y));c.closePath();}
   function polygon(c,p,points,color){const v=vertices(p,points);if(v.length<3)return;path(c,v);c.fillStyle=color;c.fill();}
   function face(c,p,near){
-    const g=p.geometry,mid=B.DEPTH/2,far=near?mid:g.far,last=near?g.near:mid;
+    const g=p.geometry,mid=(g.far+g.near)/2,far=near?mid:g.far,last=near?g.near:mid;
     const clip=vertices(p,[[0,far,g.height-g.water],[0,last,g.height-g.water],[0,last,-g.water],[0,far,-g.water]]);
     if(clip.length<3)return;
     const image=load();c.save();path(c,clip);c.clip();
@@ -41,7 +40,7 @@
     }c.restore();
   }
   function sides(c,p,near){
-    const g=p.geometry,d=near?g.near:g.far,mid=B.DEPTH/2;
+    const g=p.geometry,d=near?g.near:g.far,mid=(g.far+g.near)/2;
     polygon(c,p,[[0,d,-g.water],[g.thickness,d,-g.water],[g.thickness,d,164],[0,d,164]],near?'#958b72':'#827c70');
     const image=load(),side=vertices(p,[[0,d,-g.water],[g.thickness,d,-g.water],[g.thickness,d,164],[0,d,164]]);
     if(side.length>=3&&image?.complete&&image.naturalWidth){
@@ -54,22 +53,7 @@
     const za=near?204:166,zb=near?166:204;
     polygon(c,p,[[0,a,za],[g.thickness,a,za],[g.thickness,b,zb],[0,b,zb]],'#cbbd91');
   }
-  function water(c,p,near){
-    const g=p.geometry,depth=near?g.near-9:g.far+9,point=B.project(p.anchorX+g.thickness/2,depth,-g.water,p.camera);
-    const energy=Math.max(.15,Math.min(1,Math.abs(p.offset-g.bury)*.015+p.opening*.3));
-    c.save();
-    for(let ring=0;ring<3;ring++){
-      const phase=(p.time*.7+ring/3)%1,radius=8+phase*23;c.globalAlpha=(1-phase)*energy*.6;
-      c.strokeStyle=ring%2?'#ffd07a':'#ed6c28';c.lineWidth=1;c.beginPath();c.ellipse(point.x,point.y+1,radius,radius*.16,0,0,Math.PI*2);c.stroke();
-    }
-    // A liquid lip occludes the bottom of each foundation, never its cornice.
-    c.globalAlpha=.8;c.fillStyle='#e97d35';c.fillRect(Math.round(point.x-9),Math.round(point.y-1),18,2);
-    for(let i=0;i<8;i++){
-      const phase=(p.time*1.5+i*.137)%1,x=point.x+(i-3.5)*3+Math.sin(i*5)*phase*5;
-      const y=point.y-Math.sin(phase*Math.PI)*energy*(7+i%3*3);c.globalAlpha=(1-phase)*energy;c.fillStyle=i%3?'#e88230':'#ffd784';c.fillRect(Math.round(x),Math.round(y),2,2);
-    }c.restore();
-  }
-  function back(c,p){if(!p?.visible)return;sides(c,p,false);face(c,p,false);water(c,p,false);}
+  function back(c,p){if(!p?.visible)return;architecture(c,p,false);}
   function surface(c,p){
     if(!p?.visible||p.opening<=0)return;
     const g=p.geometry,h=g.openingHeight*p.opening,points=vertices(p,[[0,g.openingFar,0],[0,g.openingNear,0],[0,g.openingNear,h],[0,g.openingFar,h]]);
@@ -83,7 +67,19 @@
       c.strokeStyle=i%3?'#b8eaff22':'#ffffff33';c.lineWidth=1;c.beginPath();c.moveTo(a.x,a.y);c.lineTo(b.x,b.y);c.stroke();
     }c.restore();
   }
-  function front(c,p){if(!p?.visible)return;sides(c,p,true);face(c,p,true);water(c,p,true);}
+  function architecture(c,p,near){
+    c.save();c.globalAlpha=1-Math.min(1,p.collapse*3);sides(c,p,near);face(c,p,near);c.restore();
+    if(p.collapse>0){
+      const g=p.geometry;
+      for(let i=0;i<20;i++){
+        if((i%2===0)!==near)continue;
+        const age=p.collapse,depth=g.far+(i%6)*12+(i%3-1)*age*18;
+        const z=Math.max(0,(25+Math.floor(i/6)*45)*(1-age*age*1.8));
+        polygon(c,p,[[i%2*8-4,depth,z],[i%2*8+7,depth+8,z],[i%2*8+5,depth+8,z+10],[i%2*8-4,depth,z+12]],i%3?'#dad8c4':'#b7a363');
+      }
+    }
+  }
+  function front(c,p){if(!p?.visible)return;architecture(c,p,true);}
   const api={load,aboveWater,vertices,back,surface,front,geometry:F.GATE};
   if(typeof module!=='undefined')module.exports=api;else root.FoolPortal=api;
 })(globalThis);
