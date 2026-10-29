@@ -1,0 +1,22 @@
+{
+  "viewport": [
+    844,
+    390
+  ],
+  "duration_ms": 2500,
+  "fps": 20,
+  "frames": 50,
+  "closed": {
+    "x": 152,
+    "y": 294.75,
+    "width": 686,
+    "height": 89.25
+  },
+  "open": {
+    "x": 152,
+    "y": 192.8125,
+    "width": 686,
+    "height": 191.1875
+  },
+  "source": "real browser capture; virtual clock advances at 50 ms"
+}

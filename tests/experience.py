@@ -12,7 +12,7 @@ server=ThreadingHTTPServer(('127.0.0.1',0),partial(Quiet,directory=str(ROOT)))
 threading.Thread(target=server.serve_forever,daemon=True).start();base=f'http://127.0.0.1:{server.server_port}/'
 with sync_playwright() as p:
  browser=p.chromium.launch(executable_path=os.environ.get('CHROMIUM_PATH','/usr/bin/chromium'),args=['--no-sandbox']);errors=[];checks=[]
- for w,h in [(1440,900),(844,390)]:
+ for w,h in [(1440,900),(1366,768)]:
   page=browser.new_page(viewport={'width':w,'height':h});page.on('pageerror',lambda e:errors.append(str(e)))
   page.goto(base+'Fool.html?start=1');expect(page.get_by_role('button',name='Inizia partita')).to_be_enabled()
   expect(page.locator('.vehicle-preview canvas')).to_have_count(3)
@@ -63,7 +63,7 @@ with sync_playwright() as p:
  loser=page.evaluate('HellscapeUI.game.s.respondent');expect(page.locator(f'.turn-order [data-team="{loser}"] .lives')).to_have_attribute('aria-label',f'{2-loser} '+('vita' if 2-loser==1 else 'vite')+' su 3')
  page.goto(base+'Fool.html?resume=1');assert page.evaluate('HellscapeUI.game.s.groups.reduce((n,g,i)=>n+Fool.remainingLives(HellscapeUI.game.s,i),0)')==5;page.close()
  # The rules keep every remaining slide and navigation entry after removing refusal.
- page=browser.new_page(viewport={'width':1440,'height':900});page.goto(base+'Fool_regole.html');expect(page.locator('.slide')).to_have_count(22);expect(page.locator('#section option')).to_have_count(22);expect(page.locator('[data-go]')).to_have_count(22);assert 'rifiut' not in page.locator('body').inner_text().lower();page.close()
+ page=browser.new_page(viewport={'width':1440,'height':900});page.goto(base+'Fool_regole.html');expect(page.locator('.slide')).to_have_count(23);expect(page.locator('#section option')).to_have_count(23);expect(page.locator('[data-go]')).to_have_count(23);assert 'rifiut' not in page.locator('body').inner_text().lower();page.close()
  # Deadline and final-screen outcomes retain an explicit chosen/no-answer label.
  page=browser.new_page(viewport={'width':1440,'height':900});page.on('pageerror',lambda e:errors.append(str(e)));page.goto(base+'Fool.html')
  page.get_by_role('button',name='Inizia partita').click()

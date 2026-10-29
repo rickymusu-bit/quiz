@@ -57,7 +57,7 @@ with sync_playwright() as p:
    assert snapshot(f)==before
    page.keyboard.press('Enter');page.keyboard.press('a');f.locator('[data-game-action=next]').evaluate('e=>e.click()');assert snapshot(f)==before
    elapsed=f.evaluate('FoolHellRace.tieStatus().elapsed');f.evaluate('HellscapeUI.changed()');assert f.evaluate('FoolHellRace.tieStatus().elapsed')==elapsed
-   run(page,100);page.keyboard.press('p');run(page,50);frozen=f.locator('.hell-race canvas').evaluate('c=>c.toDataURL()');run(page,500)
+   run(page,100);f.get_by_role('button',name='Pausa scena',exact=True).click();run(page,50);frozen=f.locator('.hell-race canvas').evaluate('c=>c.toDataURL()');run(page,500)
    assert f.locator('.hell-race canvas').evaluate('c=>c.toDataURL()')==frozen;assert snapshot(f)==before
    set_viewport(page,f,height,width)
    run(page,50)
@@ -71,7 +71,7 @@ with sync_playwright() as p:
    for button in f.locator('.tie-controls button').all():
     b=button.bounding_box();assert b['height']>=44;assert b['x']>=-1 and b['x']+b['width']<=width+1
    page.screenshot(path=str(ART/f'intro-{width}x{height}-dpr{dpr}.png'))
-   page.keyboard.press('p');run(page,50)
+   f.get_by_role('button',name='Riprendi scena',exact=True).click();run(page,50)
    f.evaluate("Object.defineProperty(document,'hidden',{configurable:true,get:()=>true});document.dispatchEvent(new Event('visibilitychange'))");run(page,500)
    held=f.evaluate('FoolHellRace.tieStatus().elapsed');run(page,500);assert f.evaluate('FoolHellRace.tieStatus().elapsed')==held
    f.evaluate("Object.defineProperty(document,'hidden',{configurable:true,get:()=>false});document.dispatchEvent(new Event('visibilitychange'))")

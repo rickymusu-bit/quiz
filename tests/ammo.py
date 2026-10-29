@@ -52,7 +52,7 @@ with sync_playwright() as p:
   # Opening and closing the information popup never consumes an item or resumes its inventory.
   page.goto(base+'Fool.html?start=1');page.get_by_role('button',name='Inizia partita').click()
   page.evaluate('''()=>{const g=HellscapeUI.game;g.s.groups[g.s.owner].inventory.push({id:g.uid(),type:'aura',target:null,origin:'test'});HellscapeUI.changed()}''')
-  page.get_by_role('button',name='Svela e avvia il tempo').click();page.keyboard.press('i');remaining=page.evaluate('HellscapeUI.game.left()')
+  page.get_by_role('button',name='Svela e avvia il tempo').click();page.locator('.turn-order [aria-current=step]').click();remaining=page.evaluate('HellscapeUI.game.left()')
   page.locator('#dialog [data-ammo="aura"]').click();page.wait_for_timeout(120);assert page.evaluate('HellscapeUI.game.left()')==remaining
   page.keyboard.press('Escape');assert not page.evaluate('HellscapeUI.game.running');page.locator('#dialog').get_by_role('button',name='Chiudi',exact=True).click();assert page.evaluate('HellscapeUI.game.running')
   page.emulate_media(reduced_motion='no-preference')

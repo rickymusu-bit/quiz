@@ -27,7 +27,7 @@ test('Malocchio bypasses a pending Catene once but the skipped ordinary turn rem
  assert.equal(g.s.valid,3);
  F.Game.restore(g.snapshot());
 });
-test('Rules and names: Tributo, Livella and no multiplier',()=>{assert.equal(F.RULES,'25.0.0');assert.equal(F.LABELS.ruba,'Tributo');assert.equal(F.LABELS.marx,'Livella');assert.equal(F.TYPES.length,9);assert.equal(F.VERSION,'2.8.0')});
+test('Rules and names: Tributo, Livella and no multiplier',()=>{assert.equal(F.RULES,'26.0.0');assert.equal(F.LABELS.ruba,'Tributo');assert.equal(F.LABELS.marx,'Livella');assert.equal(F.TYPES.length,9);assert.equal(F.VERSION,'2.9.0')});
 test('Six unique junkpunk vehicles and backward-compatible legacy games',()=>{
  const cfg=settings();
  const selected=['ape','chopper','truck'];
@@ -51,7 +51,7 @@ test('Restore an existing 2.1.0 game while retaining chosen probabilities and po
  const restored=F.Game.restore(saved);assert.equal(restored.s.version,F.VERSION);
  assert.equal(restored.s.config.bonusWeights.marx,30);assert.equal(F.exact(restored.s.groups[0].score),'305');
 });
-test('Each Ammo type has its own distinct high-resolution artifact',()=>{
+test('Each Omen has an icon slot; Arsenico has a temporary placeholder',()=>{
  assert.match(html,/ammo-relics-v1\.webp/);
  for(const kind of F.TYPES)assert.match(html,new RegExp('\\[data-ammo="'+kind+'"\\]'));
 });
@@ -83,10 +83,10 @@ test('3–99 questions: multiples of 3, unique, exact topic quotas',()=>{for(let
 test('Invalid counts and probabilities are rejected',()=>{for(const n of [0,1,4,100,102,3.5])assert.throws(()=>F.prepare(bank,settings(n)));for(const v of [-1,101,NaN,'30']){const cfg=settings();cfg.bonusWeights.aura=v;assert.throws(()=>F.prepare(bank,cfg))}});
 test('Base points stay constant when a group answers correctly again',()=>{const g=game(33,0),first=g.s.order[0];let expected=F.rational(0);for(let n=0;n<4;n++){const q=g.s.current;if(g.s.respondent===first)expected=F.add(expected,F.rational(g.s.config.bases[q.difficulty]));reply(g,true);if(n<3)g.next()}assert.equal(F.exact(g.s.groups[first].score),F.exact(expected));assert.equal(g.s.groups[first].streak,undefined)});
 test('Livella redistributes all accumulated points exactly without rounding',()=>{const g=game(33,0);g.s.groups.forEach((team,i)=>team.score=F.rational([101,200,1][i]));const owner=g.s.respondent;const copy={id:g.uid(),type:'marx',target:null,origin:'test'};g.s.groups[owner].inventory.push(copy);g.use(copy.id,null);for(const team of g.s.groups)assert.equal(F.exact(team.score),'302/3');assert.equal(g.s.groups[owner].inventory.length,0);assert(g.s.events.some(e=>e.type==='marx-redistribution'));F.Game.restore(g.snapshot())});
-test('Livella excludes eliminated and protected teams while retaining the total and history',()=>{
+test('Livella excludes eliminated teams, including protected scores while retaining the total and history',()=>{
  const g=game(33,0),[owner,target,dead]=g.s.order;g.s.groups[owner].score=F.rational(101);g.s.groups[target].score=F.rational(200);g.s.groups[dead].score=F.rational(999);
  g.eliminate(dead,'test');g.s.groups[target].aura=3;const copy={id:g.uid(),type:'marx',target:null,origin:'test'};g.s.groups[owner].inventory.push(copy);g.use(copy.id,null);
- assert.equal(F.exact(g.s.groups[owner].score),'101');assert.equal(F.exact(g.s.groups[target].score),'200');assert.equal(F.exact(g.s.groups[dead].score),'999');assert.equal(g.s.groups[target].aura,3);F.Game.restore(g.snapshot());
+ assert.equal(F.exact(g.s.groups[owner].score),'301/2');assert.equal(F.exact(g.s.groups[target].score),'301/2');assert.equal(F.exact(g.s.groups[dead].score),'999');assert.equal(g.s.groups[target].aura,3);F.Game.restore(g.snapshot());
 });
 test('Livella awards at 100% and preserved probability is added to previous save formats',()=>{const g=game(33,100);reply(g,true);assert(g.s.result.bonuses.some(b=>b.type==='marx'));const saved=g.snapshot();saved.version='2.0.0';saved.rules='19.0.0';delete saved.config.bonusWeights.marx;const restored=F.Game.restore(saved);assert.equal(restored.s.config.bonusWeights.marx,15);assert.equal(restored.s.version,F.VERSION);assert.equal(restored.s.rules,F.RULES)});
 test('Independent bonus awards',()=>{for(const chance of [0,100]){const g=game(33,chance);reply(g,true);assert.equal(g.s.result.bonuses.length,chance===100?9:0);F.Game.restore(g.snapshot())}});
@@ -113,7 +113,7 @@ test('Livella changes points while leaving other players Sigillo and Contrappass
  const g=game(),owner=g.s.owner,target=g.s.order[1];g.s.groups[owner].score=F.rational(90);g.s.groups[target].aura=g.s.turn;
  g.s.groups[target].inventory.push({id:g.uid(),type:'karma',target:null,origin:'test'},{id:g.uid(),type:'karma',target:null,origin:'test'});
  const marx={id:g.uid(),type:'marx',target:null,origin:'test'};g.s.groups[owner].inventory.push(marx);g.use(marx.id,null);
- assert.equal(F.exact(g.s.groups[target].score),'0');for(const i of g.s.order.filter(i=>i!==target))assert.equal(F.exact(g.s.groups[i].score),'45');assert.equal(g.s.groups[target].aura,g.s.turn);assert(g.s.groups[target].inventory.every(c=>c.type==='karma'));F.Game.restore(g.snapshot());
+ assert.equal(F.exact(g.s.groups[target].score),'30');for(const i of g.s.order.filter(i=>i!==target))assert.equal(F.exact(g.s.groups[i].score),'30');assert.equal(g.s.groups[target].aura,g.s.turn);assert(g.s.groups[target].inventory.every(c=>c.type==='karma'));F.Game.restore(g.snapshot());
 });
 test('Answered questions retain their displayed option order for read-only review and restore',()=>{
  const g=game(),q=copy(g.s.current);reply(g,false);const e=g.s.events.find(e=>e.outcome);assert.deepEqual(copy(e.question),q);

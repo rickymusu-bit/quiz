@@ -37,7 +37,7 @@ function updateResumeLink(){
 }
 updateResumeLink();
 document.addEventListener('keydown',event=>{
- if(event.defaultPrevented||event.repeat||event.isComposing||event.ctrlKey||event.altKey||event.metaKey||document.getElementById('play-frame')||event.target.closest?.('input,select,textarea,[contenteditable="true"]'))return;
+ if(document.body.dataset.input==='mobile'||event.defaultPrevented||event.repeat||event.isComposing||event.ctrlKey||event.altKey||event.metaKey||document.getElementById('play-frame')||event.target.closest?.('input,select,textarea,[contenteditable="true"]'))return;
  const keys={n:'.menu a[href="Fool.html?start=1"]',r:'#resume-game',g:'.menu a[href="Fool_regole.html"]',i:'.menu a[href="Fool.html?settings=1"]',f:'#home-fullscreen'},selector=keys[event.key.toLowerCase()],control=selector&&document.querySelector(selector);
  if(control&&!control.hidden){event.preventDefault();control.click()}
 });

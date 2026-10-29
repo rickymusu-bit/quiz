@@ -41,6 +41,8 @@ jobs:
             command: npm run test:offline
           - suite: quality
             command: npm run test:quality
+          - suite: omen
+            command: npm run test:omen
           - suite: orientation
             command: npm run preview:offline && npm run test:orientation
     steps:

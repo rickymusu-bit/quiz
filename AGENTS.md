@@ -25,9 +25,9 @@ Applicare la preferenza «GIF per la dinamica, screenshot per gli stati statici,
 
 - La coerenza fisica della scena prevale sulla leggibilità costante dei veicoli. Strutture in primo piano possono occluderli: rispettare profondità, prospettiva, ombre, materiali e punti d’appoggio, senza spostare o abbassare gli elementi soltanto per lasciare visibili i mezzi.
 - Ripartire dal progetto della strada: un ponte di metallo e pietra neri sopra un mare di lava, in stile junkpunk, gotico e horror. Le colonne decorative proposte sono scartate.
-- Il ponte della seconda GIF è approvato dall’utente: preservare lava e struttura nello stesso riferimento di camera e i veicoli ingranditi al doppio. È autorizzata la prosecuzione delle altre modifiche, una consegna per volta: portale, poi icona/animazione Antisigillo, poi Sacrificio.
+- Il ponte della seconda GIF è approvato dall’utente: preservare lava e struttura nello stesso riferimento di camera e i veicoli ingranditi al doppio. La successiva specifica Omen della PR #49 supera la fase storica di Antisigillo.
 - L’animazione del portale è approvata. Il suo sprite deve essere disegnato nativamente di taglio, con spessore e prospettiva coerenti: non deformare una facciata frontale per simulare la vista laterale. Posizionare lo sprite con traslazione e scala uniforme, preservando i tempi della sequenza.
-- Il portale di taglio con dettagli dorati e crollo in rocce è approvato («Ok bellissimo. Vai avanti»). La successiva richiesta autorizza la consegna delle regole Ammo: Antisigillo 20%; Sacrificio 5%, −1 vita e +777 punti; Tributo trasferisce il 33% esatto dei punti attuali dell’avversario e chi lo usa rinuncia subito al turno corrente (chiarimento esplicito dell’utente).
+- Il portale di taglio con dettagli dorati e crollo in rocce è approvato («Ok bellissimo. Vai avanti»). La successiva richiesta autorizza la consegna delle regole Ammo: Antisigillo 20% (regola storica rimossa dalla specifica Omen della PR #49); Sacrificio 5%, −1 vita e +777 punti; Tributo trasferisce il 33% esatto dei punti attuali dell’avversario e chi lo usa rinuncia subito al turno corrente (chiarimento esplicito dell’utente).
 - I dettagli del portale restano dorati: verificare che l’esportazione GIF non li sposti verso l’arancione della lava. Il crollo produce rocce e blocchi di pietra volumetrici, con gravità, piccoli rimbalzi e macerie permanenti; non fogli o ritagli piatti della facciata.
 
 ## Regola aggiornata di Malocchio
@@ -36,13 +36,17 @@ Applicare la preferenza «GIF per la dinamica, screenshot per gli stati statici,
 
 ## Regola aggiornata di Sigillo
 
-- Sigillo protegge dagli effetti negativi delle Ammo altrui, ma blocca ogni altro uso di Ammo e la loro acquisizione da risposte corrette. Flagello ignora la protezione; Antisigillo la distrugge e rimuove subito anche le restrizioni.
-- Interpretazione operativa comunicata: tre turni personali, incluso quello di attivazione; contatore 3 → 2 → 1, scadenza all’inizio del quarto. Livella esclude il protetto, lasciandone invariati i punti. Sigillo rimuove Catene e Tributi pendenti e non evita sanzioni o rischi autoimposti.
+- Sigillo protegge dagli effetti negativi delle Ammo altrui, ma blocca ogni altro uso di Ammo e la loro acquisizione da risposte corrette. Flagello e Livella ignorano la protezione; Antisigillo è rimosso dalla specifica Omen della PR #49.
+- Interpretazione operativa comunicata: tre turni personali, incluso quello di attivazione; contatore 3 → 2 → 1, scadenza all’inizio del quarto. Livella include il protetto nella redistribuzione. Sigillo rimuove Catene, Tributi e Arsenico pendenti e non evita sanzioni o rischi autoimposti.
 
 ## Regola aggiornata di Contrappasso
 
 - Contrappasso è attivabile su di sé per tre turni personali, incluso quello di attivazione. Raddoppia i punti delle risposte corrette e sottrae il doppio del valore in caso di errore o timeout, con minimo zero. Non trasforma più le Ammo avversarie, non si accumula e non raddoppia i premi Ammo o i punti di altre Ammo.
 - Con Malocchio conta il Contrappasso del rispondente: penalità complessiva ×2, senza sommare un ulteriore ×1. Un Sigillo successivo non annulla un rischio proprio già attivato. Preservare contatori e copie storiche nei salvataggi senza applicare bonus retroattivi.
+
+## Specifica Omen della PR #49
+
+- Applicare [la specifica Omen, Cerbero e layout v1](docs/HELLSCAPE_SPEC_OMEN_CERBERO_LAYOUT_v1.md), che supera le regole storiche discordanti di Catene, Antisigillo e Livella. La grafica definitiva di Arsenico e Cerbero resta una fase separata da approvare; per questa implementazione Arsenico usa un segnaposto.
 
 ## Protocollo per sprite animati
 

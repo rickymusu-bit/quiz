@@ -25,6 +25,7 @@
     feedbackEpoch = 0,
     cinematicPause = null,
     lastFinalGame = null,
+    hudOpen = new Set(),
     setupMode = launchParams.get("settings") === "1" ? "settings" : "config";
   const teamDraft = {
     names: ["Giocatore 1", "Giocatore 2", "Giocatore 3"],
@@ -488,7 +489,7 @@
     const grid = node("div", undefined, "columns settings-grid");
     const time = node("section", undefined, "panel");
     time.append(
-      node("h3", "Tempo e Ammo"),
+      node("h3", "Tempo e Omen"),
       input(
         "Numero di domande (multipli di 3, massimo 99)",
         "question-count",
@@ -511,10 +512,10 @@
     grid.append(time);
     const bonusPanel = node("section", undefined, "panel");
     bonusPanel.append(
-      node("h3", "Probabilità delle Ammo"),
+      node("h3", "Probabilità delle Omen"),
       node(
         "p",
-        "Ogni Ammo viene estratta indipendentemente dalle altre dopo una risposta corretta. Puoi ottenere da zero a sette Ammo. Le probabilità sono indipendenti e non devono sommare al 100%. Tocca un’icona per conoscerne il funzionamento.",
+        "Ogni Omen viene estratta indipendentemente dalle altre dopo una risposta corretta. Puoi ottenere da zero a nove Omen. Le probabilità sono indipendenti e non devono sommare al 100%. Tocca un’icona per conoscerne il funzionamento.",
         "muted",
       ),
     );
@@ -914,7 +915,7 @@
             nav,
             node(
               "p",
-              "Consultazione: punti, Ammo e turni restano invariati. Il timer rimane in pausa.",
+              "Consultazione: punti, Omen e turni restano invariati. Il timer rimane in pausa.",
               "muted",
             ),
           );
@@ -967,7 +968,7 @@
   function ammoImpact(s) {
     // Solo gli eventi del turno attuale: nessuna notifica storica ripetuta.
     const event = [...s.events].reverse().find(e => (e.turn === s.turn || (e.type === "turn-forfeited" && e.turn === s.turn - 1)) &&
-      (e.activation || ["aura-block", "karma-trigger", "spoiler-pass", "turn-skipped", "turn-forfeited"].includes(e.type)));
+      (e.activation || ["aura-block", "karma-trigger", "spoiler-pass", "turn-skipped", "turn-forfeited", "arsenico-tick"].includes(e.type)));
     if (!event) return null;
     const name = index => s.groups[index]?.name ?? "Giocatore";
     const ammo = event.copy?.type;
@@ -981,9 +982,11 @@
     else if (event.type === "turn-skipped")
       description = name(event.target) + ": turno saltato per Catene";
     else if (event.type === "turn-forfeited")
-      description = name(event.source) + ": rinuncia al turno corrente per Tributo";
+      description = name(event.source) + ": rinuncia al turno corrente per " + F.LABELS[event.ammo];
+    else if (event.type === "arsenico-tick")
+      description = name(event.target) + ": Arsenico −" + F.formatScore(event.amount) + " pt · " + event.remaining + " turni rimanenti";
     else if (ammo === "salta")
-      description = name(event.target) + ": Catene, salterà il prossimo turno";
+      description = name(event.target) + ": Catene, salterà il prossimo turno · costo 11% a " + name(event.source);
     else if (ammo === "ruba")
       description = name(event.source) + ": Tributo, 33% dei punti sottratto; turno ceduto";
     else if (ammo === "svela")
@@ -991,19 +994,19 @@
     else if (ammo === "karma")
       description = name(event.source) + ": Contrappasso, 3 turni di punti e rischio doppi";
     else if (ammo === "aura")
-      description = name(event.source) + ": Sigillo attivo per 3 turni personali; Ammo bloccate";
+      description = name(event.source) + ": Sigillo attivo per 3 turni personali; Omen bloccate";
     else if (ammo === "marx")
       description = "Tutti: Livella redistribuisce i punti";
     else if (ammo === "ira")
       description = "Tutti: −1 vita, inventari distrutti, fino a −666 punti";
     else if (ammo === "sacrificio")
       description = name(event.source) + ": −1 vita, +777 punti";
-    else if (ammo === "antisigillo")
-      description = name(event.target) + ": Sigillo dissipato, protezione annullata";
+    else if (ammo === "arsenico")
+      description = name(event.target) + ": Arsenico, −11% per 3 turni personali";
     if (!description) return null;
     const panel = node("section", undefined, "ammo-impact");
-    panel.setAttribute("aria-label", "Ultimo effetto Ammo");
-    panel.append(node("strong", "EFFETTO AMMO"), node("p", description));
+    panel.setAttribute("aria-label", "Ultimo effetto Omen");
+    panel.append(node("strong", "EFFETTO OMEN"), node("p", description));
     return panel;
   }
   function turnOrder() {
@@ -1021,9 +1024,18 @@
     for (const i of order) {
       const g = s.groups[i],
         item = node("li"),
+        playerWindow = node("details", undefined, "player-window"),
+        summary = node("summary"),
         button = btn("", () => showInventory(i)),
         stats = node("span", undefined, "turn-stats"),
         count = F.remainingLives(s, i);
+      playerWindow.open = hudOpen.has(i);
+      summary.setAttribute("aria-label", "Espandi o comprimi " + g.name);
+      playerWindow.addEventListener("toggle", () => {
+        if (!playerWindow.isConnected) return;
+        if (playerWindow.open) hudOpen.add(i); else hudOpen.delete(i);
+      });
+      button.addEventListener("click", event => event.preventDefault());
       button.dataset.team = String(i);
       button.setAttribute("aria-label",
         g.name + " · " + F.formatScore(g.score) + " punti · " + count +
@@ -1034,23 +1046,39 @@
       if(s.phase==="pareggio")stats.append(node("span","Punti congelati","tie-score-note"));
       button.append(node("span", g.name, "turn-name"), stats);
       const effects = s.effects.filter(e => e.target === i);
-      if (effects.length || g.aura !== null || g.contrappasso !== null) {
+      const finalDose = [...s.events].reverse().find(e => e.type === "arsenico-tick" && e.target === i && e.remaining === 0 && e.turn === s.turn);
+      if (effects.length || g.aura !== null || g.contrappasso !== null || finalDose) {
         const statuses = node("span", undefined, "active-ammo-effects");
-        for (const effect of effects) {
+        for (const effect of [...new Map(effects.map(e => [e.type, e])).values()]) {
+          const skips = effects.filter(e => e.type === "salta").length;
           const label = effect.type === "salta"
-            ? "Catene: prossimo turno saltato"
-            : "Tributo pendente: prossimo guadagno condiviso";
+            ? (skips === 1 ? "Catene: prossimo turno saltato" : "Catene: " + skips + " turni da saltare")
+            : effect.type === "arsenico"
+              ? "Arsenico: " + effect.remaining + " turni rimanenti · −" + F.formatScore(effect.lastLoss) + " pt"
+              : "Tributo pendente: prossimo guadagno condiviso";
           const status = node("span", label, "effect-chip");
           status.title = label + " · da " + s.groups[effect.source].name;
           statuses.append(status);
         }
+        if (finalDose && !effects.some(e => e.type === "arsenico"))
+          statuses.append(node("span", "Arsenico: terminato · −" + F.formatScore(finalDose.amount) + " pt", "effect-chip"));
         if (g.aura !== null)
           statuses.append(node("span", "Sigillo: " + g.aura + (g.aura === 1 ? " turno" : " turni"), "effect-chip shielded"));
         if (g.contrappasso !== null)
           statuses.append(node("span", "Contrappasso: " + g.contrappasso + (g.contrappasso === 1 ? " turno" : " turni") + " · ×2", "effect-chip"));
         button.append(statuses);
       }
-      item.append(button);
+      summary.append(button);
+      playerWindow.append(summary);
+      const inventory = node("div", undefined, "hud-inventory");
+      for (const copies of groupsOfInventory(g)) {
+        const first = copies[0], icon = ammoRounds(first.type, 1, () => showInventory(i));
+        icon.title = F.LABELS[first.type] + " ×" + copies.length;
+        inventory.append(icon);
+      }
+      if (!g.inventory.length) inventory.append(node("span", "Nessun Omen"));
+      playerWindow.append(inventory);
+      item.append(playerWindow);
       list.append(item);
     }
     grid.append(list);
@@ -1128,7 +1156,7 @@
       s.phase === "ordinaria" && ["hidden", "answer"].includes(s.screen) &&
       !(s.screen === "answer" && s.paused && !inventoryCanResume) &&
       !(copy.type === "karma" && s.groups[team].contrappasso !== null) && !(copy.type === "svela" && s.screen !== "hidden") &&
-      (copy.type !== "antisigillo" || s.groups.some((g,i) => i !== team && !g.out && g.aura !== null)) &&
+      (copy.type !== "arsenico" || s.groups.some((g,i) => i !== team && !g.out && !s.effects.some(e => e.type === "arsenico" && e.target === i))) &&
       (copy.target === null || !s.groups[copy.target].out) &&
       s.groups[team].inventory.some(c => c.id === copy.id);
   }
@@ -1156,7 +1184,7 @@
     }, "primary", !canUseAmmo(copy, team)));
     controls.append(btn("Chiudi", close));
     if (game && Number.isInteger(team) && game.s.groups[team].aura !== null)
-      d.append(node("p", "Sigillo attivo: non puoi usare altre Ammo e non ne guadagni dalle risposte corrette.", "shield-restriction"));
+      d.append(node("p", "Sigillo attivo: non puoi usare altre Omen e non ne guadagni dalle risposte corrette.", "shield-restriction"));
     if (copy?.type === "karma" && Number.isInteger(team) && game.s.groups[team].contrappasso !== null)
       d.append(node("p", "Contrappasso è già attivo: non si accumula e potrai usarne un’altra copia alla scadenza.", "muted"));
     d.append(controls);
@@ -1332,6 +1360,9 @@
         undefined,
         "operation-body" + (s.screen === "hidden" ? " hidden-question" : ""),
       );
+    b.dataset.screen = s.screen;
+    b.dataset.question = s.current?.id ?? "";
+    b.dataset.paused = String(s.paused);
     if (s.suspended) {
       b.append(
         node("h2", "Partita sospesa"),
@@ -1415,7 +1446,7 @@
       b.append(
         node(
           "p",
-          "Malocchio: scegli a timer fermo. Chi sbaglia o lascia scadere il tempo perde il valore della domanda, fino a zero. Chi risponde bene tiene punti e Ammo. Dopo risponde il gruppo successivo a " + s.groups[s.owner].name + ".",
+          "Malocchio: scegli a timer fermo. Chi sbaglia o lascia scadere il tempo perde il valore della domanda, fino a zero. Chi risponde bene tiene punti e Omen. Dopo risponde il gruppo successivo a " + s.groups[s.owner].name + ".",
           "good",
         ),
       );
@@ -1439,7 +1470,7 @@
         (s.config.bases[s.current.difficulty] * 2) + " punti, minimo zero.", "question-risk"));
     if (s.screen === "answer" && s.malocchio && s.groups[s.respondent].contrappasso === null)
       b.append(node("p", "Malocchio · errore o tempo scaduto: −" + s.config.bases[s.current.difficulty] +
-        " punti, minimo zero. Punti e Ammo di una corretta restano a " + s.groups[s.respondent].name + ". La rotazione riparte da chi segue " + s.groups[s.malocchio.source].name + ".", "malocchio-risk"));
+        " punti, minimo zero. Punti e Omen di una corretta restano a " + s.groups[s.respondent].name + ". La rotazione riparte da chi segue " + s.groups[s.malocchio.source].name + ".", "malocchio-risk"));
     if (s.screen === "answer" && !s.paused)
       b.append(
         node(
@@ -1500,16 +1531,27 @@
                 : ""),
           ),
         );
-      if (r.ammoSuppressed) ex.append(node("p", "Sigillo attivo: punti guadagnati, nessuna Ammo ottenuta.", "muted"));
+      if (r.ammoSuppressed) ex.append(node("p", "Sigillo attivo: punti guadagnati, nessun Omen ottenuto.", "muted"));
       const won = awardedBonuses(r);
       if (won.length) {
         const rewards = node("p", undefined, "ammo-rewards");
-        rewards.append(node("span", "Ammo ottenute:", "good"));
+        rewards.append(node("span", "Omen ottenuti:", "good"));
         for (const copy of won) rewards.append(ammoRounds(copy.type, 1));
         ex.append(rewards);
       }
+      const detail = btn("Dettagli esito", () => {
+        dialog("Esito e Omen", d => {
+          d.append(text("p", s.current.body, "question"));
+          for (const child of ex.children) if (!child.classList.contains("ammo-rewards")) d.append(child.cloneNode(true));
+          if (won.length) {
+            d.append(node("p", "Omen ottenuti:"));
+            for (const copy of won) d.append(ammoRounds(copy.type, 1));
+          }
+          d.append(btn("Chiudi", closeDialog));
+        });
+      }, "result-details");
       b.append(
-        ex,
+        ex, detail,
         btn(
           "Prossima domanda",
           command(() => {
@@ -1553,6 +1595,8 @@
       }
       return;
     }
+    const previousBody = main.querySelector(".operation-body");
+    const unfold = previousBody?.dataset.screen === "hidden" && s.screen === "answer" && previousBody.dataset.question === s.current?.id;
     main.className = "operational";
     const stage = gameStage(s);
     main.replaceChildren(stage, turnOrder());
@@ -1566,6 +1610,7 @@
       animateVialRefill(from);
     }
     const body = gameBody();
+    if (unfold) body.classList.add("unfolding-question");
     if (s.owner !== s.respondent)
       body.prepend(node(
         "p",
@@ -1573,7 +1618,7 @@
         "owner-status",
       ));
     if (s.suspendAfter)
-      body.append(node("p", "Sospensione al termine della domanda.", "muted"));
+      body.append(node("p", "Sospensione al termine della domanda.", "muted suspension-note"));
     main.append(body, optionsToggle());
     syncCinematic();
     if (s.draftBonus && !$("dialog").open) {
@@ -1691,7 +1736,7 @@
       d.append(
         node(
           "p",
-          "Correggi il punteggio di un dannato. La modifica riguarda soltanto i punti: Ammo e sanzioni restano invariate.",
+          "Correggi il punteggio di un dannato. La modifica riguarda soltanto i punti: Omen e sanzioni restano invariate.",
         ),
       );
       const team = select(
@@ -1960,7 +2005,7 @@
           r.append(ammoRounds(c.type, copies.length, index => showAmmoInfo(c.type, copies[index], i)));
           entries.append(r);
         }
-        if (!sets.length) list.append(node("p", "Nessuna Ammo posseduta."));
+        if (!sets.length) list.append(node("p", "Nessun Omen posseduto."));
         if (sets.length > 7) {
           const nav = node("div", undefined, "row");
           nav.append(
@@ -2005,14 +2050,14 @@
     dialog("Attiva " + F.LABELS[copy.type], (d) => {
       d.append(node("p", F.AMMO_HELP[copy.type]));
       let target = null;
-      if (["salta", "ruba", "antisigillo"].includes(copy.type)) {
+      if (["salta", "ruba", "arsenico"].includes(copy.type)) {
         const candidates = s.groups
           .map((g, i) => [i, g])
           .filter(
             ([i, g]) =>
               i !== s.owner &&
               !g.out &&
-              (copy.type !== "antisigillo" || g.aura !== null) &&
+              (copy.type !== "arsenico" || !s.effects.some(e => e.type === "arsenico" && e.target === i)) &&
               (copy.target === null || copy.target === i),
           );
         if (!candidates.length) throw Error("Nessun bersaglio valido");
@@ -2029,8 +2074,14 @@
           persist();
         };
       }
-      if (copy.type === "marx") {
-        const active = game.active().filter(i => s.groups[i].aura === null);
+      if (copy.type === "salta") {
+        const score = s.groups[s.owner].score, cost = F.rational(BigInt(score.n) * 11n, BigInt(score.d) * 100n);
+        const after = F.add(score, F.rational(-BigInt(cost.n), BigInt(cost.d)));
+        d.append(node("p", "Costo a " + s.groups[s.owner].name + ": 11% · −" + F.formatScore(cost) + " pt (" + F.exact(cost) + " esatti). Punti: " + F.formatScore(score) + " → " + F.formatScore(after) + ". Il bersaglio salterà il prossimo turno; Sigillo blocca il salto, non il costo.", "chains-preview"));
+      } else if (copy.type === "arsenico") {
+        d.append(node("p", "Cedi soltanto questo turno. Il bersaglio perde l’11% corrente all’inizio di ciascuno dei prossimi 3 turni, anche se saltati. Sigillo blocca l’effetto; il turno resta ceduto.", "arsenico-preview"));
+      } else if (copy.type === "marx") {
+        const active = game.active();
         let total = F.rational(0);
         for (const i of active) total = F.add(total, s.groups[i].score);
         const share = F.rational(
@@ -2046,7 +2097,7 @@
               active.length +
               " giocatori attivi: " +
               F.formatScore(share) +
-              " punti ciascuno. I giocatori eliminati e i protetti da Sigillo restano esclusi.",
+              " punti ciascuno. Gli eliminati restano esclusi; Sigillo non protegge.",
           ),
         );
       } else if (copy.type === "sacrificio") {
@@ -2059,12 +2110,12 @@
         for (const i of game.active()) {
           const before = F.remainingLives(s, i), after = Math.max(0, before - 1);
           affected.append(node("li", s.groups[i].name + ": " + before + " → " + after +
-            (after === 0 ? " · eliminazione" : " vite") + " · tutte le Ammo distrutte · punti " +
+            (after === 0 ? " · eliminazione" : " vite") + " · tutte le Omen distrutte · punti " +
             F.formatScore(s.groups[i].score) + " → " + F.formatScore(F.compare(s.groups[i].score, F.rational(666)) <= 0 ? F.rational(0) : F.add(s.groups[i].score,F.rational(-666)))));
         }
         d.append(affected);
       }
-      d.append(node("p", "La conferma consuma una munizione.", "muted"));
+      d.append(node("p", "La conferma consuma un Omen.", "muted"));
       d.append(
         btn(
           "Conferma uso",
@@ -2416,6 +2467,7 @@
   // Shortcuts share the same guards and actions as the visible controls.
   document.addEventListener("keydown", (event) => {
     if (
+      document.body.dataset.input === "mobile" ||
       event.defaultPrevented ||
       event.isComposing ||
       event.ctrlKey ||

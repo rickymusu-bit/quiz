@@ -12,7 +12,7 @@ threading.Thread(target=server.serve_forever,daemon=True).start();base=f'http://
 with sync_playwright() as p:
  browser=p.chromium.launch(executable_path=os.environ.get('CHROMIUM_PATH','/usr/bin/chromium'),args=['--no-sandbox']);errors=[];checks=[]
  def start(width,height):
-  page=browser.new_page(viewport={'width':width,'height':height});page.on('pageerror',lambda e:errors.append(str(e)));page.goto(base);page.get_by_role('button',name='Inizia partita').click();page.wait_for_function('FoolEnding.prepare(FoolEnding.load(()=>{}))!==null');page.evaluate('document.fonts.ready');page.clock.install();page.clock.pause_at(page.evaluate('Date.now()+1000'));return page
+  page=browser.new_page(viewport={'width':width,'height':height});page.clock.install();page.on('pageerror',lambda e:errors.append(str(e)));page.goto(base);page.get_by_role('button',name='Inizia partita').click();page.wait_for_function('FoolEnding.prepare(FoolEnding.load(()=>{}))!==null');page.evaluate('document.fonts.ready');page.clock.pause_at(page.evaluate('Date.now()+1000'));return page
  def centered(page):
   cue=page.locator('.movement-cue').bounding_box();stage=page.locator('#viewport-stage').bounding_box()
   assert abs(cue['x']+cue['width']/2-stage['x']-stage['width']/2)<1,'Outcome box must be centered on the game stage'
@@ -38,9 +38,9 @@ with sync_playwright() as p:
   page=start(width,height);page.get_by_role('button',name='Svela e avvia il tempo').click();page.clock.run_for(1000);left=page.evaluate('HellscapeUI.game.left()')
   page.evaluate("()=>{const g=HellscapeUI.game;g.eliminate(g.s.order.find(i=>i!==g.s.respondent),'test');HellscapeUI.changed()}");page.clock.run_for(500)
   panels(page,False);assert not page.evaluate('HellscapeUI.game.running');assert page.evaluate('HellscapeUI.game.left()')==left
-  page.keyboard.press('p');page.clock.run_for(100);panels(page,True);assert page.evaluate('HellscapeUI.game.s.paused && HellscapeUI.game.s.pauseReason==="manuale"')
+  page.locator('.scene-controls button').click();page.clock.run_for(100);panels(page,True);assert page.evaluate('HellscapeUI.game.s.paused && HellscapeUI.game.s.pauseReason==="manuale"')
   frozen=page.locator('.hell-race canvas').evaluate('c=>c.toDataURL()');page.clock.run_for(1200);assert page.locator('.hell-race canvas').evaluate('c=>c.toDataURL()')==frozen
-  page.keyboard.press('p');page.clock.run_for(100);panels(page,False);page.clock.run_for(5600);panels(page,True)
+  page.get_by_role('button',name='Riprendi partita',exact=True).click();page.clock.run_for(100);panels(page,False);page.clock.run_for(5600);panels(page,True)
   assert page.evaluate('HellscapeUI.game.running');assert left-1200<=page.evaluate('HellscapeUI.game.left()')<=left
   page.locator('.answer').nth(page.evaluate('HellscapeUI.game.s.current.correct')).click();assert page.evaluate('HellscapeUI.game.s.valid')==1
   page.close();checks.append({'viewport':[width,height],'motion_and_capture':'PASS','timer_and_manual_pause':'PASS'})
