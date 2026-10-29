@@ -1,0 +1,68 @@
+{
+  "status": "design proposal; manual single-pose guide; approval pending",
+  "reference": "cerbero-proposta.png",
+  "source_size": [
+    1536,
+    1024
+  ],
+  "facing": "right",
+  "anatomy": {
+    "heads": 3,
+    "legs": 4,
+    "tails": 1
+  },
+  "view_mapping": {
+    "head_left": "upper/far head in this view",
+    "head_center": "middle head",
+    "head_right": "lower/near head"
+  },
+  "hierarchy": {
+    "body": [
+      "neck_left",
+      "neck_center",
+      "neck_right",
+      "leg_front_near",
+      "leg_front_far",
+      "leg_hind_near",
+      "leg_hind_far",
+      "tail"
+    ],
+    "neck_left": [
+      "head_left"
+    ],
+    "neck_center": [
+      "head_center"
+    ],
+    "neck_right": [
+      "head_right"
+    ],
+    "head_left": [
+      "jaw_left",
+      "mouth_left"
+    ],
+    "head_center": [
+      "jaw_center",
+      "mouth_center"
+    ],
+    "head_right": [
+      "jaw_right",
+      "mouth_right"
+    ]
+  },
+  "mouth_pixels_proposed": {
+    "mouth_left": [
+      1358,
+      216
+    ],
+    "mouth_center": [
+      1361,
+      406
+    ],
+    "mouth_right": [
+      1452,
+      655
+    ]
+  },
+  "animation_status": "No animated frames or emissions generated; anchors require approval and validation on each future pose",
+  "contact_policy": "Reuse the existing chase ground reference with uniform scaling; validate per-paw contacts after canonical design approval"
+}
