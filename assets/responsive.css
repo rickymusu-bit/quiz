@@ -77,8 +77,8 @@ body[data-layout="compact"] .home-heading::before {
   content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
   background:linear-gradient(#08040566,transparent 35%,transparent 75%,#08040588);
 }
-body[data-layout="compact"] #viewport-stage .home-content .subtitle { font-size:22px;letter-spacing:.12em;margin:6px 0 0; }
-body[data-layout="compact"] #viewport-stage .home-content h1 { width:96%;height:auto; }
+body[data-layout="compact"] #viewport-stage .home-content .subtitle { font-size:18px;letter-spacing:.12em;margin:6px 0 0; }
+body[data-layout="compact"] #viewport-stage .home-content h1 { width:70%;height:auto; }
 body[data-layout="compact"] .home-wordmark { transform:translateY(-12px); }
 body[data-layout="compact"] #viewport-stage .home-content .menu { width:min(100%,740px);margin:0;padding:12px;gap:8px; }
 body[data-layout="compact"] #viewport-stage .menu a,

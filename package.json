@@ -1,6 +1,6 @@
 {
   "name": "hellscape",
-  "version": "3.10.0",
+  "version": "3.11.0",
   "private": true,
   "scripts": {
     "dev": "python3 -m http.server 8000 --bind 127.0.0.1",

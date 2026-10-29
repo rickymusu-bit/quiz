@@ -32,7 +32,7 @@ Applicare la preferenza «GIF per la dinamica, screenshot per gli stati statici,
 
 ## Regola aggiornata di Malocchio
 
-- La consegna di Sacrificio, Tributo e probabilità è approvata («Ok va bene»). Malocchio ora mostra testo e valore senza alternative; chi risponde bene tiene punti e Ammo, chi sbaglia o lascia scadere il tempo perde il valore della domanda con minimo zero (chiarimento esplicito). La rotazione riparte da chi segue l’utilizzatore, anche dopo il passaggio a un altro gruppo, rispettando Catene ed eliminazioni. Salvare autore e rischio della domanda senza riapplicare esiti già registrati.
+- La consegna di Sacrificio, Tributo e probabilità è approvata («Ok va bene»). Malocchio mostra testo e valore senza alternative e concede 45 secondi per scegliere se tenerla o a chi passarla. Alla scadenza resta all’utilizzatore e parte il normale tempo di risposta. Pausa, orientamento, salvataggio e ripresa conservano il residuo; chi risponde bene tiene punti e Ammo, chi sbaglia o lascia scadere il tempo perde il valore della domanda con minimo zero (chiarimento esplicito). La rotazione riparte da chi segue l’utilizzatore, anche dopo il passaggio a un altro gruppo, rispettando Catene ed eliminazioni. Salvare autore e rischio della domanda senza riapplicare esiti già registrati.
 
 ## Regola aggiornata di Sigillo
 
@@ -53,6 +53,8 @@ Applicare la preferenza «GIF per la dinamica, screenshot per gli stati statici,
 - Animare Cerbero con fotogrammi disegnati e articolazioni leggibili: camminata fluida, coda che scodinzola dalla base alla punta, tre teste con movimenti dei colli sfalsati durante il passo e fuoco che nasce dalle tre bocche. La deformazione elastica della sola posa statica è respinta.
 - La cattura avviene con una bocca: la testa afferra il veicolo e lo scaraventa oltre il ponte; il mezzo cade e affonda nella lava. Cerbero non usa le zampe per afferrare o portare i mezzi alla bocca.
 - I veicoli sono rigidi: vietare contrazioni e dilatazioni della carrozzeria. Mostrare le irregolarità della strada con piccoli spostamenti verticali e oscillazioni delle sospensioni, conservando le proporzioni.
+- Durante la partita Cerbero sputa periodicamente fuoco dalle tre bocche, continuando il passo; l’effetto è soltanto visivo e segue pausa e movimento ridotto. Nella home Cerbero sostituisce il demone.
+- Le nuove partite durano 13 turni totali (non giri): contano anche turni saltati o ceduti; Malocchio non aggiunge un turno. Impostazioni e avanzamento si esprimono in turni. Le partite già salvate conservano la durata originaria.
 - Punti predefiniti delle nuove partite: facile 111, media 222, difficile 333. Conservare i valori personalizzati dei profili e delle partite salvate.
 
 ## Protocollo per sprite animati

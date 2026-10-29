@@ -415,11 +415,14 @@
     if(root.FoolBridge)root.FoolBridge.draw(c,W,tick,progress,null,effectTime,layers);
     else if(root.FoolTerrain)root.FoolTerrain.draw(c,W,tick,progress,null,effectTime);
   }
-  function drawChaser(c,travel,advance=0){drawChaserAt(c,travel,{...motion.CHASE,left:motion.CHASE.left+advance});}
-  function drawChaserAt(c,travel,geometry,dust=true){
+  function drawChaser(c,travel,advance=0,breath=null){drawChaserAt(c,travel,{...motion.CHASE,left:motion.CHASE.left+advance},true,breath);}
+  function drawChaserAt(c,travel,geometry,dust=true,breath=null){
     root.FoolCerbero.load(()=>live?.redraw?.());
-    const body={...geometry,runWeight:1,pose:[{frame:8,weight:1}],worldDistance:travel.distance,time:travel.time};
-    root.FoolCerbero.render(c,body,travel);
+    const body={...geometry,runWeight:1,pose:[{frame:8,weight:1}],worldDistance:travel.distance,time:travel.time,
+      animation:breath?.active?'fire':'walk',movingFire:true,actionTime:breath?.age??0};
+    const rig=root.FoolCerbero.render(c,body,travel);
+    if(rig&&breath?.active)for(const id of root.FoolCerbero.heads)
+      root.FoolCerbero.flame(c,id,breath.emissionAge,rig.heads[id],1.3);
     if(dust)root.FoolCerbero.dust(c,body,travel);
   }
 
@@ -465,8 +468,8 @@
   }
   function copyFrame(frame){return JSON.parse(JSON.stringify(frame));}
   function scene(c,W,state,sec,final,previous,reduced,travel){
-    const total=Math.max(1,Number(state.config.questionCount||33));
-    const progress=root.FoolTerrain?root.FoolTerrain.progress(state):clamp(state.valid/total,0,1);
+    const total=Math.max(1,Number(state.config.turnCount||state.config.questionCount||33));
+    const progress=root.FoolTerrain?root.FoolTerrain.progress(state):clamp((state.config.turnCount?state.completedTurns:state.valid)/total,0,1);
     const positions=state.groups.map((g,i)=>packPosition(state,i,progress,previous,sec,W));
     const shot=ammo?.current(),queue=visualState?.queue||[];
     const tieView=tie?.sample({reduced,captures:queue.length>0}),hold=tieView?.holdCapture;
@@ -520,7 +523,8 @@
       racer(c,0,0,i,movement,{...group,vehicle},2);c.restore();
     }
     const staticTravel=reduced?{...travel,time:0,footfalls:[]}:travel;
-    drawChaser(c,staticTravel,(tieView?.strength??0)*10);
+    const breath=!reduced&&!shot&&!hold&&state.phase==='ordinaria'?root.FoolCerbero.periodicFire(travel.time):null;
+    drawChaser(c,staticTravel,(tieView?.strength??0)*10,breath);
     if(visualState)visualState.frame=normalFrame(state,positions,travel,(tieView?.strength??0)*10);
     if(shot)root.FoolAmmo.render(c,W,state,shot,ammo.sample(reduced),positions,reduced);
     root.FoolBridge?.front(c,W,{distance:travel.distance});
@@ -548,7 +552,7 @@
     caption.className = 'hell-race-caption';
     caption.textContent = final
       ? (state.winner === null ? 'Cerbero afferra l’ultimo veicolo con una bocca e lo scaraventa nella lava, dove affonda. Nessun giocatore è fuggito.' : state.groups[state.winner].name + ' attraversa il portale che emerge dal terreno. Gli altri veicoli sono gettati nella lava con un morso. Dopo il crollo del varco Cerbero sputa fuoco da tutte e tre le bocche.')
-      : 'Fuga dall’Inferno: le posizioni dei tre veicoli seguono i punteggi. La porta si avvicina con il procedere delle domande.';
+      : 'Fuga dall’Inferno: le posizioni dei tre veicoli seguono i punteggi. La porta si avvicina con il procedere dei turni.';
     fig.appendChild(caption);
     const ammoStatus = document.createElement('span');
     ammoStatus.className = 'ammo-status';

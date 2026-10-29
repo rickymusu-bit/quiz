@@ -27,7 +27,7 @@ test('Malocchio bypasses a pending Catene once but the skipped ordinary turn rem
  assert.equal(g.s.valid,3);
  F.Game.restore(g.snapshot());
 });
-test('Rules and names: Tributo, Livella and no multiplier',()=>{assert.equal(F.RULES,'26.0.0');assert.equal(F.LABELS.ruba,'Tributo');assert.equal(F.LABELS.marx,'Livella');assert.equal(F.TYPES.length,9);assert.equal(F.VERSION,'2.9.0')});
+test('Rules and names: Tributo, Livella and no multiplier',()=>{assert.equal(F.RULES,'27.0.0');assert.equal(F.LABELS.ruba,'Tributo');assert.equal(F.LABELS.marx,'Livella');assert.equal(F.TYPES.length,9);assert.equal(F.VERSION,'3.0.0')});
 test('Six unique junkpunk vehicles and backward-compatible legacy games',()=>{
  const cfg=settings();
  const selected=['ape','chopper','truck'];
@@ -39,9 +39,9 @@ test('Six unique junkpunk vehicles and backward-compatible legacy games',()=>{
  assert.match(html,/vehicle-chooser/);
 });
 
-test('Default settings keep 33 questions and Livella at 15 percent',()=>{
- const cfg=settings();delete cfg.questionCount;delete cfg.bonusWeights.marx;
- const validated=F.config(cfg);assert.equal(validated.questionCount,33);
+test('Default configuration uses 13 total turns and Livella at 15 percent',()=>{
+ const cfg=settings(13);delete cfg.questionCount;delete cfg.bonusWeights.marx;
+ const validated=F.config(cfg);assert.equal(validated.questionCount,13);assert.equal(validated.turnCount,13);
  assert.equal(validated.bonusWeights.marx,15);
  for(const type of F.TYPES.filter(t=>!['marx','ira','antisigillo','sacrificio'].includes(t)))assert.equal(F.DEFAULT_BONUS_WEIGHTS[type],30);
 });

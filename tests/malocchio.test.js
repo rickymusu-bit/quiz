@@ -6,8 +6,8 @@ function game(){return F.Game.start(F.prepare(bank,{names:['A','B','C'],seconds:
 function peek(g,target=null,bound=null){const s=g.s,owner=s.owner,c={id:g.uid(),type:'svela',target:bound,origin:'test'};s.groups[owner].inventory.push(c);g.use(c.id,null);if(target!==null)g.pass(target);return owner;}
 function wrong(g){g.answer((g.s.current.correct+1)%4);}
 
-test('Malocchio reveals only a pending question, at a stopped timer, and persists its author',()=>{
- const g=game(),source=g.s.owner;peek(g);assert.equal(g.s.screen,'choice');assert.equal(g.running,false);assert.deepEqual(g.s.malocchio,{source,question:g.s.current.id});
+test('Malocchio reveals only a pending question, with a separate 45-second choice timer, and persists its author',()=>{
+ const g=game(),source=g.s.owner;peek(g);assert.equal(g.s.screen,'choice');assert.equal(g.running,true);assert.equal(g.left(),45000);assert.deepEqual(g.s.malocchio,{source,question:g.s.current.id});
  assert.equal(g.s.groups[source].inventory.length,0);assert.equal(g.s.groups[source].score.n,'0');F.Game.restore(g.snapshot());
  assert.throws(()=>g.reveal());assert.throws(()=>g.answer(0));g.pass(source);assert.equal(g.left(),30000);assert(g.running);
  assert.throws(()=>peek(g));
@@ -60,7 +60,7 @@ test('Legacy in-flight 2.5 Malocchio saves gain the risk and rotation anchor wit
   const g=game(),[source,,target]=g.s.order;g.s.groups[target].score=F.rational(1000);peek(g);if(screen!=='choice')g.pass(target);if(screen==='result')g.answer(g.s.current.correct);
   const old=g.snapshot();old.version='2.5.0';old.rules='22.0.0';delete old.malocchio;const before=F.clone(old.groups);
   const r=F.Game.restore(old);assert.deepEqual(r.s.groups,before);assert.equal(r.s.malocchio.source,source);assert.equal(r.s.current.id,old.current.id);
-  if(screen==='choice')r.pass(target);if(screen!=='result'){if(r.s.paused)r.resume();wrong(r);}r.next();assert.equal(r.s.owner,r.s.order[1]);F.Game.restore(r.snapshot());
+  if(screen==='choice'){r.resume();r.pass(target);}if(screen!=='result'){if(r.s.paused)r.resume();wrong(r);}r.next();assert.equal(r.s.owner,r.s.order[1]);F.Game.restore(r.snapshot());
  }
 });
 test('Malocchio state is validated and clears on the transition to Ultimo Miglio',()=>{

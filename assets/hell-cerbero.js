@@ -210,7 +210,7 @@
       rage = demon.animation === "rage",
       celebrate = demon.animation === "celebrate";
     const index =
-      !capture && !fire && run > 0.35
+      !capture && (!fire || demon.movingFire) && run > 0.35
         ? ((Math.floor((distance / M.STRIDE) * D.walk.length) % D.walk.length) +
             D.walk.length) %
           D.walk.length
@@ -251,7 +251,8 @@
           tilt = Math.sin((demon.actionTime ?? time) * 9 + i + 0.5) * 0.13;
         }
         if (fire) {
-          const onset = M.ease((demon.actionTime ?? 0) / 0.22);
+          const age = demon.actionTime ?? 0;
+          const onset = M.ease(age / 0.22) * (demon.movingFire ? 1 - M.ease((age - 1.5) / 0.3) : 1);
           neckAngle = M.lerp(neckAngle, [-0.14, -0.04, 0.06][i], onset);
           tilt = M.lerp(
             tilt,
@@ -412,6 +413,13 @@
       c.restore();
     }
   }
+  // One breath every 18 seconds of active scene time, first at 8 seconds.
+  // Rendering and UI rebuilds never restart the cycle or consume game RNG.
+  function periodicFire(time) {
+    const start = 8, interval = 18, duration = 1.8;
+    const age = time < start ? -1 : (time - start) % interval;
+    return {active: age >= 0 && age < duration, age, duration, emissionAge: age - .2};
+  }
   function flame(c, id, age, head, duration = 1.3, input = images) {
     if (age < 0 || age >= duration) return;
     const atlas = prepare(input);
@@ -448,6 +456,7 @@
     render,
     dust,
     flame,
+    periodicFire,
     transform,
     captureAngle,
   };

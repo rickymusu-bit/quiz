@@ -197,16 +197,9 @@
     try {
       const saved = JSON.parse(raw),
         count = saved?.config?.questionCount ?? 33;
-      if (count < 33)
-        parent.append(
-          node(
-            "p",
-            "La partita salvata prevede soltanto " +
-              count +
-              " domande. Per iniziare una nuova partita da 33, scegli Inizia partita.",
-            "help",
-          ),
-        );
+      if (!saved?.config?.turnCount)
+        parent.append(node("p", "La partita salvata conserva la durata originaria di " + count +
+          " domande. Le nuove partite durano 13 turni totali.", "help"));
     } catch (e) {}
   }
   function leaveForHome() {
@@ -264,12 +257,13 @@
       seconds: 45,
       bonusWeights: { ...F.DEFAULT_BONUS_WEIGHTS },
       difficulty: "misto",
-      questionCount: 33,
+      turnCount: F.DEFAULT_TURN_COUNT,
+      questionCount: F.DEFAULT_TURN_COUNT,
       bases: { ...F.DEFAULT_BASE_POINTS },
-      quotas: balancedQuotas("misto", 33),
+      quotas: balancedQuotas("misto", F.DEFAULT_TURN_COUNT),
     };
   }
-  function balancedQuotas(filter, total = 33) {
+  function balancedQuotas(filter, total = F.DEFAULT_TURN_COUNT) {
     const topics = [...new Set(bank.bank.map((q) => q.topic))],
       counts = topics.map(
         (t) =>
@@ -299,7 +293,8 @@
         ...(value.bonusWeights ?? {}),
       },
       difficulty: value.difficulty,
-      questionCount: value.questionCount ?? 33,
+      turnCount: value.turnCount ?? F.DEFAULT_TURN_COUNT,
+      questionCount: value.turnCount ?? F.DEFAULT_TURN_COUNT,
       bases: value.bases,
       quotas: value.quotas,
       names,
@@ -307,21 +302,30 @@
       vehicles: teamDraft.vehicles.slice(),
     };
   }
+  function migrateQuotas(value, total) {
+    const entries = Object.entries(value.quotas ?? {}).filter(([, n]) => n > 0);
+    const sum = entries.reduce((n, [, weight]) => n + weight, 0);
+    if (!sum) return balancedQuotas(value.difficulty, total);
+    const quotas = Object.fromEntries(Object.keys(value.quotas).map(t => [t, 0]));
+    const fractions = entries.map(([topic, weight]) => {
+      const exact = weight / sum * total;
+      quotas[topic] = Math.floor(exact);
+      return {topic, fraction: exact - Math.floor(exact)};
+    }).sort((a,b) => b.fraction - a.fraction);
+    let left = total - Object.values(quotas).reduce((a,b) => a+b, 0);
+    for (const item of fractions) if (left-- > 0) quotas[item.topic]++;
+    return quotas;
+  }
   function savedSettings() {
     try {
       const value = settingsStore().profiles[selectedBankId];
       if (value) {
-        /* I vecchi profili non attestano che una partita di 3/6/... domande sia una scelta consapevole. */
-        const legacyShort =
-          (value.questionCount ?? 33) < 33 &&
-          value.questionCountConfirmed !== true;
-        const safe = legacyShort
-          ? {
-              ...value,
-              questionCount: 33,
-              quotas: balancedQuotas(value.difficulty, 33),
-            }
-          : value;
+        const total = value.turnCount ?? (value.questionCountConfirmed && value.questionCount !== 33
+          ? value.questionCount : F.DEFAULT_TURN_COUNT);
+        const safe = value.turnCount ? value : {
+          ...value, turnCount: total, questionCount: total,
+          quotas: migrateQuotas(value, total),
+        };
         F.prepare(
           bank.bank,
           settingsConfig(safe, ["Giocatore 1", "Giocatore 2", "Giocatore 3"]),
@@ -448,20 +452,20 @@
       p.append(grid);
       syncVehicleChoices();
       const currentSettings = savedSettings();
-      const count = currentSettings.questionCount ?? 33;
+      const count = currentSettings.turnCount ?? F.DEFAULT_TURN_COUNT;
       p.append(
         node(
           "p",
           "Partita ordinaria: " +
             count +
-            " domande. Lo Ultimo Miglio si apre soltanto alla fine, in caso di parità al primo posto.",
+            " turni totali. Lo Ultimo Miglio si apre soltanto alla fine, in caso di parità al primo posto.",
           "help",
         ),
       );
       const row = node("div", undefined, "row");
       row.append(
         btn(
-          "Inizia partita (" + count + " domande)",
+          "Inizia partita (" + count + " turni)",
           () => {
             rememberTeams();
             const chosen = savedSettings();
@@ -491,9 +495,9 @@
     time.append(
       node("h3", "Tempo e Omen"),
       input(
-        "Numero di domande (multipli di 3, massimo 99)",
-        "question-count",
-        value.questionCount ?? 33,
+        "Turni totali (da 1 a 99)",
+        "turn-count",
+        value.turnCount ?? F.DEFAULT_TURN_COUNT,
         "number",
       ),
       input("Secondi per domanda", "seconds", value.seconds, "number"),
@@ -540,7 +544,7 @@
       node("h3", "Distribuzione delle domande"),
       node(
         "p",
-        "Le quote devono sommare al numero di domande scelto. Le altre domande restano in riserva per sostituzioni e Ultimo Miglio.",
+        "Scegli gli argomenti delle domande disponibili nei turni: le quote devono sommare al numero di turni. Turni saltati o ceduti contano comunque; Malocchio non crea un turno aggiuntivo. Le altre domande restano in riserva per sostituzioni e Ultimo Miglio.",
         "muted",
       ),
     );
@@ -550,10 +554,10 @@
     p.append(topics);
     drawQuotas(value.quotas);
     $("difficulty").onchange = () => act(rebalance);
-    $("question-count").onchange = () => act(rebalance);
-    $("question-count").step = "3";
-    $("question-count").min = "3";
-    $("question-count").max = "99";
+    $("turn-count").onchange = () => act(rebalance);
+    $("turn-count").step = "1";
+    $("turn-count").min = "1";
+    $("turn-count").max = "99";
     topics.append(btn("Ribilancia quote", rebalance));
     const row = node("div", undefined, "row");
     row.append(
@@ -648,9 +652,9 @@
     show();
   }
   function rebalance() {
-    const total = number("question-count");
-    if (!Number.isInteger(total) || total < 3 || total > 99 || total % 3 !== 0)
-      throw Error("Scegli un multiplo di 3 compreso tra 3 e 99");
+    const total = number("turn-count");
+    if (!Number.isInteger(total) || total < 1 || total > 99)
+      throw Error("Scegli un numero intero di turni compreso tra 1 e 99");
     drawQuotas(balancedQuotas($("difficulty").value, total));
   }
   function number(id) {
@@ -667,7 +671,8 @@
         F.TYPES.map((type) => [type, number("weight-" + type)]),
       ),
       difficulty: $("difficulty").value,
-      questionCount: number("question-count"),
+      turnCount: number("turn-count"),
+      questionCount: number("turn-count"),
       bases: Object.fromEntries(
         ["facile", "media", "difficile"].map((d) => [d, number("base-" + d)]),
       ),
@@ -1098,7 +1103,7 @@
       d.dataset.passive = "options";
       const bar = node("div", undefined, "options-grid");
       if (s.phase !== "conclusa" && !s.suspended) {
-        if (s.screen === "answer")
+        if (["answer", "choice"].includes(s.screen))
           bar.append(btn(wasRunning ? "Pausa" : "Riprendi timer", () => {
             closeDialog();
             if (!wasRunning && !fitBlocked) game.resume(s.revision);
@@ -1219,7 +1224,7 @@
       const held = cinematicPause;
       cinematicPause = null;
       if (held.game === game && game.s.current?.id === held.question &&
-          game.s.screen === "answer" && game.s.paused && game.s.pauseReason === "animazione" &&
+          ["answer", "choice"].includes(game.s.screen) && game.s.paused && game.s.pauseReason === "animazione" &&
           !game.s.panel && !game.s.suspended && !fitBlocked && !FoolLayout.portrait) {
         game.resume(game.s.revision);
         changed();
@@ -1366,6 +1371,10 @@
     b.dataset.screen = s.screen;
     b.dataset.question = s.current?.id ?? "";
     b.dataset.paused = String(s.paused);
+    if (s.phase === "ordinaria" && s.config.turnCount) {
+      const number = Math.min(s.config.turnCount, s.completedTurns + (s.turnClosed ? 0 : 1));
+      b.append(node("div", "Turno " + number + " di " + s.config.turnCount, "eyebrow turn-progress"));
+    }
     if (s.suspended) {
       b.append(
         node("h2", "Partita sospesa"),
@@ -1395,7 +1404,7 @@
       return b;
     }
     if (s.screen === "hidden") {
-      b.append(
+      if (!s.config.turnCount || s.phase === "pareggio") b.append(
         node(
           "div",
           s.phase === "pareggio"
@@ -1411,8 +1420,8 @@
                 (s.config.questionCount ?? 33),
           "eyebrow",
         ),
-        questionActions(),
       );
+      b.append(questionActions());
       return b;
     }
     if (s.current) {
@@ -1446,10 +1455,13 @@
       }
     }
     if (s.screen === "choice") {
+      const decisionTime = node("p", Math.ceil(game.left()/1000) + " s per scegliere", "malocchio-choice-time");
+      decisionTime.id = "malocchio-choice-time";
+      b.append(decisionTime);
       b.append(
         node(
           "p",
-          "Malocchio: scegli a timer fermo. Chi sbaglia o lascia scadere il tempo perde il valore della domanda, fino a zero. Chi risponde bene tiene punti e Omen. Dopo risponde il gruppo successivo a " + s.groups[s.owner].name + ".",
+          "Scegli a chi assegnare la domanda. Alla scadenza resta a te e parte il tempo di risposta. Errore o timeout: perdi il valore della domanda, minimo zero.",
           "good",
         ),
       );
@@ -1463,6 +1475,7 @@
             btn(
               i === s.owner ? "Tieni la domanda" : "Passa a " + g.name,
               command(() => game.pass(i, revision)),
+              "", s.paused || !!s.panel || fitBlocked,
             ),
           );
       });
@@ -1490,7 +1503,7 @@
           "muted keyboard-hint",
         ),
       );
-    if (s.screen === "answer" && s.paused)
+    if (["answer", "choice"].includes(s.screen) && s.paused)
       b.append(
         node(
           "p",
@@ -1498,7 +1511,7 @@
           "good",
         ),
       );
-    if(s.screen === "answer" && s.paused && !s.panel)
+    if(["answer", "choice"].includes(s.screen) && s.paused && !s.panel)
       b.append(btn("Riprendi partita",command(()=>game.resume(revision)),"primary resume-question"));
     if (s.screen === "result") {
       const r = s.result,
@@ -1912,10 +1925,14 @@
     if (!vial || !game) return;
     const level = Math.max(
       0,
-      Math.min(1, game.left() / (game.s.config.seconds * 1000)),
+      Math.min(1, game.left() / game.timeLimit()),
     );
     vial.style.setProperty("--level", String(level));
     vial.dataset.paused = String(!game.running);
+    const choice = game.s.screen === "choice";
+    vial.setAttribute("aria-label", choice ? "Tempo per scegliere a chi passare Malocchio" : "Tempo a disposizione");
+    const choiceTime = $("malocchio-choice-time");
+    if (choiceTime) choiceTime.textContent = Math.ceil(game.left()/1000) + " s per scegliere";
     vial.setAttribute("aria-valuenow", String(Math.round(level * 100)));
     vial.setAttribute(
       "aria-valuetext",
@@ -1950,7 +1967,7 @@
     const original = game;
     return () => {
       if (
-        wasRunning && game === original && game.s.screen === "answer" &&
+        wasRunning && game === original && ["answer", "choice"].includes(game.s.screen) &&
         game.s.paused && !game.s.panel && !game.s.draftBonus &&
         !game.s.suspended && !fitBlocked && !FoolLayout.portrait
       ) game.resume(game.s.revision);
@@ -2570,7 +2587,7 @@
     if (s.suspended) return;
     if (key === "p") {
       event.preventDefault();
-      if (s.screen === "answer")
+      if (["answer", "choice"].includes(s.screen))
         act(command(() => (s.paused ? game.resume(s.revision) : game.pause())));
       return;
     }
