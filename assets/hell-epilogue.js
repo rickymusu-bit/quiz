@@ -8,7 +8,7 @@
   const stages=[];let end=0;for(const [phase,duration] of Object.entries(D)){stages.push({phase:phase==='cross'?'escape':phase,start:end,end:end+duration});end+=duration;}
   // Legacy sampling hooks keep their names; they now mark descent/collapse ends.
   const T=Object.freeze(Object.fromEntries([...stages.map(s=>[s.phase+'End',s.end]),['duration',end],['riseEnd',D.descent],['sinkEnd',D.descent+D.open+D.cross+D.close+D.collapse],['brake',1.2]]));
-  const GATE=Object.freeze({far:25,near:85,height:204,water:0,thickness:16,openingFar:38,openingNear:72,openingHeight:138,bury:260});
+  const GATE=Object.freeze({far:22,near:88,height:204,water:0,thickness:24,skew:1,openingFar:46,openingNear:64,openingHeight:138,bury:280});
   const pose=frame=>[{frame,weight:1}],mix=(a,b,t)=>[{frame:a,weight:1-t},{frame:b,weight:t}];
   function sample(t){for(const s of stages)if(t<s.end)return {phase:s.phase,local:Math.max(0,t-s.start)};return {phase:'done',local:0};}
   const IMPACT=D.descent;
@@ -25,12 +25,13 @@
   }
   function prepare(entry,winner){
     const v=entry.positions[winner],depth=v.ground-B.TOP;
+    const half=(GATE.near-GATE.far)/2,gateDepth=Math.max(half,Math.min(B.DEPTH-half,depth));
     const approach=travel(T.brake,T.brake,entry.camera.speed,48)+48*(T.openEnd-T.brake);
     const startX=B.worldX(v.x,depth,entry.camera),gateX=startX+approach+v.width/2+10;
     const basePan=travel(T.brake,T.brake,entry.camera.speed,12);
     const center=gateX-entry.camera.distance-basePan;
     const extraPan=Math.max(0,center-400);
-    return {entry,winner,depth,startX,gateX,approach,basePan,extraPan,crossSpeed:Math.max(140,2*(v.width+40)/D.cross-48)};
+    return {entry,winner,depth,gateDepth,startX,gateX,approach,basePan,extraPan,crossSpeed:Math.max(140,2*(v.width+GATE.thickness+24)/D.cross-48)};
   }
   function frame(route,time){
     const t=Math.max(0,time),s=sample(t),e=route.entry;
@@ -39,7 +40,8 @@
     const approach=t<T.brake?travel(t,T.brake,e.camera.speed,48):travel(T.brake,T.brake,e.camera.speed,48)+48*(Math.min(t,T.openEnd)-T.brake);
     const crossing=travel(Math.max(0,t-T.openEnd),D.cross,48,route.crossSpeed);
     const positions=e.positions.map(v=>({...v,visible:v.index===route.winner})),v=positions[route.winner];
-    const vx=route.startX+approach+crossing,p=B.project(vx,route.depth,0,camera),threshold=B.project(route.gateX,route.depth,0,camera);
+    const depth=lerp(route.depth,route.gateDepth,ease(t/T.riseEnd));
+    const vx=route.startX+approach+crossing,p=B.project(vx,depth,0,camera),threshold=B.project(route.gateX,depth,0,camera);
     Object.assign(v,{x:p.x,ground:p.y,clipRight:threshold.x,visible:vx-v.width/2<route.gateX,worldX:vx});
     const demonAdvance=approach+48*Math.max(0,t-T.openEnd);
     const maxLeft=route.gateX-e.demon.width-35;
@@ -55,8 +57,8 @@
     else if(s.phase==='exhausted'){demon.pose=mix(10,7,ease(s.local/.35));demon.breath=1+.007*Math.sin(s.local*5)*ease(s.local/.3)*(1-ease((s.local-.8)/.25));}
     else if(s.phase==='done'){demon.pose=mix(7,11,(1+Math.sin(t*2))*.12);demon.breath=1+.006*Math.sin(t*5);}
     const sinceImpact=t-IMPACT,damage=ease(sinceImpact/.38),collapse=ease((t-T.closeEnd)/D.collapse);
-    const laneDepth=route.depth-v.height/2;
-    const portal={...portalAt(t),anchorX:route.gateX,camera,time:e.time+t,geometry:{...GATE,far:laneDepth-30,near:laneDepth+30,openingFar:laneDepth-17,openingNear:laneDepth+17}};
+    const laneDepth=route.gateDepth,half=(GATE.near-GATE.far)/2;
+    const portal={...portalAt(t),anchorX:route.gateX,camera,time:e.time+t,collapseAge:t-T.closeEnd,damage,sinceImpact,geometry:{...GATE,far:laneDepth-half,near:laneDepth+half,openingFar:laneDepth-9,openingNear:laneDepth+9}};
     const bridge={anchorX:route.gateX,camera,damage,collapse,depth:laneDepth,rubble:t>=T.closeEnd,collapseAge:t-T.closeEnd,sinceImpact,time:e.time+t};
     const burst=sinceImpact>=0&&sinceImpact<.35?Math.sin(sinceImpact*49)*(1-sinceImpact/.35):0;
     const shake=impact>0?{x:Math.sin(t*67)*impact*1.3,y:Math.sin(t*79)*impact*1.1}:{x:burst*.8,y:burst*1.2};

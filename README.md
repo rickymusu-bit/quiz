@@ -1,5 +1,7 @@
 # Correzioni v1.3.0 · motore 2.4.0 / regole 21.0.0
 
+Consegna aggiornata: GIF reali del browser per animazioni e comportamenti dinamici; screenshot per gli stati statici. Vedi [AGENTS.md](AGENTS.md) e gli [interventi da affrontare uno alla volta](docs/HELLSCAPE_LAVORO_SEQUENZIALE.md).
+
 La specifica corrente è [HELLSCAPE_CORREZIONI_CODEX_v1.3.0](docs/HELLSCAPE_CORREZIONI_CODEX_v1.3.0.md). Le note storiche più sotto non prevalgono su questa specifica. Stato e verifiche: [rapporto v1.3.0](docs/HELLSCAPE_VERIFICA_v1.3.0.md).
 
 Antisigillo dissipa soltanto un Sigillo attivo avversario; non è riflesso da Contrappasso. Flagello applica simultaneamente −1 vita, inventario vuoto e fino a −666 punti a tutti gli attivi. L’Ultimo Miglio conserva le vite rimaste e usa solo domande difficili nuove; ogni errore/timeout toglie una vita, completando il giro prima del verdetto.

@@ -1,17 +1,32 @@
-/* Marble architecture on the bridge's transverse world plane; no screen anchor. */
+/* White marble/azure gateway: world geometry, contact, textured collapse. */
 (function(root){
   'use strict';
   const B=typeof module!=='undefined'?require('./hell-bridge.js'):root.FoolBridge;
   const F=typeof module!=='undefined'?require('./hell-epilogue.js'):root.FoolEpilogue;
+  const ASSET='assets/hell-race/portal-side-v3.png';
+  // Landmarks belong to the native oblique drawing. Never shear the complete sprite.
+  const SPRITE=Object.freeze({width:1024,height:1536,anchorX:484,anchorY:1360,rise:1352,
+    opening:[[344,1230],[574,1520],[574,620],[344,330]],
+    near:[[495,0],[1024,0],[1024,1536],[440,1536],[440,1330],[475,1200],[520,1130],[520,600],[495,540]],
+    feet:[[[186,1142],[280,1222],[343,1233],[451,1155]],[[456,1417],[579,1526],[648,1514],[692,1518],[850,1451],[850,1428]]],
+    fragments:[[1,262,104,79,88],[2,341,8,171,184],[3,512,86,145,106],[7,226,192,115,192],[8,341,192,171,192],[9,512,192,170,192],[10,682,210,136,174],[13,230,384,111,192],[14,341,384,171,192],[15,512,384,170,192],[16,682,384,137,192],[19,252,576,89,192],[20,341,576,89,192],[21,528,576,154,192],[22,682,576,118,192],[25,195,768,146,192],[26,341,768,89,192],[27,539,768,143,192],[28,682,768,118,192],[31,186,960,155,192],[32,341,960,111,192],[33,513,960,169,192],[34,682,960,128,192],[37,191,1152,150,81],[38,341,1152,171,192],[39,512,1152,170,192],[40,682,1152,156,192],[44,455,1344,57,120],[45,512,1344,170,184],[46,682,1344,169,176]]});
+  const ROCK_ASSET='assets/hell-race/portal-rocks-v1.png';
+  const ROCK_FRAMES=Object.freeze([[32,49,466,422],[542,24,463,451],[1054,25,458,458],[26,543,485,447],[561,533,407,468],[1044,537,469,452]]);
   let art=null;
+  let stone=null;
+  function loadRocks(redraw=()=>{}){
+    if(!stone&&typeof root.Image==='function'){
+      stone=new root.Image();stone.decoding='async';stone.src=root.HellscapeOffline?.assets?.[ROCK_ASSET]||ROCK_ASSET;
+      stone.addEventListener('load',redraw,{once:true});stone.addEventListener('error',()=>{stone.failed=true;redraw();},{once:true});
+    }return stone;
+  }
   function load(redraw=()=>{}){
+    loadRocks(redraw);
     if(!art&&typeof root.Image==='function'){
-      art=new root.Image();art.decoding='async';const path='assets/hell-race/portal-marble-v1.webp';
-      art.src=root.HellscapeOffline?.assets?.[path]||path;
+      art=new root.Image();art.decoding='async';art.src=root.HellscapeOffline?.assets?.[ASSET]||ASSET;
       art.addEventListener('load',redraw,{once:true});art.addEventListener('error',()=>{art.failed=true;redraw();},{once:true});
     }return art;
   }
-  // Architecture is projected on the winner’s lane and translated from the sky.
   function aboveWater(vertices,water){
     const out=[];
     for(let i=0;i<vertices.length;i++){
@@ -20,66 +35,124 @@
       if(inside!==next){const t=(water-a.z)/(b.z-a.z);out.push({x:a.x+(b.x-a.x)*t,depth:a.depth+(b.depth-a.depth)*t,z:water});}
     }return out;
   }
-  function vertices(p,points){return aboveWater(points.map(([x,depth,z])=>({x:p.anchorX+x,depth,z:z-p.offset})),-p.geometry.water).map(v=>B.project(v.x,v.depth,v.z,p.camera));}
+  function point(p,x,depth,z){
+    const g=p.geometry,mid=(g.far+g.near)/2;
+    return B.project(p.anchorX+x+g.skew*(depth-mid),depth,z-p.offset,p.camera);
+  }
+  function vertices(p,points){
+    const g=p.geometry,mid=(g.far+g.near)/2;
+    return aboveWater(points.map(([x,depth,z])=>({x:p.anchorX+x+g.skew*(depth-mid),depth,z:z-p.offset})),-g.water)
+      .map(v=>B.project(v.x,v.depth,v.z,p.camera));
+  }
   function path(c,points){c.beginPath();points.forEach((v,i)=>i?c.lineTo(v.x,v.y):c.moveTo(v.x,v.y));c.closePath();}
-  function polygon(c,p,points,color){const v=vertices(p,points);if(v.length<3)return;path(c,v);c.fillStyle=color;c.fill();}
-  function face(c,p,near){
-    const g=p.geometry,mid=(g.far+g.near)/2,far=near?mid:g.far,last=near?g.near:mid;
-    const clip=vertices(p,[[0,far,g.height-g.water],[0,last,g.height-g.water],[0,last,-g.water],[0,far,-g.water]]);
-    if(clip.length<3)return;
-    const image=load();c.save();path(c,clip);c.clip();
-    if(image?.complete&&image.naturalWidth){
-      const origin=B.project(p.anchorX,g.far,g.height-g.water-p.offset,p.camera),span=g.near-g.far;
-      c.transform(B.SHEAR*span/image.naturalWidth,span/image.naturalWidth,0,g.height/image.naturalHeight,origin.x,origin.y);
-      c.drawImage(image,0,0);
-    }else{
-      // Coherent geometric fallback, including the aperture and a pediment.
-      for(const [a,b]of [[g.far,g.openingFar],[g.openingNear,g.near]])polygon(c,p,[[0,a,-g.water],[0,b,-g.water],[0,b,138],[0,a,138]],'#ded6bd');
-      polygon(c,p,[[0,g.far,138],[0,g.near,138],[0,g.near,166],[0,g.far,166]],'#e5d5a6');
-      polygon(c,p,[[0,g.far,166],[0,g.near,166],[0,mid,204]],'#e9e4d4');
+  function spriteFrame(p){
+    const g=p.geometry,anchor=point(p,0,(g.far+g.near)/2,0),scale=g.height/SPRITE.rise;
+    return {x:anchor.x-SPRITE.anchorX*scale,y:anchor.y-SPRITE.anchorY*scale,scale,width:SPRITE.width*scale,height:SPRITE.height*scale};
+  }
+  function spritePoint(p,x,y){const f=spriteFrame(p);return {x:f.x+x*f.scale,y:f.y+y*f.scale};}
+  function spritePath(c,p,points){path(c,points.map(([x,y])=>spritePoint(p,x,y)));}
+  function drawSprite(c,p,near){
+    const image=load(),f=spriteFrame(p);
+    if(!image?.complete||!image.naturalWidth)return;
+    c.save();c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';
+    if(near){spritePath(c,p,SPRITE.near);c.clip();}
+    c.drawImage(image,f.x,f.y,f.width,f.height);c.restore();
+  }
+  function seed(i){return ((Math.imul(i+17,1103515245)>>>0)%997)/997;}
+  function pieces(p){
+    const g=p.geometry,mid=(g.far+g.near)/2,scale=g.height/SPRITE.rise;
+    return SPRITE.fragments.map(([id,sx,sy,sw,sh],index)=>{
+      const delay=Math.floor(id/6)*.035+seed(id)*.06,released=p.collapseAge>=delay;
+      const age=Math.max(0,Math.min(1.65,p.collapseAge)-delay),width=sw*scale,height=sh*scale,centerX=sx+sw/2,centerY=sy+sh/2;
+      const initialDepth=g.far+Math.max(0,Math.min(1,(centerX-186)/(851-186)))*(g.near-g.far);
+      const initialX=(centerX-SPRITE.anchorX)*scale-(B.SHEAR+g.skew)*(initialDepth-mid);
+      const diameter=Math.max(10,Math.min(30,Math.sqrt(width*height)*1.12));
+      const initialZ=Math.max(0,initialDepth-mid-(centerY-SPRITE.anchorY)*scale-diameter*.46);
+      const impactTime=Math.sqrt(initialZ/320),impactAge=age-impactTime;
+      let z=0,settled=false;
+      if(age<impactTime)z=initialZ-320*age*age;
+      else if(impactAge<.18){const u=impactAge/.18;z=diameter*.14*4*u*(1-u);}
+      else if(impactAge<.28){const u=(impactAge-.18)/.10;z=diameter*.025*4*u*(1-u);}
+      else settled=true;
+      const progress=Math.min(1,age/(impactTime+.28)),drift=1-Math.pow(1-progress,3),padding=diameter*.55+2;
+      const targetDepth=Math.max(padding,Math.min(B.DEPTH-padding,initialDepth+(seed(id+7)-.5)*24));
+      const spin=(seed(id+23)-.5)*4.5,finalAngle=(seed(id+31)-.5)*.45;
+      const angle=impactAge<0?spin*age:finalAngle+(spin*impactTime-finalAngle)*Math.pow(Math.max(0,1-impactAge/.28),2);
+      return {id,sx,sy,sw,sh,near:centerX>=495,width,height,diameter,rock:index%ROCK_FRAMES.length,
+        material:'stone',released,age,impactTime,impactAge,settled,z,
+        depth:initialDepth+(targetDepth-initialDepth)*drift,x:initialX+(seed(id+13)-.5)*42*drift,angle};
+    });
+  }
+  function rockShadow(c,p,piece){
+    const at=point({...p,offset:0},piece.x,piece.depth,0),opacity=.34/(1+piece.z*.025);
+    c.save();c.globalAlpha=opacity;c.fillStyle='#080b0e';c.beginPath();c.ellipse(at.x,at.y,piece.diameter*.48,piece.diameter*.12,0,0,Math.PI*2);c.fill();c.restore();
+  }
+  function rockDust(c,p,piece){
+    const age=piece.impactAge;if(age<0||age>.42)return;
+    const at=point({...p,offset:0},piece.x,piece.depth,0),fade=1-age/.42;
+    c.save();
+    for(let i=0;i<4;i++){
+      c.globalAlpha=fade*.13;c.fillStyle=i%2?'#b5b8b0':'#d4d4c9';c.beginPath();
+      c.ellipse(at.x+(seed(piece.id+i+81)-.5)*age*32,at.y-1-Math.sin(age/.42*Math.PI)*3,
+        2+age*15+piece.diameter*.12,1+age*5,0,0,Math.PI*2);c.fill();
     }c.restore();
   }
-  function sides(c,p,near){
-    const g=p.geometry,d=near?g.near:g.far,mid=(g.far+g.near)/2;
-    polygon(c,p,[[0,d,-g.water],[g.thickness,d,-g.water],[g.thickness,d,164],[0,d,164]],near?'#958b72':'#827c70');
-    const image=load(),side=vertices(p,[[0,d,-g.water],[g.thickness,d,-g.water],[g.thickness,d,164],[0,d,164]]);
-    if(side.length>=3&&image?.complete&&image.naturalWidth){
-      c.save();path(c,side);c.clip();const at=B.project(p.anchorX,d,164-p.offset,p.camera);
-      c.drawImage(image,image.naturalWidth*.84,image.naturalHeight*.18,image.naturalWidth*.11,image.naturalHeight*.82,at.x,at.y,g.thickness,180);
-      c.globalAlpha=.27;c.fillStyle='#29251c';c.fillRect(at.x,at.y,g.thickness,180);c.restore();
+  function rubble(c,p,near){
+    const image=load(),rocks=loadRocks();
+    for(const piece of pieces(p).filter(v=>v.near===near).sort((a,b)=>a.depth-b.depth)){
+      if(!piece.released){
+        if(image?.complete&&image.naturalWidth){
+          const f=spriteFrame({...p,offset:0});
+          c.drawImage(image,piece.sx,piece.sy,piece.sw,piece.sh,f.x+piece.sx*f.scale,f.y+piece.sy*f.scale,piece.sw*f.scale,piece.sh*f.scale);
+        }continue;
+      }
+      rockShadow(c,p,piece);rockDust(c,p,piece);
+      const [sx,sy,sw,sh]=ROCK_FRAMES[piece.rock],scale=piece.diameter/Math.max(sw,sh),w=sw*scale,h=sh*scale;
+      const at=point({...p,offset:0},piece.x,piece.depth,piece.z);
+      const support=(Math.abs(Math.sin(piece.angle))*w+Math.abs(Math.cos(piece.angle))*h)/2;
+      c.save();c.translate(at.x,at.y-support+.8);c.rotate(piece.angle);
+      if(rocks?.complete&&rocks.naturalWidth)c.drawImage(rocks,sx,sy,sw,sh,-w/2,-h/2,w,h);
+      else{
+        c.fillStyle='#bfc1b8';path(c,[{x:-w*.45,y:h*.3},{x:-w*.4,y:-h*.3},{x:0,y:-h*.48},{x:w*.44,y:-h*.18},{x:w*.37,y:h*.4},{x:0,y:h*.48}]);c.fill();
+      }c.restore();
     }
-    for(const z of [0,18,132,143,157,164])polygon(c,p,[[0,d,z],[g.thickness,d,z],[g.thickness,d,z+3],[0,d,z+3]],'#d4b76a');
-    const a=near?mid:g.far,b=near?g.near:mid;
-    const za=near?204:166,zb=near?166:204;
-    polygon(c,p,[[0,a,za],[g.thickness,a,za],[g.thickness,b,zb],[0,b,zb]],'#cbbd91');
   }
-  function back(c,p){if(!p?.visible)return;architecture(c,p,false);}
+  function ground(c,p){
+    const g=p.geometry,floor={...p,offset:0},contact=Math.max(0,Math.min(1,p.descent));
+    c.save();c.globalAlpha=contact*contact*.36*(1-p.collapse);
+    for(const foot of SPRITE.feet){spritePath(c,floor,foot);c.fillStyle='#03080a';c.fill();}
+    c.globalAlpha=p.damage??0;
+    spritePath(c,floor,[[266,1224],[577,1524],[589,1514],[278,1214]]);c.fillStyle='#06090c';c.fill();
+    if(p.opening>0){
+      c.globalAlpha=p.opening*.24;
+      spritePath(c,floor,[[184,1230],[414,1520],[574,1520],[344,1230]]);c.fillStyle='#a2edff';c.fill();
+    }
+    const age=p.sinceImpact;
+    if(age>=0&&age<.8){
+      for(let i=0;i<22;i++){
+        const depth=g.far+seed(i)*((g.near-g.far)),at=point(floor,(seed(i+5)-.5)*age*65,depth,Math.sin(age/.8*Math.PI)*(4+seed(i+9)*16));
+        c.globalAlpha=(1-age/.8)*.42;c.fillStyle=i%3?'#a89d8a':'#e3e9df';c.beginPath();c.ellipse(at.x,at.y,2+age*5,1+age*2,0,0,Math.PI*2);c.fill();
+      }
+    }c.restore();
+  }
   function surface(c,p){
-    if(!p?.visible||p.opening<=0)return;
-    const g=p.geometry,h=g.openingHeight*p.opening,points=vertices(p,[[0,g.openingFar,0],[0,g.openingNear,0],[0,g.openingNear,h],[0,g.openingFar,h]]);
-    if(points.length<3)return;c.save();path(c,points);c.clip();
-    const left=B.project(p.anchorX,g.openingFar,0,p.camera),right=B.project(p.anchorX,g.openingNear,0,p.camera);
-    const glow=c.createLinearGradient(left.x,left.y,right.x,right.y);glow.addColorStop(0,'#2456a8');glow.addColorStop(.18,'#77ceff');glow.addColorStop(.48,'#f5ffff');glow.addColorStop(.7,'#c9f5ff');glow.addColorStop(1,'#3878ce');
-    c.fillStyle=glow;c.fillRect(0,0,512,384);
-    for(let i=0;i<10;i++){
-      const depth=g.openingFar+((i*11+p.time*3)%(g.openingNear-g.openingFar));
-      const a=B.project(p.anchorX,depth,0,p.camera),b=B.project(p.anchorX,depth,h,p.camera);
-      c.strokeStyle=i%3?'#b8eaff22':'#ffffff33';c.lineWidth=1;c.beginPath();c.moveTo(a.x,a.y);c.lineTo(b.x,b.y);c.stroke();
+    if(!p?.visible||p.opening<=0||p.collapse>0)return;
+    const points=SPRITE.opening.map(([x,y])=>spritePoint(p,x,y)),left=spritePoint(p,429,0),right=spritePoint(p,540,0);
+    c.save();path(c,points);c.clip();
+    const glow=c.createLinearGradient(left.x,0,right.x,0);
+    glow.addColorStop(0,'#4b9bd1');glow.addColorStop(.22,'#acebff');glow.addColorStop(.5,'#f8ffff');glow.addColorStop(.8,'#d6f7ff');glow.addColorStop(1,'#659fcf');
+    c.globalAlpha=p.opening;c.fillStyle=glow;path(c,points);c.fill();
+    for(let i=0;i<12;i++){
+      const at=spritePoint(p,433+(i+.5)*104/12,550+((i*77+p.time*85)%660));
+      c.globalAlpha=p.opening*(.18+.2*seed(i));c.fillStyle='#ffffff';c.beginPath();c.ellipse(at.x,at.y,.7,5+i%3,0,0,Math.PI*2);c.fill();
     }c.restore();
   }
   function architecture(c,p,near){
-    c.save();c.globalAlpha=1-Math.min(1,p.collapse*3);sides(c,p,near);face(c,p,near);c.restore();
-    if(p.collapse>0){
-      const g=p.geometry;
-      for(let i=0;i<20;i++){
-        if((i%2===0)!==near)continue;
-        const age=p.collapse,depth=g.far+(i%6)*12+(i%3-1)*age*18;
-        const z=Math.max(0,(25+Math.floor(i/6)*45)*(1-age*age*1.8));
-        polygon(c,p,[[i%2*8-4,depth,z],[i%2*8+7,depth+8,z],[i%2*8+5,depth+8,z+10],[i%2*8-4,depth,z+12]],i%3?'#dad8c4':'#b7a363');
-      }
-    }
+    if(p.collapse>0){rubble(c,p,near);return;}
+    if(p.visible)drawSprite(c,p,near);
   }
-  function front(c,p){if(!p?.visible)return;architecture(c,p,true);}
-  const api={load,aboveWater,vertices,back,surface,front,geometry:F.GATE};
+  function back(c,p){if(!p)return;ground(c,p);surface(c,p);architecture(c,p,false);}
+  function front(c,p){if(p)architecture(c,p,true);}
+  const api={load,loadRocks,ASSET,ROCK_ASSET,ROCK_FRAMES,SPRITE,spriteFrame,aboveWater,vertices,point,pieces,back,front,geometry:F.GATE};
   if(typeof module!=='undefined')module.exports=api;else root.FoolPortal=api;
 })(globalThis);

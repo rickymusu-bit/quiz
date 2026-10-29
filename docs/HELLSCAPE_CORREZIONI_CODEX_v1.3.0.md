@@ -1,5 +1,7 @@
 # Hellscape — Correzioni gameplay e regia (prompt operativo per Codex)
 
+> Aggiornamento dell’utente del 28/10/2026: per le modifiche dinamiche allegare **GIF reali del browser**, non soltanto screenshot. Per gli stati statici restano validi gli screenshot; niente HTML di anteprima. Questa richiesta prevale sui riferimenti «solo screenshot» presenti nel testo storico seguente. Procedere con [un intervento per volta](HELLSCAPE_LAVORO_SEQUENZIALE.md).
+
 **Versione:** 1.3.0 · **Data:** 28 ottobre 2026  
 **Repository:** `rickymusu-bit/quiz` · **Base di lavoro:** ramo `fix/malocchio-preview-spec-20261028` (PR contenente le prime correzioni)  
 **Stato:** specifica vincolante da IMPLEMENTARE e VERIFICARE; non equivale a funzionalità già presenti.

@@ -1,0 +1,44 @@
+{
+  "revision": "3c88158f73e159c018f0a7985ca12965d0c0c046",
+  "errors": [],
+  "world_lock_channels_compared": 576000,
+  "vehicles": [
+    {
+      "row": 0,
+      "width": 54.56,
+      "height": 44.254222222222225,
+      "ground": 246.33333333333334
+    },
+    {
+      "row": 1,
+      "width": 71.92,
+      "height": 69.81707602339182,
+      "ground": 283
+    },
+    {
+      "row": 5,
+      "width": 49.6,
+      "height": 43.990476190476194,
+      "ground": 319.6666666666667
+    }
+  ],
+  "vehicle_scale_vs_v1": 2,
+  "viewport": [
+    1024,
+    768
+  ],
+  "gif_pixels": [
+    640,
+    480
+  ],
+  "frames": 72,
+  "duration_ms": 6000,
+  "capture_fps": 12,
+  "bytes": 13977332,
+  "sha256": "a06fef3b33d722f33f85d5832db4cd9a2165a92ee609b591ee4522522fccae44",
+  "world_distance": 287.99999999999926,
+  "engine_unchanged": true,
+  "foreground_occlusion": "PASS",
+  "pause": "PASS",
+  "offline_external_requests": []
+}

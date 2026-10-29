@@ -99,7 +99,7 @@
   }
   function vehicleSize(row, scale = 2) {
     const frame = vehicleRow(row)[0];
-    const width = vehicleWidths[row] * (scale < 2 ? .65 : (root.FoolBridge?.RACE_SCALE ?? .62));
+    const width = vehicleWidths[row] * (scale < 2 ? .65 : (root.FoolBridge?.RACE_SCALE ?? 1.24));
     return { width, height: width * frame.height / frame.width };
   }
   function drawVehicle(c, row, frame, x, ground, scale = 2) {
@@ -114,7 +114,7 @@
     canvas.width=320;canvas.height=180;
     const paint=()=>{const c=canvas.getContext('2d');c.setTransform(2,0,0,2,0,0);c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';c.clearRect(0,0,160,90);const row=Math.max(0,VEHICLES.indexOf(id)),size=vehicleSize(row);
       // One common preview scale retains the same relative sizes as the race.
-      const zoom=1.35/(root.FoolBridge?.RACE_SCALE ?? .62); sprite(c,'vehicles',8,6,row,0,80-size.width*zoom/2,86-size.height*zoom,size.width*zoom,size.height*zoom)};
+      const zoom=1.35/(root.FoolBridge?.RACE_SCALE ?? 1.24); sprite(c,'vehicles',8,6,row,0,80-size.width*zoom/2,86-size.height*zoom,size.width*zoom,size.height*zoom)};
     if(imageReady(sheets.vehicles))paint();else sheets.vehicles?.addEventListener('load',paint,{once:true});
     return canvas;
   }
@@ -382,7 +382,12 @@
 
   function background(c, W, tick, progress, effectTime=tick, ending=null) {
     const layers=ending?.bridge?{damage:ending.bridge,
-      behind:()=>root.FoolPortal.back(c,ending.portal),above:()=>root.FoolPortal.surface(c,ending.portal)}:null;
+      behind:()=>root.FoolPortal.back(c,ending.portal)}:null;
+    if(root.FoolBridge?.environment(c,W,H,tick,effectTime)){
+      flyingDevils(c,W,effectTime);
+      root.FoolBridge.draw(c,W,tick,progress,null,effectTime,layers);
+      return;
+    }
     if(imageReady(sheets.world)){
       const img=sheets.world;
       // Distant architecture and foreground scroll at different velocities.
@@ -576,7 +581,7 @@
     }
     backgroundAt(travel.distance);
     const movement=reduced?0:travel.roadTime;
-    const order=state.groups.map((g,i)=>i).filter(i=>i!==state.respondent);order.push(state.respondent);
+    const order=state.groups.map((g,i)=>i).sort((a,b)=>positions[a].y-positions[b].y);
     for(const i of order){
       const group=state.groups[i],awaitingCapture=hold&&queue.some(q=>q.index===i);
       if(group.out&&!awaitingCapture&&!(shot?.type==='ira'&&shot.targets.includes(i)))continue;
@@ -587,7 +592,9 @@
     const staticTravel=reduced?{...travel,time:0,footfalls:[]}:travel;
     drawChaser(c,staticTravel,(tieView?.strength??0)*10);
     if(visualState)visualState.frame=normalFrame(state,positions,travel,(tieView?.strength??0)*10);
-    if(shot){root.FoolAmmo.render(c,W,state,shot,ammo.sample(reduced),positions,reduced);return 'ammo';}
+    if(shot)root.FoolAmmo.render(c,W,state,shot,ammo.sample(reduced),positions,reduced);
+    root.FoolBridge?.front(c,W,{distance:travel.distance});
+    if(shot)return 'ammo';
     if(hold)return tieView.blocking?'eliminated':'race';
     return queue.length?'capture':tieView?.blocking?'tie-intro':'race';
   }
@@ -651,7 +658,7 @@
       lastPaint=now;
       const width = RACE_WIDTH;
       // Match CSS size and effective DPR, bounded to 1536×1152 (7 MiB RGBA).
-      const rasterScale=Math.max(1,Math.min(3,canvas.getBoundingClientRect().width/width*Math.min(2,root.devicePixelRatio||1)));
+      const rasterScale=Math.max(1,Math.min(1536/width,canvas.getBoundingClientRect().width/width*Math.min(2,root.devicePixelRatio||1)));
       const rasterWidth=Math.round(width*rasterScale),rasterHeight=Math.round(H*rasterScale);
       if(canvas.width!==rasterWidth||canvas.height!==rasterHeight){canvas.width=rasterWidth;canvas.height=rasterHeight;}
       ctx.setTransform(canvas.width/width,0,0,canvas.height/H,0,0);

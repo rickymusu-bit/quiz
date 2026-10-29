@@ -1,0 +1,22 @@
+{
+  "revision": "544ba3bb0918e6d3f48de2e1c1040f820e3b13f0",
+  "errors": [],
+  "viewport": [
+    1024,
+    768
+  ],
+  "gif_pixels": [
+    640,
+    480
+  ],
+  "frames": 72,
+  "duration_ms": 6000,
+  "capture_fps": 12,
+  "bytes": 14078300,
+  "sha256": "6175c4742327790576b19feeddf4b1605dcba430bb56e1380b6006d6ea1a15bd",
+  "world_distance": 287.9999999999994,
+  "engine_unchanged": true,
+  "foreground_occlusion": "PASS",
+  "pause": "PASS",
+  "offline_external_requests": []
+}
