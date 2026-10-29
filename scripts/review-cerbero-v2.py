@@ -11,13 +11,13 @@ class Quiet(SimpleHTTPRequestHandler):
  def log_message(self,*args):pass
 server=ThreadingHTTPServer(('127.0.0.1',0),partial(Quiet,directory=str(ROOT)))
 threading.Thread(target=server.serve_forever,daemon=True).start()
-report={'revision_parent':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),'errors':[],'clips':[],
+report={'runtime_revision':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),'errors':[],'clips':[],
  'runtime_sha256':{str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted((ROOT/'assets').rglob('*')) if p.is_file()}}
 def gif(name,frames,step,viewport,kind):
  # One palette for the whole clip avoids frame palette flicker and oversized files.
  samples=Image.new('RGB',(160*8,90*math.ceil(len(frames)/8)))
  for i,im in enumerate(frames):samples.paste(im.resize((160,90)),(i%8*160,i//8*90))
- palette=samples.quantize(colors=256,method=Image.Quantize.MEDIANCUT,dither=Image.Dither.NONE)
+ palette=samples.quantize(colors=128 if name=='morso-lancio-lava.gif' else 256,method=Image.Quantize.MEDIANCUT,dither=Image.Dither.NONE)
  converted=[im.quantize(palette=palette,dither=Image.Dither.NONE) for im in frames]
  durations=[(round((i+1)*step/10)-round(i*step/10))*10 for i in range(len(frames))]
  file=OUT/name;converted[0].save(file,save_all=True,append_images=converted[1:],duration=durations,loop=0,disposal=1,optimize=True)
@@ -49,7 +49,7 @@ try:
      car=f['positions'][f['victim']];mouth=f['anchors']['mouths']['right'];angle=car['rotation']
      assert abs(car['x']-math.cos(angle)*car['width']*.35-mouth['x'])<.01
      assert abs(car['ground']-car['height']/2-math.sin(angle)*car['width']*.35-mouth['y'])<.01
-    frames.append(Image.open(BytesIO(q.screenshot())).convert('RGB').resize((768,432),Image.Resampling.LANCZOS));assert state()==before
+    frames.append(Image.open(BytesIO(q.screenshot())).convert('RGB').resize((640,360),Image.Resampling.LANCZOS));assert state()==before
    gif('morso-lancio-lava.gif',frames,50,[1366,768],'real browser capture, rigid flight and lava submersion')
    report['capture_actions']=actions
    q.evaluate('''()=>{const g=HellscapeUI.game;g.eliminate(1,'revisione finale');g.complete(0);HellscapeUI.changed()}''');q.clock.run_for(100)

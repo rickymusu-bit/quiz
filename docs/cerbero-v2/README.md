@@ -40,10 +40,11 @@ npm run test:chase
 npm run test:endings
 npm run test:orientation
 node scripts/render-audit.cjs
+node scripts/cerbero-sequences.cjs
 python3 scripts/review-cerbero-v2.py
 ```
 
-Le tavole `evidence/*-sprites.png` sono controlli della composizione. Le GIF sono registrazioni reali di Chromium, senza sostituire renderer o timeline, a 20 FPS. Il rapporto `evidence/report.json` registra revisione runtime, impronte dei file, viewport, durata e dimensioni esportate. La finestra è 1366×768; la camminata è un ritaglio della scena, le altre clip sono esportate a 768×432. `points-report.json` documenta default e conservazione dei valori personalizzati su sito/offline.
+Le tavole `evidence/*-sprites.png` sono controlli della composizione. Le GIF sono registrazioni reali di Chromium, senza sostituire renderer o timeline, a 20 FPS. Il rapporto `evidence/report.json` registra revisione runtime, impronte dei file, viewport, durata e dimensioni esportate. La finestra è 1366×768; la camminata è un ritaglio della scena, il lancio è esportato a 640×360 e le fiammate a 768×432. `points-report.json` documenta default e conservazione dei valori personalizzati su sito/offline.
 
 ![Pose di camminata](evidence/camminata-sprites.png)
 
@@ -56,3 +57,7 @@ Le tavole `evidence/*-sprites.png` sono controlli della composizione. Le GIF son
 ![Campioni delle fiammate](evidence/fiamme-sprites.png)
 
 ![Tre bocche nel gioco](evidence/tre-bocche.gif)
+
+Acquisizione runtime: `1caa1f47d9a1672b939247a510210bd87ec49d0f`. Gli allegati vengono aggiunti in un commit successivo senza modifiche al runtime. Camminata: 3,2 s; morso/lancio/lava: 5,4 s; tre bocche: 1,6 s. Tutte le clip mantengono 20 FPS.
+
+Verifiche locali riuscite: 157 test Node e dataset, suite frame completa, build, offline su tre viewport e due banche, finali con pausa/visibilità/movimento ridotto, inseguimento con 0/1/2 perdenti e dieci campioni offline, orientamento su sito/export/schermo intero. L’audit usa tre configurazioni di viewport/DPR e registra dimensioni native e tempi osservati, senza promettere FPS su altri dispositivi.
