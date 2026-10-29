@@ -5,9 +5,44 @@ on:
     branches: [main]
 permissions:
   contents: read
+concurrency:
+  group: hellscape-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
-  verify:
+  checks:
+    name: ${{ matrix.suite }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix:
+        include:
+          - suite: core
+            command: npm test && npm run test:frames && npm run build
+          - suite: portal
+            command: npm run test:portal
+          - suite: chase
+            command: npm run test:chase
+          - suite: ties
+            command: npm run test:ties
+          - suite: motion
+            command: npm run test:motion
+          - suite: layout
+            command: npm run test:layout
+          - suite: browser
+            command: npm run test:browser
+          - suite: ammo
+            command: npm run test:ammo
+          - suite: endings
+            command: npm run test:endings
+          - suite: terrain
+            command: npm run test:terrain
+          - suite: offline
+            command: npm run test:offline
+          - suite: quality
+            command: npm run test:quality
+          - suite: orientation
+            command: npm run preview:offline && npm run test:orientation
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
@@ -28,23 +63,13 @@ jobs:
             browser_path=$(node -p "require('playwright').chromium.executablePath()")
           fi
           echo "CHROMIUM_PATH=$browser_path" >> "$GITHUB_ENV"
-      - run: npm test
-      - run: npm run test:frames
-      - run: npm run test:portal
-      - run: npm run test:chase
-      - run: npm run test:ties
-      - run: npm run test:motion
-      - run: npm run test:layout
-      - run: npm run test:browser
-      - run: npm run test:ammo
-      - run: npm run test:endings
-      - run: npm run test:terrain
-      - run: npm run build
-      - run: npm run test:offline
-      - run: npm run test:quality
+      - name: Esegui ${{ matrix.suite }}
+        run: ${{ matrix.command }}
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
-          name: hellscape-${{ github.sha }}
+          name: hellscape-${{ github.sha }}-${{ matrix.suite }}
+          if-no-files-found: ignore
           path: |
             dist/Hellscape-offline.html
             dist/Hellscape-Ammo.html
@@ -57,3 +82,11 @@ jobs:
             artifacts/tie/
             artifacts/chase/
             artifacts/portal/
+            artifacts/orientation/
+  verify:
+    if: always()
+    needs: checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Tutte le suite devono riuscire
+        run: test "${{ needs.checks.result }}" = "success"

@@ -1,4 +1,5 @@
 """Landscape-only interaction, timer/state preservation and real browser GIF."""
+from browser_viewport import set_viewport
 from pathlib import Path
 from functools import partial
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
@@ -26,7 +27,7 @@ with sync_playwright() as p:
         else:q.goto(base+'Fool.html?start=1');v=q
         return c,q,v
     def rotate(q,v,w,h):
-        q.set_viewport_size({'width':w,'height':h});v.evaluate('fitFoolViewport()');q.clock.run_for(50)
+        set_viewport(q,v,w,h);q.clock.run_for(50)
         assert v.evaluate('FoolLayout.portrait')==(w<=h)
     def gate(v):
         expect(v.locator('#orientation-note')).to_be_visible();expect(v.locator('#viewport-stage')).to_be_hidden();assert v.locator('#viewport-stage').evaluate('e=>e.inert')

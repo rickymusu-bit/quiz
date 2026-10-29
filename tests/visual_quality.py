@@ -4,6 +4,7 @@ Run: node scripts/build.cjs --quality-preview && python3 tests/visual_quality.py
 Screenshots and measured (not HTML-declared) dimensions go to artifacts/quality/.
 Use --quick for just desktop and small Android landscape.
 """
+from browser_viewport import set_viewport
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 from PIL import Image
@@ -60,7 +61,7 @@ with sync_playwright() as p:
         page.goto('http://quality.test/preview')
         page.locator('#quality-tools').evaluate('(el)=>el.style.display="none"')
         for width, height in VIEWPORTS:
-            page.set_viewport_size({'width':width,'height':height})
+            set_viewport(page,page.frames[1],width,height)
             prefix = f'{width}x{height}-dpr{dpr}'
             for scenario in ['home','selezione','quiz','ammo','ultima','spareggio','portale','vittoria','gameover','regole']:
                 if scenario == 'ammo':
@@ -98,22 +99,15 @@ with sync_playwright() as p:
                 page.screenshot(path=str(ART/f'{scenario}-{prefix}.png'),animations='allow')
                 report['renders'].append({'scenario':scenario,'viewport':[width,height],'dpr':dpr,
                                           'metrics':f.evaluate(METRICS)})
-                if scenario == 'home' and width in [1366,390]:
+                if scenario == 'home' and width in [1366,667]:
                     f.locator('.home-wordmark').screenshot(path=str(ART/f'logo-{width}-dpr{dpr}.png'))
-            # Uniform scaling remains stable through an orientation change/fullscreen.
+            # Portrait deliberately hides the scene; inspect its proportions only
+            # after the actual iframe viewport has returned to landscape.
             page.evaluate("HellscapeQuality.show('home')")
             f = page.frames[1]
-            page.set_viewport_size({'width':height,'height':width})
-            f.wait_for_function("""() => {
-              const compact=FoolLayout.measure(innerWidth,innerHeight).compact;
-              if(document.body.dataset.layout!==(compact?'compact':'stage'))return false;
-              const r=document.querySelector(compact?'.home-heading':'#viewport-stage').getBoundingClientRect();
-              return r.width>0 && Math.abs(r.width/r.height-4/3)<.001;
-            }""")
-            subject = '.home-heading' if f.evaluate('document.body.dataset.layout') == 'compact' else '#viewport-stage'
-            r = f.locator(subject).bounding_box()
-            assert abs(r['width']/r['height'] - 4/3) < .001
-            page.set_viewport_size({'width':width,'height':height})
+            set_viewport(page,f,height,width)
+            assert f.locator('#viewport-stage').evaluate('e=>e.inert')
+            set_viewport(page,f,width,height)
             f.get_by_role('button',name='Schermo intero',exact=True).click()
             page.wait_for_timeout(150)
             assert f.evaluate('!!document.fullscreenElement')

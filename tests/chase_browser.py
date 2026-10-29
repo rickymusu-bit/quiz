@@ -1,4 +1,5 @@
 """Offline world/camera choreography, real anchors, 0/1/2 losers and viewport/DPR review."""
+from browser_viewport import set_viewport
 from pathlib import Path
 from playwright.sync_api import sync_playwright,expect
 from PIL import Image
@@ -43,8 +44,8 @@ with sync_playwright() as p:
     pause_checked=True;f.get_by_role('button',name='Pausa scena',exact=True).click();page.clock.run_for(100);frozen=raw(f);held=state(f);page.clock.run_for(500)
     assert raw(f)==frozen and state(f)==held
     f.evaluate('HellscapeUI.changed()');page.clock.run_for(100);assert raw(f)==frozen
-    page.set_viewport_size({'width':768,'height':1366});page.clock.run_for(100);assert f.locator('.hell-race canvas').evaluate('c=>c.width<=1536')
-    page.set_viewport_size({'width':1366,'height':768});page.clock.run_for(100);frozen=raw(f)
+    set_viewport(page,f,768,1366);page.clock.run_for(100);assert f.locator('.hell-race canvas').evaluate('c=>c.width<=1536')
+    set_viewport(page,f,1366,768);page.clock.run_for(100);frozen=raw(f)
     f.evaluate("Object.defineProperty(document,'hidden',{configurable:true,get:()=>true});document.dispatchEvent(new Event('visibilitychange'))");page.clock.run_for(500);assert raw(f)==frozen
     f.evaluate("Object.defineProperty(document,'hidden',{configurable:true,get:()=>false});document.dispatchEvent(new Event('visibilitychange'))")
     f.get_by_role('button',name='Riprendi scena',exact=True).focus();page.keyboard.press('Enter');page.clock.run_for(100)
