@@ -106,3 +106,14 @@ body.showing-cinematic dialog:not(#orientation-note)::backdrop{background:transp
 #viewport-stage .ending .victory-wordmark .end-wordmark{position:absolute;left:0;top:50%;transform:translateY(-50%);width:100%;height:auto;max-height:none;image-rendering:auto}
 #viewport-stage .ending .winner-escape{font:clamp(24px,3.4vw,36px)/1.15 FoolTerminal,monospace;color:#f1e5bc;max-width:90%;text-shadow:2px 2px #100b09}
 body[data-layout="compact"] #viewport-stage .ending .victory-wordmark .end-wordmark{max-height:none}
+
+/* Keep the final return action inside the viewport, even when the long
+   victory artwork and answer summary fill the remaining height. */
+#viewport-stage main.final-screen .ending>.ending-home{
+  position:absolute;top:16px;left:16px;z-index:6;margin:0;
+  max-width:calc(100% - 32px);
+}
+#viewport-stage main.final-screen .ending>.ending-home button{
+  max-width:100%;white-space:normal;min-height:48px;
+  background:#311e18;border:2px solid #cba176;color:#fff0dc;
+}
