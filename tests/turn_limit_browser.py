@@ -22,12 +22,14 @@ try:
                 q.on('pageerror', lambda error: errors.append(str(error)))
                 q.clock.install()
                 q.goto(f'http://127.0.0.1:{server.server_port}/Fool.html?start=1')
-                q.get_by_role('button', name='Inizia partita (13 turni)', exact=True).click()
+                q.get_by_role('button', name='Inizia partita (13 turni per giocatore)', exact=True).click()
                 q.clock.pause_at(q.evaluate('Date.now()+1000'))
                 q.clock.run_for(2000)
                 q.evaluate('''kind => {
                     const g=HellscapeUI.game,s=g.s;
-                    s.config.turnCount=kind==='forfeit'?1:2;
+                    delete s.config.roundCount;s.config.turnCount=kind==='forfeit'?1:2;
+                    s.config.questionCount=s.config.turnCount;
+                    const keys=Object.keys(s.config.quotas);s.config.quotas=Object.fromEntries(keys.map((key,i)=>[key,i?0:s.config.turnCount]));
                     const c={id:g.uid(),type:kind==='forfeit'?'arsenico':'salta',target:null,origin:'test'};
                     s.groups[s.owner].inventory.push(c);
                     g.use(c.id,s.order[1]);

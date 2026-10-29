@@ -83,26 +83,27 @@
       ["misto", "facile", "media", "difficile"].includes(c.difficulty),
       "Filtro difficoltà non valido",
     );
-    // Existing saves with an explicit questionCount retain question-based play.
-    const turns =
-      c.turnCount ??
-      (c.questionCount === undefined ? core.DEFAULT_TURN_COUNT : null);
+    // New games store rounds separately. Legacy saves with turnCount still
+    // retain their original total-turn limit, without changing their duration.
+    const rounds = c.roundCount === undefined ? null :
+      integer(c.roundCount, 1, Math.floor(Number.MAX_SAFE_INTEGER / names.length), "Numero turni");
+    need(rounds === null || c.turnCount === undefined,
+      "Non mescolare turni per giocatore e turni totali");
+    const turns = rounds === null
+      ? (c.turnCount ?? (c.questionCount === undefined ? core.DEFAULT_TURN_COUNT : null))
+      : null;
     const questionCount = integer(
-      turns ?? c.questionCount,
-      turns === null ? 3 : 1,
-      turns === null ? 99 : Number.MAX_SAFE_INTEGER,
-      turns === null ? "Numero domande" : "Numero turni",
+      rounds === null ? (turns ?? c.questionCount) : rounds * names.length,
+      rounds === null && turns === null ? 3 : 1,
+      rounds === null && turns === null ? 99 : Number.MAX_SAFE_INTEGER,
+      rounds === null && turns === null ? "Numero domande" : "Numero turni",
     );
-    if (turns === null)
-      need(
-        questionCount % 3 === 0,
-        "Il numero di domande deve essere un multiplo di 3",
-      );
-    if (turns !== null && c.questionCount !== undefined)
-      need(
-        c.questionCount === questionCount,
-        "Riserva e numero di turni incoerenti",
-      );
+    if (rounds === null && turns === null)
+      need(questionCount % names.length === 0,
+        "Il numero di domande deve essere un multiplo di " + names.length);
+    if ((rounds !== null || turns !== null) && c.questionCount !== undefined)
+      need(c.questionCount === questionCount,
+        "Riserva e numero di turni incoerenti");
     need(
       c.quotas && Object.keys(c.quotas).length,
       "Selezionare argomenti e quote",
@@ -124,10 +125,13 @@
       ...clone(c),
       bonusWeights: clone(bonusWeights),
       questionCount,
-      ...(turns === null ? {} : { turnCount: questionCount }),
+      ...(rounds !== null ? { roundCount: rounds } :
+        turns === null ? {} : { turnCount: questionCount }),
       names,
     };
   }
+  const totalTurnLimit = c => c.roundCount === undefined
+    ? c.turnCount : c.roundCount * c.names.length;
   function prepare(bank, c, random = Math.random) {
     c = config(c);
     const eligible = bank.filter(
@@ -136,12 +140,13 @@
         c.quotas[q.topic] > 0 &&
         (c.difficulty === "misto" || q.difficulty === c.difficulty),
     );
-    if (c.turnCount) {
+    if (c.roundCount || c.turnCount) {
       const topics = c.selectedTopics ?? Object.keys(c.quotas).filter(t => c.quotas[t] > 0),
         counts = datasets.topicCounts(bank, c.difficulty),
         available = topics.reduce((sum,t) => sum + (counts[t] ?? 0), 0),
         maximum = datasets.turnCapacity(bank, topics, c.names.length, c.difficulty);
-      need(c.turnCount <= maximum,
+      const requested = c.roundCount ?? c.turnCount;
+      need(requested <= maximum,
         "Massimo " + maximum + " turni: " + available + " domande disponibili ÷ " + c.names.length + " giocatori");
     }
     let chosen = [];
@@ -348,7 +353,15 @@
         pos = (pos + 1) % s.order.length;
         const i = s.order[pos],
           g = s.groups[i];
-        if (g.out) continue;
+        if (g.out) {
+          // A round still contains the eliminated player's slot. Count it
+          // only for new per-player matches; old total-turn saves are unchanged.
+          if (s.config.roundCount !== undefined) {
+            s.completedTurns++;
+            if (s.completedTurns >= totalTurnLimit(s.config)) return null;
+          }
+          continue;
+        }
         // The personal-turn boundary is the only place that ticks Arsenico,
         // before Catene. Restore, render, reveal and Malocchio never tick it.
         this.applyArsenico(i);
@@ -358,13 +371,13 @@
         );
         if (skip >= 0) {
           s.effects.splice(skip, 1);
-          if (s.config.turnCount) s.completedTurns++;
+          if (totalTurnLimit(s.config)) s.completedTurns++;
           this.log(g.name + " salta un turno", {
             type: "turn-skipped",
             target: i,
             turn: s.turn + 1,
           });
-          if (s.config.turnCount && s.completedTurns >= s.config.turnCount)
+          if (totalTurnLimit(s.config) && s.completedTurns >= totalTurnLimit(s.config))
             return null;
           continue;
         }
@@ -415,7 +428,7 @@
     }
     closeTurn() {
       const s = this.s;
-      if (s.phase !== "ordinaria" || !s.config.turnCount || s.turnClosed)
+      if (s.phase !== "ordinaria" || !totalTurnLimit(s.config) || s.turnClosed)
         return;
       s.completedTurns++;
       s.turnClosed = true;
@@ -1031,8 +1044,8 @@
       }
       if (
         s.phase === "ordinaria" &&
-        (s.config.turnCount
-          ? s.completedTurns >= s.config.turnCount
+        (totalTurnLimit(s.config)
+          ? s.completedTurns >= totalTurnLimit(s.config)
           : s.valid === (s.config.questionCount ?? 33))
       ) {
         let leaders = [active[0]];
@@ -1410,17 +1423,17 @@
     integer(
       s.completedTurns,
       0,
-      s.config.turnCount ?? Number.MAX_SAFE_INTEGER,
+      totalTurnLimit(s.config) ?? Number.MAX_SAFE_INTEGER,
       "Turni completati",
     );
     need(typeof s.turnClosed === "boolean", "Stato turno non valido");
     integer(s.turn, 1, Number.MAX_SAFE_INTEGER, "Turno");
     integer(s.valid, 0, s.config.questionCount ?? 33, "Domande valide");
-    if (s.config.turnCount) {
+    if (totalTurnLimit(s.config)) {
       need(s.valid <= s.completedTurns, "Risposte oltre i turni completati");
       if (s.phase === "ordinaria")
         need(
-          s.completedTurns < s.config.turnCount &&
+          s.completedTurns < totalTurnLimit(s.config) &&
             s.turnClosed === (s.screen === "result"),
           "Avanzamento dei turni non valido",
         );

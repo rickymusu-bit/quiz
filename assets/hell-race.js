@@ -468,8 +468,12 @@
   }
   function copyFrame(frame){return JSON.parse(JSON.stringify(frame));}
   function scene(c,W,state,sec,final,previous,reduced,travel){
-    const total=Math.max(1,Number(state.config.turnCount||state.config.questionCount||33));
-    const progress=root.FoolTerrain?root.FoolTerrain.progress(state):clamp((state.config.turnCount?state.completedTurns:state.valid)/total,0,1);
+    const total=Math.max(1,Number(state.config.roundCount!==undefined
+      ? state.config.roundCount*state.groups.length
+      : state.config.turnCount||state.config.questionCount||33));
+    const turnBased=state.config.roundCount!==undefined||state.config.turnCount!==undefined;
+    const progress=root.FoolTerrain?root.FoolTerrain.progress(state)
+      :clamp((turnBased?state.completedTurns:state.valid)/total,0,1);
     const positions=state.groups.map((g,i)=>packPosition(state,i,progress,previous,sec,W));
     const shot=ammo?.current(),queue=visualState?.queue||[];
     const tieView=tie?.sample({reduced,captures:queue.length>0}),hold=tieView?.holdCapture;

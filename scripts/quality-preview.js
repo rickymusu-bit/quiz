@@ -44,6 +44,8 @@
     w.FoolEnding.render = endingRender;
     w.FoolEnding.frame = endingFrame;
     const config = JSON.parse(JSON.stringify(ui.game.s.config));
+    // Review scenarios intentionally use the legacy three-total-turn fixture.
+    delete config.roundCount;
     config.questionCount = 3;
     config.turnCount = 3;
     Object.keys(config.quotas).forEach(key => config.quotas[key] = 0);

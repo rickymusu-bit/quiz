@@ -18,7 +18,8 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/v130');fs.
       async function reset(){await page.evaluate(()=>{
         const old=HellscapeUI.game,F=Fool,c={...old.s.config,questionCount:3,turnCount:3,seconds:45,difficulty:'facile',quotas:{...old.s.config.quotas},bonusWeights:Object.fromEntries(F.TYPES.map(t=>[t,0]))};
         Object.keys(c.quotas).forEach((k,i)=>c.quotas[k]=i?0:3);
-        const g=F.Game.start(F.prepare(old.s.bank,c,()=>.25),{random:()=>.25});g.s.id+='-v130-'+(++window.__v130Serial|| (window.__v130Serial=1));
+        delete c.roundCount;
+         const g=F.Game.start(F.prepare(old.s.bank,c,()=>.25),{random:()=>.25});g.s.id+='-v130-'+(++window.__v130Serial|| (window.__v130Serial=1));
         HellscapeUI.game=g;HellscapeUI.changed();
       });await page.clock.runFor(100);}
       async function shot(name){const file=`${name}-${width}x${height}-dpr${dpr}.png`;await page.screenshot({path:path.join(out,file)});report.screenshots.push({file,viewport:[width,height],dpr});console.log("Screenshot:",file);}

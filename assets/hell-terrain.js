@@ -11,10 +11,12 @@
   };
   const fade = (level, start) => clamp((level - start) / 0.22);
   function progress(state) {
-    return clamp(
-      (Number((state.config.turnCount ? state.completedTurns : state.valid)) || 0) /
-        Math.max(1, Number((state.config.turnCount || state.config.questionCount)) || 33),
-    );
+    const turnBased = state.config.roundCount !== undefined || state.config.turnCount !== undefined;
+    const total = state.config.roundCount !== undefined
+      ? state.config.roundCount * state.groups.length
+      : state.config.turnCount || state.config.questionCount || 33;
+    return clamp((Number(turnBased ? state.completedTurns : state.valid) || 0) /
+      Math.max(1, Number(total) || 33));
   }
   const box = (c, x, y, w, h, color) => {
     c.fillStyle = color;

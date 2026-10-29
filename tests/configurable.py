@@ -23,21 +23,21 @@ with sync_playwright() as p:
   page.locator('#bank-choice').select_option(bank);expect(page.locator('#turn-count')).to_have_value('13');expect(page.locator('#weight-marx')).to_have_value('15');expect(page.locator('#weight-ira')).to_have_value('5');fits(page)
   for count in [1,4,13,33]:
    page.locator('#turn-count').fill(str(count));page.locator('#seconds').click()
-   assert sum(page.locator('#quotas input[type="number"]').evaluate_all('(els)=>els.map(e=>Number(e.value))'))==count
+   assert sum(page.locator('#quotas input[type="number"]').evaluate_all('(els)=>els.map(e=>Number(e.value))'))==count*3
    for kind in ['salta','ruba','svela','aura','karma','marx','ira','arsenico','sacrificio']:page.locator('#weight-'+kind).fill('100')
    page.get_by_role('button',name='Salva impostazioni').click();expect(page.locator('#message')).to_contain_text('Impostazioni salvate');fits(page)
    expect(page.get_by_role('button',name='Anteprima',exact=True)).to_have_count(0)
    expect(page.locator('#teacher-preview')).to_have_count(0)
    page.goto(base+'Fool.html');page.locator('#bank-choice').select_option(bank)
-   page.get_by_role('button',name=f'Inizia partita ({count} turni)',exact=True).click()
-   assert page.evaluate('HellscapeUI.game.s.config.turnCount')==count
-   assert page.evaluate('HellscapeUI.game.s.queue.length')==count-1
+   page.get_by_role('button',name=f'Inizia partita ({count} turni per giocatore)',exact=True).click()
+   assert page.evaluate('HellscapeUI.game.s.config.roundCount')==count
+   assert page.evaluate('HellscapeUI.game.s.queue.length')==count*3-1
    fits(page)
    page.goto(base+'Fool.html?settings=1');page.locator('#bank-choice').select_option(bank)
   stored=page.evaluate('localStorage.getItem("fool-settings-v1")');page.locator('#turn-count').fill('0');page.locator('#seconds').click();page.get_by_role('button',name='Salva impostazioni').click();assert page.evaluate('localStorage.getItem("fool-settings-v1")')==stored
   page.locator('#turn-count').fill('3');page.locator('#seconds').click();page.get_by_role('button',name='Salva impostazioni').click()
-  page.goto(base+'Fool.html');page.locator('#bank-choice').select_option(bank);expect(page.get_by_role('button',name='Inizia partita (3 turni)',exact=True)).to_be_enabled();page.get_by_role('button',name='Inizia partita (3 turni)',exact=True).click()
-  assert page.evaluate('HellscapeUI.game.s.config.questionCount')==3 and page.evaluate('HellscapeUI.game.s.queue.length')==2
+  page.goto(base+'Fool.html');page.locator('#bank-choice').select_option(bank);expect(page.get_by_role('button',name='Inizia partita (3 turni per giocatore)',exact=True)).to_be_enabled();page.get_by_role('button',name='Inizia partita (3 turni per giocatore)',exact=True).click()
+  assert page.evaluate('HellscapeUI.game.s.config.questionCount')==9 and page.evaluate('HellscapeUI.game.s.queue.length')==8
   page.get_by_role('button',name='Svela e avvia il tempo').click();assert page.get_by_role('button',name='Inventario',exact=True).count()==0
   page.locator('.answer').nth(page.evaluate('HellscapeUI.game.s.current.correct')).click();assert page.evaluate('HellscapeUI.game.s.result.bonuses.length')==9
   for kind in ['salta','ruba','svela','aura','karma','marx','ira','arsenico','sacrificio']:expect(page.locator(f'.solution .ammo-round[data-ammo="{kind}"]')).to_have_count(1)
@@ -67,10 +67,10 @@ with sync_playwright() as p:
   # A legacy short match without an explicit confirmation must restart at 13 turns.
   page.evaluate('''()=>{const data=JSON.parse(localStorage.getItem("fool-settings-v1"));for(const v of Object.values(data.profiles)){v.questionCount=3;delete v.turnCount;delete v.questionCountConfirmed;const keys=Object.keys(v.quotas);v.quotas=Object.fromEntries(keys.map((key,i)=>[key,i===0?3:0]));}localStorage.setItem("fool-settings-v1",JSON.stringify(data))}''')
   page.goto(base+'Fool.html?start=1');page.locator('#bank-choice').select_option(bank)
-  expect(page.get_by_role('button',name='Inizia partita (13 turni)',exact=True)).to_be_visible()
-  page.get_by_role('button',name='Inizia partita (13 turni)',exact=True).click()
+  expect(page.get_by_role('button',name='Inizia partita (13 turni per giocatore)',exact=True)).to_be_visible()
+  page.get_by_role('button',name='Inizia partita (13 turni per giocatore)',exact=True).click()
   assert page.evaluate('HellscapeUI.game.s.phase')=='ordinaria' and page.evaluate('HellscapeUI.game.s.valid')==0
-  assert page.evaluate('HellscapeUI.game.s.config.questionCount')==13 and page.evaluate('HellscapeUI.game.s.queue.length')==12
+  assert page.evaluate('HellscapeUI.game.s.config.questionCount')==39 and page.evaluate('HellscapeUI.game.s.queue.length')==38
   # A legacy settings profile with one probability still opens and starts with defaults.
   page.evaluate('()=>{const data=JSON.parse(localStorage.getItem("fool-settings-v1"));for(const v of Object.values(data.profiles)){delete v.turnCount;delete v.questionCount;delete v.bonusWeights;v.probability=90;v.seconds=60;v.quotas=Object.fromEntries(Object.keys(v.quotas).map(t=>[t,0]));let left=33;while(left)for(const t in v.quotas)if(left){v.quotas[t]++;left--}}localStorage.setItem("fool-settings-v1",JSON.stringify(data))}')
   page.goto(base+'Fool.html?settings=1');page.locator('#bank-choice').select_option(bank);expect(page.locator('#seconds')).to_have_value('60');expect(page.locator('#turn-count')).to_have_value('13')

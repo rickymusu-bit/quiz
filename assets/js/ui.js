@@ -200,7 +200,7 @@
         count = saved?.config?.questionCount ?? 33;
       if (!saved?.config?.turnCount)
         parent.append(node("p", "La partita salvata conserva la durata originaria di " + count +
-          " domande. Le nuove partite durano 13 turni totali.", "help"));
+          " domande. Le nuove partite durano 13 turni per giocatore.", "help"));
     } catch (e) {}
   }
   function leaveForHome() {
@@ -214,6 +214,16 @@
       window.hellscapePreviewHome();
       return;
     }
+    // When the game runs inside the fullscreen home iframe, restore the
+    // parent menu directly rather than navigating inside the iframe.
+    try {
+      if (window.parent !== window &&
+          window.parent.location.origin === location.origin &&
+          typeof window.parent.foolReturnHome === "function") {
+        window.parent.foolReturnHome();
+        return;
+      }
+    } catch (error) {}
     location.assign(new URL("./", location.href).href);
   }
   function goHome() {
@@ -260,10 +270,10 @@
       bonusWeights: { ...F.DEFAULT_BONUS_WEIGHTS },
       difficulty: "misto",
       turnCount: total,
-      questionCount: total,
+      questionCount: total * teamDraft.names.length,
       selectedTopics: Object.keys(F.topicCounts(bank.bank)),
       bases: { ...F.DEFAULT_BASE_POINTS },
-      quotas: balancedQuotas(total),
+      quotas: balancedQuotas(total * teamDraft.names.length),
     };
   }
   function balancedQuotas(total = F.DEFAULT_TURN_COUNT, selected = null) {
@@ -284,6 +294,8 @@
     return store.profiles();
   }
   function settingsConfig(value, names = teamDraft.names) {
+    const rounds = value.turnCount ?? F.DEFAULT_TURN_COUNT;
+    const questions = rounds * names.length;
     return {
       seconds: value.seconds,
       bonusWeights: {
@@ -291,8 +303,8 @@
         ...(value.bonusWeights ?? {}),
       },
       difficulty: "misto",
-      turnCount: value.turnCount ?? F.DEFAULT_TURN_COUNT,
-      questionCount: value.turnCount ?? F.DEFAULT_TURN_COUNT,
+      roundCount: rounds,
+      questionCount: questions,
       bases: value.bases,
       quotas: value.quotas,
       ...(value.selectedTopics ? {selectedTopics:value.selectedTopics} : {}),
@@ -302,17 +314,26 @@
     };
   }
   function migrateQuotas(value, total) {
-    const entries = Object.entries(value.quotas ?? {}).filter(([, n]) => n > 0);
-    const sum = entries.reduce((n, [, weight]) => n + weight, 0);
-    if (!sum) return balancedQuotas(total, new Set(value.selectedTopics ?? Object.keys(F.topicCounts(bank.bank))));
-    const quotas = Object.fromEntries(Object.keys(value.quotas).map(t => [t, 0]));
-    const fractions = entries.map(([topic, weight]) => {
-      const exact = weight / sum * total;
-      quotas[topic] = Math.floor(exact);
-      return {topic, fraction: exact - Math.floor(exact)};
-    }).sort((a,b) => b.fraction - a.fraction);
-    let left = total - Object.values(quotas).reduce((a,b) => a+b, 0);
-    for (const item of fractions) if (left-- > 0) quotas[item.topic]++;
+    const counts = F.topicCounts(bank.bank);
+    const selected = new Set(value.selectedTopics ??
+      Object.keys(value.quotas ?? {}).filter(t => value.quotas[t] > 0));
+    const topics = Object.keys(counts).filter(t => selected.has(t));
+    const quotas = Object.fromEntries(Object.keys(counts).map(t => [t, 0]));
+    const weights = Object.fromEntries(topics.map(t => [t, Math.max(0, value.quotas?.[t] ?? 0)]));
+    const weightSum = Object.values(weights).reduce((a, b) => a + b, 0);
+    if (!weightSum) return balancedQuotas(total, selected);
+    for (const t of topics)
+      quotas[t] = Math.min(counts[t], Math.floor(total * weights[t] / weightSum));
+    let left = total - Object.values(quotas).reduce((a, b) => a + b, 0);
+    while (left > 0) {
+      const possible = topics.filter(t => quotas[t] < counts[t]);
+      if (!possible.length) break;
+      possible.sort((a, b) =>
+        (total * weights[b] / weightSum - quotas[b]) -
+        (total * weights[a] / weightSum - quotas[a]));
+      quotas[possible[0]]++;
+      left--;
+    }
     return quotas;
   }
   function savedSettings() {
@@ -321,17 +342,18 @@
       if (value) {
         const total = value.turnCount ?? (value.questionCountConfirmed && value.questionCount !== 33
           ? value.questionCount : F.DEFAULT_TURN_COUNT);
-        let safe = value.turnCount ? value : {
-          ...value, turnCount: total, questionCount: total,
-          quotas: migrateQuotas(value, total),
+        // Previous profiles stored one quota per total turn rather than three
+        // questions per round. Preserve topic proportions while upgrading.
+        let safe = {
+          ...value, turnCount: total, questionCount: total * teamDraft.names.length,
+          quotas: migrateQuotas(value, total * teamDraft.names.length),
+          difficulty: "misto",
         };
-        // Normalize previously filtered profiles only for new games.
-        // Already-started games keep their original filter when restored.
-        safe = {...safe, difficulty: "misto"};
         const topics = safe.selectedTopics ?? Object.keys(safe.quotas).filter(t => safe.quotas[t] > 0),
           maximum = F.turnCapacity(bank.bank, topics, teamDraft.names.length);
         if (maximum > 0 && safe.turnCount > maximum)
-          safe = {...safe, turnCount:maximum, questionCount:maximum, quotas:migrateQuotas(safe,maximum)};
+          safe = {...safe, turnCount:maximum, questionCount:maximum * teamDraft.names.length,
+            quotas:migrateQuotas(safe,maximum * teamDraft.names.length)};
         F.prepare(
           bank.bank,
           settingsConfig(safe, ["Giocatore 1", "Giocatore 2", "Giocatore 3"]),
@@ -464,14 +486,14 @@
           "p",
           "Partita ordinaria: " +
             count +
-            " turni totali. Lo Ultimo Miglio si apre soltanto alla fine, in caso di parità al primo posto.",
+            " turni per giocatore (" + (count * teamDraft.names.length) + " turni complessivi). L'Ultimo Miglio si apre soltanto alla fine, in caso di parità al primo posto.",
           "help",
         ),
       );
       const row = node("div", undefined, "row");
       row.append(
         btn(
-          "Inizia partita (" + count + " turni)",
+          "Inizia partita (" + count + " turni per giocatore)",
           () => {
             rememberTeams();
             const chosen = savedSettings();
@@ -501,7 +523,7 @@
     time.append(
       node("h3", "Tempo e Omen"),
       input(
-        "Turni totali",
+        "Turni per giocatore",
         "turn-count",
         value.turnCount ?? F.DEFAULT_TURN_COUNT,
         "number",
@@ -539,7 +561,7 @@
       node("h3", "Distribuzione delle domande"),
       node(
         "p",
-        "Massimo turni = tutte le domande (facili + medie + difficili) negli argomenti selezionati ÷ numero di giocatori, arrotondato per difetto. Le quote devono sommare ai turni. Turni saltati o ceduti contano comunque; Malocchio non aggiunge un turno.",
+        "Massimo turni per giocatore = tutte le domande (facili + medie + difficili) negli argomenti selezionati ÷ numero di giocatori, arrotondato per difetto. Le quote devono sommare a turni × giocatori (numero di domande previste). Turni saltati o ceduti contano comunque; Malocchio non aggiunge un turno.",
         "muted",
       ),
     );
@@ -667,7 +689,7 @@
     const total = number("turn-count");
     if (!Number.isInteger(total) || total < 1)
       throw Error("Scegli un numero intero di turni compreso tra 1 e " + maximum);
-    drawQuotas(balancedQuotas(total, settingsTopics));
+    drawQuotas(balancedQuotas(total * teamDraft.names.length, settingsTopics));
   }
   function updateTurnLimit() {
     const counts = F.topicCounts(bank.bank),
@@ -678,7 +700,7 @@
     field.max = String(maximum);
     field.disabled = maximum === 0;
     field.parentElement.firstChild.textContent = maximum
-      ? "Turni totali (massimo " + maximum + ": " + available + " ÷ " + teamDraft.names.length + ") "
+      ? "Turni per giocatore (massimo " + maximum + ": " + available + " ÷ " + teamDraft.names.length + ") "
       : "Seleziona almeno " + teamDraft.names.length + " domande disponibili ";
     if (!maximum || Number(field.value) > maximum) field.value = String(maximum);
     else if (wasDisabled) field.value = String(Math.min(F.DEFAULT_TURN_COUNT, maximum));
@@ -702,7 +724,7 @@
       difficulty: "misto",
       selectedTopics: [...settingsTopics],
       turnCount: number("turn-count"),
-      questionCount: number("turn-count"),
+      questionCount: number("turn-count") * teamDraft.names.length,
       bases: Object.fromEntries(
         ["facile", "media", "difficile"].map((d) => [d, number("base-" + d)]),
       ),
@@ -1385,7 +1407,7 @@
       );
       b.append(summary);
     }
-    const controls = node("div", undefined, "row");
+    const controls = node("div", undefined, "row ending-home");
     controls.append(btn("Torna alla schermata iniziale", goHome, "primary"));
     b.append(controls, optionsToggle());
     return b;
@@ -1404,9 +1426,12 @@
     b.dataset.screen = s.screen;
     b.dataset.question = s.current?.id ?? "";
     b.dataset.paused = String(s.paused);
-    if (s.phase === "ordinaria" && s.config.turnCount) {
-      const number = Math.min(s.config.turnCount, s.completedTurns + (s.turnClosed ? 0 : 1));
-      b.append(node("div", "Turno " + number + " di " + s.config.turnCount, "eyebrow turn-progress"));
+    if (s.phase === "ordinaria" && (s.config.roundCount || s.config.turnCount)) {
+      const rounds = s.config.roundCount ?? s.config.turnCount;
+      const number = s.config.roundCount
+        ? Math.min(rounds, 1 + Math.floor(Math.max(0, s.completedTurns - (s.turnClosed ? 1 : 0)) / s.groups.length))
+        : Math.min(rounds, s.completedTurns + (s.turnClosed ? 0 : 1));
+      b.append(node("div", "Turno " + number + " di " + rounds, "eyebrow turn-progress"));
     }
     if (s.suspended) {
       b.append(
@@ -2130,7 +2155,7 @@
       if (copy.type === "salta") {
         const score = s.groups[s.owner].score, cost = F.rational(BigInt(score.n) * 11n, BigInt(score.d) * 100n);
         const after = F.add(score, F.rational(-BigInt(cost.n), BigInt(cost.d)));
-        d.append(node("p", "Costo a " + s.groups[s.owner].name + ": 11% · −" + F.formatScore(cost) + " pt (" + F.exact(cost) + " esatti). Punti: " + F.formatScore(score) + " → " + F.formatScore(after) + ". Il bersaglio salterà il prossimo turno; Sigillo blocca il salto, non il costo.", "chains-preview"));
+        d.append(node("p", "Costo a " + s.groups[s.owner].name + ": 11% · −" + F.formatScore(cost) + " pt. Punti: " + F.formatScore(score) + " → " + F.formatScore(after) + ". Il bersaglio salterà il prossimo turno; Sigillo blocca il salto, non il costo.", "chains-preview"));
       } else if (copy.type === "arsenico") {
         d.append(node("p", "Cedi soltanto questo turno. Il bersaglio perde l’11% corrente all’inizio di ciascuno dei prossimi 3 turni, anche se saltati. Sigillo blocca l’effetto; il turno resta ceduto.", "arsenico-preview"));
       } else if (copy.type === "marx") {
