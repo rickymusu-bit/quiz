@@ -22,7 +22,7 @@ try:
                 q.on('pageerror', lambda error: errors.append(str(error)))
                 q.clock.install()
                 q.goto(f'http://127.0.0.1:{server.server_port}/Fool.html?start=1')
-                q.get_by_role('button', name='Inizia partita (13 turni)', exact=True).click()
+                q.get_by_role('button', name='Inizia partita (13 turni per giocatore)', exact=True).click()
                 q.clock.pause_at(q.evaluate('Date.now()+1000'))
                 q.clock.run_for(2000)
                 q.evaluate('''kind => {
