@@ -59,6 +59,18 @@ sostituire il renderer. I punteggi e gli inventari iniziali sono fixture di prov
 l’attivazione di Arsenico passa dai controlli reali. Il rapporto registra revisione,
 impronte dei file runtime, viewport, durata e file acquisiti.
 
+Acquisizioni sulla revisione runtime `9a8398bc35967a0c3ed4c3f0a973d5957fcbcc2c`.
+Gli allegati vengono aggiunti in un commit successivo senza cambiare il runtime.
+Corsa/Arsenico: 4,5 s, 8 FPS; cattura: 5,2 s, 10 FPS; fuga/portale: 7,12 s,
+8 FPS; reazione finale: 6,75 s, 8 FPS. [Rapporto](evidence/report.json),
+[layout e Omen](evidence/omen-layout.json), [audit](evidence/render-audit.json).
+
+Esiti locali: 152 test Node e validazione dataset riusciti; suite frame e build
+riuscite; inseguimento e portale con 8 campioni offline viewport/DPR ciascuno;
+Omen con 5 configurazioni desktop/mobile/offline e controllo delle posizioni
+invertite. I rapporti dei tempi riportano il dispositivo virtuale di prova e
+non rappresentano una promessa di FPS su altri dispositivi.
+
 Le GIF sono registrazioni del browser, non animazioni generate del personaggio.
 La finestra desktop è 1366×768; le GIF sono esportate a 768×432.
 Lo screenshot mobile è 844×390, DPR 2. Il layout conserva domanda in basso che
