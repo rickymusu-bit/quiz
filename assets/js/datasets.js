@@ -109,7 +109,7 @@
         });
     }
   }
-  function parseDataset(text, katex) {
+  function parseDataset(text, katex, { requireAllDifficulties = false } = {}) {
     need(
       typeof text === "string" &&
         new TextEncoder().encode(text).length <= 20 * 1024 * 1024,
@@ -191,10 +191,13 @@
         });
       }
     }
-    need(
-      ["facile", "media", "difficile"].every(d => difficulties.has(d)),
-      "La banca deve includere domande facili, medie e difficili",
-    );
+    // Enforce full coverage only when loading a new catalogue entry. During
+    // restore, saved banks can legitimately contain a single historic level.
+    if (requireAllDifficulties)
+      need(
+        ["facile", "media", "difficile"].every(d => difficulties.has(d)),
+        "La banca deve includere domande facili, medie e difficili",
+      );
     return {
       title: typeof data.titolo === "string" ? data.titolo : "Banca domande",
       bank,
