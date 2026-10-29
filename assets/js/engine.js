@@ -353,7 +353,15 @@
         pos = (pos + 1) % s.order.length;
         const i = s.order[pos],
           g = s.groups[i];
-        if (g.out) continue;
+        if (g.out) {
+          // A round still contains the eliminated player's slot. Count it
+          // only for new per-player matches; old total-turn saves are unchanged.
+          if (s.config.roundCount !== undefined) {
+            s.completedTurns++;
+            if (s.completedTurns >= totalTurnLimit(s.config)) return null;
+          }
+          continue;
+        }
         // The personal-turn boundary is the only place that ticks Arsenico,
         // before Catene. Restore, render, reveal and Malocchio never tick it.
         this.applyArsenico(i);
