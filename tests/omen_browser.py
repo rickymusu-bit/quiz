@@ -22,7 +22,7 @@ try:
    assert v.locator('.hud-inventory').first.is_visible()
    v.evaluate('HellscapeUI.changed()');q.wait_for_timeout(50);assert v.locator('.player-window').first.get_attribute('open') is not None
    v.locator('.player-window summary').first.evaluate('e=>e.parentElement.open=false');q.wait_for_timeout(50)
-   select(v,'salta',s['target']);expect(v.locator('.chains-preview')).to_contain_text('110');confirm(v)
+   select(v,'salta',s['target']);expect(v.locator('.chains-preview')).to_contain_text('110');expect(v.locator('.chains-preview')).not_to_contain_text('esatti');expect(v.locator('.chains-preview')).not_to_contain_text('/');confirm(v)
    q.wait_for_timeout(2300);assert v.evaluate('Fool.exact(HellscapeUI.game.s.groups[HellscapeUI.game.s.owner].score)')=='890'
    # A fresh fixture avoids consuming the target's first poisoned turn via this Catene.
    v.evaluate('HellscapeUI.game.s.effects=[]');fixture(v)
