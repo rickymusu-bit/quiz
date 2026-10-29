@@ -1,3 +1,5 @@
+> Runtime corrente: [Cerbero v2](../../docs/cerbero-v2/README.md), otto pose canine disegnate, teste e coda articolate, presa con la bocca e lancio nella lava. I veicoli usano una sagoma rigida, con piccole oscillazioni delle sospensioni. I precedenti rig e le prese con mani descritti sotto sono storici.
+
 > Aggiornamento 29/10/2026: il runtime usa ora il [Cerbero carne approvato](../../docs/cerbero/README.md) e la fiala `arsenico-v1.png`. Le sezioni sugli atlanti bipedi qui sotto sono storiche; questi file non vengono più caricati dal gioco o dall’export offline.
 
 # Asset della corsa infernale

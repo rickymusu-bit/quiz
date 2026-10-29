@@ -4,49 +4,74 @@ const { test } = require("node:test"),
 const K = require("../assets/hell-cerbero.js"),
   M = require("../assets/hell-motion.js"),
   C = require("../assets/hell-chase.js");
-const near = (a, b, eps = 1e-6) =>
-  assert(Math.abs(a - b) < eps, `${a} != ${b}`);
-const body = { ...M.CHASE, runWeight: 1, pose: C.pose(0) };
-test("The canonical rig has three stable mouths, four legs and interpolates every joint exactly", () => {
+const near = (a, b, e = 1e-6) => assert(Math.abs(a - b) < e, `${a} != ${b}`),
+  body = { ...M.CHASE, runWeight: 1 };
+test("Three stable mouths and four drawn legs replace the elastic mesh and hand anchor", () => {
   assert.deepEqual(K.heads, ["left", "center", "right"]);
   assert.equal(K.legs.length, 4);
-  for (let frame = 0; frame < 16; frame++) {
-    const d = { ...body, pose: C.pose(frame) },
-      pose = K.sample(d, { distance: 23, time: 2 });
-    Object.values(K.points).forEach(([x, y], i) => {
-      const p = K.deform({ x, y }, pose);
-      near(p.x, pose.targets[i].x);
-      near(p.y, pose.targets[i].y);
-    });
-    const rig = K.geometry(d, { distance: 23, time: 2 });
-    assert.deepEqual(Object.keys(rig.mouths), K.heads);
-    for (const direction of Object.values(rig.directions)) {
-      near(Math.hypot(direction.x, direction.y), 1);
-      assert(
-        direction.x > 0.7,
-        "Each emission follows its forward-facing head",
-      );
+  assert.equal(K.deform, undefined);
+  for (let i = 0; i < 32; i++) {
+    const g = K.geometry(body, { distance: i, time: i / 48 });
+    assert.deepEqual(Object.keys(g.mouths), K.heads);
+    assert.equal(g.hand, undefined);
+    for (const id of K.heads) {
+      const h = g.heads[id],
+        actual = K.transform(h, h.definition.mouth);
+      near(actual.x, g.mouths[id].x);
+      near(actual.y, g.mouths[id].y);
+      near(Math.hypot(g.directions[id].x, g.directions[id].y), 1);
     }
   }
 });
-test("Planted feet have no world slide, and every stride joins continuously", () => {
-  for (const side of K.legs) {
-    const offset = ["hind_far", "front_near"].includes(side) ? M.STRIDE / 2 : 0;
-    const a = M.STRIDE * 0.1 - offset,
-      b = M.STRIDE * 0.4 - offset;
-    const p = K.geometry(body, { distance: a, time: a / 48 }).feet[side],
-      q = K.geometry(body, { distance: b, time: b / 48 }).feet[side];
-    near(p.x + a, q.x + b);
-    near(p.y, q.y);
+test("Necks remain attached and their painted bone lengths stay rigid through the gait", () => {
+  for (let i = 0; i < 64; i++) {
+    const g = K.geometry(body, { distance: i / 2, time: i / 96 });
+    for (const id of K.heads) {
+      const h = g.heads[id],
+        endpoint = K.transform(h.neck, g.def.headRoots[id]);
+      near(endpoint.x, h.root.x);
+      near(endpoint.y, h.root.y);
+      const a = g.def.neckRoots[id],
+        b = g.def.headRoots[id],
+        native = Math.hypot(a[0] - b[0], a[1] - b[1]);
+      near(
+        Math.hypot(h.root.x - h.neck.root.x, h.root.y - h.neck.root.y),
+        native * g.scale,
+      );
+    }
   }
-  for (const boundary of [0, 0.6, 1]) {
-    const a = K.legCycle((boundary - 1e-8) * M.STRIDE),
-      b = K.legCycle((boundary + 1e-8) * M.STRIDE);
-    near(a.x, b.x, 1e-4);
-    near(a.y, b.y, 1e-4);
-  }
+  assert.equal(
+    new Set(K.data.walk.map((f) => f.referenceWidth)).size,
+    1,
+    "Drawn body poses use one fixed uniform scale",
+  );
 });
-test("Rig sampling does not depend on render count or mutate presentation or game input", () => {
+test("Each head moves independently and the articulated tail visibly wags without stretching", () => {
+  const samples = Array.from({ length: 32 }, (_, i) =>
+    K.geometry(body, {
+      distance: (i * M.STRIDE) / 32,
+      time: (i * M.STRIDE) / 32 / 48,
+    }),
+  );
+  for (const id of K.heads) {
+    const values = samples.map((g) => g.heads[id].angle);
+    assert(
+      Math.max(...values) - Math.min(...values) > 0.2,
+      id + " has a real angular movement",
+    );
+  }
+  const tips = samples.map((g) => g.tailTip.y);
+  assert(Math.max(...tips) - Math.min(...tips) > 12, "Tail tip sweeps visibly");
+  for (const g of samples)
+    for (let i = 1; i < g.tail.length; i++) {
+      const source =
+          i === 1 ? K.data.parts.tail.joint1 : K.data.parts.tail.joint2,
+        p = K.transform(g.tail[i - 1], source);
+      near(p.x, g.tail[i].root.x);
+      near(p.y, g.tail[i].root.y);
+    }
+});
+test("Active time and distance determine identical poses at 30/60/144 Hz, pause and reduced motion", () => {
   const travel = { distance: 117, time: 3 },
     before = JSON.stringify({ body, travel }),
     reference = K.geometry(body, travel);
@@ -56,58 +81,25 @@ test("Rig sampling does not depend on render count or mutate presentation or gam
     assert.deepEqual(K.geometry(body, travel), reference);
   }
   assert.equal(JSON.stringify({ body, travel }), before);
-  assert.deepEqual(
-    K.geometry(body, travel),
-    reference,
-    "Frozen active clock means identical pose",
-  );
+  assert.deepEqual(K.geometry(body, travel), reference);
 });
-test("Capture and swallow use the same deformed anchors as the painted creature", () => {
+test("Capture keeps the rear of the car attached to the biting mouth, with no paw grip", () => {
   const state = {
       winner: 0,
       groups: [{ out: false }, { out: false }, { out: false }],
     },
     entry = C.defaultEntry(state),
     route = C.captureRoute(entry, 1, K.metrics());
-  for (let t = 0; t < C.T.capture; t += 0.03) {
+  for (let t = C.T.bite; t < C.T.release; t += 0.02) {
     const f = C.captureFrame(route, t),
-      g = K.geometry(f.demon);
-    near(g.hand.x, f.anchors.hand.x);
-    near(g.hand.y, f.anchors.hand.y);
-    near(g.mouth.x, f.anchors.mouth.x);
-    if (f.gripped) {
-      near(f.positions[1].x, g.hand.x);
-      near(f.positions[1].ground - f.positions[1].height / 2, g.hand.y);
-    }
-    if (f.swallowing) near(f.positions[1].clip, g.mouth.x);
+      g = K.geometry(f.demon),
+      v = f.positions[1];
+    assert(f.attached);
+    near(v.x - Math.cos(v.rotation) * v.width * 0.35, g.mouths.right.x);
+    near(
+      v.ground - v.height / 2 - Math.sin(v.rotation) * v.width * 0.35,
+      g.mouths.right.y,
+    );
+    assert.equal(g.hand, undefined);
   }
-});
-test("Every cinematic blend and gait retains mesh orientation without folds", () => {
-  const area = (a, b, c) =>
-    (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
-  for (let frame = 0; frame < 16; frame++)
-    for (let step = 0; step < 16; step++) {
-      const pose = K.sample(
-        {
-          ...body,
-          pose: C.mixPoses(C.pose(frame), C.pose((frame + 1) % 16), 0.5),
-        },
-        { distance: (step * M.STRIDE) / 16, time: step / 10 },
-      );
-      const v = K.vertices.map((q) =>
-        q.weights.reduce(
-          (p, w, i) => ({
-            x: p.x + w * pose.targets[i].x,
-            y: p.y + w * pose.targets[i].y,
-          }),
-          { x: 0, y: 0 },
-        ),
-      );
-      for (const t of K.triangles)
-        assert(
-          area(...t.map((i) => K.vertices[i])) * area(...t.map((i) => v[i])) >
-            0,
-          `Mesh fold at pose ${frame}, gait ${step}`,
-        );
-    }
 });

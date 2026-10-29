@@ -11,10 +11,11 @@ process.chdir(path.resolve(__dirname,'..'));
  for(const scale of [2,1]){
   const widths=[];
   for(let row=0;row<6;row++){
-   widths[row]=[];
+   widths[row]=[];let canonical;
    for(let frame=0;frame<8;frame++){
     const canvas=createCanvas(200,130),ctx=canvas.getContext('2d');
     const bounds=api.drawVehicle(ctx,row,frame,100,110,scale),pixels=visible(canvas);widths[row].push(pixels.width);
+    const pixelsRGBA=ctx.getImageData(0,0,200,130).data;if(frame===0)canonical=pixelsRGBA;else assert.deepEqual(pixelsRGBA,canonical,'Metal body pixels must not deform across requested drive frames');
     assert(pixels.width>15&&pixels.height>12);assert(pixels.left>0&&pixels.right<199&&pixels.top>0&&pixels.bottom<129);
 
    }

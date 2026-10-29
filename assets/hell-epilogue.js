@@ -52,6 +52,7 @@
     demon.worldDistance=camera.distance+demon.left-M.CHASE.left;
     demon.time=e.time+t;
     if(t>=T.escapeEnd){demon.runWeight=.12;demon.pose=mix(8,7,ease((t-T.escapeEnd)/.7));}
+    demon.animation=s.phase==='fire'?'fire':s.phase==='rage'?'rage':'walk';demon.actionTime=s.local;
     let impact=0,fireAge=null,hitAge=null;
     if(s.phase==='rage'){const action=rageAt(s.local);demon.pose=action.pose;impact=action.impact;hitAge=action.cycle-.46;}
     else if(s.phase==='fire'){demon.pose=s.local<.25?mix(7,10,ease(s.local/.25)):pose(10);fireAge=s.local-.2;}

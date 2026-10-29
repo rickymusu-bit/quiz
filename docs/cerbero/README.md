@@ -1,3 +1,5 @@
+> Documento storico: l’animazione a mesh v1 è stata respinta dall’utente. Il runtime corrente usa [fotogrammi e articolazioni v2](../cerbero-v2/README.md), con presa tramite bocca e lancio nella lava. Le verifiche e le GIF sotto riguardano soltanto la revisione storica indicata.
+
 # Cerbero carne e Arsenico — integrazione v1
 
 Design approvati dall’utente: «Approvo tutto, preferisco quello più rosso carne».

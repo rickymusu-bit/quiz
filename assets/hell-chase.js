@@ -3,19 +3,22 @@
   'use strict';
   const Motion=typeof module!=='undefined'?require('./hell-motion.js'):root.FoolMotion;
   const Bridge=typeof module!=='undefined'?require('./hell-bridge.js'):root.FoolBridge;
+  const Drawings=typeof module!=='undefined'?require('./hell-cerbero-frames.js'):root.FoolCerberoFrames;
+  const Throw=typeof module!=='undefined'?require('./hell-throw.js'):root.FoolThrow;
   const Finale=typeof module!=='undefined'?require('./hell-epilogue.js'):root.FoolEpilogue;
-  const T=Object.freeze({lineup:1.1,capture:5.2,pursuit:1.8,grip:.9,lift:1.2,mouth:2.05,swallow:2.45,hidden:3.05,recover:3.7});
+  const T=Object.freeze({lineup:1.1,capture:5.2,pursuit:1.8,bite:Drawings.capture.bite,lift:Drawings.capture.lift,release:Drawings.capture.release,impact:Drawings.capture.release+Throw.FLIGHT,hidden:Drawings.capture.release+Throw.FLIGHT+Throw.SINK,recover:3.7});
   const WIDTH=512;
   const {clamp,ease,lerp,travel}=Motion;
   function speed(t,duration,from,to){return lerp(from,to,ease(t/duration));}
   const pose=frame=>[{frame,weight:1}];
   function mixPoses(a,b,t){const weights=new Map();for(const [list,factor]of [[a,1-t],[b,t]])for(const p of list)weights.set(p.frame,(weights.get(p.frame)||0)+p.weight*factor);return [...weights].filter(([,w])=>w>.00001).map(([frame,weight])=>({frame,weight}));}
-  const KEYS=[[0,0],[T.grip,1],[T.lift,1],[1.65,2],[T.mouth,3],[T.swallow,4],[T.hidden,4],[3.4,6],[T.recover,7],[4.25,8],[T.capture,8]];
-  function capturePose(t){for(let i=1;i<KEYS.length;i++)if(t<KEYS[i][0])return mixPoses(pose(KEYS[i-1][1]),pose(KEYS[i][1]),ease((t-KEYS[i-1][0])/(KEYS[i][0]-KEYS[i-1][0])));return pose(8);}
-  function captureAction(t){return t<T.grip?'approach':t<T.lift?'grip':t<T.mouth?'lift':t<T.hidden?'swallow':t<T.recover?'chew':'recover';}
-  const fallbackMetric={height:.59,hand:{x:.9,y:.50},mouth:{x:.74,y:.32}};
-  function metrics(weights,frames){let height=0,hx=0,hy=0,mx=0,my=0;for(const p of weights){const m=frames?.[p.frame]||fallbackMetric;height+=m.height*p.weight;hx+=m.hand.x*p.weight;hy+=m.hand.y*p.weight;mx+=m.mouth.x*p.weight;my+=m.mouth.y*p.weight;}return {height,hand:{x:hx,y:hy},mouth:{x:mx,y:my}};}
-  function actorPoints(demon,frames){if(typeof frames?.actorPoints==='function')return frames.actorPoints(demon);const m=metrics(demon.pose,frames),top=demon.ground-m.height*demon.width;return {hand:{x:demon.left+m.hand.x*demon.width,y:top+m.hand.y*demon.width},mouth:{x:demon.left+m.mouth.x*demon.width,y:top+m.mouth.y*demon.width},top};}
+  const KEYS=Drawings.capture.angles.map(([time],frame)=>[time,frame]);
+  function captureIndex(t){let frame=0;for(const [at,index] of KEYS){if(at>t)break;frame=index;}return frame;}
+  function capturePose(t){return pose(captureIndex(t));}
+  function captureAction(t){return t<T.bite?'approach':t<T.lift?'bite':t<T.release?'windup':t<T.impact?'flight':t<T.hidden?'sink':'recover';}
+  const fallbackMetric={height:.7,mouth:{x:.93,y:.66}};
+  function metrics(weights,frames){let height=0,mx=0,my=0;for(const p of weights){const m=frames?.[p.frame]||fallbackMetric;height+=m.height*p.weight;mx+=m.mouth.x*p.weight;my+=m.mouth.y*p.weight;}return{height,mouth:{x:mx,y:my}};}
+  function actorPoints(demon,frames){if(typeof frames?.actorPoints==='function')return frames.actorPoints(demon);const m=metrics(demon.pose,frames),top=demon.ground-m.height*demon.width;return{mouth:{x:demon.left+m.mouth.x*demon.width,y:top+m.mouth.y*demon.width},top};}
   function defaultEntry(state,h={}){
     return {time:0,camera:{distance:0,speed:Motion.ROAD_SPEED},demon:{...Motion.CHASE,runWeight:1,pose:pose(0)},
       positions:state.groups.map((g,index)=>{const row=h.vehicleIndex?.(state,index)??index,size=h.vehicleSize?.(row)??{width:36,height:20};return {index,row,x:254+index*35,ground:270+index*25,...size};})};
@@ -39,30 +42,41 @@
     else if(t<p.duration)return {phase:'dance',local:seq};
     return {phase:'done',local:p.winner===null?3.2:3.6};
   }
+  function biteAnchor(anchors){return anchors.mouths?.right??anchors.mouth;}
+  function biteAngle(anchors){const d=anchors.directions?.right;return d?Math.atan2(d.y,d.x):0;}
+  function captureBody(route,time){
+    const t=clamp(time/T.capture)*T.capture,entry=route.entry,u=ease(t/T.bite),v=ease((t-T.recover)/(T.capture-T.recover));
+    const approach=travel(Math.min(t,T.bite),T.bite,entry.camera.speed,Motion.ROAD_SPEED);
+    const distance=entry.camera.distance+approach+Motion.ROAD_SPEED*Math.max(0,t-T.bite)+route.extra*v;
+    const speedNow=t<T.bite?speed(t,T.bite,entry.camera.speed,Motion.ROAD_SPEED):Motion.ROAD_SPEED+route.extra*6*clamp((t-T.recover)/(T.capture-T.recover))*(1-clamp((t-T.recover)/(T.capture-T.recover)))/(T.capture-T.recover);
+    const demon={left:t<T.bite?lerp(entry.demon.left,route.contact.left,u):lerp(route.contact.left,route.target.left,v),
+      ground:t<T.bite?lerp(entry.demon.ground,route.contact.ground,u):lerp(route.contact.ground,route.target.ground,v),
+      width:route.contact.width,runWeight:t<.65?1:t<2.15?0:lerp(0,1,v),
+      animation:t<.65||t>=2.3?'walk':'capture',captureTime:t,actionFrame:captureIndex(t),pose:capturePose(t),time:entry.time+t};
+    demon.worldDistance=distance+demon.left-Motion.CHASE.left;
+    return{demon,camera:{distance,speed:speedNow}};
+  }
   function captureRoute(entry,index,frames,{final=false}={}){
-    const victim={...entry.positions[index]},width=entry.demon.width,m=metrics(pose(1),frames);
-    const contact={left:victim.x-m.hand.x*width,ground:victim.ground-victim.height/2+(m.height-m.hand.y)*width,width};
+    const victim={...entry.positions[index]},width=entry.demon.width;
+    const probe={left:0,ground:0,width,runWeight:0,animation:'capture',captureTime:T.bite,actionFrame:5,pose:pose(5),worldDistance:0,time:0};
+    const anchors=actorPoints(probe,frames),mouth=biteAnchor(anchors),angle=biteAngle(anchors),centre=Throw.attachment(mouth,victim,0);
+    const contact={left:victim.x-centre.x,ground:victim.ground-victim.height/2-centre.y,width};
     const target={left:Motion.CHASE.left,ground:final?contact.ground:Motion.CHASE.ground,width};
-    const extra=Math.max(0,contact.left-target.left)+8;
-    return {entry,index,victim,contact,target,extra,frames};
+    const route={entry,index,victim,contact,target,extra:Math.max(0,contact.left-target.left)+8,frames,gripAngle:angle};
+    const release=captureBody(route,T.release),a=actorPoints(release.demon,frames);
+    route.flight=Throw.plan(victim,biteAnchor(a),biteAngle(a)-angle,release.camera,entry.time+T.release);
+    return route;
   }
   function captureFrame(route,time){
-    const t=Math.max(0,Math.min(T.capture,time)),entry=route.entry,u=ease(t/T.grip),v=ease((t-T.recover)/(T.capture-T.recover));
-    const approach=travel(Math.min(t,T.grip),T.grip,entry.camera.speed,Motion.ROAD_SPEED);
-    const cameraDistance=entry.camera.distance+approach+Motion.ROAD_SPEED*Math.max(0,t-T.grip)+route.extra*v;
-    const cameraSpeed=t<T.grip?speed(t,T.grip,entry.camera.speed,Motion.ROAD_SPEED):Motion.ROAD_SPEED+route.extra*6*clamp((t-T.recover)/(T.capture-T.recover))*(1-clamp((t-T.recover)/(T.capture-T.recover)))/(T.capture-T.recover);
-    const left=t<T.grip?lerp(entry.demon.left,route.contact.left,u):lerp(route.contact.left,route.target.left,v);
-    const ground=t<T.grip?lerp(entry.demon.ground,route.contact.ground,u):lerp(route.contact.ground,route.target.ground,v);
-    const runWeight=t<T.grip?lerp(entry.demon.runWeight??1,.12,u):lerp(.12,1,v);
-    const demon={left,ground,width:route.contact.width,pose:capturePose(t),runWeight,time:entry.time+t};
-    demon.worldDistance=cameraDistance+demon.left-Motion.CHASE.left;
-    const anchors=actorPoints(demon,route.frames),car={...route.victim,rotation:0,visible:t<T.hidden};
-    if(t>=T.grip&&t<T.mouth){car.x=anchors.hand.x;car.ground=anchors.hand.y+car.height/2;car.rotation=-.12*ease((t-T.grip)/(T.lift-T.grip));}
-    else if(t>=T.mouth&&t<T.swallow){const feed=ease((t-T.mouth)/(T.swallow-T.mouth));car.x=lerp(anchors.hand.x,anchors.mouth.x+car.width/2,feed);car.ground=lerp(anchors.hand.y,anchors.mouth.y,feed)+car.height/2;car.rotation=lerp(-.12,0,feed);}
-    else if(t>=T.swallow){const feed=ease((t-T.swallow)/(T.hidden-T.swallow));car.x=anchors.mouth.x+car.width/2-(car.width+2)*feed;car.ground=anchors.mouth.y+car.height/2;car.clip=anchors.mouth.x;}
-    const positions=entry.positions.map(p=>({...p,x:p.x}));
-    positions[route.index]=car;
-    return {phase:'capture',action:captureAction(t),time:entry.time+t,camera:{distance:cameraDistance,speed:cameraSpeed},demon,positions,anchors,victim:route.index,touching:t>=T.grip-.12&&t<T.mouth,gripped:t>=T.grip&&t<T.mouth,swallowing:t>=T.swallow&&t<T.hidden,swallowed:t>=T.hidden,flameAge:t-.18,flameAim:{x:route.victim.x,y:route.victim.ground-route.victim.height/2},flameDuration:.65};
+    const t=Math.max(0,Math.min(T.capture,time)),entry=route.entry,{demon,camera}=captureBody(route,t);
+    const anchors=actorPoints(demon,route.frames),car={...route.victim,rotation:0,visible:true};
+    const attached=t>=T.bite&&t<T.release;
+    if(attached){const angle=biteAngle(anchors)-route.gripAngle,centre=Throw.attachment(biteAnchor(anchors),car,angle);car.x=centre.x;car.ground=centre.y+car.height/2;car.rotation=angle;car.attached=true;}
+    if(t>=T.release)Object.assign(car,Throw.sample(route.flight,entry.time+t,camera));
+    const positions=entry.positions.map(p=>({...p}));positions[route.index]=car;
+    return{phase:'capture',action:captureAction(t),time:entry.time+t,camera,demon,positions,anchors,
+      victim:route.index,biteMouth:'right',bitten:attached,attached,airborne:!!car.airborne,sinking:!!car.sinking,
+      removed:t>=T.hidden,lavaImpact:car.impact??null};
   }
   function prepare(p,entry,frames){
     const ids=[...p.victims,...(p.winner===null?[]:[p.winner])];
@@ -98,12 +112,12 @@
       positions=start.positions.map(v=>({...v,visible:v.index===winner,x:v.index===winner?lerp(v.x,route.escapeX,u):v.x}));
       if(s.phase!=='winner-chase'){
         const seq=Math.max(0,t-p.chaseEnd);
-        if(winner===null){camera.distance+=Motion.ROAD_SPEED*seq;camera.speed=Motion.ROAD_SPEED;}
+        if(winner===null){camera.distance+=travel(Math.min(seq,1.2),1.2,Motion.ROAD_SPEED,0);camera.speed=speed(seq,1.2,Motion.ROAD_SPEED,0);demon.animation=camera.speed>.5?'walk':'celebrate';demon.runWeight=camera.speed>.5?1:0;}
       }
     }
     demon.worldDistance=camera.distance+demon.left-Motion.CHASE.left;
     return {phase:s.phase,local:s.local,time:entry.time+t,camera,demon,positions};
   }
-  const api={T,ease,lerp,travel,pose,mixPoses,capturePose,captureAction,actorPoints,defaultEntry,plan,sample,captureRoute,captureFrame,prepare,frame};
+  const api={T,ease,lerp,travel,pose,mixPoses,capturePose,captureIndex,captureAction,actorPoints,defaultEntry,plan,sample,captureRoute,captureFrame,prepare,frame};
   if(typeof module!=='undefined')module.exports=api;else root.FoolChase=api;
 })(globalThis);

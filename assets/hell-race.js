@@ -102,6 +102,9 @@
     return { width, height: width * frame.height / frame.width };
   }
   function drawVehicle(c, row, frame, x, ground, scale = 2) {
+    // The source atlas varies body length between drawings. A single canonical
+    // metal body is used in motion, outlines, captures and previews.
+    frame = 0;
     const size = vehicleSize(row, scale);
     const bounds = { x: x - size.width / 2, y: ground - size.height,
       width: size.width, height: size.height };
@@ -141,10 +144,9 @@
       vehicleSize:row=>imageReady(sheets.vehicles)?vehicleSize(row):{width:50,height:40},
       drawVehicle:(...args)=>{if(imageReady(sheets.vehicles))return drawVehicle(...args)},
       entry:visualState?.entry,
-      chaser:(c,d,t)=>drawChaserAt(c,t,d,false),
       runDust:(c,d,t)=>{if(t)root.FoolCerbero.dust(c,d,t);},
       travelFor:(time,distance)=>visualState.contacts.sample(time,distance),
-      onFrame:(frame,travel)=>{visualState.frame=frame;visualState.lastTravel=travel;if(frame.swallowed)visualState.consumed.add(frame.victim);},
+      onFrame:(frame,travel)=>{visualState.frame=frame;visualState.lastTravel=travel;if(frame.removed)visualState.consumed.add(frame.victim);},
       demon:(c)=>drawChaser(c,clock.snapshot())};
   }
   const clamp = (n, a, b) => Math.min(b, Math.max(a, n));
@@ -423,6 +425,7 @@
 
   const outlineFrames=new Map();
   function vehicleOutline(c, row, frame, x, ground) {
+    frame = 0;
     if (!imageReady(sheets.vehicles)) return;
     const source = vehicleRow(row)[frame], key = row + ':' + frame;
     let mask = outlineFrames.get(key);
@@ -511,8 +514,10 @@
       const group=state.groups[i],awaitingCapture=hold&&queue.some(q=>q.index===i);
       if(group.out&&!awaitingCapture&&!(shot?.type==='ira'&&shot.targets.includes(i)))continue;
       const vehicle=state.config.vehicles?.[i]||['chopper','pickup','ape'][i],p=positions[i],row=Math.max(0,VEHICLES.indexOf(vehicle));
-      if(i===state.respondent||(tieView?.blocking&&tieView.kind!=='elimination'&&state.tieOrder.includes(i)))vehicleOutline(c,row,Math.floor(movement*10+i*2)%8,p.x,p.y);
-      racer(c,p.x,p.y,i,movement,{...group,vehicle},2);
+      const ride=reduced?{heave:0,pitch:0}:motion.suspension(travel.distance,p.x,p.width);
+      c.save();c.translate(p.x,p.y+ride.heave);c.rotate(ride.pitch);
+      if(i===state.respondent||(tieView?.blocking&&tieView.kind!=='elimination'&&state.tieOrder.includes(i)))vehicleOutline(c,row,0,0,0);
+      racer(c,0,0,i,movement,{...group,vehicle},2);c.restore();
     }
     const staticTravel=reduced?{...travel,time:0,footfalls:[]}:travel;
     drawChaser(c,staticTravel,(tieView?.strength??0)*10);
@@ -542,7 +547,7 @@
     const caption = document.createElement('figcaption');
     caption.className = 'hell-race-caption';
     caption.textContent = final
-      ? (state.winner === null ? 'Il demone inghiotte l’ultimo veicolo, sputa fuoco verso l’alto e danza vittorioso. Nessun giocatore è fuggito.' : state.groups[state.winner].name + ' attraversa il portale che emerge dal terreno. Il varco sprofonda; il demone ruggisce, lo investe di fuoco, poi salta e batte i pugni a terra.')
+      ? (state.winner === null ? 'Cerbero afferra l’ultimo veicolo con una bocca e lo scaraventa nella lava, dove affonda. Nessun giocatore è fuggito.' : state.groups[state.winner].name + ' attraversa il portale che emerge dal terreno. Gli altri veicoli sono gettati nella lava con un morso. Dopo il crollo del varco Cerbero sputa fuoco da tutte e tre le bocche.')
       : 'Fuga dall’Inferno: le posizioni dei tre veicoli seguono i punteggi. La porta si avvicina con il procedere delle domande.';
     fig.appendChild(caption);
     const ammoStatus = document.createElement('span');

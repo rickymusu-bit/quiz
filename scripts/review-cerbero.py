@@ -1,4 +1,4 @@
-"""Record the integrated Cerberus and Arsenico in Chromium, without render overrides."""
+"""Historical v1 recording harness. Current correction: review-cerbero-v2.py."""
 from pathlib import Path
 from functools import partial
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler

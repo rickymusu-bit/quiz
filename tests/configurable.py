@@ -19,6 +19,7 @@ with sync_playwright() as p:
  for bank,width,height in [('termologia',1440,900),('introduzione-fisica-misura',844,390)]:
   page=b.new_page(viewport={'width':width,'height':height});page.on('pageerror',lambda e:errors.append(str(e)))
   page.goto(base+'Fool.html?settings=1');expect(page.get_by_role('heading',name='Impostazioni',exact=True)).to_be_visible();expect(page.locator('#question-count')).to_be_visible()
+  for level,points in [('facile',111),('media',222),('difficile',333)]:expect(page.locator('#base-'+level)).to_have_value(str(points))
   page.locator('#bank-choice').select_option(bank);expect(page.locator('#question-count')).to_have_value('33');expect(page.locator('#weight-marx')).to_have_value('15');expect(page.locator('#weight-ira')).to_have_value('5');fits(page)
   for count in [3,6,99]:
    page.locator('#question-count').fill(str(count));page.locator('#seconds').click()

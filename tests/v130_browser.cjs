@@ -28,7 +28,7 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/v130');fs.
       // Malocchio is exercised through the real inventory and confirmation UI.
       await page.evaluate(()=>{const g=HellscapeUI.game;g.s.groups[g.s.owner].inventory.push({id:g.uid(),type:'svela',target:null,origin:'browser'});HellscapeUI.changed();});await page.clock.runFor(100);
       await page.getByRole('button',{name:'Inventario',exact:true}).click();await page.locator('#dialog [data-ammo="svela"]').click();await page.locator('#ammo-info').getByRole('button',{name:'Usa',exact:true}).click();await page.locator('#dialog').getByRole('button',{name:'Conferma uso',exact:true}).click();
-      await page.clock.runFor(2500);assert.equal(await page.locator('.answers,.answer').count(),0);assert.equal(await page.locator('.question').count(),1);assert.match(await page.locator('.question-points').innerText(),/100 punti/);
+      await page.clock.runFor(2500);assert.equal(await page.locator('.answers,.answer').count(),0);assert.equal(await page.locator('.question').count(),1);assert.match(await page.locator('.question-points').innerText(),/111 punti/);
       const held=await page.evaluate(()=>HellscapeUI.game.left());await page.keyboard.press('a');await page.keyboard.press('Enter');await page.clock.runFor(2000);
       assert.equal(await page.evaluate(()=>HellscapeUI.game.s.screen),'choice');assert.equal(await page.evaluate(()=>HellscapeUI.game.left()),held);
       const q=await page.evaluate(()=>HellscapeUI.game.s.current.options);const accessible=await page.locator('.operation-body').ariaSnapshot();q.forEach(option=>assert(!accessible.includes(option)));

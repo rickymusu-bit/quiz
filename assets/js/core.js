@@ -26,6 +26,7 @@
     arsenico: "Scegli un avversario e rinunci subito al turno corrente. All’inizio dei suoi prossimi 3 turni personali, anche se saltati per Catene, perde l’11% del punteggio corrente: tre riduzioni composte esatte. Sigillo blocca e rimuove l’effetto. Non si accumula: un bersaglio già avvelenato non può riceverne un altro.",
     sacrificio: "Sacrifichi una vita e ottieni immediatamente 777 punti. Si applica solo a te e non è utilizzabile con Sigillo attivo. Se era la tua ultima vita sei eliminato comunque, anche dopo aver ricevuto i punti; altrimenti puoi continuare il turno.",
   };
+  const DEFAULT_BASE_POINTS = Object.freeze({ facile: 111, media: 222, difficile: 333 });
   const DEFAULT_BONUS_WEIGHTS = Object.fromEntries(
     TYPES.map((type) => [type, ["ira", "sacrificio"].includes(type) ? 5 : type === "marx" ? 15 : 30]),
   );
@@ -92,6 +93,7 @@
     TYPES,
     LABELS,
     DEFAULT_BONUS_WEIGHTS,
+    DEFAULT_BASE_POINTS,
     AMMO_HELP,
     clone,
     need,

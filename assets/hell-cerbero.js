@@ -1,461 +1,455 @@
-/* Approved Cerberus: one texture, connected rig, deterministic personal anchors.
-   All deformation is presentation-only. Coordinates refer to the canonical PNG. */
+/* Cerberus: drawn canine gait, independent rigid necks/jaws and articulated tail.
+   No mesh warping. Each emitted point follows the exact painted part transform. */
 (function (root) {
   "use strict";
   const M =
     typeof module !== "undefined"
       ? require("./hell-motion.js")
       : root.FoolMotion;
-  const SOURCE = Object.freeze({
-    width: 1536,
-    height: 1024,
-    left: 51,
-    top: 28,
-    right: 1502,
-    bottom: 998,
-  });
-  const SPAN = SOURCE.right - SOURCE.left,
-    HEIGHT = SOURCE.bottom - SOURCE.top;
-  const ASSET = "assets/hell-race/cerbero/carne-v1.png";
-  const clamp = M.clamp;
-  const points = {
-    rump: [535, 550],
-    back: [765, 395],
-    chest: [1010, 550],
-    belly: [820, 755],
-    neck_left: [1050, 310],
-    head_left: [1220, 152],
-    mouth_left: [1358, 216],
-    jaw_left: [1300, 278],
-    neck_center: [1085, 490],
-    head_center: [1240, 358],
-    mouth_center: [1361, 406],
-    jaw_center: [1310, 477],
-    neck_right: [1180, 630],
-    head_right: [1370, 600],
-    mouth_right: [1452, 655],
-    jaw_right: [1390, 724],
-    hip_hind_near: [575, 605],
-    knee_hind_near: [395, 790],
-    paw_hind_near: [287, 947],
-    hip_hind_far: [800, 650],
-    knee_hind_far: [660, 785],
-    paw_hind_far: [745, 907],
-    hip_front_near: [970, 680],
-    knee_front_near: [1005, 845],
-    paw_front_near: [1054, 996],
-    hip_front_far: [1205, 700],
-    knee_front_far: [1300, 830],
-    paw_front_far: [1362, 953],
-    tail_root: [485, 590],
-    tail_tip: [65, 440],
-  };
-  const names = Object.keys(points),
-    source = names.map((n) => ({ x: points[n][0], y: points[n][1] }));
-  const ids = Object.fromEntries(names.map((n, i) => [n, i]));
+  const D =
+    typeof module !== "undefined"
+      ? require("./hell-cerbero-frames.js")
+      : root.FoolCerberoFrames;
   const heads = ["left", "center", "right"],
     legs = ["hind_near", "hind_far", "front_near", "front_far"];
-  function rotate(p, origin, angle) {
-    const x = p.x - origin.x,
-      y = p.y - origin.y,
-      c = Math.cos(angle),
-      s = Math.sin(angle);
-    return { x: origin.x + x * c - y * s, y: origin.y + x * s + y * c };
+  const ASSETS = [
+    ...new Set(
+      [
+        ...D.walk.map((f) => f.asset),
+        D.parts.asset,
+        D.jaw?.asset,
+        D.flames?.asset,
+      ].filter(Boolean),
+    ),
+  ];
+  const ASSET = ASSETS[0],
+    SOURCE = { width: 1536, height: 1024 };
+  const images = {},
+    bundles = new WeakMap();
+  const rotate = (p, a) => ({
+    x: p.x * Math.cos(a) - p.y * Math.sin(a),
+    y: p.x * Math.sin(a) + p.y * Math.cos(a),
+  });
+  function canvas(w, h) {
+    if (root.document) {
+      const c = root.document.createElement("canvas");
+      c.width = w;
+      c.height = h;
+      return c;
+    }
+    return require("@napi-rs/canvas").createCanvas(w, h);
   }
-  function legCycle(distance, offset = 0) {
-    const phase = (((distance / M.STRIDE + offset) % 1) + 1) % 1,
-      stance = 0.6,
-      half = (M.STRIDE * stance) / 2;
-    if (phase < stance)
-      return { phase, contact: true, x: half - phase * M.STRIDE, y: 0 };
-    const u = (phase - stance) / (1 - stance),
-      m = -M.STRIDE * (1 - stance);
-    return {
-      phase,
-      contact: false,
-      x:
-        (2 * u * u * u - 3 * u * u + 1) * -half +
-        (u * u * u - 2 * u * u + u) * m +
-        (-2 * u * u * u + 3 * u * u) * half +
-        (u * u * u - u * u) * m,
-      y: -(Math.sin(Math.PI * u) ** 2) * 14,
-    };
+  function imageReady(im) {
+    return !!im && (im.naturalWidth || im.width) > 0 && im.complete !== false;
   }
-  // Pose keys retain the existing cinematic's timings and interpolation weights.
-  const poses = Array.from({ length: 16 }, () => ({
-    reach: 0,
-    lift: 0,
-    nod: 0,
-    fire: 0,
-    rage: 0,
-    pant: 0,
-  }));
-  Object.assign(poses[1], { reach: 1, lift: 0.12 });
-  Object.assign(poses[2], { reach: 0.7, lift: 0.7, nod: 0.03 });
-  Object.assign(poses[3], { reach: 0.9, lift: 1, nod: 0.05 });
-  Object.assign(poses[4], { reach: 0.5, lift: 0.9, nod: 0.12 });
-  Object.assign(poses[5], { reach: 0.4, lift: 0.65, nod: 0.1 });
-  Object.assign(poses[6], { reach: 0.2, lift: 0.2, nod: 0.05 });
-  Object.assign(poses[7], { pant: 1 });
-  Object.assign(poses[9], { rage: 0.5 });
-  Object.assign(poses[10], { fire: 1 });
-  Object.assign(poses[11], { rage: 1 });
-  [12, 13, 14, 15].forEach((i, k) =>
-    Object.assign(poses[i], {
-      nod: k % 2 ? -0.06 : 0.06,
-      rage: k % 2 ? 0.3 : 0,
-    }),
-  );
-  function parameters(weights) {
-    const out = { reach: 0, lift: 0, nod: 0, fire: 0, rage: 0, pant: 0 };
-    for (const p of weights ?? [{ frame: 8, weight: 1 }])
-      for (const k of Object.keys(out))
-        out[k] += (poses[p.frame]?.[k] ?? 0) * p.weight;
-    return out;
+  function ready(input = images) {
+    if (input === handle) input = images;
+    return ASSETS.every((path) => imageReady(input?.[path]));
   }
-  function sample(demon = {}, travel = {}) {
-    const run = clamp(demon.runWeight ?? 1),
-      distance = travel.distance ?? demon.worldDistance ?? 0,
-      time = travel.time ?? demon.time ?? 0;
-    const param = parameters(demon.pose),
-      targets = source.map((p) => ({ ...p })),
-      pixel = SPAN / (demon.width ?? M.CHASE.width);
-    const stride = (distance / M.STRIDE) * Math.PI * 2,
-      bob = run * (1 - Math.cos(stride * 2)) * 2.5;
-    const pant = param.pant * Math.sin(time * 5) * 2;
-    for (const p of targets) p.y -= bob + pant;
-    const move = (name, p) => {
-      targets[ids[name]] = p;
-    };
-    const base = (n) => targets[ids[n]];
-    heads.forEach((side, i) => {
-      const pivot = base("head_" + side),
-        neck = base("neck_" + side);
-      const nod =
-        param.nod +
-        run * Math.sin(stride + i * 0.8) * 0.025 -
-        param.fire * 0.18;
-      const recoil = param.fire * (1 + Math.sin(time * 19 + i) * 0.12) * 5;
-      for (const kind of ["head", "mouth", "jaw"]) {
-        const name = kind + "_" + side,
-          p = rotate(base(name), neck, nod * 0.13),
-          q = rotate(p, pivot, nod * 0.87);
-        q.x -= recoil;
-        q.y += param.rage * 7;
-        move(name, q);
+  const handle = {
+    get complete() {
+      return ready();
+    },
+    get naturalWidth() {
+      return ready() ? 1536 : 0;
+    },
+    get failed() {
+      return ASSETS.some((p) => images[p]?.failed);
+    },
+  };
+  function load(redraw = () => {}) {
+    if (typeof root.Image !== "function") return handle;
+    for (const path of ASSETS)
+      if (!images[path]) {
+        const im = new root.Image();
+        images[path] = im;
+        im.decoding = "async";
+        im.src = root.HellscapeOffline?.assets?.[path] || path;
+        im.addEventListener(
+          "load",
+          () => {
+            if (ready()) prepare();
+            redraw();
+          },
+          { once: true },
+        );
+        im.addEventListener(
+          "error",
+          () => {
+            im.failed = true;
+            redraw();
+          },
+          { once: true },
+        );
       }
-      // The lower jaw follows its own connected hinge; no detached emission source.
-      const jaw = base("jaw_" + side),
-        mouth = base("mouth_" + side);
-      jaw.y += (param.fire * 14 + param.lift * 9) * (i === 1 ? 1 : 0.6);
-      mouth.y += param.fire * 2;
+    return handle;
+  }
+  function crop(image, rect) {
+    const c = canvas(rect[2], rect[3]);
+    c.getContext("2d").drawImage(image, ...rect, 0, 0, rect[2], rect[3]);
+    return c;
+  }
+  function polygon(c, points) {
+    c.beginPath();
+    points.forEach(([x, y], i) => (i ? c.lineTo(x, y) : c.moveTo(x, y)));
+    c.closePath();
+    c.fill();
+  }
+  function headCrop(image, def) {
+    const c = crop(image, def.rect);
+    if (def.mask) {
+      const ctx = c.getContext("2d"),
+        mask = canvas(c.width, c.height),
+        m = mask.getContext("2d");
+      m.fillStyle = "#fff";
+      polygon(m, def.mask);
+      ctx.globalCompositeOperation = "destination-in";
+      ctx.drawImage(mask, 0, 0);
+      ctx.globalCompositeOperation = "source-over";
+    }
+    return c;
+  }
+  function prepare(input = images) {
+    if (input === handle) input = images;
+    if (!ready(input)) return null;
+    if (bundles.has(input)) return bundles.get(input);
+    const frames = D.walk.map((def, index) => {
+      const c = crop(input[def.asset], def.rect),
+        ctx = c.getContext("2d");
+      const necks = {};
+      for (const id of heads) {
+        const mask = canvas(768, 512),
+          mc = mask.getContext("2d"),
+          start = def.neckRoots[id],
+          end = def.headRoots[id];
+        mc.strokeStyle = "#fff";
+        mc.lineWidth = 54;
+        mc.lineCap = "round";
+        mc.beginPath();
+        mc.moveTo(...start);
+        mc.lineTo(...end);
+        mc.stroke();
+        const part = crop(input[def.asset], def.rect),
+          pc = part.getContext("2d");
+        pc.globalCompositeOperation = "destination-in";
+        pc.drawImage(mask, 0, 0);
+        ctx.globalCompositeOperation = "destination-out";
+        ctx.drawImage(mask, 0, 0);
+        necks[id] = part;
+      }
+      ctx.globalCompositeOperation = "source-over";
+      return { ...def, index, canvas: c, necks };
     });
-    legs.forEach((side, i) => {
-      const gait = legCycle(distance, [0, 0.5, 0.5, 0][i]);
-      const paw = base("paw_" + side),
-        knee = base("knee_" + side);
-      const busy = side === "front_near" ? param.reach : 0,
-        drive = run * (1 - busy);
-      const dx = gait.x * pixel * drive,
-        dy = gait.y * pixel * drive;
-      paw.x += dx;
-      paw.y += dy + bob + pant;
-      knee.x += dx * 0.45;
-      knee.y += dy * 0.55;
-      if (side === "front_near") {
-        paw.x += param.reach * 100;
-        paw.y -= param.lift * 150;
-        knee.x += param.reach * 40;
-        knee.y -= param.lift * 95;
-      }
-      if (side.startsWith("front")) {
-        paw.y += param.rage * 8;
-        knee.y += param.rage * 4;
-      }
+    frames.parts = Object.fromEntries(
+      heads.map((id) => [id, headCrop(input[D.parts.asset], D.parts[id])]),
+    );
+    const tail = crop(input[D.parts.asset], D.parts.tail.rect);
+    frames.tail = [
+      [340, 768],
+      [190, 365],
+      [0, 220],
+    ].map(([x1, x2]) => {
+      const c = canvas(768, 512),
+        ctx = c.getContext("2d");
+      ctx.beginPath();
+      ctx.rect(x1, 0, x2 - x1, 512);
+      ctx.clip();
+      ctx.drawImage(tail, 0, 0);
+      return c;
     });
-    const tail = base("tail_tip");
-    tail.y += Math.sin(stride * 0.5) * run * 18;
-    tail.x += Math.cos(stride * 0.5) * run * 5;
-    return {
-      targets,
-      run,
-      distance,
-      time,
-      parameters: param,
-      contacts: Object.fromEntries(
-        legs.map((n, i) => [
-          n,
-          legCycle(distance, [0, 0.5, 0.5, 0][i]).contact,
-        ]),
-      ),
-    };
-  }
-  // Thin-plate interpolation connects the same painted anatomy to every joint.
-  const normalized = source.map((p) => ({ x: p.x / SPAN, y: p.y / SPAN }));
-  const radial = (r2) => (r2 < 1e-16 ? 0 : r2 * Math.log(r2));
-  function inverse(matrix) {
-    const n = matrix.length,
-      a = matrix.map((row, i) =>
-        row.concat(Array.from({ length: n }, (_, j) => +(i === j))),
+    if (D.jaw)
+      frames.jaw = D.jaw.frames.map((f) => headCrop(input[D.jaw.asset], f));
+    if (D.flames)
+      frames.flames = D.flames.frames.map((f) =>
+        crop(input[D.flames.asset], f.rect),
       );
-    for (let i = 0; i < n; i++) {
-      let pivot = i;
-      for (let j = i + 1; j < n; j++)
-        if (Math.abs(a[j][i]) > Math.abs(a[pivot][i])) pivot = j;
-      [a[i], a[pivot]] = [a[pivot], a[i]];
-      const value = a[i][i];
-      if (Math.abs(value) < 1e-12) throw Error("Cerbero: singular rig");
-      for (let k = 0; k < 2 * n; k++) a[i][k] /= value;
-      for (let j = 0; j < n; j++)
-        if (j !== i) {
-          const factor = a[j][i];
-          for (let k = 0; k < 2 * n; k++) a[j][k] -= factor * a[i][k];
-        }
-    }
-    return a.map((row) => row.slice(n));
-  }
-  const count = source.length,
-    matrix = Array.from({ length: count + 3 }, () => Array(count + 3).fill(0));
-  for (let i = 0; i < count; i++) {
-    for (let j = 0; j < count; j++)
-      matrix[i][j] = radial(
-        (normalized[i].x - normalized[j].x) ** 2 +
-          (normalized[i].y - normalized[j].y) ** 2,
-      );
-    matrix[i][count] = matrix[count][i] = 1;
-    matrix[i][count + 1] = matrix[count + 1][i] = normalized[i].x;
-    matrix[i][count + 2] = matrix[count + 2][i] = normalized[i].y;
-  }
-  const inv = inverse(matrix);
-  function weights(p) {
-    const x = p.x / SPAN,
-      y = p.y / SPAN,
-      basis = normalized
-        .map((q) => radial((x - q.x) ** 2 + (y - q.y) ** 2))
-        .concat([1, x, y]);
-    return source.map((_, j) =>
-      basis.reduce((sum, v, i) => sum + v * inv[i][j], 0),
-    );
-  }
-  function deform(p, pose) {
-    const w = weights(p);
-    return w.reduce(
-      (out, v, i) => ({
-        x: out.x + v * pose.targets[i].x,
-        y: out.y + v * pose.targets[i].y,
-      }),
-      { x: 0, y: 0 },
-    );
-  }
-  const columns = 16,
-    rows = 12,
-    vertices = [],
-    triangles = [];
-  for (let y = 0; y <= rows; y++)
-    for (let x = 0; x <= columns; x++) {
-      const p = {
-        x: (x * SOURCE.width) / columns,
-        y: (y * SOURCE.height) / rows,
-      };
-      vertices.push({ ...p, weights: weights(p) });
-    }
-  for (let y = 0; y < rows; y++)
-    for (let x = 0; x < columns; x++) {
-      const a = y * (columns + 1) + x,
-        b = a + 1,
-        c = a + columns + 1,
-        d = c + 1;
-      triangles.push([a, b, c], [d, c, b]);
-    }
-  function geometry(demon, travel) {
-    const pose = sample(demon, travel),
-      scale = demon.width / SPAN;
-    const world = (p) => ({
-      x: demon.left + (p.x - SOURCE.left) * scale,
-      y: demon.ground + (p.y - SOURCE.bottom) * scale,
-    });
-    const mouthPoints = Object.fromEntries(
-      heads.map((s) => [s, world(pose.targets[ids["mouth_" + s]])]),
-    );
-    const directions = Object.fromEntries(
-      heads.map((s) => {
-        const o = points["mouth_" + s],
-          tip = deform({ x: o[0] + 70, y: o[1] - 5 }, pose),
-          a = mouthPoints[s],
-          b = world(tip),
-          l = Math.hypot(b.x - a.x, b.y - a.y);
-        return [s, { x: (b.x - a.x) / l, y: (b.y - a.y) / l }];
-      }),
-    );
-    return {
-      ...pose,
-      hand: world(pose.targets[ids.paw_front_near]),
-      mouth: mouthPoints.center,
-      mouths: mouthPoints,
-      directions,
-      feet: Object.fromEntries(
-        legs.map((s) => [s, world(pose.targets[ids["paw_" + s]])]),
-      ),
-      top: demon.ground - HEIGHT * scale,
-    };
-  }
-  let metricCache = null;
-  function metrics() {
-    if (metricCache) return metricCache;
-    const frames = poses.map((_, frame) => {
-      const g = geometry({
-        left: 0,
-        ground: HEIGHT / SPAN,
-        width: 1,
-        pose: [{ frame, weight: 1 }],
-        runWeight: 0,
-      });
-      return { height: HEIGHT / SPAN, hand: g.hand, mouth: g.mouth };
-    });
-    frames.actorPoints = (d) => geometry(d);
-    metricCache = frames;
+    bundles.set(input, frames);
     return frames;
   }
-  let art = null;
-  function load(redraw = () => {}) {
-    if (!art && typeof root.Image === "function") {
-      art = new root.Image();
-      art.decoding = "async";
-      art.src = root.HellscapeOffline?.assets?.[ASSET] || ASSET;
-      art.addEventListener("load", redraw, { once: true });
-      art.addEventListener(
-        "error",
-        () => {
-          art.failed = true;
-          redraw();
-        },
-        { once: true },
-      );
+  const CAPTURE_ANGLES = D.capture.angles;
+  function captureAngle(t) {
+    for (let i = 1; i < CAPTURE_ANGLES.length; i++) {
+      const [at, a] = CAPTURE_ANGLES[i],
+        [old, b] = CAPTURE_ANGLES[i - 1];
+      if (t < at) return M.lerp(b, a, M.ease((t - old) / (at - old)));
     }
-    return art;
+    return 0.02;
   }
-  function ready(image = art) {
-    return (
-      !!image &&
-      (image.naturalWidth || image.width) > 0 &&
-      image.complete !== false
+  function captureTime(d) {
+    if (d.captureTime !== undefined) return d.captureTime;
+    return CAPTURE_ANGLES[Math.min(15, d.actionFrame ?? 0)][0];
+  }
+  function jawIndex(d, t) {
+    if (d.animation !== "capture") return -1;
+    return t < 0.81
+      ? 0
+      : t < D.capture.bite
+        ? 1
+        : t < D.capture.release
+          ? 2
+          : 3;
+  }
+  function transform(part, point) {
+    const p = rotate(
+      {
+        x: (point[0] - part.sourceRoot[0]) * part.scale,
+        y: (point[1] - part.sourceRoot[1]) * part.scale,
+      },
+      part.angle,
     );
+    return { x: part.root.x + p.x, y: part.root.y + p.y };
   }
-  function render(c, demon, travel = {}, image = art) {
-    if (!ready(image)) return null;
-    const pose = sample(demon, travel),
-      deformed = vertices.map((v) =>
-        v.weights.reduce(
-          (o, w, i) => ({
-            x: o.x + w * pose.targets[i].x,
-            y: o.y + w * pose.targets[i].y,
-          }),
-          { x: 0, y: 0 },
-        ),
-      );
-    const scale = demon.width / SPAN;
+  function sample(demon = {}, travel = {}) {
+    const width = demon.width ?? M.CHASE.width,
+      unit = width / M.CHASE.width,
+      run = M.clamp(demon.runWeight ?? 1);
+    const distance = travel.distance ?? demon.worldDistance ?? 0,
+      time = travel.time ?? demon.time ?? 0;
+    const capture = demon.animation === "capture",
+      fire = demon.animation === "fire",
+      rage = demon.animation === "rage",
+      celebrate = demon.animation === "celebrate";
+    const index =
+      !capture && !fire && run > 0.35
+        ? ((Math.floor((distance / M.STRIDE) * D.walk.length) % D.walk.length) +
+            D.walk.length) %
+          D.walk.length
+        : 0;
+    const def = D.walk[index],
+      scale = width / def.referenceWidth;
+    const rootPoint = {
+      x: (demon.left ?? M.CHASE.left) + width * 0.4,
+      y:
+        (demon.ground ?? M.CHASE.ground) -
+        (def.bounds[3] - def.root[1]) * scale,
+    };
+    const phase = (distance / M.STRIDE) * Math.PI * 2,
+      t = captureTime(demon),
+      j = jawIndex(demon, t);
+    const world = (p) => ({
+      x: rootPoint.x + (p[0] - def.root[0]) * scale,
+      y: (demon.ground ?? M.CHASE.ground) + (p[1] - def.bounds[3]) * scale,
+    });
+    const headParts = Object.fromEntries(
+      heads.map((id, i) => {
+        const jaw = id === "right" && D.jaw,
+          jawFrame = j >= 0 ? j : fire ? 1 : 0,
+          part = jaw ? D.jaw.frames[jawFrame] : D.parts[id];
+        let neckAngle =
+          Math.sin((run > 0.35 ? phase : time * 0.8) + i * 1.45) *
+          (0.018 + run * 0.055);
+        let tilt =
+          [-0.04, 0.02, 0.03][i] +
+          Math.sin((run > 0.35 ? phase : time * 0.8) + i * 1.45 + 0.5) *
+            (0.025 + run * 0.1);
+        if (capture) {
+          neckAngle = i === 2 ? captureAngle(t) : Math.sin(t * 4 + i) * 0.035;
+          tilt = i === 2 ? 0.1 : 0;
+        }
+        if (rage) {
+          neckAngle = Math.sin((demon.actionTime ?? time) * 9 + i) * 0.11;
+          tilt = Math.sin((demon.actionTime ?? time) * 9 + i + 0.5) * 0.13;
+        }
+        if (fire) {
+          const onset = M.ease((demon.actionTime ?? 0) / 0.22);
+          neckAngle = M.lerp(neckAngle, [-0.14, -0.04, 0.06][i], onset);
+          tilt = M.lerp(
+            tilt,
+            [-0.1, 0, 0.09][i] + Math.sin(time * 13 + i) * 0.025,
+            onset,
+          );
+        }
+        const neck = {
+          root: world(def.neckRoots[id]),
+          sourceRoot: def.neckRoots[id],
+          angle: neckAngle,
+          scale,
+        };
+        const p = {
+          id,
+          root: transform(neck, def.headRoots[id]),
+          sourceRoot: part.root,
+          angle: neckAngle + tilt,
+          scale: part.scale * unit,
+          jaw: jaw ? jawFrame : -1,
+          definition: part,
+          neck,
+          unit,
+        };
+        p.mouth = transform(p, part.mouth);
+        const end = transform(p, part.muzzle),
+          length = Math.hypot(end.x - p.mouth.x, end.y - p.mouth.y) || 1;
+        p.direction = {
+          x: (end.x - p.mouth.x) / length,
+          y: (end.y - p.mouth.y) / length,
+        };
+        return [id, p];
+      }),
+    );
+    const td = D.parts.tail,
+      tailScale = td.scale * unit,
+      tailRoot = world(def.tailRoot);
+    const wag = run > 0.35 ? phase * 2 : celebrate ? time * 6 : time * 1.3,
+      strength = celebrate ? 1 : 0.15 + run * 0.85;
+    const tail = [
+      {
+        root: tailRoot,
+        sourceRoot: td.root,
+        angle: Math.sin(wag) * 0.22 * strength,
+        scale: tailScale,
+      },
+    ];
+    tail.push({
+      root: transform(tail[0], td.joint1),
+      sourceRoot: td.joint1,
+      angle: tail[0].angle + Math.sin(wag - 0.7) * 0.2 * strength,
+      scale: tailScale,
+    });
+    tail.push({
+      root: transform(tail[1], td.joint2),
+      sourceRoot: td.joint2,
+      angle: tail[1].angle + Math.sin(wag - 1.3) * 0.18 * strength,
+      scale: tailScale,
+    });
+    return {
+      index,
+      def,
+      scale,
+      root: rootPoint,
+      heads: headParts,
+      tail,
+      time,
+      distance,
+      run,
+    };
+  }
+  function geometry(demon = {}, travel = {}) {
+    const s = sample(demon, travel),
+      world = (p) => ({
+        x: s.root.x + (p[0] - s.def.root[0]) * s.scale,
+        y:
+          (demon.ground ?? M.CHASE.ground) + (p[1] - s.def.bounds[3]) * s.scale,
+      });
+    return {
+      ...s,
+      mouths: Object.fromEntries(heads.map((id) => [id, s.heads[id].mouth])),
+      directions: Object.fromEntries(
+        heads.map((id) => [id, s.heads[id].direction]),
+      ),
+      mouth: s.heads.right.mouth,
+      contact: world(s.def.contact),
+      feet: Object.fromEntries(legs.map((id) => [id, world(s.def.feet[id])])),
+      tailTip: transform(s.tail[2], D.parts.tail.tip),
+      top: (demon.ground ?? M.CHASE.ground) - widthHeight(demon),
+    };
+  }
+  function widthHeight(d) {
+    return (d.width ?? M.CHASE.width) * 0.7;
+  }
+  function paintPart(c, image, part) {
     c.save();
-    c.translate(
-      demon.left - SOURCE.left * scale,
-      demon.ground - SOURCE.bottom * scale,
-    );
-    c.scale(scale, scale);
+    c.translate(part.root.x, part.root.y);
+    c.rotate(part.angle);
+    c.scale(part.scale, part.scale);
+    c.drawImage(image, -part.sourceRoot[0], -part.sourceRoot[1]);
+    c.restore();
+  }
+  function render(c, demon, travel = {}, input = images) {
+    const atlas = prepare(input);
+    if (!atlas) return null;
+    const s = sample(demon, travel),
+      body = atlas[s.index];
+    c.save();
     c.imageSmoothingEnabled = true;
     c.imageSmoothingQuality = "high";
-    for (const triangle of triangles) {
-      const [s0, s1, s2] = triangle.map((i) => vertices[i]),
-        [t0, t1, t2] = triangle.map((i) => deformed[i]);
-      const ux = s1.x - s0.x,
-        uy = s1.y - s0.y,
-        vx = s2.x - s0.x,
-        vy = s2.y - s0.y,
-        det = ux * vy - uy * vx;
-      const ax = ((t1.x - t0.x) * vy - (t2.x - t0.x) * uy) / det,
-        ay = ((t1.y - t0.y) * vy - (t2.y - t0.y) * uy) / det,
-        bx = ((t2.x - t0.x) * ux - (t1.x - t0.x) * vx) / det,
-        by = ((t2.y - t0.y) * ux - (t1.y - t0.y) * vx) / det;
-      c.save();
-      c.transform(
-        ax,
-        ay,
-        bx,
-        by,
-        t0.x - ax * s0.x - bx * s0.y,
-        t0.y - ay * s0.x - by * s0.y,
-      );
-      const cx = (s0.x + s1.x + s2.x) / 3,
-        cy = (s0.y + s1.y + s2.y) / 3;
-      c.beginPath();
-      for (let i = 0; i < 3; i++) {
-        const p = [s0, s1, s2][i],
-          factor = 1.004,
-          x = cx + (p.x - cx) * factor,
-          y = cy + (p.y - cy) * factor;
-        i ? c.lineTo(x, y) : c.moveTo(x, y);
-      }
-      c.closePath();
-      c.clip();
-      const x = Math.min(s0.x, s1.x, s2.x),
-        y = Math.min(s0.y, s1.y, s2.y),
-        w = Math.max(s0.x, s1.x, s2.x) - x,
-        h = Math.max(s0.y, s1.y, s2.y) - y;
-      c.drawImage(image, x, y, w, h, x, y, w, h);
-      c.restore();
+    for (let i = 2; i >= 0; i--) paintPart(c, atlas.tail[i], s.tail[i]);
+    c.drawImage(
+      body.canvas,
+      s.root.x - s.def.root[0] * s.scale,
+      (demon.ground ?? M.CHASE.ground) - s.def.bounds[3] * s.scale,
+      body.canvas.width * s.scale,
+      body.canvas.height * s.scale,
+    );
+    for (const id of heads) {
+      const head = s.heads[id];
+      paintPart(c, body.necks[id], head.neck);
+      paintPart(c, head.jaw >= 0 ? atlas.jaw[head.jaw] : atlas.parts[id], head);
     }
+
     c.restore();
     return geometry(demon, travel);
   }
-  function prepare(image) {
-    return ready(image)
-      ? metrics().map((m, index) => ({ index, metrics: m }))
-      : null;
+  function metrics() {
+    const frames = Array.from({ length: 16 }, () => ({
+      height: 0.7,
+      mouth: { x: 0.92, y: 0.65 },
+    }));
+    frames.actorPoints = (d) => geometry(d);
+    return frames;
   }
   function dust(c, demon, travel) {
-    if ((demon.runWeight ?? 1) < 0.2) return;
-    const scale = demon.width / M.CHASE.width;
+    if ((demon.runWeight ?? 1) < 0.35) return;
+    const unit = (demon.width ?? 221) / 221;
     for (const event of travel?.footfalls ?? []) {
       const age = travel.time - event.at;
       if (age < 0 || age > 0.35) continue;
       const distance = (event.index * M.STRIDE) / 2;
       const birth = geometry(
-        { ...demon, left: demon.left + distance - travel.distance },
-        { distance, time: event.at },
-      );
-      legs.forEach((side, i) => {
-        if (((event.index % 2) + 2) % 2 !== [0, 1, 1, 0][i]) return;
-        const foot = birth.feet[side];
-        c.save();
-        c.globalAlpha *= 0.5 * (1 - age / 0.35);
-        for (let n = 0; n < 5; n++) {
-          const spread = (n - 2) * age * 24 * scale,
-            y =
-              foot.y - Math.sin((age / 0.35) * Math.PI) * (2 + (n % 3)) * scale;
-          c.fillStyle = n % 2 ? "#b9a18a" : "#6d5c4d";
-          c.fillRect(foot.x + spread, y, 2 * scale, scale);
-        }
-        c.restore();
-      });
+          { ...demon, left: demon.left + distance - travel.distance },
+          { distance, time: event.at },
+        ),
+        p = birth.contact;
+      c.save();
+      c.globalAlpha *= 0.4 * (1 - age / 0.35);
+      c.fillStyle = "#a88969";
+      for (let i = 0; i < 5; i++)
+        c.fillRect(
+          p.x + (i - 2) * age * 22,
+          p.y - Math.sin((age / 0.35) * Math.PI) * (2 + (i % 3)) * unit,
+          2 * unit,
+          unit,
+        );
+      c.restore();
     }
+  }
+  function flame(c, id, age, head, duration = 1.3, input = images) {
+    if (age < 0 || age >= duration) return;
+    const atlas = prepare(input);
+    if (!atlas?.flames) return false;
+    const index =
+        (Math.floor(age * 18) + heads.indexOf(id)) % atlas.flames.length,
+      def = D.flames.frames[index];
+    const envelope =
+      M.ease(age / 0.12) * (1 - M.ease((age - duration + 0.22) / 0.22));
+    const angle = Math.atan2(head.direction.y, head.direction.x),
+      width = 145 * (head.unit ?? 1) * envelope;
+    if (!envelope) return true;
+    c.save();
+    c.translate(head.mouth.x, head.mouth.y);
+    c.rotate(angle);
+    c.scale(width / def.length, width / def.length);
+    c.drawImage(atlas.flames[index], -def.source[0], -def.source[1]);
+    c.restore();
+    return true;
   }
   const api = {
     ASSET,
+    ASSETS,
     SOURCE,
-    points,
     heads,
     legs,
-    legCycle,
-    parameters,
-    sample,
-    deform,
-    geometry,
-    metrics,
+    data: D,
     load,
     ready,
-    render,
     prepare,
+    sample,
+    geometry,
+    metrics,
+    render,
     dust,
-    vertices,
-    triangles,
+    flame,
+    transform,
+    captureAngle,
   };
   if (typeof module !== "undefined") module.exports = api;
   else root.FoolCerbero = api;

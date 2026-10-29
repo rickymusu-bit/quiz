@@ -23,10 +23,10 @@ async function nativeCoverage(){
    maxSourceScale:Math.max(racePixels,previewPixels)/frame.width};
  });
  if(vehicles.some(v=>v.maxSourceScale>1))throw Error('A vehicle needs more native pixels at the current race/preview sizes');
- const K=require('../assets/hell-cerbero.js'),sourceWidth=K.SOURCE.right-K.SOURCE.left;
+ const K=require('../assets/hell-cerbero.js'),sourceWidth=Math.min(...K.data.walk.map(f=>f.referenceWidth));
  const demonRasterWidth=scene.FoolMotion.CHASE.width*rasterScaleMax;
- return {revision,rasterScaleMax,vehicles,cerbero:{source:K.ASSET,native:[K.SOURCE.width,K.SOURCE.height],
-  textureWidth:sourceWidth,poses:K.metrics().length,triangles:K.triangles.length,
+ return {revision,rasterScaleMax,vehicles,cerbero:{sources:K.ASSETS,native:[K.SOURCE.width,K.SOURCE.height],
+  textureWidth:sourceWidth,poses:K.data.walk.length,necks:K.heads.length,tailSegments:3,
   maxRasterWidth:demonRasterWidth,maxSourceScale:demonRasterWidth/sourceWidth}};
 }
 (async()=>{
@@ -49,7 +49,7 @@ async function nativeCoverage(){
     const start=performance.now();await new Promise(resolve=>setTimeout(resolve,2500));const elapsed=performance.now()-start;
     window.requestAnimationFrame=raf;ctx.setTransform=transform;
     const sorted=costs.slice().sort((a,b)=>a-b),frames=FoolEnding.prepare(FoolEnding.load(()=>{}));
-    const sourceFiles=['vehicles-drive-v1.webp','cerbero/carne-v1.png','arsenico-v1.png','ammo-relics-v1.webp','black-stone-bridge-v1.png','lava-sea-v2.png','portal-side-v3.png','portal-rocks-v1.png','victory-title-v1.webp','sacrificio-v1.png'];
+    const sourceFiles=['vehicles-drive-v1.webp',...FoolCerbero.ASSETS.map(p=>p.replace('assets/hell-race/','')),'arsenico-v1.png','ammo-relics-v1.webp','black-stone-bridge-v1.png','lava-sea-v2.png','portal-side-v3.png','portal-rocks-v1.png','victory-title-v1.webp','sacrificio-v1.png'];
     const sources=await Promise.all(sourceFiles.map(async name=>{const img=new Image();img.src='assets/hell-race/'+name;await img.decode();return {name,width:img.naturalWidth,height:img.naturalHeight};}));
     return {raster:[canvas.width,canvas.height],rgbaBytes:canvas.width*canvas.height*4,cssWidth:canvas.getBoundingClientRect().width,smoothing:ctx.imageSmoothingEnabled,frames:times.length,elapsedMs:elapsed,paintFPS:times.length*1000/elapsed,paintCallbackP95ms:sorted[Math.floor(sorted.length*.95)]??null,timingMetric:'RAF callback wall duration, includes scheduling and GC; not a CPU profiler',cerberoSource:[FoolCerbero.SOURCE.width,FoolCerbero.SOURCE.height],sources};
    });
