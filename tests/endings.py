@@ -50,10 +50,12 @@ with sync_playwright() as p:
   assert box and box['x']>=0 and box['y']>=0 and box['x']+box['width']<=page.viewport_size['width'] and box['y']+box['height']<=page.viewport_size['height'],box
   if winner==0:
    page.screenshot(path=str(ART/'victory-home-visible.png'))
+  if frames:frames[0].save(ART/f'{name}.gif',save_all=True,append_images=frames[1:],duration=[100]*(len(frames)-1)+[1500],loop=0,optimize=True)
+  checks.append({'ending':name,'phases':sorted(phase_set),'victims':page.evaluate('window.__endingPlan.victims')})
+  if winner==0:
    home.click()
    expect(page.get_by_role('link',name='Nuova partita',exact=True)).to_be_visible()
-  if frames:frames[0].save(ART/f'{name}.gif',save_all=True,append_images=frames[1:],duration=[100]*(len(frames)-1)+[1500],loop=0,optimize=True)
-  checks.append({'ending':name,'phases':sorted(phase_set),'victims':page.evaluate('window.__endingPlan.victims')});page.close()
+  page.close()
  # A mid-game elimination is consumed only once, even after unrelated UI renders.
  page=start();page.evaluate("()=>{HellscapeUI.game.eliminate(1,'test');HellscapeUI.changed()}");page.clock.run_for(5500)
  page.evaluate("()=>{HellscapeUI.game.eliminate(2,'test');HellscapeUI.game.complete(0);HellscapeUI.changed()}");page.clock.run_for(100)
