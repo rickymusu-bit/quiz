@@ -306,7 +306,7 @@
       roundCount: rounds,
       questionCount: questions,
       bases: value.bases,
-      quotas: migrateQuotas(value, questions),
+      quotas: value.quotas,
       ...(value.selectedTopics ? {selectedTopics:value.selectedTopics} : {}),
       names,
       icons: teamDraft.icons.slice(),
