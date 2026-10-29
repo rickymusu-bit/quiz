@@ -89,7 +89,8 @@ test("An eliminated player's empty slot still advances the round", () => {
   g.s.groups[g.s.order[0]].score = F.rational(10000);
   for (let i = 1; i <= 4; i++) {
     miss(g);
-    if (i < 4) g.next();
+    // The fourth answer is followed by the eliminated player's last slot.
+    g.next();
   }
   assert.equal(g.s.phase, "conclusa");
   assert.equal(g.s.completedTurns, 6);
