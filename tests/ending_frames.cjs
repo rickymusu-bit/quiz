@@ -1,14 +1,15 @@
 'use strict';
 const {createCanvas,loadImage}=require('@napi-rs/canvas'),vm=require('node:vm'),fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
-(async()=>{const root={FoolChase:require('../assets/hell-chase.js'),FoolEpilogue:require('../assets/hell-epilogue.js'),FoolPortal:require('../assets/hell-portal.js'),FoolBridge:require('../assets/hell-bridge.js')};vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../assets/hell-ending.js'),'utf8'),{globalThis:root,document:{createElement:()=>createCanvas(1,1)}});
- const image=await loadImage(path.join(__dirname,'../assets/hell-race/demon-ending-v1.webp')),frames=root.FoolEnding.prepare(image);
- assert.equal(frames.length,16);const board=createCanvas(frames[0].canvas.width*4,frames[0].canvas.height*4),ctx=board.getContext('2d');ctx.fillStyle='#171514';ctx.fillRect(0,0,board.width,board.height);
- frames.forEach((f,index)=>{const {width,height}=f.canvas,raw=f.canvas.getContext('2d').getImageData(0,0,width,height).data;let left=width,right=0,top=height,bottom=0,count=0;
-  for(let y=0;y<height;y++)for(let x=0;x<width;x++)if(raw[(y*width+x)*4+3]>24){left=Math.min(left,x);right=Math.max(right,x);top=Math.min(top,y);bottom=Math.max(bottom,y);count++;}
-  assert(count>15000,'Complete body required in every pose');assert(left>=8&&right<width-8&&top>=8&&bottom<height-7,'Every pose retains transparent padding');
-  for(const point of (index<8?[f.hand,f.mouth]:[f.mouth])){assert(point.x>=0&&point.x<width&&point.y>=0&&point.y<height,'Hand and mouth anchors stay inside their pose');}
-  ctx.drawImage(f.canvas,index%4*width,Math.floor(index/4)*height);
- });fs.mkdirSync(path.join(__dirname,'../artifacts'),{recursive:true});fs.writeFileSync(path.join(__dirname,'../artifacts/demon-ending-contact.png'),board.toBuffer('image/png'));
+(async()=>{const root={FoolCerbero:require('../assets/hell-cerbero.js'),FoolChase:require('../assets/hell-chase.js'),FoolEpilogue:require('../assets/hell-epilogue.js'),FoolPortal:require('../assets/hell-portal.js'),FoolBridge:require('../assets/hell-bridge.js')};vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../assets/hell-ending.js'),'utf8'),{globalThis:root,document:{createElement:()=>createCanvas(1,1)}});
+ const K=root.FoolCerbero,image=await loadImage(path.join(__dirname,'..',K.ASSET)),frames=root.FoolEnding.prepare(image);
+ assert.equal(frames.length,16);const board=createCanvas(440*4,330*4),ctx=board.getContext('2d');ctx.fillStyle='#171514';ctx.fillRect(0,0,board.width,board.height);
+ frames.forEach((f,index)=>{const canvas=createCanvas(440,330),c=canvas.getContext('2d'),d={left:20,ground:300,width:380,runWeight:0,pose:[{frame:index,weight:1}]};
+  const rig=K.render(c,d,{distance:0,time:0},image),raw=c.getImageData(0,0,440,330).data;let left=440,right=0,top=330,bottom=0,count=0;
+  for(let y=0;y<330;y++)for(let x=0;x<440;x++)if(raw[(y*440+x)*4+3]>24){left=Math.min(left,x);right=Math.max(right,x);top=Math.min(top,y);bottom=Math.max(bottom,y);count++;}
+  assert(count>22000,'Complete connected creature in every cinematic pose');assert(left>0&&right<439&&top>0&&bottom<329,'Tail, horns, feet and jaws retain transparent padding');
+  for(const point of [rig.hand,...Object.values(rig.mouths)])assert(point.x>=left&&point.x<=right&&point.y>=top&&point.y<=bottom+2,'Functional anchors remain inside the actual silhouette bounds');
+  ctx.drawImage(canvas,index%4*440,Math.floor(index/4)*330);
+ });fs.mkdirSync(path.join(__dirname,'../artifacts'),{recursive:true});fs.writeFileSync(path.join(__dirname,'../artifacts/cerbero-ending-contact.png'),board.toBuffer('image/png'));
  const flame=createCanvas(240,240),fc=flame.getContext('2d');fc.globalAlpha=.7;const alpha=fc.globalAlpha;root.FoolEnding.fireBreath(fc,{x:120,y:200},.6);assert.equal(fc.globalAlpha,alpha);const fd=fc.getImageData(0,0,240,240).data;let top=240,bottom=0;for(let y=0;y<240;y++)for(let x=0;x<240;x++)if(fd[(y*240+x)*4+3]>24){top=Math.min(top,y);bottom=Math.max(bottom,y)}assert(top<110&&bottom<=210,'Fire must rise above the mouth');fc.clearRect(0,0,240,240);root.FoolEnding.fireBreath(fc,{x:120,y:200},2);assert(!fc.getImageData(0,0,240,240).data.some(v=>v));
  const state={winner:0,respondent:2,groups:[{name:'A',out:false},{name:'B',out:false},{name:'C',out:false}]};
  const helper={vehicleIndex:()=>0,vehicleSize:()=>({width:44,height:36}),drawVehicle:()=>{},gate:()=>{},demonDust:()=>{},nameTag:()=>{throw Error('Names must not be drawn during capture or escape')}};

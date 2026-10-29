@@ -46,7 +46,7 @@ Applicare la preferenza «GIF per la dinamica, screenshot per gli stati statici,
 
 ## Specifica Omen della PR #49
 
-- Applicare [la specifica Omen, Cerbero e layout v1](docs/HELLSCAPE_SPEC_OMEN_CERBERO_LAYOUT_v1.md), che supera le regole storiche discordanti di Catene, Antisigillo e Livella. La grafica definitiva di Arsenico e Cerbero resta una fase separata da approvare; per questa implementazione Arsenico usa un segnaposto.
+- Applicare [la specifica Omen, Cerbero e layout v1](docs/HELLSCAPE_SPEC_OMEN_CERBERO_LAYOUT_v1.md), che supera le regole storiche discordanti di Catene, Antisigillo e Livella. I design della PR #51 sono approvati dall’utente («Approvo tutto, preferisco quello più rosso carne»): usare il Cerbero rosso/carnoso e la fiala Arsenico come riferimenti canonici per rig, animazioni e integrazione, seguendo il protocollo. Ultima disposizione richiesta: Opzioni in alto a sinistra e lista giocatori in alto a destra; domanda centrata in basso che si apre verso l’alto, barra del tempo sopra la domanda.
 
 ## Protocollo per sprite animati
 

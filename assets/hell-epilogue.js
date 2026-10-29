@@ -50,6 +50,7 @@
     const barrier=worldLeft<maxLeft-30?worldLeft:maxLeft-30+30*(1-Math.exp(-(worldLeft-maxLeft+30)/30));
     const demon={...e.demon,left:barrier-camera.distance,ground:e.demon.ground,runWeight:1,pose:pose(8)};
     demon.worldDistance=camera.distance+demon.left-M.CHASE.left;
+    demon.time=e.time+t;
     if(t>=T.escapeEnd){demon.runWeight=.12;demon.pose=mix(8,7,ease((t-T.escapeEnd)/.7));}
     let impact=0,fireAge=null,hitAge=null;
     if(s.phase==='rage'){const action=rageAt(s.local);demon.pose=action.pose;impact=action.impact;hitAge=action.cycle-.46;}

@@ -7,177 +7,10 @@
   const B=typeof module!=="undefined"?require('./hell-bridge.js'):root.FoolBridge;
   const CAPTURE=C.T.capture,plan=C.plan,sample=C.sample,captureAction=C.captureAction;
   const ease=C.ease,lerp=C.lerp;
-  // Coordinates in the generated source atlas, mapped into normalized frames.
-  const anchors = [
-    [405, 205, 311, 122],
-    [789, 207, 709, 142],
-    [1140, 152, 1085, 131],
-    [1481, 121, 1420, 101],
-    [367, 350, 317, 346],
-    [789, 369, 711, 365],
-    [1140, 462, 1108, 376],
-    [1490, 475, 1480, 371],
-    [0, 0, 291, 595],
-    [0, 0, 679, 586],
-    [0, 0, 1066, 591],
-    [0, 0, 1443, 639],
-    [0, 0, 269, 839],
-    [0, 0, 643, 832],
-    [0, 0, 1068, 891],
-    [0, 0, 1401, 829],
-  ];
-  let atlas = null,
-    art = null;
-  function prepare(image) {
-    if (atlas) return atlas;
-    if (!image?.complete || !image.naturalWidth) return null;
-    const rows = [],
-      sw = image.naturalWidth,
-      sh = image.naturalHeight;
-    for (let row = 0; row < 4; row++) {
-      const top = Math.floor((row * sh) / 4),
-        height = Math.floor(((row + 1) * sh) / 4) - top;
-      const canvas = document.createElement("canvas");
-      canvas.width = sw;
-      canvas.height = height;
-      const ctx = canvas.getContext("2d", { willReadFrequently: true });
-      ctx.drawImage(image, 0, -top);
-      const raw = ctx.getImageData(0, 0, sw, height),
-        labels = new Int32Array(sw * height),
-        parts = [];
-      let serial = 0;
-      for (let start = 0; start < labels.length; start++) {
-        if (labels[start] || raw.data[start * 4 + 3] < 24) continue;
-        const part = {
-            id: ++serial,
-            count: 0,
-            l: sw,
-            r: 0,
-            t: height,
-            b: 0,
-            pixels: [],
-          },
-          stack = [start];
-        labels[start] = serial;
-        while (stack.length) {
-          const at = stack.pop(),
-            x = at % sw,
-            y = Math.floor(at / sw);
-          part.pixels.push(at);
-          part.count++;
-          part.l = Math.min(part.l, x);
-          part.r = Math.max(part.r, x);
-          part.t = Math.min(part.t, y);
-          part.b = Math.max(part.b, y);
-          for (const next of [at - 1, at + 1, at - sw, at + sw])
-            if (
-              next >= 0 &&
-              next < labels.length &&
-              !labels[next] &&
-              Math.abs((next % sw) - x) <= 1 &&
-              raw.data[next * 4 + 3] >= 24
-            ) {
-              labels[next] = serial;
-              stack.push(next);
-            }
-        }
-        parts.push(part);
-      }
-      const bodies = parts
-        .filter((p) => p.count > 8000)
-        .sort((a, b) => b.count - a.count)
-        .slice(0, 4)
-        .sort((a, b) => a.l - b.l);
-      if (bodies.length !== 4)
-        throw Error(
-          "Demon ending atlas: expected four complete bodies in row " + row,
-        );
-      // Keep detached fingers/hand with the nearest body; never cut at a grid line.
-      for (const part of parts) {
-        if (bodies.includes(part) || part.count < 100) continue;
-        const cx = (part.l + part.r) / 2;
-        const body = bodies.reduce((a, b) =>
-          Math.abs(cx - (a.l + a.r) / 2) < Math.abs(cx - (b.l + b.r) / 2)
-            ? a
-            : b,
-        );
-        if (part.t < body.t - 2 || part.b > body.b + 2) continue;
-        body.pixels.push(...part.pixels);
-        body.l = Math.min(body.l, part.l);
-        body.r = Math.max(body.r, part.r);
-        body.t = Math.min(body.t, part.t);
-        body.b = Math.max(body.b, part.b);
-      }
-      bodies.forEach((body, col) => rows.push({ ...body, raw, top, row, col }));
-    }
-    const width = Math.max(...rows.map((p) => p.r - p.l + 1)) + 16,
-      height = Math.max(...rows.map((p) => p.b - p.t + 1)) + 16;
-    atlas = rows.map((p, index) => {
-      const c = document.createElement("canvas");
-      c.width = width;
-      c.height = height;
-      const ctx = c.getContext("2d"),
-        out = ctx.createImageData(width, height),
-        dx = Math.floor((width - (p.r - p.l + 1)) / 2),
-        dy = height - 8 - (p.b - p.t + 1);
-      for (const at of p.pixels) {
-        const x = (at % sw) - p.l + dx,
-          y = Math.floor(at / sw) - p.t + dy;
-        out.data.set(
-          p.raw.data.subarray(at * 4, at * 4 + 4),
-          (y * width + x) * 4,
-        );
-      }
-      ctx.putImageData(out, 0, 0);
-      const a = anchors[index] || [0, 0, 0, 0],
-        point = (x, y) => ({
-          x: (x * sw) / 1536 - p.l + dx,
-          y: (y * sh) / 1024 - p.top - p.t + dy,
-        });
-      return {
-        canvas: c,
-        hand: point(a[0], a[1]),
-        mouth: point(a[2], a[3]),
-      };
-    });
-    return atlas;
-  }
-  function load(redraw) {
-    P.load(redraw);
-    if (!art && typeof root.Image === "function") {
-      art = new root.Image();
-      art.decoding = "async";
-      const path = "assets/hell-race/demon-ending-v1.webp";
-      art.src = root.HellscapeOffline?.assets?.[path] || path;
-      art.addEventListener("load", redraw, { once: true });
-      art.addEventListener(
-        "error",
-        () => {
-          art.failed = true;
-          redraw();
-        },
-        { once: true },
-      );
-    }
-    return art;
-  }
-  function actor(c, index, x, ground, width = 260) {
-    const frames = prepare(art);
-    if (!frames) return null;
-    const f = frames[index],
-      zoom = width / f.canvas.width,
-      height = f.canvas.height * zoom,
-      y = ground - height;
-    c.drawImage(
-      f.canvas,
-      Math.round(x),
-      Math.round(y),
-      Math.round(width),
-      Math.round(height),
-    );
-    const point = (p) => ({ x: x + p.x * zoom, y: y + p.y * zoom });
-    return { hand: point(f.hand), mouth: point(f.mouth), top: y };
-  }
+  const K=typeof module!=="undefined"?require('./hell-cerbero.js'):root.FoolCerbero;
+  function prepare(image){return K.prepare(image);}
+  function load(redraw){P.load(redraw);return K.load(redraw);}
+  function actor(c,index,x,ground,width=260){return K.render(c,{left:x,ground,width,pose:[{frame:index,weight:1}],runWeight:0});}
   const captureFrame=t=>C.capturePose(t).reduce((a,b)=>a.weight>b.weight?a:b).frame;
   function fireBreath(
     c,
@@ -281,26 +114,8 @@
     }
     c.restore();
   }
-  function poseMetrics() {
-    const frames=prepare(art);
-    if(!frames)return null;
-    return frames.map(f=>({height:f.canvas.height/f.canvas.width,
-      hand:{x:f.hand.x/f.canvas.width,y:f.hand.y/f.canvas.width},
-      mouth:{x:f.mouth.x/f.canvas.width,y:f.mouth.y/f.canvas.width}}));
-  }
-  let actorBuffer=null;
-  function paintActor(c,W,demon,h,travel) {
-    const frames=prepare(art);if(!frames)return h.demon?.(c,0);
-    if(!actorBuffer)actorBuffer=document.createElement('canvas');
-    const scale=Math.min(3,Math.max(1,Math.abs(c.getTransform().a)));
-    if(actorBuffer.width!==Math.round(W*scale)||actorBuffer.height!==Math.round(384*scale)){actorBuffer.width=Math.round(W*scale);actorBuffer.height=Math.round(384*scale);}
-    const work=actorBuffer.getContext('2d');work.setTransform(scale,0,0,scale,0,0);work.clearRect(0,0,W,384);work.save();work.globalCompositeOperation='lighter';work.imageSmoothingEnabled=true;work.imageSmoothingQuality='high';
-    const run=Math.max(0,Math.min(1,demon.runWeight??0));
-    for(const p of demon.pose){work.globalAlpha=p.weight*(1-run);const frame=frames[p.frame].canvas,scale=demon.width/frame.width;
-      work.drawImage(frame,demon.left,demon.ground-frame.height*scale*(demon.breath??1),demon.width,frame.height*scale*(demon.breath??1));}
-    if(run){work.globalAlpha=run;if(h.chaser)h.chaser(work,demon,travel);else actor(work,8,demon.left,demon.ground,demon.width);}
-    work.restore();c.drawImage(actorBuffer,0,0,actorBuffer.width,actorBuffer.height,0,0,W,384);
-  }
+  function poseMetrics(){return K.metrics();}
+  function paintActor(c,W,demon,h,travel){return K.render(c,demon,travel);}
   function paintVehicle(c,state,v,h,travel) {
     if(v.visible===false)return;
     c.save();
@@ -326,9 +141,13 @@
     for(const v of cars.filter(v=>v.ground>f.demon.ground))paintVehicle(c,state,v,h,travel);
     if(f.flameAge!==null&&f.flameAge!==undefined){
       const duration=f.flameDuration??1.2;
-      fireBreath(c,f.anchors.mouth,f.flameAge,f.flameAim,duration);
+      const anchors=K.geometry(f.demon,travel);
+      const mouth=anchors.mouths.center,direction=anchors.directions.center;
+      const length=Math.max(35,Math.hypot(f.flameAim.x-mouth.x,f.flameAim.y-mouth.y));
+      const aim={x:mouth.x+direction.x*length,y:mouth.y+direction.y*length};
+      fireBreath(c,mouth,f.flameAge,aim,duration);
       if(f.flameAge>0&&f.flameAge<duration){
-        const target=f.flameAim,glow=c.createRadialGradient(target.x,target.y,0,target.x,target.y,48);
+        const target=aim,glow=c.createRadialGradient(target.x,target.y,0,target.x,target.y,48);
         glow.addColorStop(0,'#ffb84a66');glow.addColorStop(1,'#ff7b1800');c.save();c.globalCompositeOperation='screen';c.fillStyle=glow;c.fillRect(target.x-48,target.y-48,96,96);c.restore();
       }
     }
@@ -347,10 +166,10 @@
   const portalMotion=F.portalAt,rageMotion=F.rageAt;
   function impactDust(c,d,age){
     if(age===null||age<0||age>.45)return;
-    const hand=C.actorPoints({...d,pose:C.pose(7)},poseMetrics()).hand;
+    const feet=K.geometry(d).feet;
     c.save();
-    for(const x of [hand.x,hand.x-d.width*.18])for(let i=0;i<14;i++){
-      const spread=(i-6.5)*(2+age*13),y=d.ground-2-Math.sin(age/.45*Math.PI)*(3+i%4*3);
+    for(const foot of [feet.front_near,feet.front_far])for(let i=0;i<14;i++){
+      const x=foot.x,spread=(i-6.5)*(2+age*13),y=foot.y-2-Math.sin(age/.45*Math.PI)*(3+i%4*3);
       c.globalAlpha=(1-age/.45)*.65;c.fillStyle=i%3?'#ae9271':'#544b42';
       c.fillRect(Math.round(x+spread),Math.round(y),2+i%3,2+i%2);
     }c.restore();
@@ -371,8 +190,11 @@
       h.runDust?.(c,d,travel);paintActor(c,W,d,h,travel);
       impactDust(c,d,f.hitAge??null);
       if(f.fireAge!==null&&f.fireAge!==undefined){
-        const mouth=C.actorPoints(d,poseMetrics()).mouth;
-        fireBreath(c,mouth,f.fireAge,{x:Math.min(W-20,mouth.x+105),y:Math.max(22,mouth.y-125)},F.D.fire-.35);
+        const rig=K.geometry(d,travel);
+        for(const side of K.heads){
+          const mouth=rig.mouths[side],direction=rig.directions[side];
+          fireBreath(c,mouth,f.fireAge,{x:mouth.x+direction.x*145,y:mouth.y+direction.y*145},F.D.fire-.35);
+        }
       }
       P.front(c,f.portal);B.debris(c,f.bridge,true);
       B.front(c,W,f.camera);

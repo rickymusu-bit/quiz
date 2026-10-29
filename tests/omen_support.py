@@ -28,8 +28,11 @@ def layout(v,w,h):
  question=v.locator('.question')
  if question.count() and question.is_visible():
   assert timer['y']+timer['height']<=question.bounding_box()['y']+1
- assert options['y']-stage['y']<35 and stage['x']+stage['width']-options['x']-options['width']<35
- assert options['x']>=stage['x']+stage['width']/2
+ assert options['y']-stage['y']<35 and options['x']-stage['x']<35
+ assert options['x']+options['width']<stage['x']+stage['width']/2
+ players=v.locator('.turn-order').bounding_box()
+ assert 0<=stage['x']+stage['width']-players['x']-players['width']<35
+ assert players['x']>stage['x']+stage['width']/2
 def select(v,type,target=None):
  v.get_by_role('button',name='Inventario',exact=True).click()
  icon=v.locator(f'#dialog [data-ammo="{type}"]')

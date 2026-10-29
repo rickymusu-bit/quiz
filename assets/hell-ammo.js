@@ -56,10 +56,15 @@
   }
   const mix = (a,b,t) => a+(b-a)*t;
   let art = null;
-  let sacrificeArt = null;
+  let sacrificeArt = null, poisonArt = null;
+  const POISON_ASSET="assets/hell-race/arsenico-v1.png";
   const SACRIFICE_ASSET = "assets/hell-race/sacrificio-v1.png";
   const cells = [[0,0],[1,0],[2,0],[0,1],[1,1],[2,1],[0,2],[1,2],[2,2]];
   function load(redraw=()=>{}) {
+    if(!poisonArt&&typeof root.Image==='function'){
+      poisonArt=new root.Image();poisonArt.src=root.HellscapeOffline?.assets?.[POISON_ASSET]||POISON_ASSET;
+      poisonArt.addEventListener('load',redraw,{once:true});
+    }
     if(!sacrificeArt&&typeof root.Image==="function"){
       sacrificeArt=new root.Image();sacrificeArt.src=root.HellscapeOffline?.assets?.[SACRIFICE_ASSET]||SACRIFICE_ASSET;
       sacrificeArt.addEventListener("load",redraw,{once:true});
@@ -116,9 +121,13 @@
         relic(c,3,x,y-(1-build)*26,size+5,size*.91,-turn/2);
         if(plan.blocked)debris(c,x-size*.4,y,phase,4);
       } else if(plan.type==="arsenico") {
-        c.fillStyle="#211b10";c.fillRect(x-22,y-60,44,38);
-        c.strokeStyle="#bca378";c.setLineDash([4,3]);c.strokeRect(x-22,y-60,44,38);c.setLineDash([]);
-        c.fillStyle="#ded0a6";c.font="bold 19px monospace";c.fillText("As",x,y-35);
+        const q=reduced?1:smooth(t/.5),from=source??p;
+        const vx=mix(from.x,x,q),vy=mix(from.y-45,y-40,q)-(reduced?0:Math.sin(q*Math.PI)*35);
+        if(poisonArt?.complete&&poisonArt.naturalWidth)c.drawImage(poisonArt,vx-22,vy-26,44,44);
+        if(t>.5&&!reduced)for(let n=0;n<5;n++){
+          const age=clamp01((t-.5-n*.025)/.35);c.save();c.globalAlpha*=1-age;
+          c.fillStyle='#b1c271';c.fillRect(x-8+n*4,y-21+age*32,2,3);c.restore();
+        }
       } else if(plan.type==="salta") {
         const close=reduced?1:Math.min(1,t*4);
         relic(c,0,x,y,size+(1-close)*24,size*.8,turn);
@@ -163,7 +172,7 @@
     }
     c.restore();
   }
-  function ready(){load();return [art,sacrificeArt].every(img=>img?.complete&&img.naturalWidth>0);}
+  function ready(){load();return [art,sacrificeArt,poisonArt].every(img=>img?.complete&&img.naturalWidth>0);}
   const api = { plans, createTracker, render, labels, load, ready };
   if (typeof module !== "undefined") module.exports = api;
   else root.FoolAmmo = api;

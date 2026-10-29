@@ -1,3 +1,5 @@
+> Aggiornamento 29/10/2026: il runtime usa ora il [Cerbero carne approvato](../../docs/cerbero/README.md) e la fiala `arsenico-v1.png`. Le sezioni sugli atlanti bipedi qui sotto sono storiche; questi file non vengono più caricati dal gioco o dall’export offline.
+
 # Asset della corsa infernale
 
 Versione grafica **1.8.0** — 28/10/2026.

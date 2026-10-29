@@ -9,8 +9,8 @@
   const VEHICLES = ['chopper', 'pickup', 'truck', 'coupe', 'offroad', 'ape'];
   // Widths in logical race pixels; preserve each complete silhouette's aspect ratio.
   const vehicleWidths = [44, 58, 62, 54, 56, 40];
-  const sheets = { vehicles: null, demon: null, world: null };
-  const files = { vehicles: 'vehicles-drive-v1.webp', demon: 'demon-actions-v1.webp', world: 'infernal-world-v1.webp' };
+  const sheets = { vehicles: null, world: null };
+  const files = { vehicles: 'vehicles-drive-v1.webp', world: 'infernal-world-v1.webp' };
   // Shared atlases are decoded once; every state uses the same images.
   if (typeof root.Image === 'function') {
     for (const key of Object.keys(sheets)) {
@@ -48,9 +48,9 @@
   function atlasRow(key,row){
     const cacheKey=key+':'+row;
     if(animationRows.has(cacheKey))return animationRows.get(cacheKey);
-    const img=sheets[key],isVehicle=key==='vehicles',columns=isVehicle?8:4;
-    const bands=isVehicle?[[70,245],[255,435],[440,625],[650,790],[800,960],[985,1165]]:[[35,337],[350,660],[675,985]];
-    const referenceHeight=isVehicle?1254:1024;
+    const img=sheets[key],columns=8;
+    const bands=[[70,245],[255,435],[440,625],[650,790],[800,960],[985,1165]];
+    const referenceHeight=1254;
     const top=Math.floor(bands[row][0]*img.naturalHeight/referenceHeight),height=Math.ceil((bands[row][1]-bands[row][0])*img.naturalHeight/referenceHeight),width=img.naturalWidth;
     const work=document.createElement('canvas');work.width=width;work.height=height;
     const ctx=work.getContext('2d',{willReadFrequently:true});ctx.drawImage(img,0,-top);
@@ -78,12 +78,11 @@
     });
     // An outer-edge pose is truncated in the source art: reuse a complete pose.
     frames.forEach((frame,i)=>{if(frame.r>=width-1)frames[i]=frames[Math.max(0,i-1)]});
-    const rowTop=Math.min(...frames.map(f=>f.t)),rowBottom=Math.max(...frames.map(f=>f.b));
     const frameWidth=Math.max(...frames.map(f=>f.r-f.l+1))+8,
-      frameHeight=(isVehicle?Math.max(...frames.map(f=>f.b-f.t+1)):rowBottom-rowTop+1)+8;
+      frameHeight=Math.max(...frames.map(f=>f.b-f.t+1))+8;
     const result=frames.map(frame=>{
       const canvas=document.createElement('canvas');canvas.width=frameWidth;canvas.height=frameHeight;
-      const c=canvas.getContext('2d'),out=c.createImageData(frameWidth,frameHeight),dx=Math.floor((frameWidth-(frame.r-frame.l+1))/2),dy=isVehicle?frameHeight-4-(frame.b-frame.t+1):frame.t-rowTop+4;
+      const c=canvas.getContext('2d'),out=c.createImageData(frameWidth,frameHeight),dx=Math.floor((frameWidth-(frame.r-frame.l+1))/2),dy=frameHeight-4-(frame.b-frame.t+1);
       for(const at of frame.pixels){const x=at%width-frame.l+dx,y=Math.floor(at/width)-frame.t+dy;out.data.set(raw.data.subarray(at*4,at*4+4),(y*frameWidth+x)*4)}
       c.putImageData(out,0,0);return canvas;
     });
@@ -91,7 +90,7 @@
   }
   function sprite(c,key,columns,rows,row,frame,x,y,width,height){
     if(!imageReady(sheets[key]))return false;
-    const animated=key==='vehicles'||key==='demon';
+    const animated=key==='vehicles';
     const image=animated?atlasRow(key,row)[frame]:sheets[key];
     const rect=animated?[0,0,image.width,image.height]:frameRect(key,columns,rows,row,frame),scale=Math.min(width/rect[2],height/rect[3]);
     const w=rect[2]*scale,h=rect[3]*scale;
@@ -140,10 +139,10 @@
   function endingHelpers(state) {
     return {vehicleIndex:(s,i)=>Math.max(0,VEHICLES.indexOf(s.config.vehicles?.[i]||['chopper','pickup','ape'][i])),
       vehicleSize:row=>imageReady(sheets.vehicles)?vehicleSize(row):{width:50,height:40},
-      drawVehicle:(...args)=>{if(imageReady(sheets.vehicles))return drawVehicle(...args)},demonDust,
+      drawVehicle:(...args)=>{if(imageReady(sheets.vehicles))return drawVehicle(...args)},
       entry:visualState?.entry,
       chaser:(c,d,t)=>drawChaserAt(c,t,d,false),
-      runDust:(c,d,t)=>{if(!t)return;const scale=d.width/170;c.save();c.translate(d.left,d.ground-134*scale);c.scale(scale,scale);demonDust(c,40,t.roadTime,'chase',0,t);c.restore();},
+      runDust:(c,d,t)=>{if(t)root.FoolCerbero.dust(c,d,t);},
       travelFor:(time,distance)=>visualState.contacts.sample(time,distance),
       onFrame:(frame,travel)=>{visualState.frame=frame;visualState.lastTravel=travel;if(frame.swallowed)visualState.consumed.add(frame.victim);},
       demon:(c)=>drawChaser(c,clock.snapshot())};
@@ -249,30 +248,6 @@
       dustPuff(c, rear, ground, age, life, (5 + dustNoise(seed + 6) * 4) * weight * scale,
         (30 + dustNoise(seed + 12) * 15) * scale, seed, .85);
       if (i < 10) dirtChip(c, rear + 2, ground, age, .35 + dustNoise(seed + 7) * .25, seed, scale);
-    }
-    c.restore();
-  }
-  function demonDust(c, x, tick, mode, actionTime, travel = null) {
-    c.save();
-    // Ground impacts share the distance-driven gait, including gradual speed changes.
-    // Attack keeps its two authored impacts; particles remain analytical and bounded.
-    const stepRate = motion.ROAD_SPEED / (motion.STRIDE / 2);
-    const clock = mode === 'chase' ? (travel?.time ?? tick) : actionTime;
-    const latest = mode === 'chase' ? Math.floor(tick * stepRate) : 1;
-    const impacts = mode === 'chase' && travel ? travel.footfalls :
-      Array.from({length:7},(_,i)=>({index:latest-i,at:mode==='chase'?(latest-i)/stepRate:.12+(latest-i)*.23}));
-    for (const impact of impacts) {
-      const step = impact.index, born = impact.at;
-      if (mode !== 'chase' && step < 0) continue;
-      const age = clock - born;
-      const foot = x + (step % 2 ? 76 : 4), ground = 133;
-      for (let j = 0; j < 5; j++) {
-        const seed = step * 17 + j * 31;
-        dustPuff(c, foot + (dustNoise(seed) - .5) * 13, ground, age - j * .025,
-          1.05 + dustNoise(seed + 8) * .35, 10 + dustNoise(seed + 3) * 7,
-          22 + dustNoise(seed + 5) * 25, seed, 1.15);
-        dirtChip(c, foot, ground, age, .5 + dustNoise(seed + 11) * .3, seed, 1.5, j % 3 === 0 ? 1 : -1);
-      }
     }
     c.restore();
   }
@@ -438,66 +413,15 @@
     if(root.FoolBridge)root.FoolBridge.draw(c,W,tick,progress,null,effectTime,layers);
     else if(root.FoolTerrain)root.FoolTerrain.draw(c,W,tick,progress,null,effectTime);
   }
-  let chaseBlend = null;
-  function blendChase(c, pose, x, y, width, height) {
-    const frames = atlasRow('demon', 0), source = frames[pose.frame];
-    if (!chaseBlend) {
-      chaseBlend = document.createElement('canvas');
-      chaseBlend.width = source.width; chaseBlend.height = source.height;
-    }
-    const mix = chaseBlend.getContext('2d');
-    mix.clearRect(0, 0, chaseBlend.width, chaseBlend.height);
-    mix.save();
-    // Add weighted premultiplied pixels: the shared torso stays opaque.
-    mix.globalCompositeOperation = 'lighter';
-    mix.globalAlpha = 1 - pose.mix; mix.drawImage(source, 0, 0);
-    mix.globalAlpha = pose.mix; mix.drawImage(frames[pose.next], 0, 0);
-    mix.restore();
-    const scale = Math.min(width / source.width, height / source.height),
-      w = source.width * scale, h = source.height * scale;
-    c.drawImage(chaseBlend, x+(width-w)/2, y+height-h, w, h);
-  }
-  function drawChaser(c, travel, advance = 0) {
-    drawChaserAt(c,travel,{...motion.CHASE,left:motion.CHASE.left+advance});
-  }
+  function drawChaser(c,travel,advance=0){drawChaserAt(c,travel,{...motion.CHASE,left:motion.CHASE.left+advance});}
   function drawChaserAt(c,travel,geometry,dust=true){
-    const scale=geometry.width/170;
-    c.save();c.translate(geometry.left,geometry.ground-134*scale);c.scale(scale,scale);
-    demon(c,travel.roadTime,40,'#9b2831','chase',0,travel,dust);c.restore();
+    root.FoolCerbero.load(()=>live?.redraw?.());
+    const body={...geometry,runWeight:1,pose:[{frame:8,weight:1}],worldDistance:travel.distance,time:travel.time};
+    root.FoolCerbero.render(c,body,travel);
+    if(dust)root.FoolCerbero.dust(c,body,travel);
   }
-  function demon(c, tick, x = 32, shade = '#9b2831', mode = 'chase', actionTime = 0, travel = null, dust = true) {
-    if(dust)demonDust(c, x, tick, mode, actionTime, travel);
-    if (imageReady(sheets.demon)) {
-      const row=mode==='attack'?1:mode==='devour'?2:0;
-      if (row === 0) {
-        const pose = travel?.gait ?? motion.gait(tick * motion.ROAD_SPEED);
-        blendChase(c, pose, x-40, 9, motion.CHASE.width / motion.CHASE.scale, 125);
-      } else sprite(c,'demon',4,3,row,Math.min(3,Math.floor(actionTime*9)),x-40,9,170,125);
-      return;
-    }
-    const y = 12 + Math.round(Math.sin(tick * 4) * 2);
-    // Sagoma di un demone enorme, con corna, artigli e fauci animate.
-    r(c, x + 5, y + 33, 45, 103, '#210d1b');
-    r(c, x + 11, y + 17, 37, 55, shade);
-    r(c, x + 2, y + 1, 11, 37, '#b5503b');
-    r(c, x + 5, y - 5, 7, 28, '#e09a58');
-    r(c, x + 43, y + 1, 11, 37, '#b5503b');
-    r(c, x + 44, y - 5, 7, 28, '#e09a58');
-    r(c, x + 18, y + 38, 8, 8, '#ffe164');
-    r(c, x + 36, y + 38, 8, 8, '#ffe164');
-    r(c, x + 21, y + 40, 3, 3, '#1b0a16');
-    r(c, x + 39, y + 40, 3, 3, '#1b0a16');
-    r(c, x + 18, y + 53, 29, 14 + Math.round((Math.sin(tick * 7) + 1) * 2), '#0d0814');
-    for (let i = 0; i < 5; i++) r(c, x + 20 + i * 5, y + 53, 3, 5, '#e7b88e');
-    for (let i = 0; i < 4; i++) r(c, x + 23 + i * 5, y + 65, 3, 5, '#e7b88e');
-    r(c, x - 10, y + 89, 18, 26, shade);
-    r(c, x + 47, y + 87, 22, 31, shade);
-    for (let i = 0; i < 3; i++) {
-      r(c, x - 12 + i * 5, y + 114, 4, 13, '#d58a55');
-      r(c, x + 49 + i * 6, y + 116, 5, 13, '#d58a55');
-    }
-  }
-  const outlineFrames = new Map();
+
+  const outlineFrames=new Map();
   function vehicleOutline(c, row, frame, x, ground) {
     if (!imageReady(sheets.vehicles)) return;
     const source = vehicleRow(row)[frame], key = row + ':' + frame;
