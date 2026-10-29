@@ -29,3 +29,16 @@ test("Legacy defaults and bounds are stable without mutating saved state", () =>
   assert.equal(T.progress({ valid: 100, config: { questionCount: 33 } }), 1);
   assert.equal(T.progress({ valid: -10, config: { questionCount: 33 } }), 0);
 });
+
+test("Round-based terrain advances on skipped turns, not merely on answered questions", () => {
+  const s = {
+    valid: 7, completedTurns: 13, phase: "ordinaria",
+    config: {roundCount: 13, questionCount: 39},
+    groups: [{}, {}, {}],
+  };
+  assert.equal(T.progress(s), 1 / 3);
+  s.valid = 13;
+  assert.equal(T.progress(s), 1 / 3);
+  s.completedTurns = 39;
+  assert.equal(T.progress(s), 1);
+});
