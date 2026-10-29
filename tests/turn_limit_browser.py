@@ -27,7 +27,9 @@ try:
                 q.clock.run_for(2000)
                 q.evaluate('''kind => {
                     const g=HellscapeUI.game,s=g.s;
-                    s.config.turnCount=kind==='forfeit'?1:2;
+                    delete s.config.roundCount;s.config.turnCount=kind==='forfeit'?1:2;
+                    s.config.questionCount=s.config.turnCount;
+                    const keys=Object.keys(s.config.quotas);s.config.quotas=Object.fromEntries(keys.map((key,i)=>[key,i?0:s.config.turnCount]));
                     const c={id:g.uid(),type:kind==='forfeit'?'arsenico':'salta',target:null,origin:'test'};
                     s.groups[s.owner].inventory.push(c);
                     g.use(c.id,s.order[1]);
