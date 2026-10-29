@@ -336,7 +336,13 @@
       s.owner = i;
       s.respondent = i;
       s.turn++;
-      s.groups[i].aura = null;
+      if (s.groups[i].aura !== null) {
+        s.groups[i].aura--;
+        if (s.groups[i].aura === 0) {
+          s.groups[i].aura = null;
+          this.log("Sigillo di " + s.groups[i].name + " scaduto", { type: "seal-expired", target: i, turn: s.turn });
+        }
+      }
       s.usedBonus = false;
       s.draftBonus = null;
       s.malocchio = null;
@@ -438,6 +444,7 @@
         s.owner === s.respondent && !g.out,
         "Solo il giocatore titolare può usare Ammo",
       );
+      need(g.aura === null, "Sigillo attivo: non puoi usare altre Ammo");
       const copy = g.inventory.find((c) => c.id === copyId);
       need(copy && copy.type !== "karma", "Contrappasso si trasforma automaticamente");
       need(
@@ -479,15 +486,25 @@
         this.log("Antisigillo: protezione di " + s.groups[target].name + " dissipata", {
           type: "seal-dispelled", source: s.respondent, target, turn: s.turn,
         });
-      } else if (copy.type === "aura") g.aura = s.turn;
-      else if (copy.type === "svela") {
+      } else if (copy.type === "aura") {
+        g.aura = 3;
+        s.effects = s.effects.filter(e => e.target !== s.respondent);
+        this.log("Sigillo: 3 turni personali, niente uso o guadagno di Ammo", {
+          type: "seal-activated", target: s.respondent, remaining: 3, turn: s.turn,
+        });
+      } else if (copy.type === "svela") {
         s.passLock = copy.target;
         s.malocchio = { source: s.owner, question: s.current.id };
         s.seen.push(s.current.id);
         s.screen = "choice";
         s.remaining = s.config.seconds * 1000;
       } else if (copy.type === "marx") {
-        const active = this.active();
+        const active = this.active().filter(i => s.groups[i].aura === null);
+        const protectedGroups = this.active().filter(i => s.groups[i].aura !== null);
+        for (const target of protectedGroups)
+          this.log("Livella non modifica i punti di " + s.groups[target].name + ": Sigillo attivo", {
+            type: "seal-protected", source: s.respondent, target, ammo: "marx", turn: s.turn,
+          });
         let total = rational(0);
         for (const i of active) total = add(total, s.groups[i].score);
         const share = rational(
@@ -504,6 +521,7 @@
           {
             type: "marx-redistribution",
             groups: active,
+            protectedGroups,
             share: clone(share),
             total: clone(total),
           },
@@ -611,7 +629,7 @@
       };
       if (s.phase === "ordinaria") {
         // Legacy deferred Tributi are settled once; new attacks transfer immediately.
-        const beneficiaries = s.malocchio ? [] : [
+        const beneficiaries = s.malocchio || g.aura !== null ? [] : [
           ...new Set(
             s.effects
               .filter(
@@ -641,7 +659,8 @@
           {
             const weights = s.config.bonusWeights ?? DEFAULT_BONUS_WEIGHTS;
             result.bonuses = [];
-            for (const type of TYPES) {
+            result.ammoSuppressed = g.aura !== null;
+            for (const type of g.aura === null ? TYPES : []) {
               if (this.random() * 100 >= weights[type]) continue;
               const c = {
                 id: this.uid(),
@@ -658,7 +677,8 @@
         if (!correct && s.malocchio) {
           const value = rational(s.config.bases[q.difficulty]);
           result.base = value.n;
-          result.penalty = compare(g.score, value) <= 0 ? clone(g.score) : value;
+          result.penaltyBlocked = g.aura !== null && s.malocchio.source !== i;
+          result.penalty = result.penaltyBlocked ? rational(0) : compare(g.score, value) <= 0 ? clone(g.score) : value;
           g.score = add(g.score, rational(-BigInt(result.penalty.n), BigInt(result.penalty.d)));
           this.log("Malocchio: " + g.name + " perde " + exact(result.penalty) + " punti (valore domanda " + exact(value) + ", minimo zero)", {
             type: "malocchio-penalty", source: s.malocchio.source, target: i, amount: clone(result.penalty), value, questionId: q.id, turn: s.turn,
@@ -890,7 +910,7 @@
       return s;
     }
     static restore(raw, deps = {}) {
-      const s = clone(raw), legacyDamage = ["1.2.0", "2.0.0", "2.1.0", "2.2.0", "2.2.1", "2.3.0"].includes(s.version);
+      const s = clone(raw), legacyShield = s.version !== VERSION, legacyDamage = ["1.2.0", "2.0.0", "2.1.0", "2.2.0", "2.2.1", "2.3.0"].includes(s.version);
       if (
         s.version === "1.2.0" &&
         s.rules === "18.2.0" &&
@@ -935,7 +955,18 @@
         s.version = VERSION;
         s.rules = RULES;
       }
+      if (s.version === "2.6.0" && s.rules === "23.0.0") {
+        s.version = VERSION;
+        s.rules = RULES;
+      }
       if (s.version === VERSION && s.rules === RULES) {
+        if (legacyShield && Array.isArray(s.groups)) {
+          for (const g of s.groups) if (g.aura !== null) {
+            need(Number.isSafeInteger(g.aura) && g.aura > 0 && g.aura <= s.turn, "Sigillo precedente non valido");
+            g.aura = 3;
+          }
+          if (Array.isArray(s.effects)) s.effects = s.effects.filter(e => !s.groups[e.target] || s.groups[e.target].aura === null);
+        }
         if (s.malocchio === undefined) {
           const active = s.phase === "ordinaria" && ["choice", "answer", "result"].includes(s.screen) &&
             (s.screen === "choice" || s.respondent !== s.owner ||
@@ -1060,7 +1091,7 @@
       );
       need(
         g.aura === null ||
-          (Number.isInteger(g.aura) && g.aura > 0 && g.aura <= s.turn),
+          (Number.isInteger(g.aura) && g.aura >= 1 && g.aura <= 3),
         "Sigillo non valida",
       );
       need(Array.isArray(g.inventory), "Inventario non valido");

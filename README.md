@@ -1,4 +1,19 @@
-# Malocchio · motore 2.6.0 / regole 23.0.0
+# Sigillo · motore 2.7.0 / regole 24.0.0
+
+Sigillo dura **tre turni personali**, incluso quello di attivazione. Il contatore
+3 → 2 → 1 scende soltanto all’inizio dei propri turni; al quarto scade. Protegge
+dagli effetti negativi delle Ammo avversarie, rimuove Catene e Tributi pendenti
+e lascia invariati i punti del protetto durante Livella (ripartizione tra gli altri).
+Mentre è attivo impedisce qualsiasi altro uso di Ammo e qualsiasi nuova Ammo da
+risposte corrette; i punti delle risposte corrette e le copie già possedute restano.
+**Flagello** colpisce comunque; **Antisigillo** distrugge la protezione in anticipo
+e rimuove immediatamente anche le restrizioni. Non evita sanzioni o rischi propri.
+
+Il campo persistito `aura` ora contiene i turni personali residui (1–3, oppure
+null), anziché il vecchio numero del turno di attivazione. Le partite precedenti
+con Sigillo attivo migrano a tre turni residui senza riassegnare punti o vite.
+
+## Malocchio · motore 2.6.0 / regole 23.0.0
 
 Malocchio mostra testo e valore della domanda senza alternative, a timer fermo.
 Chi lo usa può tenerla o passarla a un altro gruppo. Alla conferma parte il timer

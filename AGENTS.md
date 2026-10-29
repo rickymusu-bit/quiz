@@ -30,6 +30,11 @@ Applicare la preferenza «GIF per la dinamica, screenshot per gli stati statici,
 
 - La consegna di Sacrificio, Tributo e probabilità è approvata («Ok va bene»). Malocchio ora mostra testo e valore senza alternative; chi risponde bene tiene punti e Ammo, chi sbaglia o lascia scadere il tempo perde il valore della domanda con minimo zero (chiarimento esplicito). La rotazione riparte da chi segue l’utilizzatore, anche dopo il passaggio a un altro gruppo, rispettando Catene ed eliminazioni. Salvare autore e rischio della domanda senza riapplicare esiti già registrati.
 
+## Regola aggiornata di Sigillo
+
+- Sigillo protegge dagli effetti negativi delle Ammo altrui, ma blocca ogni altro uso di Ammo e la loro acquisizione da risposte corrette. Flagello ignora la protezione; Antisigillo la distrugge e rimuove subito anche le restrizioni.
+- Interpretazione operativa comunicata: tre turni personali, incluso quello di attivazione; contatore 3 → 2 → 1, scadenza all’inizio del quarto. Livella esclude il protetto, lasciandone invariati i punti. Sigillo rimuove Catene e Tributi pendenti e non evita sanzioni o rischi autoimposti.
+
 ## Refactoring e manutenzione del progetto
 
 Queste istruzioni si applicano a **qualsiasi agente o strumento** che modifichi il repository, inclusi ChatGPT Work, Codex e interventi manuali assistiti. Non dipendono dall'ambiente di sviluppo.

@@ -13,6 +13,8 @@ Le colonne proposte sono **scartate** e rimosse dall’intervento. La richiesta 
 
 5. **Consegnato, in verifica visiva:** Malocchio: testo senza alternative; risposta errata o tempo scaduto sottraggono il valore della domanda fino a zero; chi risponde bene conserva punti e Ammo; rotazione dal successivo all’utilizzatore. [GIF reale e verifiche](previews/malocchio/README.md).
 
+6. **Consegnato, in verifica visiva:** Sigillo: immunità per tre turni personali, niente uso o guadagno Ammo; Flagello e Antisigillo restano efficaci. Livella esclude i protetti. [GIF reale e verifiche](previews/sigillo/README.md).
+
 Le consegne precedenti con soli PNG restano documentazione storica, non sono sufficienti per giudicare le nuove modifiche dinamiche.
 
 Strada approvata: [ponte nero e correzioni della seconda GIF](design/black-stone-bridge/README.md).

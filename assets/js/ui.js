@@ -989,7 +989,7 @@
     else if (ammo === "svela")
       description = name(event.source) + ": Malocchio, scelta del destinatario";
     else if (ammo === "aura")
-      description = name(event.source) + ": Sigillo protettiva attivata";
+      description = name(event.source) + ": Sigillo attivo per 3 turni personali; Ammo bloccate";
     else if (ammo === "marx")
       description = "Tutti: Livella redistribuisce i punti";
     else if (ammo === "ira")
@@ -1043,7 +1043,7 @@
           statuses.append(status);
         }
         if (g.aura !== null)
-          statuses.append(node("span", "Sigillo: attiva", "effect-chip shielded"));
+          statuses.append(node("span", "Sigillo: " + g.aura + (g.aura === 1 ? " turno" : " turni"), "effect-chip shielded"));
         button.append(statuses);
       }
       item.append(button);
@@ -1120,7 +1120,7 @@
   function canUseAmmo(copy, team) {
     if (!game || !copy) return false;
     const s = game.s;
-    return team === s.owner && team === s.respondent && !s.groups[team].out &&
+    return team === s.owner && team === s.respondent && !s.groups[team].out && s.groups[team].aura === null &&
       s.phase === "ordinaria" && ["hidden", "answer"].includes(s.screen) &&
       !(s.screen === "answer" && s.paused && !inventoryCanResume) &&
       copy.type !== "karma" && !(copy.type === "svela" && s.screen !== "hidden") &&
@@ -1151,6 +1151,8 @@
       selectBonus(copy);
     }, "primary", !canUseAmmo(copy, team)));
     controls.append(btn("Chiudi", close));
+    if (game && Number.isInteger(team) && game.s.groups[team].aura !== null)
+      d.append(node("p", "Sigillo attivo: non puoi usare altre Ammo e non ne guadagni dalle risposte corrette.", "shield-restriction"));
     d.append(controls);
     d.addEventListener("cancel", e => { e.preventDefault(); close(); });
     document.body.append(d);
@@ -1467,7 +1469,7 @@
         text("p", s.current.explanation),
       );
       if (r.malocchio && !r.correct)
-        ex.append(node("p", "Malocchio: −" + F.formatScore(r.penalty) + " punti · minimo zero", "bad"));
+        ex.append(node("p", r.penaltyBlocked ? "Sigillo: penalità di Malocchio bloccata." : "Malocchio: −" + F.formatScore(r.penalty) + " punti · minimo zero", r.penaltyBlocked ? "good" : "bad"));
       else if (r.base)
         ex.append(
           node(
@@ -1484,6 +1486,7 @@
                 : ""),
           ),
         );
+      if (r.ammoSuppressed) ex.append(node("p", "Sigillo attivo: punti guadagnati, nessuna Ammo ottenuta.", "muted"));
       const won = awardedBonuses(r);
       if (won.length) {
         const rewards = node("p", undefined, "ammo-rewards");
@@ -2012,7 +2015,7 @@
         };
       }
       if (copy.type === "marx") {
-        const active = game.active();
+        const active = game.active().filter(i => s.groups[i].aura === null);
         let total = F.rational(0);
         for (const i of active) total = F.add(total, s.groups[i].score);
         const share = F.rational(
@@ -2028,7 +2031,7 @@
               active.length +
               " giocatori attivi: " +
               F.formatScore(share) +
-              " punti ciascuno. I giocatori eliminati restano esclusi.",
+              " punti ciascuno. I giocatori eliminati e i protetti da Sigillo restano esclusi.",
           ),
         );
       } else if (copy.type === "sacrificio") {
