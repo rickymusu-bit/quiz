@@ -265,7 +265,7 @@
       bonusWeights: { ...F.DEFAULT_BONUS_WEIGHTS },
       difficulty: "misto",
       questionCount: 33,
-      bases: { facile: 100, media: 200, difficile: 300 },
+      bases: { ...F.DEFAULT_BASE_POINTS },
       quotas: balancedQuotas("misto", 33),
     };
   }

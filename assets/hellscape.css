@@ -69,7 +69,7 @@ dialog .scoreboard{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));ga
 #viewport-stage .operation-body .question-points{font-size:20px;margin-bottom:6px}
 #viewport-stage .operation-body .solution{font-size:16px}
 .owner-status{font-size:14px;margin:0 0 8px;color:#e7bc8c}
-.turn-order{position:absolute;left:12px;top:12px;width:164px;padding:7px;background:#140e0deb;border:1px solid #906346;box-shadow:3px 3px #0008;z-index:3}
+.turn-order{position:absolute;right:12px;left:auto;top:12px;width:164px;padding:7px;background:#140e0deb;border:1px solid #906346;box-shadow:3px 3px #0008;z-index:3}
 .turn-order ol{list-style:none;padding:0;margin:0;display:grid;gap:4px}
 .turn-order button{display:block;width:100%;min-height:34px;padding:6px 4px;font:22px/1.05 FoolTerminal,monospace;text-align:left;overflow-wrap:anywhere;background:#241710;border:1px solid #644630}
 .turn-name{display:block;overflow-wrap:anywhere}
@@ -78,7 +78,7 @@ dialog .scoreboard{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));ga
 .turn-order .lives{display:inline-flex;flex-wrap:nowrap;gap:3px;margin:0}
 .turn-order .heart{width:16px;height:16px;flex:0 0 16px}
 .turn-order [aria-current=step]{color:#ffe044;border-color:#ffe044;background:#392809}
-#viewport-stage .options-toggle{position:absolute;top:18px;right:18px;min-height:44px;padding:8px 16px;font:28px/1 FoolTerminal,monospace;background:#140e0deb;border:1px solid #ac8055;box-shadow:3px 3px #0008;z-index:3}
+#viewport-stage .options-toggle{position:absolute;top:18px;left:18px;right:auto;min-height:44px;padding:8px 16px;font:28px/1 FoolTerminal,monospace;background:#140e0deb;border:1px solid #ac8055;box-shadow:3px 3px #0008;z-index:3}
 .options-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0 18px}.options-grid button{font-size:17px;overflow-wrap:anywhere}
 dialog[data-passive=options]{width:620px;overflow:auto}dialog[data-passive=inventory]{overflow:auto}
 

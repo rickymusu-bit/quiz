@@ -36,7 +36,8 @@ regolamento/salvataggi 26.0.0. Nessun merge o deploy automatico.
 
 ## HUD e grafica
 
-Tre finestre impilate in alto, corrente per primo e in giallo. Nome e punteggio
+Tre finestre impilate in alto a destra, corrente per primo e in giallo.
+Il pulsante Opzioni è in alto a sinistra (ultima richiesta dell’utente). Nome e punteggio
 restano visibili; il triangolo apre vite e inventario, in sovrapposizione alla
 scena. Il pulsante del giocatore apre l’inventario completo. L’apertura dei
 pannelli è conservata al render e alla rotazione. Il pannello delle domande è ancorato in basso e centrato nell’area di gioco;

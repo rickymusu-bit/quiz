@@ -50,6 +50,11 @@ function inline(file) {
       (_, attr, p) => attr + '="' + data(p) + '"',
     );
 }
+function addCerberoAssets(assets) {
+  const frames=require('../assets/hell-cerbero-frames.js');
+  const paths=new Set([...frames.walk.map(f=>f.asset),frames.parts.asset,frames.jaw?.asset,frames.flames?.asset].filter(Boolean));
+  for(const file of paths)assets[file]=data(file);
+}
 function offline(review = false) {
   const catalog = JSON.parse(read("datasets.json")),
     texts = {
@@ -59,13 +64,14 @@ function offline(review = false) {
   for (const bank of catalog.banche) texts[bank.url] = read(bank.url);
   const assets = {};
 
-  for(const name of ["black-stone-bridge-v1.png","lava-sea-v2.png","portal-side-v3.png","portal-rocks-v1.png","sacrificio-v1.png"])
+  for(const name of ["black-stone-bridge-v1.png","lava-sea-v2.png","portal-side-v3.png","portal-rocks-v1.png","sacrificio-v1.png","arsenico-v1.png"])
     assets["assets/hell-race/"+name]=data("assets/hell-race/"+name);
   for (const name of fs.readdirSync(path.join(root, "assets/hell-race")))
-    if (name.endsWith(".webp") && name !== 'portal-flames-v1.webp')
+    if (name.endsWith(".webp") && !['portal-flames-v1.webp','demon-actions-v1.webp','demon-ending-v1.webp'].includes(name))
       assets["assets/hell-race/" + name] = data("assets/hell-race/" + name);
   for (const file of ["assets/game-over.png"])
     assets[file] = data(file);
+  addCerberoAssets(assets);
   const config = { texts, assets };
   const pages = {};
   for (const file of ["index.html", "Fool.html", "Fool_regole.html"]) {
@@ -90,9 +96,10 @@ function offline(review = false) {
 function ammoPreview(){
   const assets={};
 
-  for(const name of ['vehicles-drive-v1.webp','demon-actions-v1.webp','infernal-world-v1.webp','ammo-relics-v1.webp','lava-bridge-v1.webp','lava-lake-v1.webp','black-stone-bridge-v1.png','lava-sea-v2.png','sacrificio-v1.png']){
+  for(const name of ['vehicles-drive-v1.webp','infernal-world-v1.webp','ammo-relics-v1.webp','lava-bridge-v1.webp','lava-lake-v1.webp','black-stone-bridge-v1.png','lava-sea-v2.png','sacrificio-v1.png','arsenico-v1.png']){
     const p='assets/hell-race/'+name;assets[p]=data(p);
   }
+  addCerberoAssets(assets);
   const html=inline('Ammo-preview.html').replace('<head>','<head><meta name="hellscape-revision" content="'+revision+'"><script>window.HellscapeOffline={assets:'+safe(assets)+'};</script>');
   fs.writeFileSync(path.join(out,'Hellscape-Ammo.html'),html);
 }
