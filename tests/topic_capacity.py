@@ -41,7 +41,7 @@ def only_first(q):
 try:
     with sync_playwright() as p:
         browser = p.chromium.launch(executable_path=os.environ.get('CHROMIUM_PATH', '/usr/bin/chromium'), args=['--no-sandbox'])
-        for bank, width, height, single, easy in [('termologia', 1366, 768, 3, 1), ('introduzione-fisica-misura', 844, 390, 8, 2)]:
+        for bank, width, height, single in [('termologia', 1366, 768, 3), ('introduzione-fisica-misura', 844, 390, 8)]:
             q = browser.new_page(viewport={'width': width, 'height': height})
             q.on('pageerror', lambda e: report['errors'].append(str(e)))
             q.goto(base + 'Fool.html?settings=1')
@@ -56,12 +56,9 @@ try:
             expect(q.locator('#turn-count')).to_have_attribute('max', str(single))
             expect(q.locator('#turn-count')).to_have_value(str(single))
             capture(q, width == 1366)
-            q.locator('#difficulty').select_option('facile')
-            expect(q.locator('#turn-count')).to_have_attribute('max', str(easy))
-            expect(q.locator('#turn-count')).to_have_value(str(easy))
+            expect(q.locator('#difficulty')).to_have_count(0)
             capture(q, width == 1366)
-            if record: q.screenshot(path=str(OUT / f'massimo-turni-facile-{width}.png'))
-            q.locator('#difficulty').select_option('misto')
+            if record: q.screenshot(path=str(OUT / f'massimo-turni-argomento-{width}.png'))
             q.locator('#turn-count').fill(str(single + 10)); q.locator('#seconds').click()
             expect(q.locator('#turn-count')).to_have_value(str(single))
             q.get_by_role('button', name='Salva impostazioni', exact=True).click()
@@ -108,7 +105,18 @@ try:
             expect(q.locator('#turn-count')).to_have_value('33')
             expect(q.locator('#base-facile')).to_have_value('777')
             expect(q.locator('#seconds')).to_have_value('90')
-            report['checks'].append({'bank': bank, 'viewport': [width, height], 'all_topics_max': 33, 'one_topic_max': single, 'easy_max': easy, 'two_topics_max': single * 2, 'empty_selection': 'blocked', 'selection_survives_one_turn_profile': True})
+            # Normalize a stored single-level preference when preparing the next game.
+            q.evaluate('''()=>{
+                const data=JSON.parse(localStorage.getItem("fool-settings-v1"));
+                for (const profile of Object.values(data.profiles)) profile.difficulty="facile";
+                localStorage.setItem("fool-settings-v1",JSON.stringify(data));
+            }''')
+            q.goto(base+'Fool.html?settings=1');q.locator('#bank-choice').select_option(bank)
+            expect(q.locator('#difficulty')).to_have_count(0)
+            expect(q.locator('#turn-count')).to_have_attribute('max','33')
+            q.get_by_role('button',name='Salva impostazioni',exact=True).click()
+            assert all(v['difficulty']=='misto' for v in q.evaluate('JSON.parse(localStorage.getItem("fool-settings-v1")).profiles').values())
+            report['checks'].append({'bank': bank, 'viewport': [width, height], 'all_topics_max': 33, 'one_topic_max': single, 'two_topics_max': single * 2, 'all_levels_counted': True, 'legacy_filter_normalized': True, 'empty_selection': 'blocked', 'selection_survives_one_turn_profile': True})
             q.close()
         # Embedded settings use the same cap with external requests disabled.
         context = browser.new_context(viewport={'width': 844, 'height': 390}, offline=True)
@@ -121,8 +129,8 @@ try:
         q = context.new_page(); q.goto('http://capacity.test/preview'); f = q.frames[1]
         f.get_by_role('link', name='Impostazioni', exact=True).click(); f = q.frames[1]
         expect(f.locator('#turn-count')).to_have_attribute('max', '33')
-        f.locator('#difficulty').select_option('facile')
-        expect(f.locator('#turn-count')).to_have_attribute('max', '10')
+        expect(f.locator('#difficulty')).to_have_count(0)
+        expect(f.locator('#turn-count')).to_have_attribute('max', '33')
         assert not requests, requests
         context.close(); browser.close()
     assert not report['errors'], report['errors']
@@ -133,6 +141,6 @@ try:
         images[0].save(gif, save_all=True, append_images=images[1:], duration=250, loop=0, optimize=True)
         report['clip'] = {'file': gif.name, 'viewport': [1366, 768], 'pixels': [960, 540], 'duration_ms': len(frames) * 250, 'fps': 4, 'sha256': hashlib.sha256(gif.read_bytes()).hexdigest()}
         (OUT / 'capacity-report.json').write_text(json.dumps(report, indent=2) + '\n')
-    print('PASS: selected questions / players, difficulty, clamping, empty selection, persistence, actual start, desktop/mobile and offline')
+    print('PASS: all difficulty levels counted, selected questions / players, clamping, legacy preference migration, persistence, desktop/mobile and offline')
 finally:
     server.shutdown()
