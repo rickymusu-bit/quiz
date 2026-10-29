@@ -112,9 +112,11 @@ test("A bank must include easy, medium and hard questions", () => {
     alternative: ["A","B","C","D"], corretta: "A", spiegazione: "Risposta A",
   }));
   const dataset = {versione:1, argomenti:[{id:"arg", nome:"Argomento", domande:questions}]};
-  assert.equal(F.parseDataset(JSON.stringify(dataset)).bank.length,3);
+  assert.equal(F.parseDataset(JSON.stringify(dataset), undefined, {requireAllDifficulties:true}).bank.length,3);
   dataset.argomenti[0].domande = questions.slice(0,2);
-  assert.throws(() => F.parseDataset(JSON.stringify(dataset)), /banca deve includere domande facili, medie e difficili/);
+  // Restore is intentionally permissive for legacy saves.
+  assert.equal(F.parseDataset(JSON.stringify(dataset)).bank.length,2);
+  assert.throws(() => F.parseDataset(JSON.stringify(dataset), undefined, {requireAllDifficulties:true}), /banca deve includere domande facili, medie e difficili/);
 });
 test("Forfeited turns end at the configured limit even with no valid answers", () => {
   for (const type of ["ruba", "arsenico"]) {
