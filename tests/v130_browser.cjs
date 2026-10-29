@@ -16,7 +16,7 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/v130');fs.
       await page.waitForFunction(()=>FoolEnding.prepare(FoolEnding.load(()=>{}))&&FoolPortal.load()?.complete);
       await page.evaluate(()=>document.fonts.ready);await page.clock.install();await page.clock.pauseAt(new Date(Date.now()+100));
       async function reset(){await page.evaluate(()=>{
-        const old=HellscapeUI.game,F=Fool,c={...old.s.config,questionCount:3,seconds:45,difficulty:'facile',quotas:{...old.s.config.quotas},bonusWeights:Object.fromEntries(F.TYPES.map(t=>[t,0]))};
+        const old=HellscapeUI.game,F=Fool,c={...old.s.config,questionCount:3,turnCount:3,seconds:45,difficulty:'facile',quotas:{...old.s.config.quotas},bonusWeights:Object.fromEntries(F.TYPES.map(t=>[t,0]))};
         Object.keys(c.quotas).forEach((k,i)=>c.quotas[k]=i?0:3);
         const g=F.Game.start(F.prepare(old.s.bank,c,()=>.25),{random:()=>.25});g.s.id+='-v130-'+(++window.__v130Serial|| (window.__v130Serial=1));
         HellscapeUI.game=g;HellscapeUI.changed();
@@ -30,7 +30,7 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/v130');fs.
       await page.getByRole('button',{name:'Inventario',exact:true}).click();await page.locator('#dialog [data-ammo="svela"]').click();await page.locator('#ammo-info').getByRole('button',{name:'Usa',exact:true}).click();await page.locator('#dialog').getByRole('button',{name:'Conferma uso',exact:true}).click();
       await page.clock.runFor(2500);assert.equal(await page.locator('.answers,.answer').count(),0);assert.equal(await page.locator('.question').count(),1);assert.match(await page.locator('.question-points').innerText(),/111 punti/);
       const held=await page.evaluate(()=>HellscapeUI.game.left());await page.keyboard.press('a');await page.keyboard.press('Enter');await page.clock.runFor(2000);
-      assert.equal(await page.evaluate(()=>HellscapeUI.game.s.screen),'choice');assert.equal(await page.evaluate(()=>HellscapeUI.game.left()),held);
+      assert.equal(await page.evaluate(()=>HellscapeUI.game.s.screen),'choice');assert(Math.abs(await page.evaluate(()=>HellscapeUI.game.left())-(held-2000))<100,'The separate 45s decision timer continues while answer keys are ignored');
       const q=await page.evaluate(()=>HellscapeUI.game.s.current.options);const accessible=await page.locator('.operation-body').ariaSnapshot();q.forEach(option=>assert(!accessible.includes(option)));
       await shot('malocchio');const target=await page.evaluate(()=>HellscapeUI.game.s.order[1]);await page.getByRole('button',{name:await page.evaluate(i=>'Passa a '+HellscapeUI.game.s.groups[i].name,target),exact:true}).click();
       await page.clock.runFor(100);assert.equal(await page.locator('.answer').count(),4);assert(await page.evaluate(()=>HellscapeUI.game.running));assert.equal(await page.evaluate(()=>HellscapeUI.game.s.respondent),target);

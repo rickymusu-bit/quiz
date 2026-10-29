@@ -35,7 +35,7 @@ assert(!selected||[...types,...modes,'reload'].includes(selected),'Unknown Ammo 
     await view.getByRole('button',{name:/Inizia partita/}).click();
     await view.waitForFunction('FoolEnding.prepare(FoolEnding.load(()=>{}))!==null');
     await view.evaluate('document.fonts.ready');
-    await page.clock.pauseAt(await page.evaluate('Date.now()+100'));
+    await page.clock.pauseAt(await page.evaluate('Date.now()+1000'));
     await view.evaluate(()=>{const g=HellscapeUI.game;g.s.groups.forEach((v,i)=>v.score=Fool.rational(200+i*400));HellscapeUI.changed()});
     await page.clock.runFor(2000);
     return {page,view};

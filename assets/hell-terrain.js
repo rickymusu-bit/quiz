@@ -12,8 +12,8 @@
   const fade = (level, start) => clamp((level - start) / 0.22);
   function progress(state) {
     return clamp(
-      (Number(state.valid) || 0) /
-        Math.max(1, Number(state.config.questionCount) || 33),
+      (Number((state.config.turnCount ? state.completedTurns : state.valid)) || 0) /
+        Math.max(1, Number((state.config.turnCount || state.config.questionCount)) || 33),
     );
   }
   const box = (c, x, y, w, h, color) => {

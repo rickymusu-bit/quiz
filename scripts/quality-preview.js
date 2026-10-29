@@ -45,6 +45,7 @@
     w.FoolEnding.frame = endingFrame;
     const config = JSON.parse(JSON.stringify(ui.game.s.config));
     config.questionCount = 3;
+    config.turnCount = 3;
     Object.keys(config.quotas).forEach(key => config.quotas[key] = 0);
     config.quotas[Object.keys(config.quotas)[0]] = 3;
     Object.keys(config.bonusWeights).forEach(key => config.bonusWeights[key] = 0);

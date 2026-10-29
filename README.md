@@ -1,3 +1,13 @@
+## Aggiornamento · 13 turni totali e Cerbero in partita
+
+Le nuove partite durano **13 turni totali**, configurabili da 1 fino al numero di domande disponibili negli argomenti e nella difficoltà scelti diviso il numero di giocatori, arrotondato per difetto: un turno appartiene a un solo giocatore, non è un giro. Contano anche i salti per Catene e le cessioni per Tributo/Arsenico; passare una domanda con Malocchio non crea un altro turno. Alla fine si confrontano i punti; la parità al primo posto apre l’Ultimo Miglio. I salvataggi precedenti conservano la durata in domande. Il vecchio profilo predefinito da 33 domande diventa 13 turni per le nuove partite, mantenendo punti, tempo, probabilità e proporzioni degli argomenti; durate personalizzate esplicite mantengono il proprio numero.
+
+Malocchio concede **45 secondi attivi** per tenere la domanda o assegnarla. Alla scadenza resta all’utilizzatore e parte il normale tempo intero per rispondere. Pausa, finestre passive, orientamento e ripresa conservano il residuo. Le risposte restano nascoste durante la scelta.
+
+Cerbero sputa dalle tre bocche ogni 60 secondi attivi della scena, con prima fiammata dopo 60 secondi e azione di 1,8 secondi. Continua a camminare; è un effetto visivo, senza modifiche a punti, vite o timer. È sospeso durante catture, Omen e finali e disattivato con movimento ridotto. La home usa `assets/hellscape-cerbero-home.webp`, conversione senza perdita dell’illustrazione con Cerbero al posto del demone.
+
+Motore **3.0.0**, regolamento **27.0.0**, applicazione **3.11.0**. Le sezioni versionate sotto documentano anche il comportamento storico, superato dall’aggiornamento corrente.
+
 ## Omen, Arsenico e HUD — 3.10.0
 
 Implementazione della [specifica della PR #49](docs/HELLSCAPE_SPEC_OMEN_CERBERO_LAYOUT_v1.md).
@@ -179,7 +189,7 @@ Per confrontare la grafica con la base della PR #17, preparare un checkout e ind
 
 ## Partita ordinaria
 
-L’arbitro infernale configura nomi, simboli e tre veicoli distinti per i giocatori, tempo, punteggi, difficoltà, argomenti e numero di domande (multiplo di tre da 3 a 99, predefinito 33). All'avvio viene indicato esplicitamente il numero di domande della **partita ordinaria**: l’Ultimo Miglio non è un'alternativa all'inizio della partita. I vecchi profili salvati con meno di 33 domande, non marcati come scelta esplicita, vengono riportati a 33; una nuova scelta di partita breve, salvata dalle impostazioni, resta valida. Se si riprende una partita già salvata con meno di 33 domande, viene mostrato un avviso; la partita esistente non viene modificata automaticamente. Una risposta corretta assegna i **punti base della difficoltà**, senza moltiplicatori o serie; una risposta errata non sottrae punti. I punti possono essere condivisi tramite Tributo. L'ordine dei giocatori è sorteggiato e poi fisso.
+L’arbitro infernale configura nomi, simboli e tre veicoli distinti per i giocatori, tempo, punteggi, difficoltà, argomenti e numero di turni totali (da 1 fino alle domande disponibili negli argomenti e nella difficoltà selezionati divise per il numero di giocatori, predefinito 13). All’avvio e durante la domanda viene indicata la durata in turni. I vecchi salvataggi mantengono la durata originaria. Una risposta corretta assegna i **punti base della difficoltà**, senza moltiplicatori o serie; una risposta errata non sottrae punti. I punti possono essere condivisi tramite Tributo. L'ordine dei giocatori è sorteggiato e poi fisso.
 
 Le otto **Ammo** sono **Catene, Tributo, Malocchio, Sigillo, Contrappasso, Livella, Flagello e Antisigillo**. La probabilità di estrazione è indipendente per ogni tipo: 30% predefinito per i primi cinque, **15% per Livella e 5% per Flagello**. Antisigillo ha una probabilità indipendente predefinita del 30%. Le probabilità sono configurabili singolarmente. Tributo mantiene la precedente logica di divisione del guadagno fra il rispondente e i beneficiari; l'identificativo interno `ruba` resta invariato per compatibilità. **Livella** ridistribuisce immediatamente tutti i punti già accumulati in parti identiche fra i giocatori ancora attivi, compreso quello che lo utilizza, senza creare o eliminare punti. I punteggi dei giocatori eliminati rimangono invariati. Quando il totale non è divisibile, il gioco conserva frazioni esatte. Livella non è un attacco: Sigillo non lo blocca e Contrappasso non reagisce. Dopo una risposta corretta possono essere assegnate più Ammo indipendenti; nello stesso turno è possibile usarne più di una.
 
