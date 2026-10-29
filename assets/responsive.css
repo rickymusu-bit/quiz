@@ -126,10 +126,10 @@ body[data-layout="compact"] .turn-order ol {grid-template-columns:1fr;gap:4px;}
 .hud-inventory {position:absolute;top:calc(100% + 24px);left:0;width:100%;z-index:6;display:flex;flex-wrap:wrap;gap:4px;padding:6px;background:#20140ffa;border:1px solid #ac8055;font-size:14px;box-shadow:3px 5px 8px #000b;}
 #viewport-stage .hud-inventory .ammo-round {width:32px;height:32px;min-height:32px;}
 #viewport-stage .player-window[open] {z-index:7;}
-#viewport-stage main.operational>.statusline,
-body[data-layout="compact"] #viewport-stage main.operational>.statusline {
-  position:absolute;top:var(--game-gap);left:calc(var(--hud-width) + 2*var(--game-gap));right:var(--game-gap);
-  margin:0;min-height:26px;
+/* The timer travels with the question when the lower panel opens upwards. */
+#viewport-stage .operation-body>.statusline {
+  position:static;display:block;padding:0;margin:0 0 8px;min-height:28px;
+  background:none;border:0;box-shadow:none;
 }
 #viewport-stage main.operational>.operation-body,
 body[data-layout="compact"] #viewport-stage main.operational>.operation-body {
@@ -138,7 +138,7 @@ body[data-layout="compact"] #viewport-stage main.operational>.operation-body {
 }
 #viewport-stage main.operational>.options-toggle,
 body[data-layout="compact"] #viewport-stage main.operational>.options-toggle {
-  position:absolute;bottom:var(--game-gap);left:var(--game-gap);margin:0;min-height:44px;font-size:24px;
+  position:absolute;top:var(--game-gap);right:var(--game-gap);bottom:auto;left:auto;margin:0;min-height:44px;font-size:24px;
 }
 .result-details {display:none;}
 @media(max-height:600px) {
@@ -170,10 +170,14 @@ body[data-layout="compact"] #viewport-stage main.operational>.options-toggle {
 @media(max-height:350px) {
 #viewport-stage main.operational,body[data-layout="compact"] #viewport-stage main.operational {--hud-width:120px;--game-gap:4px;}
   #viewport-stage .player-window summary>button {font-size:18px;}
-#viewport-stage .operation-body[data-screen=result]>.solution{position:absolute;top:4px;right:8px;margin:0;font-size:14px;}
+#viewport-stage .operation-body[data-screen=result]>.solution{position:absolute;top:40px;right:8px;margin:0;font-size:14px;}
 body[data-layout="compact"] #viewport-stage main.operational>.operation-body{padding:4px 8px;}
  body[data-layout="compact"] #viewport-stage .operation-body .question{margin:2px 0;}
  #viewport-stage .operation-body .question-points{margin-bottom:2px;}
+ /* Leave room for the timer and corner control on the shortest screens. */
+ body[data-layout="compact"] #viewport-stage .operation-body .answer{font-size:15px;gap:6px;}
+ #viewport-stage .operation-body .letter{font-size:22px;flex-basis:18px;}
+ #viewport-stage .operation-body[data-screen=answer]>.statusline{margin-right:100px;}
 }
 
 

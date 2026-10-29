@@ -19,6 +19,16 @@ def layout(v,w,h):
  assert not data['outside'],(w,h,data)
  assert v.locator('.turn-order').bounding_box()['y']<h*.12
  assert v.locator('#fit-warning').is_hidden()
+ box=v.locator('.operation-body').bounding_box()
+ timer=v.locator('.statusline').bounding_box()
+ options=v.locator('.options-toggle').bounding_box()
+ stage=v.locator('#viewport-stage').bounding_box()
+ assert box['y']<=timer['y'] and timer['y']+timer['height']<=box['y']+box['height']
+ question=v.locator('.question')
+ if question.count() and question.is_visible():
+  assert timer['y']+timer['height']<=question.bounding_box()['y']+1
+ assert options['y']-stage['y']<35 and stage['x']+stage['width']-options['x']-options['width']<35
+ assert options['x']>=stage['x']+stage['width']/2
 def select(v,type,target=None):
  v.get_by_role('button',name='Inventario',exact=True).click()
  icon=v.locator(f'#dialog [data-ammo="{type}"]')

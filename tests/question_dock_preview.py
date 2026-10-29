@@ -1,10 +1,11 @@
 """Real timed browser capture of the bottom question dock unfolding upwards."""
-from omen_support import ROOT, server, base
+from omen_support import ROOT, server, base, layout
 from playwright.sync_api import sync_playwright
 from PIL import Image
 from io import BytesIO
+from pathlib import Path
 import os,json
-OUT=ROOT/'docs/screenshots/omen-v1';OUT.mkdir(parents=True,exist_ok=True)
+OUT=Path(os.environ.get('HELLSCAPE_PREVIEW_DIR',str(ROOT/'docs/screenshots/omen-v1')));OUT.mkdir(parents=True,exist_ok=True)
 frames=[]
 try:
  with sync_playwright() as p:
@@ -18,6 +19,12 @@ try:
   q.get_by_role('button',name='Svela e avvia il tempo',exact=True).click()
   capture(40);opened=q.locator('.operation-body').bounding_box();q.screenshot(path=str(OUT/'question-open.png'))
   assert opened['y']<closed['y'];assert abs(opened['y']+opened['height']-closed['y']-closed['height'])<2
+  layout(q,844,390)
+  for width,height,name in [(1440,900,'desktop'),(667,375,'mobile-small'),(568,320,'mobile-min')]:
+   q.set_viewport_size({'width':width,'height':height})
+   q.wait_for_function('size=>innerWidth===size[0] && innerHeight===size[1]',arg=[width,height])
+   q.clock.run_for(300);layout(q,width,height)
+   q.screenshot(path=str(OUT/f'question-{name}.png'))
   b.close()
  sheet=Image.new('RGB',(844,390*5))
  for i,f in enumerate(frames[::10]):sheet.paste(f,(0,390*i))

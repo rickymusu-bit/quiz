@@ -78,3 +78,12 @@ campioni offline viewport/DPR), inseguimento, movimento, finali, terreno, qualit
 visiva, layout, orientamento e le componenti browser di configurazione,
 inventari, ripristino, opzioni e comandi desktop. I riepiloghi e le dimensioni
 misurate sono in `docs/screenshots/omen-v1/verification.json`.
+
+## Barra del tempo e Opzioni
+
+La barra del tempo è inclusa nel pannello della domanda, sopra testo e risposte,
+e ne segue l’apertura verso l’alto. «Opzioni» occupa l’angolo superiore destro.
+Su schermi con altezza fino a 350 px le spaziature delle alternative e la zona
+del timer riservano spazio al comando nell’angolo.
+
+[Anteprime aggiornate e controlli](screenshots/timer-options/README.md).

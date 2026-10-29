@@ -1360,6 +1360,9 @@
         undefined,
         "operation-body" + (s.screen === "hidden" ? " hidden-question" : ""),
       );
+    const status = node("div", undefined, "statusline");
+    status.append(timeVial());
+    b.append(status);
     b.dataset.screen = s.screen;
     b.dataset.question = s.current?.id ?? "";
     b.dataset.paused = String(s.paused);
@@ -1600,15 +1603,6 @@
     main.className = "operational";
     const stage = gameStage(s);
     main.replaceChildren(stage, turnOrder());
-    const status = node("div", undefined, "statusline");
-    status.append(timeVial());
-    main.append(status);
-    updateTimeVial();
-    if (vialRefillFrom !== null) {
-      const from = vialRefillFrom;
-      vialRefillFrom = null;
-      animateVialRefill(from);
-    }
     const body = gameBody();
     if (unfold) body.classList.add("unfolding-question");
     if (s.owner !== s.respondent)
@@ -1620,6 +1614,12 @@
     if (s.suspendAfter)
       body.append(node("p", "Sospensione al termine della domanda.", "muted suspension-note"));
     main.append(body, optionsToggle());
+    updateTimeVial();
+    if (vialRefillFrom !== null) {
+      const from = vialRefillFrom;
+      vialRefillFrom = null;
+      animateVialRefill(from);
+    }
     syncCinematic();
     if (s.draftBonus && !$("dialog").open) {
       inventoryCanResume = false;
