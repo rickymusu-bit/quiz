@@ -90,7 +90,7 @@
     const questionCount = integer(
       turns ?? c.questionCount,
       turns === null ? 3 : 1,
-      99,
+      turns === null ? 99 : Number.MAX_SAFE_INTEGER,
       turns === null ? "Numero domande" : "Numero turni",
     );
     if (turns === null)
@@ -114,6 +114,12 @@
       sum === questionCount,
       "La somma delle quote deve essere " + questionCount,
     );
+    if (c.selectedTopics !== undefined)
+      need(Array.isArray(c.selectedTopics) && c.selectedTopics.length > 0 &&
+        new Set(c.selectedTopics).size === c.selectedTopics.length &&
+        c.selectedTopics.every(t => typeof t === "string" && Object.hasOwn(c.quotas, t)) &&
+        Object.entries(c.quotas).every(([t,n]) => !n || c.selectedTopics.includes(t)),
+        "Selezione degli argomenti non valida");
     return {
       ...clone(c),
       bonusWeights: clone(bonusWeights),
@@ -130,6 +136,14 @@
         c.quotas[q.topic] > 0 &&
         (c.difficulty === "misto" || q.difficulty === c.difficulty),
     );
+    if (c.turnCount) {
+      const topics = c.selectedTopics ?? Object.keys(c.quotas).filter(t => c.quotas[t] > 0),
+        counts = datasets.topicCounts(bank, c.difficulty),
+        available = topics.reduce((sum,t) => sum + (counts[t] ?? 0), 0),
+        maximum = Math.floor(available / c.names.length);
+      need(c.turnCount <= maximum,
+        "Massimo " + maximum + " turni: " + available + " domande disponibili ÷ " + c.names.length + " giocatori");
+    }
     let chosen = [];
     for (const [t, n] of Object.entries(c.quotas)) {
       const pool = eligible.filter((q) => q.topic === t);

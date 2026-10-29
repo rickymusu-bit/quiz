@@ -195,7 +195,13 @@
     };
   }
 
-  const api = { parseDataset, validateMath, mathParts, scienceParts };
+  function topicCounts(bank, difficulty = "misto") {
+    const counts = Object.fromEntries(bank.map(q => [q.topic, 0]));
+    for (const q of bank)
+      if (difficulty === "misto" || q.difficulty === difficulty) counts[q.topic]++;
+    return counts;
+  }
+  const api = { parseDataset, validateMath, mathParts, scienceParts, topicCounts };
   if (typeof module !== "undefined") module.exports = api;
   else root.HellscapeDatasets = api;
 })(globalThis);

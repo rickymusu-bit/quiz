@@ -21,9 +21,9 @@ with sync_playwright() as p:
   page.goto(base+'Fool.html?settings=1');expect(page.get_by_role('heading',name='Impostazioni',exact=True)).to_be_visible();expect(page.locator('#turn-count')).to_be_visible()
   for level,points in [('facile',111),('media',222),('difficile',333)]:expect(page.locator('#base-'+level)).to_have_value(str(points))
   page.locator('#bank-choice').select_option(bank);expect(page.locator('#turn-count')).to_have_value('13');expect(page.locator('#weight-marx')).to_have_value('15');expect(page.locator('#weight-ira')).to_have_value('5');fits(page)
-  for count in [1,4,13,99]:
+  for count in [1,4,13,33]:
    page.locator('#turn-count').fill(str(count));page.locator('#seconds').click()
-   assert sum(page.locator('#quotas input').evaluate_all('(els)=>els.map(e=>Number(e.value))'))==count
+   assert sum(page.locator('#quotas input[type="number"]').evaluate_all('(els)=>els.map(e=>Number(e.value))'))==count
    for kind in ['salta','ruba','svela','aura','karma','marx','ira','arsenico','sacrificio']:page.locator('#weight-'+kind).fill('100')
    page.get_by_role('button',name='Salva impostazioni').click();expect(page.locator('#message')).to_contain_text('Impostazioni salvate');fits(page)
    expect(page.get_by_role('button',name='Anteprima',exact=True)).to_have_count(0)
@@ -78,6 +78,6 @@ with sync_playwright() as p:
   expect(page.locator('#weight-marx')).to_have_value('15');expect(page.locator('#weight-ira')).to_have_value('5');expect(page.locator('#weight-arsenico')).to_have_value('30');expect(page.locator('#weight-sacrificio')).to_have_value('5')
   page.goto(base+'Fool_regole.html')
   for section in range(23):page.locator('#section').select_option(str(section));fits(page)
-  checks.append({'bank':bank,'size':[width,height],'turn_counts':[1,4,13,99],'awards':9,'uses':1,'second_sigillo':'blocked'});page.close()
+  checks.append({'bank':bank,'size':[width,height],'turn_counts':[1,4,13,33],'awards':9,'uses':1,'second_sigillo':'blocked'});page.close()
  assert not errors,errors;b.close();print(json.dumps({'configurable':checks,'errors':errors}))
 if 'server' in globals():server.shutdown()

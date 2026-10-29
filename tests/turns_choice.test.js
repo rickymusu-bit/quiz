@@ -4,7 +4,7 @@ const { test } = require("node:test"),
 const F = require("../assets/js/engine.js"),
   K = require("../assets/hell-cerbero.js"),
   M = require("../assets/hell-motion.js");
-const bank = Array.from({ length: 99 }, (_, i) => ({
+const bank = Array.from({ length: 300 }, (_, i) => ({
   id: "t" + i,
   topic: "t",
   topicName: "T",
@@ -49,12 +49,12 @@ function reply(g, correct = true) {
 }
 
 test("New durations accept any whole number of turns; default is 13 and old explicit question durations survive", () => {
-  for (const turns of [1, 4, 13, 99]) {
+  for (const turns of [1, 4, 13, 99, 100]) {
     const { g } = setup(turns);
     assert.equal(g.s.config.turnCount, turns);
     assert.equal(g.s.queue.length, turns - 1);
   }
-  for (const turns of [0, 1.5, 100]) assert.throws(() => setup(turns));
+  for (const turns of [0, 1.5, 101]) assert.throws(() => setup(turns));
   const { g } = setup();
   const cfg = { ...g.s.config };
   delete cfg.turnCount;
@@ -87,6 +87,21 @@ test("Exactly 13 total turns end the ordinary game; answering and moving next ca
   assert.equal(g.s.phase, "conclusa");
   assert.equal(g.s.valid, 13);
   assert.equal(g.s.completedTurns, 13);
+});
+test("Turn capacity follows selected topics and difficulty, including banks above 99 questions", () => {
+  const large = Array.from({length:150}, (_,i) => ({
+    ...bank[i % bank.length], id:"capacity"+i, topic:i%2 ? "b":"a",
+    difficulty:["facile","media","difficile"][i%3],
+  }));
+  assert.deepEqual(F.topicCounts(large), {a:75,b:75});
+  assert.deepEqual(F.topicCounts(large,"facile"), {a:25,b:25});
+  const config = {...setup().g.s.config, turnCount:50, questionCount:50, quotas:{a:25,b:25}};
+  const g = F.Game.start(F.prepare(large,config,()=>.25));
+  assert.equal(g.s.queue.length,49);
+  assert.equal(F.Game.restore(g.snapshot()).s.config.turnCount,50);
+  assert.throws(()=>F.prepare(large,{...config,turnCount:26,questionCount:26,quotas:{a:26,b:0}}),/Massimo 25 turni: 75 domande/);
+  assert.throws(()=>F.prepare(large,{...config,difficulty:"facile",turnCount:17,questionCount:17,quotas:{a:9,b:8}}),/Massimo 16 turni: 50 domande/);
+  assert.throws(()=>F.prepare(large,{...config,turnCount:100,questionCount:100,quotas:{a:80,b:20}}),/Massimo 50 turni/);
 });
 test("Forfeited turns end at the configured limit even with no valid answers", () => {
   for (const type of ["ruba", "arsenico"]) {
@@ -200,15 +215,15 @@ test("Choice pause, save/restore and delayed callbacks never reset or bypass its
   assert.equal(h.s.completedTurns, 0);
 });
 test("Periodic three-mouth breaths use active time, keep the drawn walking gait and preserve the game model", () => {
-  for (const at of [0, 7.99, 9.8, 25.99, 27.8])
+  for (const at of [0, 8, 59.99, 61.81, 119.99, 121.81])
     assert.equal(K.periodicFire(at).active, false);
-  for (const at of [8, 8.8, 26, 26.8])
+  for (const at of [60, 60.8, 120, 120.8, 180])
     assert.equal(K.periodicFire(at).active, true);
   const { g } = setup();
   const before = g.snapshot();
   const poses = [];
   for (let i = 0; i < 8; i++) {
-    const time = 8.1 + i * 0.08,
+    const time = 60.1 + i * 0.08,
       breath = K.periodicFire(time),
       travel = { time, distance: time * M.ROAD_SPEED };
     poses.push(

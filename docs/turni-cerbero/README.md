@@ -2,7 +2,7 @@
 
 ## Regole
 
-Le nuove partite durano **13 turni totali**, non tredici giri. Il numero è configurabile da 1 a 99. Ogni risposta, turno ceduto con Tributo/Arsenico, turno saltato per Catene o interruzione per eliminazione del titolare consuma un solo turno. Malocchio resta nel turno dell’autore, anche se risponde un altro giocatore. Una sostituzione o una riserva da rifornire non aggiunge turni.
+Le nuove partite durano **13 turni totali**, non tredici giri. Il numero è configurabile da 1 fino alla somma delle domande disponibili negli argomenti selezionati, filtrate per difficoltà, divisa per il numero di giocatori e arrotondata per difetto. Non esiste un tetto fisso di 99. La selezione degli argomenti è esplicita e resta salvata anche quando il numero di turni è inferiore al numero di argomenti. Cambiando argomenti o difficoltà, un totale superiore alla nuova disponibilità viene ridotto e le quote ribilanciate soltanto sugli argomenti selezionati. Ogni risposta, turno ceduto con Tributo/Arsenico, turno saltato per Catene o interruzione per eliminazione del titolare consuma un solo turno. Malocchio resta nel turno dell’autore, anche se risponde un altro giocatore. Una sostituzione o una riserva da rifornire non aggiunge turni.
 
 Il confronto dei punti avviene alla fine del turno limite, anche quando questo è saltato o ceduto. Arsenico si applica all’inizio di un turno saltato prima del confronto finale. Un solo primo classificato vince; la parità apre l’Ultimo Miglio. Restano invariati punti, vite e regole dello spareggio.
 
@@ -20,7 +20,7 @@ Il vecchio profilo predefinito da 33 domande diventa 13 turni per una nuova part
 
 ## Grafica
 
-Cerbero sputa fuoco dalle tre bocche durante la corsa: prima sequenza dopo 8 secondi attivi della scena, poi ogni 18 secondi. L’azione dura 1,8 secondi, con preparazione, emissione e recupero. Le zampe continuano a usare le otto pose disegnate del passo; teste e coda restano articolate. I getti seguono esattamente le bocche del rig. Sono riutilizzati gli atlanti approvati, senza nuovi disegni di sprite.
+Cerbero sputa fuoco dalle tre bocche durante la corsa: prima sequenza dopo 60 secondi attivi della scena, poi ogni 60 secondi. L’azione dura 1,8 secondi, con preparazione, emissione e recupero. Le zampe continuano a usare le otto pose disegnate del passo; teste e coda restano articolate. I getti seguono esattamente le bocche del rig. Sono riutilizzati gli atlanti approvati, senza nuovi disegni di sprite.
 
 È un effetto visivo: non modifica punti, vite, turni, timer o generatore casuale. Pausa e sospensione congelano il tempo; movimento ridotto disattiva i getti. Catture, Omen, spareggi e finale mantengono le proprie azioni.
 
@@ -31,7 +31,7 @@ La home usa `assets/hellscape-cerbero-home.webp`, nuova illustrazione dal riferi
 - `npm test`: regole, turni, conteggi idempotenti, scadenze, migrazioni, punteggi e dataset.
 - `npm run test:frames`: sagome, articolazioni, veicoli rigidi ed effetti.
 - `npm run test:ammo`: animazioni delle nove Omen, tre viewport, pausa/ripresa, ricaricamento e dimostrazione offline.
-- `python3 tests/configurable.py`: impostazioni su due banche e due viewport, durate 1/4/13/99, probabilità e vecchi profili.
+- `python3 tests/configurable.py`: impostazioni su due banche e due viewport, durate 1/4/13/33, probabilità e vecchi profili.
 - `python3 tests/tie_browser.py --quick`: Ultimo Miglio offline, avanzamento, input, pausa e ripresa.
 - `python3 tests/turn_limit_browser.py`: spareggio dopo l’ultimo turno saltato o ceduto, domanda iniziale e focus, pausa e comandi su desktop/mobile e movimento ridotto; incluso in `test:ties`.
 - `python3 tests/periodic_fire.py`: tre emettitori effettivi in corsa, pausa/ripresa della fiammata e movimento ridotto; incluso in `test:motion`.

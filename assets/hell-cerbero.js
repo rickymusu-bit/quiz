@@ -413,10 +413,10 @@
       c.restore();
     }
   }
-  // One breath every 18 seconds of active scene time, first at 8 seconds.
+  // One breath per minute of active scene time, first at 60 seconds.
   // Rendering and UI rebuilds never restart the cycle or consume game RNG.
   function periodicFire(time) {
-    const start = 8, interval = 18, duration = 1.8;
+    const start = 60, interval = 60, duration = 1.8;
     const age = time < start ? -1 : (time - start) % interval;
     return {active: age >= 0 && age < duration, age, duration, emissionAge: age - .2};
   }

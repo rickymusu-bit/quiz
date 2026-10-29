@@ -29,11 +29,11 @@ try:
   q.goto(base+'Fool.html?start=1');expect(q.get_by_role('button',name='Inizia partita (13 turni)',exact=True)).to_be_visible();q.clock.install();q.get_by_role('button',name='Inizia partita (13 turni)',exact=True).click();q.wait_for_function('FoolCerbero.ready() && FoolAmmo.ready() && FoolBridge.load().complete',timeout=120000);q.evaluate('document.fonts.ready');clock_pause(q);q.clock.run_for(3000)
   assert q.evaluate('HellscapeUI.game.s.config.turnCount')==13;expect(q.locator('.turn-progress')).to_have_text('Turno 1 di 13');q.screenshot(path=str(OUT/'turno-1-di-13.png'))
   # No renderer overrides: use the active scene clock to record one real breath.
-  elapsed=q.evaluate('FoolHellRace.motionSnapshot().time');q.clock.run_for(max(0,round((6.9-elapsed)*1000)));frozen=q.evaluate('JSON.stringify(HellscapeUI.game.snapshot())');frames=[]
+  elapsed=q.evaluate('FoolHellRace.motionSnapshot().time');q.clock.run_for(max(0,round((58.9-elapsed)*1000)));frozen=q.evaluate('JSON.stringify(HellscapeUI.game.snapshot())');frames=[]
   for _ in range(76):q.clock.run_for(50);frames.append(shot(q));assert q.evaluate('JSON.stringify(HellscapeUI.game.snapshot())')==frozen
-  gif('fuoco-periodico.gif',frames,'Real ordinary gameplay: anticipation, three jets while walking, recovery; first breath at active scene time 8s',[1366,768])
+  gif('fuoco-periodico.gif',frames,'Real ordinary gameplay: anticipation, three jets while walking, recovery; first breath at active scene time 60s',[1366,768])
   # Freeze a running periodic breath with the real pause controls.
-  q.clock.run_for(16000);q.evaluate('HellscapeUI.game.s.config.seconds=90;HellscapeUI.game.s.config.bonusWeights=Object.fromEntries(Fool.TYPES.map(t=>[t,0]));HellscapeUI.game.s.groups[HellscapeUI.game.s.owner].inventory.push({id:HellscapeUI.game.uid(),type:"svela",target:null,origin:"review"});HellscapeUI.changed()')
+  q.clock.run_for(100);q.evaluate('HellscapeUI.game.s.config.seconds=90;HellscapeUI.game.s.config.bonusWeights=Object.fromEntries(Fool.TYPES.map(t=>[t,0]));HellscapeUI.game.s.groups[HellscapeUI.game.s.owner].inventory.push({id:HellscapeUI.game.uid(),type:"svela",target:null,origin:"review"});HellscapeUI.changed()')
   q.get_by_role('button',name='Inventario',exact=True).click();q.locator('#dialog [data-ammo="svela"]').click();q.locator('#ammo-info').get_by_role('button',name='Usa',exact=True).click();q.locator('#dialog').get_by_role('button',name='Conferma uso',exact=True).click()
   for _ in range(60):
    q.clock.run_for(100)

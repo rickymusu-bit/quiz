@@ -55,7 +55,8 @@
     shield: ["⛨", "Scudo"],
     crown: ["♛", "Corona"],
   };
-  let settingsTab = "general",
+  let settingsTopics = new Set(),
+    settingsTab = "general",
     passiveReturn = null,
     vialRefillFrom = null;
   const node = (tag, text, cls) => {
@@ -253,25 +254,22 @@
     act(goHome);
   });
   function defaultSettings() {
+    const total = Math.min(F.DEFAULT_TURN_COUNT, Math.floor(bank.bank.length / teamDraft.names.length));
     return {
       seconds: 45,
       bonusWeights: { ...F.DEFAULT_BONUS_WEIGHTS },
       difficulty: "misto",
-      turnCount: F.DEFAULT_TURN_COUNT,
-      questionCount: F.DEFAULT_TURN_COUNT,
+      turnCount: total,
+      questionCount: total,
+      selectedTopics: Object.keys(F.topicCounts(bank.bank)),
       bases: { ...F.DEFAULT_BASE_POINTS },
-      quotas: balancedQuotas("misto", F.DEFAULT_TURN_COUNT),
+      quotas: balancedQuotas("misto", total),
     };
   }
-  function balancedQuotas(filter, total = F.DEFAULT_TURN_COUNT) {
-    const topics = [...new Set(bank.bank.map((q) => q.topic))],
-      counts = topics.map(
-        (t) =>
-          bank.bank.filter(
-            (q) =>
-              q.topic === t && (filter === "misto" || q.difficulty === filter),
-          ).length,
-      ),
+  function balancedQuotas(filter, total = F.DEFAULT_TURN_COUNT, selected = null) {
+    const available = F.topicCounts(bank.bank, filter),
+      topics = Object.keys(available),
+      counts = topics.map(t => !selected || selected.has(t) ? available[t] : 0),
       values = topics.map(() => 0);
     let remaining = total;
     while (remaining && values.some((n, i) => n < counts[i]))
@@ -297,6 +295,7 @@
       questionCount: value.turnCount ?? F.DEFAULT_TURN_COUNT,
       bases: value.bases,
       quotas: value.quotas,
+      ...(value.selectedTopics ? {selectedTopics:value.selectedTopics} : {}),
       names,
       icons: teamDraft.icons.slice(),
       vehicles: teamDraft.vehicles.slice(),
@@ -322,10 +321,15 @@
       if (value) {
         const total = value.turnCount ?? (value.questionCountConfirmed && value.questionCount !== 33
           ? value.questionCount : F.DEFAULT_TURN_COUNT);
-        const safe = value.turnCount ? value : {
+        let safe = value.turnCount ? value : {
           ...value, turnCount: total, questionCount: total,
           quotas: migrateQuotas(value, total),
         };
+        const topics = safe.selectedTopics ?? Object.keys(safe.quotas).filter(t => safe.quotas[t] > 0),
+          counts = F.topicCounts(bank.bank, safe.difficulty),
+          maximum = Math.floor(topics.reduce((sum,t) => sum + (counts[t] ?? 0),0) / teamDraft.names.length);
+        if (maximum > 0 && safe.turnCount > maximum)
+          safe = {...safe, turnCount:maximum, questionCount:maximum, quotas:migrateQuotas(safe,maximum)};
         F.prepare(
           bank.bank,
           settingsConfig(safe, ["Giocatore 1", "Giocatore 2", "Giocatore 3"]),
@@ -495,7 +499,7 @@
     time.append(
       node("h3", "Tempo e Omen"),
       input(
-        "Turni totali (da 1 a 99)",
+        "Turni totali",
         "turn-count",
         value.turnCount ?? F.DEFAULT_TURN_COUNT,
         "number",
@@ -544,7 +548,7 @@
       node("h3", "Distribuzione delle domande"),
       node(
         "p",
-        "Scegli gli argomenti delle domande disponibili nei turni: le quote devono sommare al numero di turni. Turni saltati o ceduti contano comunque; Malocchio non crea un turno aggiuntivo. Le altre domande restano in riserva per sostituzioni e Ultimo Miglio.",
+        "Massimo turni = domande disponibili negli argomenti e nella difficoltà scelti ÷ numero di giocatori, arrotondato per difetto. Le quote devono sommare ai turni. Turni saltati o ceduti contano comunque; Malocchio non aggiunge un turno.",
         "muted",
       ),
     );
@@ -552,12 +556,12 @@
     list.id = "quotas";
     topics.append(list);
     p.append(topics);
+    settingsTopics = new Set(value.selectedTopics ?? Object.keys(value.quotas).filter(t => value.quotas[t] > 0));
     drawQuotas(value.quotas);
     $("difficulty").onchange = () => act(rebalance);
     $("turn-count").onchange = () => act(rebalance);
     $("turn-count").step = "1";
     $("turn-count").min = "1";
-    $("turn-count").max = "99";
     topics.append(btn("Ribilancia quote", rebalance));
     const row = node("div", undefined, "row");
     row.append(
@@ -588,6 +592,7 @@
       btn("Torna alla schermata iniziale", goHome),
     );
     p.append(row);
+    updateTurnLimit();
     showSettingsTab(settingsTab);
   }
   function showSettingsTab(tab) {
@@ -608,30 +613,45 @@
 
   function drawQuotas(quotas) {
     const list = $("quotas"),
-      filter = $("difficulty").value;
+      counts = F.topicCounts(bank.bank, $("difficulty").value),
+      previousPage = Number(main.querySelector(".quota-pages")?.dataset.page ?? 0);
     list.replaceChildren();
     main.querySelector(".quota-pages")?.remove();
     const labels = [
       ...new Map(bank.bank.map((q) => [q.topic, q.topicName])),
     ].map(([t, name], i) => {
-      const count = bank.bank.filter(
-        (q) => q.topic === t && (filter === "misto" || q.difficulty === filter),
-      ).length;
+      const count = counts[t];
       const l = input(
-        name + " (" + count + " disponibili)",
+        "Quota",
         "quota-" + i,
-        quotas[t] ?? 0,
+        settingsTopics.has(t) ? Math.min(quotas[t] ?? 0, count) : 0,
         "number",
       );
-      l.querySelector("input").dataset.topic = t;
-      list.append(l);
-      return l;
+      const amount = l.querySelector("input");
+      amount.dataset.topic = t;
+      amount.min = "0"; amount.max = String(count); amount.step = "1";
+      amount.disabled = !settingsTopics.has(t) || count === 0;
+      const row = node("div", undefined, "quota-row"),
+        choice = node("label", undefined, "quota-topic"),
+        check = node("input");
+      check.type = "checkbox"; check.id = "topic-" + i;
+      check.checked = settingsTopics.has(t);
+      check.setAttribute("aria-label", "Seleziona " + name);
+      check.onchange = () => act(() => {
+        if(check.checked) settingsTopics.add(t); else settingsTopics.delete(t);
+        rebalance(); $(check.id)?.focus();
+      });
+      choice.append(check, node("span", name + " (" + count + " disponibili)"));
+      amount.setAttribute("aria-label", "Quota " + name);
+      row.append(choice, l); list.append(row);
+      return row;
     });
-    let page = 0;
+    let page = Math.min(previousPage, Math.max(0, Math.ceil(labels.length / 4) - 1));
     const nav = node("nav", undefined, "row quota-pages"),
       count = node("span");
     nav.setAttribute("aria-label", "Pagine degli argomenti");
     const show = () => {
+      nav.dataset.page = String(page);
       labels.forEach((label, i) => (label.hidden = Math.floor(i / 4) !== page));
       count.textContent = page + 1 + " / " + Math.ceil(labels.length / 4);
       previous.disabled = page === 0;
@@ -652,10 +672,27 @@
     show();
   }
   function rebalance() {
+    const maximum = updateTurnLimit();
+    if (!maximum) { drawQuotas({}); return; }
     const total = number("turn-count");
-    if (!Number.isInteger(total) || total < 1 || total > 99)
-      throw Error("Scegli un numero intero di turni compreso tra 1 e 99");
-    drawQuotas(balancedQuotas($("difficulty").value, total));
+    if (!Number.isInteger(total) || total < 1)
+      throw Error("Scegli un numero intero di turni compreso tra 1 e " + maximum);
+    drawQuotas(balancedQuotas($("difficulty").value, total, settingsTopics));
+  }
+  function updateTurnLimit() {
+    const counts = F.topicCounts(bank.bank, $("difficulty").value),
+      available = [...settingsTopics].reduce((sum, t) => sum + (counts[t] ?? 0), 0),
+      maximum = Math.floor(available / teamDraft.names.length),
+      field = $("turn-count"),
+      wasDisabled = field.disabled;
+    field.max = String(maximum);
+    field.disabled = maximum === 0;
+    field.parentElement.firstChild.textContent = maximum
+      ? "Turni totali (massimo " + maximum + ": " + available + " ÷ " + teamDraft.names.length + ") "
+      : "Seleziona almeno " + teamDraft.names.length + " domande disponibili ";
+    if (!maximum || Number(field.value) > maximum) field.value = String(maximum);
+    else if (wasDisabled) field.value = String(Math.min(F.DEFAULT_TURN_COUNT, maximum));
+    return maximum;
   }
   function number(id) {
     const x = $(id).value.trim();
@@ -665,19 +702,22 @@
     return n;
   }
   function readSettings() {
+    if ($("turn-count").disabled)
+      throw Error("Seleziona argomenti con almeno " + teamDraft.names.length + " domande disponibili alla difficoltà scelta");
     return {
       seconds: number("seconds"),
       bonusWeights: Object.fromEntries(
         F.TYPES.map((type) => [type, number("weight-" + type)]),
       ),
       difficulty: $("difficulty").value,
+      selectedTopics: [...settingsTopics],
       turnCount: number("turn-count"),
       questionCount: number("turn-count"),
       bases: Object.fromEntries(
         ["facile", "media", "difficile"].map((d) => [d, number("base-" + d)]),
       ),
       quotas: Object.fromEntries(
-        [...$("quotas").querySelectorAll("input")].map((i) => [
+        [...$("quotas").querySelectorAll('input[type="number"]')].map((i) => [
           i.dataset.topic,
           number(i.id),
         ]),
