@@ -1,8 +1,8 @@
 /* Hellscape: core. Shared by the static site, Node tests and offline export. */
 (function (root) {
   "use strict";
-  const RULES = "22.0.0",
-    VERSION = "2.5.0",
+  const RULES = "23.0.0",
+    VERSION = "2.6.0",
     TYPES = ["salta", "ruba", "svela", "aura", "karma", "marx", "ira", "antisigillo", "sacrificio"];
   const LABELS = {
     salta: "Catene",
@@ -18,7 +18,7 @@
   const AMMO_HELP = {
     salta: "Le catene immobilizzano un avversario attivo e gli fanno saltare il prossimo turno ordinario. Più Catene si sommano, una per turno. Se riceve una domanda tramite Malocchio, risponde subito, ma le Catene restano pendenti. Nessuna vita viene tolta.",
     ruba: "Prendi immediatamente il 33% esatto dei punti attuali di un avversario e rinunci subito al turno corrente, senza rispondere alla domanda. Il Sigillo blocca il furto ma non il costo del turno. Contrappasso reagisce al furto non bloccato. Non toglie vite; i punti futuri non vengono condivisi.",
-    svela: "Scruti soltanto il testo della domanda e il punteggio, senza vedere le quattro alternative, a timer fermo. Puoi affrontarla oppure passarla immediatamente a un altro dannato attivo: il timer intero parte alla conferma. Chi la riceve non può usare Ammo o passarla di nuovo. Le Catene già pendenti sul bersaglio non vengono consumate.",
+    svela: "Svela soltanto il testo della domanda e il suo valore, senza alternative e a timer fermo. Puoi tenerla o passarla a un altro gruppo attivo: il tempo intero parte alla conferma. Chi risponde correttamente tiene tutti i punti e le Ammo guadagnate; se sbaglia o scade il tempo perde il valore della domanda, fermandosi a zero punti. Chi la riceve non può usare Ammo o ripassarla. La rotazione riparte dal gruppo successivo a chi ha usato Malocchio, rispettando Catene ed eliminazioni.",
     aura: "Attiva il sigillo nel tuo turno per bloccare i nuovi attacchi Catene, Tributo e Malocchio fino al tuo prossimo turno. Non cancella effetti già pendenti, non si accumula e non protegge da Livella, Flagello, Sacrificio, sanzioni o errori.",
     karma: "Contrappasso agisce passivamente: quando subisci un nuovo attacco non bloccato, una copia si trasforma in quell’Ammo, utilizzabile solo contro l’aggressore. Ogni attacco trasforma al massimo una copia. Non reagisce a Livella, Flagello, Antisigillo o Sacrificio.",
     marx: "Livella redistribuisce immediatamente in parti uguali i punti di tutti i dannati ancora in gara, compreso chi la usa. Il totale resta identico anche con frazioni. Non agisce sugli eliminati, non viene bloccata da Sigillo e non attiva Contrappasso.",

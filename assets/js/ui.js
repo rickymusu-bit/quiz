@@ -1008,11 +1008,11 @@
     const s = game.s,
       grid = node("nav", undefined, "turn-order");
     grid.setAttribute("aria-label", "Turnazione");
-    const pos = Math.max(0, s.order.indexOf(s.respondent));
+    const pos = Math.max(0, s.order.indexOf(s.malocchio?.source ?? s.respondent));
     const order = [...new Set([
       s.respondent,
-      ...s.order.slice(pos),
-      ...s.order.slice(0, pos),
+      ...s.order.slice(pos + 1),
+      ...s.order.slice(0, pos + 1),
       ...s.groups.map((_, i) => i),
     ])];
     const list = node("ol");
@@ -1168,8 +1168,7 @@
       main.querySelector('.hell-race[data-animation-busy="true"]') !== null);
   }
   function syncCinematic() {
-    const malocchioAnswer = game?.s.screen === "answer" && game.s.events.some(e =>
-      e.turn === game.s.turn && e.activation && e.copy?.type === "svela");
+    const malocchioAnswer = game?.s.screen === "answer" && !!game.s.malocchio;
     // The full response timer starts at confirmation, including a passed question.
     const active = cinematicActive() && !malocchioAnswer;
     const tieActive = FoolHellRace.tieStatus().blocking;
@@ -1227,6 +1226,7 @@
     main.classList.add("showing-movement");
     const cue = node("div", r.option === null ? "TEMPO SCADUTO" :
       r.correct ? "RISPOSTA CORRETTA" : "RISPOSTA ERRATA", "movement-cue");
+    if (r.malocchio && !r.correct) cue.append(node("span", "−" + F.formatScore(r.penalty) + " PT", "malocchio-loss"));
     cue.dataset.outcome = r.correct ? "correct" : "incorrect";
     cue.setAttribute("role", "status");
     cue.setAttribute("aria-live", "polite");
@@ -1407,7 +1407,7 @@
       b.append(
         node(
           "p",
-          "Malocchio: scegli a timer fermo. Il tempo intero parte alla conferma.",
+          "Malocchio: scegli a timer fermo. Chi sbaglia o lascia scadere il tempo perde il valore della domanda, fino a zero. Chi risponde bene tiene punti e Ammo. Dopo risponde il gruppo successivo a " + s.groups[s.owner].name + ".",
           "good",
         ),
       );
@@ -1426,6 +1426,9 @@
       });
       b.append(row);
     }
+    if (s.screen === "answer" && s.malocchio)
+      b.append(node("p", "Malocchio · errore o tempo scaduto: −" + s.config.bases[s.current.difficulty] +
+        " punti, minimo zero. Punti e Ammo di una corretta restano a " + s.groups[s.respondent].name + ". La rotazione riparte da chi segue " + s.groups[s.malocchio.source].name + ".", "malocchio-risk"));
     if (s.screen === "answer" && !s.paused)
       b.append(
         node(
@@ -1463,7 +1466,9 @@
         ),
         text("p", s.current.explanation),
       );
-      if (r.base)
+      if (r.malocchio && !r.correct)
+        ex.append(node("p", "Malocchio: −" + F.formatScore(r.penalty) + " punti · minimo zero", "bad"));
+      else if (r.base)
         ex.append(
           node(
             "p",

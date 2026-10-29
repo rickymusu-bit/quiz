@@ -182,6 +182,7 @@
         usedBonus: false,
         draftBonus: null,
         passLock: null,
+        malocchio: null,
         effects: [],
         seen: [],
         rejected: [],
@@ -338,6 +339,7 @@
       s.groups[i].aura = null;
       s.usedBonus = false;
       s.draftBonus = null;
+      s.malocchio = null;
       this.take();
     }
     reveal(expected) {
@@ -480,6 +482,7 @@
       } else if (copy.type === "aura") g.aura = s.turn;
       else if (copy.type === "svela") {
         s.passLock = copy.target;
+        s.malocchio = { source: s.owner, question: s.current.id };
         s.seen.push(s.current.id);
         s.screen = "choice";
         s.remaining = s.config.seconds * 1000;
@@ -603,10 +606,12 @@
         share: rational(0),
         beneficiaries: [],
         bonus: null,
+        penalty: rational(0),
+        malocchio: s.malocchio ? clone(s.malocchio) : null,
       };
       if (s.phase === "ordinaria") {
         // Legacy deferred Tributi are settled once; new attacks transfer immediately.
-        const beneficiaries = [
+        const beneficiaries = s.malocchio ? [] : [
           ...new Set(
             s.effects
               .filter(
@@ -650,6 +655,15 @@
             result.bonus = result.bonuses[0] ?? null;
           }
         }
+        if (!correct && s.malocchio) {
+          const value = rational(s.config.bases[q.difficulty]);
+          result.base = value.n;
+          result.penalty = compare(g.score, value) <= 0 ? clone(g.score) : value;
+          g.score = add(g.score, rational(-BigInt(result.penalty.n), BigInt(result.penalty.d)));
+          this.log("Malocchio: " + g.name + " perde " + exact(result.penalty) + " punti (valore domanda " + exact(value) + ", minimo zero)", {
+            type: "malocchio-penalty", source: s.malocchio.source, target: i, amount: clone(result.penalty), value, questionId: q.id, turn: s.turn,
+          });
+        }
         s.effects = s.effects.filter(
           (e) => !(e.type === "ruba" && e.target === i),
         );
@@ -692,6 +706,7 @@
       this.stop();
       s.draftBonus = null;
       s.phase = "conclusa";
+      s.malocchio = null;
       s.winner = winner;
       s.panel = null;
       s.paused = false;
@@ -743,6 +758,7 @@
           if (!leaders.includes(i))
             this.eliminate(i, "Punteggio inferiore al primo posto");
         s.phase = "pareggio";
+        s.malocchio = null;
         s.tieOrder = s.order.filter((i) => leaders.includes(i));
         s.tieIndex = -1;
         s.tieRound = 1;
@@ -768,7 +784,7 @@
       this.guard();
       this.revision(expected);
       need(this.s.screen === "result", "Registrare prima un esito");
-      this.newTurn(this.s.respondent);
+      this.newTurn(this.s.malocchio?.source ?? this.s.respondent);
     }
     openSanctions() {
       need(
@@ -806,6 +822,7 @@
     }
     resolveEliminations() {
       const s = this.s;
+      const rotationFrom = s.malocchio?.source ?? s.respondent;
       const interrupted =
         s.groups[s.respondent].out &&
         ["hidden", "answer", "choice", "supply"].includes(s.screen);
@@ -815,7 +832,7 @@
         this.stop();
         if (s.current && s.seen.includes(s.current.id))
           s.cancelled.push(s.current.id);
-        this.newTurn(s.respondent);
+        this.newTurn(rotationFrom);
         if (s.suspendAfter) {
           s.suspended = true;
           s.suspendAfter = false;
@@ -914,7 +931,17 @@
         // Replace the former default; explicit alternative probabilities survive.
         if (s.config?.bonusWeights?.antisigillo === 30) s.config.bonusWeights.antisigillo = 20;
       }
+      if (s.version === "2.5.0" && s.rules === "22.0.0") {
+        s.version = VERSION;
+        s.rules = RULES;
+      }
       if (s.version === VERSION && s.rules === RULES) {
+        if (s.malocchio === undefined) {
+          const active = s.phase === "ordinaria" && ["choice", "answer", "result"].includes(s.screen) &&
+            (s.screen === "choice" || s.respondent !== s.owner ||
+              (s.events ?? []).some(e => e.turn === s.turn && e.activation && e.copy?.type === "svela"));
+          s.malocchio = active ? { source: s.owner, question: s.current?.id } : null;
+        }
         s.config.bonusWeights = {
           ...DEFAULT_BONUS_WEIGHTS,
           ...(s.config.bonusWeights ?? {}),
@@ -1005,6 +1032,11 @@
       s.phase !== "ordinaria" || s.order.length === 3,
       "Rotazione ordinaria incompleta",
     );
+    need(s.malocchio === null || (
+      s.malocchio && s.phase === "ordinaria" && ["choice", "answer", "result"].includes(s.screen) &&
+      s.malocchio.source === s.owner && s.malocchio.question === s.current?.id && s.usedBonus
+    ), "Stato Malocchio non valido");
+    need(s.screen !== "choice" || s.malocchio !== null, "Scelta senza Malocchio");
     const copyIds = new Set();
     for (const g of s.groups) {
       integer(g.sanctions, 0, 3, "Sanzioni");

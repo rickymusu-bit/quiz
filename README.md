@@ -1,4 +1,16 @@
-# Aggiornamento Ammo · motore 2.5.0 / regole 22.0.0
+# Malocchio · motore 2.6.0 / regole 23.0.0
+
+Malocchio mostra testo e valore della domanda senza alternative, a timer fermo.
+Chi lo usa può tenerla o passarla a un altro gruppo. Alla conferma parte il timer
+intero: chi risponde bene tiene tutti i punti e le Ammo ottenute; chi sbaglia o
+lascia scadere il tempo perde il valore della domanda, **senza scendere sotto zero**.
+Le vite restano invariate. La rotazione riparte da chi segue **l’autore di Malocchio**,
+rispettando Catene ed eliminazioni, anche se ha risposto un altro gruppo.
+La domanda passata non può essere ripassata né permette Ammo al destinatario.
+Il rischio e l’autore persistono nei salvataggi, anche migrando una domanda aperta
+nelle versioni precedenti; nessun esito storico viene riapplicato.
+
+## Aggiornamento Ammo · motore 2.5.0 / regole 22.0.0
 
 La richiesta aggiornata dell’utente prevale sulle specifiche storiche sotto:
 
