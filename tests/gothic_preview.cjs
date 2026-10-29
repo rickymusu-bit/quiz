@@ -12,7 +12,7 @@ const {chromium}=require('playwright'),fs=require('node:fs'),assert=require('nod
    await page.clock.install({time:epoch});
    // A controlled origin avoids racing a 100 ms deadline across browser round trips.
    await page.clock.pauseAt(new Date(epoch.getTime()+60000));
-   for(const label of ['Catene','Tributo','Malocchio','Sigillo','Contrappasso','Livella','Flagello','Antisigillo','Sacrificio']){
+   for(const label of ['Catene','Tributo','Malocchio','Sigillo','Contrappasso','Livella','Flagello','Arsenico','Sacrificio']){
     await page.getByRole('button',{name:label,exact:true}).click();await page.clock.runFor(650);
     assert.match(await page.locator('#effect-description').innerText(),new RegExp(label));
     const before=await page.locator('canvas').evaluate(c=>c.toDataURL());await page.clock.runFor(200);

@@ -1,0 +1,28 @@
+[
+  {
+    "offline": false,
+    "defaults": [
+      111,
+      222,
+      333
+    ],
+    "custom_profile_preserved": [
+      123,
+      456,
+      789
+    ]
+  },
+  {
+    "offline": true,
+    "defaults": [
+      111,
+      222,
+      333
+    ],
+    "custom_profile_preserved": [
+      123,
+      456,
+      789
+    ]
+  }
+]

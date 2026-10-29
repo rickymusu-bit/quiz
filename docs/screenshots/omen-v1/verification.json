@@ -1,0 +1,101 @@
+{
+  "engine_tests": 147,
+  "engine_failed": 0,
+  "datasets": {
+    "termologia": 100,
+    "introduzione-fisica-misura": 100
+  },
+  "all_question_layout_cases": 1200,
+  "question_layout_failures": 0,
+  "question_layout_viewports": [
+    [
+      568,
+      320
+    ],
+    [
+      667,
+      375
+    ],
+    [
+      844,
+      390
+    ]
+  ],
+  "omen_browser": [
+    {
+      "offline": false,
+      "viewport": [
+        1440,
+        900
+      ],
+      "dpr": 1,
+      "rules": "PASS",
+      "overflow": "PASS",
+      "restore": "PASS",
+      "rotation": "PASS"
+    },
+    {
+      "offline": false,
+      "viewport": [
+        844,
+        390
+      ],
+      "dpr": 2,
+      "rules": "PASS",
+      "overflow": "PASS",
+      "restore": "PASS",
+      "rotation": "PASS"
+    },
+    {
+      "offline": false,
+      "viewport": [
+        667,
+        375
+      ],
+      "dpr": 1,
+      "rules": "PASS",
+      "overflow": "PASS",
+      "restore": "PASS",
+      "rotation": "PASS"
+    },
+    {
+      "offline": false,
+      "viewport": [
+        568,
+        320
+      ],
+      "dpr": 2,
+      "rules": "PASS",
+      "overflow": "PASS",
+      "restore": "PASS",
+      "rotation": "PASS"
+    },
+    {
+      "offline": true,
+      "viewport": [
+        844,
+        390
+      ],
+      "dpr": 2,
+      "rules": "PASS",
+      "overflow": "PASS",
+      "restore": "PASS",
+      "rotation": "PASS"
+    }
+  ],
+  "verified": [
+    "build",
+    "frames",
+    "portal: 40 offline viewport/DPR samples",
+    "chase: 0/1/2 losers and offline samples",
+    "motion: 30/60/144 FPS and browser pause/visibility",
+    "endings",
+    "terrain",
+    "quality: desktop/mobile DPR 1/2",
+    "layout: desktop/mobile DPR 1/2",
+    "orientation: site/offline/reduced motion/fullscreen",
+    "engine persistence and migration",
+    "browser components: questions, assets, start/resume, experience, desktop keyboard, configuration, Omen controls, cinematic UI, options, UX regressions"
+  ],
+  "delivery": "GIF and screenshots only; no merge or deploy"
+}

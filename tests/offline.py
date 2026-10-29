@@ -52,7 +52,7 @@ with sync_playwright() as p:
    assert frame().evaluate('HellscapeUI.game.s.valid')==1
    frame().evaluate('HellscapeUI.showRules()')
    expect(frame().locator('.rules-content .rules-page')).to_have_count(1)
-   assert frame().locator('#rules-section option').count()==22
+   assert frame().locator('#rules-section option').count()==23
    frame().get_by_role('button',name='Torna alla partita').click()
    frame().evaluate('document.fonts.ready');page.wait_for_timeout(250)
    if bank=='termologia':page.screenshot(path=str(ART/f'offline-{width}x{height}.png'))

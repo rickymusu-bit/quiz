@@ -64,6 +64,7 @@
       height = viewport?.height || root.innerHeight;
     let layout = measure(width, height);
     doc.body.dataset.layout = layout.compact ? 'compact' : 'stage';
+    doc.body.dataset.input = root.matchMedia('(pointer: coarse)').matches || layout.compact ? 'mobile' : 'desktop';
     if (layout.compact) {
       const padding = getComputedStyle(stage), value = name => parseFloat(padding[name]) || 0;
       layout = measure(Math.max(1, width - value('paddingLeft') - value('paddingRight')),
@@ -93,7 +94,7 @@
       if (controls && getComputedStyle(controls).visibility !== 'hidden')
         controls.scrollIntoView({block:'nearest'});
     }
-    if (layout.compact && !cinematic && panel && panelMode !== previousPanel && panelMode !== 'result') {
+    if (layout.compact && !playing && !cinematic && panel && panelMode !== previousPanel && panelMode !== 'result') {
       const bounds = panel.getBoundingClientRect();
       if (bounds.bottom > height || bounds.top < 0)
         (stage.querySelector('.statusline') || panel).scrollIntoView({block:'start'});

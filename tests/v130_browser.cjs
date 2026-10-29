@@ -28,18 +28,13 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/v130');fs.
       // Malocchio is exercised through the real inventory and confirmation UI.
       await page.evaluate(()=>{const g=HellscapeUI.game;g.s.groups[g.s.owner].inventory.push({id:g.uid(),type:'svela',target:null,origin:'browser'});HellscapeUI.changed();});await page.clock.runFor(100);
       await page.getByRole('button',{name:'Inventario',exact:true}).click();await page.locator('#dialog [data-ammo="svela"]').click();await page.locator('#ammo-info').getByRole('button',{name:'Usa',exact:true}).click();await page.locator('#dialog').getByRole('button',{name:'Conferma uso',exact:true}).click();
-      await page.clock.runFor(2500);assert.equal(await page.locator('.answers,.answer').count(),0);assert.equal(await page.locator('.question').count(),1);assert.match(await page.locator('.question-points').innerText(),/100 punti/);
+      await page.clock.runFor(2500);assert.equal(await page.locator('.answers,.answer').count(),0);assert.equal(await page.locator('.question').count(),1);assert.match(await page.locator('.question-points').innerText(),/111 punti/);
       const held=await page.evaluate(()=>HellscapeUI.game.left());await page.keyboard.press('a');await page.keyboard.press('Enter');await page.clock.runFor(2000);
       assert.equal(await page.evaluate(()=>HellscapeUI.game.s.screen),'choice');assert.equal(await page.evaluate(()=>HellscapeUI.game.left()),held);
       const q=await page.evaluate(()=>HellscapeUI.game.s.current.options);const accessible=await page.locator('.operation-body').ariaSnapshot();q.forEach(option=>assert(!accessible.includes(option)));
       await shot('malocchio');const target=await page.evaluate(()=>HellscapeUI.game.s.order[1]);await page.getByRole('button',{name:await page.evaluate(i=>'Passa a '+HellscapeUI.game.s.groups[i].name,target),exact:true}).click();
       await page.clock.runFor(100);assert.equal(await page.locator('.answer').count(),4);assert(await page.evaluate(()=>HellscapeUI.game.running));assert.equal(await page.evaluate(()=>HellscapeUI.game.s.respondent),target);
       await reset();
-      // Antisigillo UI offers only active protected opponents.
-      await page.evaluate(()=>{const g=HellscapeUI.game;g.s.groups[g.s.order[1]].aura=g.s.turn;g.s.groups[g.s.owner].inventory.push({id:g.uid(),type:'antisigillo',target:null,origin:'browser'});HellscapeUI.changed();});await page.clock.runFor(100);
-      await page.getByRole('button',{name:'Inventario',exact:true}).click();await page.locator('#dialog [data-ammo="antisigillo"]').click();await shot('antisigillo');
-      await page.locator('#ammo-info').getByRole('button',{name:'Usa',exact:true}).click();assert.equal(await page.locator('#bonus-target option').count(),1);await page.locator('#dialog').getByRole('button',{name:'Conferma uso',exact:true}).click();
-      assert.equal(await page.evaluate(()=>HellscapeUI.game.s.groups[HellscapeUI.game.s.order[1]].aura),null);await page.clock.runFor(2000);
       await page.evaluate(()=>{const g=HellscapeUI.game;g.s.groups.forEach((p,i)=>{p.score=Fool.rational([2000,666,1][i],i===2?3:1);p.inventory.push({id:g.uid(),type:'aura',target:null,origin:'fresh'});p.aura=i===g.s.owner?null:3;});g.s.groups[g.s.owner].inventory.push({id:g.uid(),type:'ira',target:null,origin:'browser'});HellscapeUI.changed();});await page.clock.runFor(5000);
       await page.getByRole('button',{name:'Inventario',exact:true}).click();await page.locator('#dialog [data-ammo="ira"]').click();await page.locator('#ammo-info').getByRole('button',{name:'Usa',exact:true}).click();await shot('flagello-confirm');await page.locator('#dialog').getByRole('button',{name:'Conferma uso',exact:true}).click();await page.clock.runFor(2300);
       assert.deepEqual(await page.evaluate(()=>HellscapeUI.game.s.groups.map(p=>[Fool.exact(p.score),p.damage,p.inventory.length])),[['1334',1,0],['0',1,0],['0',1,0]]);assert(await page.evaluate(()=>HellscapeUI.game.s.groups.every((p,i)=>(p.aura!==null)===(i!==HellscapeUI.game.s.owner))));await shot('flagello-result');
@@ -55,7 +50,7 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/v130');fs.
       async function at(offset){const wanted=plan.chaseEnd+offset;const actual=await page.evaluate(()=>{const s=FoolHellRace.presentationSnapshot();return s.frame.time-s.plan.entry.time;});await page.clock.runFor(Math.max(0,Math.round((wanted-actual)*1000)));}
       await at(1.35);await shot('portal-descent');await at(2.25);await shot('portal-impact');await at(2.85);await shot('portal-crossing');await at(5.5);await shot('portal-rubble');
       const end=await page.evaluate(()=>FoolHellRace.presentationSnapshot().frame);assert(end.bridge.rubble&&end.bridge.damage===1);assert(!end.portal.visible);assert(end.cleared);assert.equal(await page.evaluate(()=>JSON.stringify(HellscapeUI.game.snapshot())),before);
-      report.checks.push({viewport:[width,height],dpr,raster,malocchio:'PASS',antisigillo:'PASS',flagello:'PASS',ultimoMiglio:'PASS',capture:'PASS',portal:'PASS'});await page.close();
+      report.checks.push({viewport:[width,height],dpr,raster,malocchio:'PASS',flagello:'PASS',ultimoMiglio:'PASS',capture:'PASS',portal:'PASS'});await page.close();
     }
     assert.deepEqual(report.errors,[]);fs.writeFileSync(path.join(out,'report.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(report.checks,null,2));
   }finally{await browser.close();server.close();}

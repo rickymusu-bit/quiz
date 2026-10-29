@@ -1,6 +1,6 @@
 {
   "name": "hellscape",
-  "version": "3.9.0",
+  "version": "3.10.0",
   "private": true,
   "scripts": {
     "dev": "python3 -m http.server 8000 --bind 127.0.0.1",
@@ -16,6 +16,7 @@
     "test:terrain": "python3 tests/terrain_browser.py",
     "test:quality": "node scripts/build.cjs --quality-preview && python3 tests/visual_quality.py",
     "test:layout": "python3 tests/responsive.py",
+    "test:omen": "npm run preview:offline && python3 tests/omen_browser.py",
     "test:orientation": "python3 tests/orientation.py",
     "test:motion": "node tests/motion.cjs && node scripts/build.cjs --quality-preview && python3 tests/motion_browser.py",
     "test:ties": "node --test tests/tie.test.js && node scripts/build.cjs --quality-preview && python3 tests/tie_browser.py",

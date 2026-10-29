@@ -1,3 +1,8 @@
+## Omen, Arsenico e HUD — 3.10.0
+
+Implementazione della [specifica della PR #49](docs/HELLSCAPE_SPEC_OMEN_CERBERO_LAYOUT_v1.md).
+[Decisioni, compatibilità e verifiche](docs/HELLSCAPE_OMEN_v1.md).
+
 **Si gioca solo in orizzontale.** In verticale ruota il dispositivo: timer e animazioni restano fermi e la partita conserva i progressi. [GIF reale e verifiche](docs/previews/orientation/README.md).
 
 # Contrappasso · motore 2.8.0 / regole 25.0.0

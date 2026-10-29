@@ -17,12 +17,6 @@ test('A protected correct answer keeps all points but awards no Ammo and perform
  answer(g,true);assert.equal(F.exact(g.s.groups[source].score),'300');assert.equal(g.s.result.ammoSuppressed,true);assert.deepEqual(g.s.result.bonuses,[]);assert.equal(g.s.result.bonus,null);
  assert.deepEqual(g.s.groups[source].inventory.map(c=>c.id),[spare.id]);assert.equal(rolls,0);F.Game.restore(g.snapshot());
 });
-test('Antisigillo removes both protection and restrictions immediately, restoring use and awards',()=>{
- const g=game(),[protectedPlayer,attacker]=g.s.order;seal(g);answer(g);g.next();g.use(item(g,'antisigillo').id,protectedPlayer);assert.equal(g.s.groups[protectedPlayer].aura,null);
- answer(g);g.next();answer(g);g.next();assert.equal(g.s.owner,protectedPlayer);
- g.use(item(g,'sacrificio').id,null);assert.equal(F.exact(g.s.groups[protectedPlayer].score),'777');
- g.s.config.bonusWeights=Object.fromEntries(F.TYPES.map(t=>[t,100]));answer(g,true);assert.equal(g.s.result.ammoSuppressed,false);assert.equal(g.s.result.bonuses.length,9);
-});
 
 test('Sigillo lasts exactly three personal turns including activation, with no reduction on others or a restored game',()=>{
  let g=game();const source=g.s.owner;seal(g);assert.equal(g.s.groups[source].aura,3);
@@ -38,12 +32,12 @@ test('Activation removes pending negative Ammo and blocks Catene, Tributo and Ma
  for(const type of ['salta','ruba','svela']){assert.equal(g.attack(type,opponent,source,g.uid()),false);assert.equal(F.exact(g.s.groups[source].score),'1000');assert.equal(karma.type,'karma');}
  assert.equal(g.s.groups[source].aura,3);F.Game.restore(g.snapshot());
 });
-test('Livella excludes all protected scores from both redistribution and its cinematic target set',()=>{
+test('Livella includes all protected scores from both redistribution and its cinematic target set',()=>{
  for(const points of [[101,900,202],[0,0,3]]){
   const g=game(),[source,protectedPlayer,third]=g.s.order;g.s.groups[source].score=F.rational(points[0],3);g.s.groups[protectedPlayer].score=F.rational(points[1]);g.s.groups[third].score=F.rational(points[2],3);g.s.groups[protectedPlayer].aura=3;
-  const before=F.clone(g.s.groups[protectedPlayer]);g.use(item(g,'marx').id,null);const share=F.rational(points[0]+points[2],6);
-  assert.deepEqual(g.s.groups[protectedPlayer],before);assert.deepEqual(g.s.groups[source].score,share);assert.deepEqual(g.s.groups[third].score,share);
-  const plans=require('../assets/hell-ammo.js').plans(g.s.events,g.s),plan=plans.find(p=>p.type==='marx');assert.deepEqual(plan.targets,[source,third]);assert.equal(plan.blocked,false);F.Game.restore(g.snapshot());
+  const before=F.clone(g.s.groups[protectedPlayer]);g.use(item(g,'marx').id,null);const share=F.rational(points[0]+points[1]*3+points[2],9);
+  assert.deepEqual(g.s.groups[protectedPlayer],{...before,score:share});assert.deepEqual(g.s.groups[source].score,share);assert.deepEqual(g.s.groups[third].score,share);
+  const plans=require('../assets/hell-ammo.js').plans(g.s.events,g.s),plan=plans.find(p=>p.type==='marx');assert.deepEqual(plan.targets,g.s.order);assert.equal(plan.blocked,false);F.Game.restore(g.snapshot());
  }
 });
 test('Flagello from an opponent ignores Sigillo, removes life/Ammo/points and retains the remaining protection',()=>{

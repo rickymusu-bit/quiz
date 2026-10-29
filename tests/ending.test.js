@@ -7,7 +7,7 @@ const state = (winner = 0, out = [false, false, false]) => ({
   respondent: 2,
   groups: out.map((flag) => ({ out: flag })),
 });
-test("Only survivor crosses the descending portal before collapse, fists, flame and exhaustion", () => {
+test("Only survivor crosses the descending portal before collapse, reaction, flame and exhaustion", () => {
   const s = state(2, [true, true, false]),
     p = E.plan(s, [0, 1]);
   assert.deepEqual(p.victims, []);
@@ -26,7 +26,7 @@ test("Score victory removes remaining opponents before opening the portal", () =
   assert.equal(E.sample(p, p.captureEnd + 0.1).phase, "winner-chase");
   assert.equal(E.sample(p, p.reactionStart + 0.1).phase, "rage");
 });
-test("Game Over eats only the last player and then dances without a portal", () => {
+test("Game Over throws only the last vehicle into lava and then reacts without a portal", () => {
   const p = E.plan(state(null, [true, true, true]), [0, 1], [2]);
   assert.deepEqual(p.victims, [2]);
   assert.equal(E.sample(p, 2).phase, "capture");
@@ -49,13 +49,13 @@ test("Planning and animation sampling preserve the authoritative state", () => {
   assert.equal(E.sample(p, 0).phase, E.sample(p, 0).phase);
 });
 
-test("Vehicle stays gripped through the lift, disappears inside the mouth and recovers", () => {
-  assert.equal(E.captureAction(1), "grip");
-  assert.equal(E.captureAction(1.4), "lift");
-  assert.equal(E.captureAction(2.7), "swallow");
-  assert.equal(E.captureAction(3.3), "chew");
-  assert.equal(E.captureAction(4), "recover");
-  assert.equal(E.captureAction(5.1), "recover");
+test("Canine capture orders approach, bite, windup, flight, lava and recovery", () => {
+  assert.equal(E.captureAction(.8), "approach");
+  assert.equal(E.captureAction(1.1), "bite");
+  assert.equal(E.captureAction(1.5), "windup");
+  assert.equal(E.captureAction(2.7), "flight");
+  assert.equal(E.captureAction(3.8), "sink");
+  assert.equal(E.captureAction(4.8), "recover");
 });
 
 test("Portal opens after impact and collapses only after the crossing", () => {
@@ -68,7 +68,7 @@ test("Portal opens after impact and collapses only after the crossing", () => {
   assert(E.portalMotion(F.T.closeEnd+.5).collapse>0);assert.equal(E.portalMotion(F.T.closeEnd+.5).offset,0);
   assert.equal(E.portalMotion(F.T.sinkEnd).visible, false);
 });
-test("Rage plants the feet and anticipates three heavy fist impacts", () => {
+test("Rage retains its three reaction pulses with planted paws", () => {
   for(const t of [.46,1.46,2.46]){
     const hit=E.rageMotion(t);assert(hit.impact>.99);assert.equal(hit.lift,0);
   }

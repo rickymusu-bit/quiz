@@ -5,14 +5,14 @@ const root=path.resolve(__dirname,'..');
 const revision=require('node:child_process').execFileSync('git',['rev-parse','HEAD'],{cwd:root,encoding:'utf8'}).trim();
 async function nativeCoverage(){
  const {createCanvas,loadImage}=require('@napi-rs/canvas'),vm=require('node:vm');
- const images={};for(const [key,name] of Object.entries({vehicles:'vehicles-drive-v1',demon:'demon-actions-v1',world:'infernal-world-v1'}))
+ const images={};for(const [key,name] of Object.entries({vehicles:'vehicles-drive-v1',world:'infernal-world-v1'}))
   images[key]=await loadImage(path.join(root,'assets/hell-race/'+name+'.webp'));
  const scene={FoolMotion:require('../assets/hell-motion.js'),FoolLayout:require('../assets/hell-layout.js'),
   FoolBridge:require('../assets/hell-bridge.js'),__sheets:images,matchMedia:()=>({matches:false})};
  const document={createElement:()=>createCanvas(1,1)};
  // Run the actual crop/size code in isolation; expose private readers only in this audit VM.
  const code=fs.readFileSync(path.join(root,'assets/hell-race.js'),'utf8')
-  .replace('const sheets = { vehicles: null, demon: null, world: null };','const sheets = root.__sheets;')
+  .replace('const sheets = { vehicles: null, world: null };','const sheets = root.__sheets;')
   .replace('root.FoolHellRace = { createStage, vehiclePreview };','root.FoolHellRace = { createStage, vehiclePreview, vehicleRow, vehicleSize, atlasRow };');
  vm.runInNewContext(code,{window:scene,document});const api=scene.FoolHellRace;
  const rasterScaleMax=1536/scene.FoolLayout.reference.rasterWidth;
@@ -23,14 +23,11 @@ async function nativeCoverage(){
    maxSourceScale:Math.max(racePixels,previewPixels)/frame.width};
  });
  if(vehicles.some(v=>v.maxSourceScale>1))throw Error('A vehicle needs more native pixels at the current race/preview sizes');
- const demonRun=api.atlasRow('demon',0)[0],demonRasterWidth=scene.FoolMotion.CHASE.width*rasterScaleMax;
- const ending={FoolChase:require('../assets/hell-chase.js'),FoolEpilogue:require('../assets/hell-epilogue.js'),
-  FoolPortal:require('../assets/hell-portal.js'),FoolBridge:scene.FoolBridge};
- vm.runInNewContext(fs.readFileSync(path.join(root,'assets/hell-ending.js'),'utf8'),{globalThis:ending,document});
- const poses=ending.FoolEnding.prepare(await loadImage(path.join(root,'assets/hell-race/demon-ending-v1.webp')));
- return {revision,rasterScaleMax,vehicles,
-  demonRun:{native:[demonRun.width,demonRun.height],maxRasterWidth:demonRasterWidth,maxSourceScale:demonRasterWidth/demonRun.width},
-  demonEnding:{frames:poses.length,native:[poses[0].canvas.width,poses[0].canvas.height],maxRasterWidth:demonRasterWidth,maxSourceScale:demonRasterWidth/poses[0].canvas.width}};
+ const K=require('../assets/hell-cerbero.js'),sourceWidth=Math.min(...K.data.walk.map(f=>f.referenceWidth));
+ const demonRasterWidth=scene.FoolMotion.CHASE.width*rasterScaleMax;
+ return {revision,rasterScaleMax,vehicles,cerbero:{sources:K.ASSETS,native:[K.SOURCE.width,K.SOURCE.height],
+  textureWidth:sourceWidth,poses:K.data.walk.length,necks:K.heads.length,tailSegments:3,
+  maxRasterWidth:demonRasterWidth,maxSourceScale:demonRasterWidth/sourceWidth}};
 }
 (async()=>{
  const coverage=await nativeCoverage();
@@ -52,9 +49,9 @@ async function nativeCoverage(){
     const start=performance.now();await new Promise(resolve=>setTimeout(resolve,2500));const elapsed=performance.now()-start;
     window.requestAnimationFrame=raf;ctx.setTransform=transform;
     const sorted=costs.slice().sort((a,b)=>a-b),frames=FoolEnding.prepare(FoolEnding.load(()=>{}));
-    const sourceFiles=['vehicles-drive-v1.webp','demon-actions-v1.webp','demon-ending-v1.webp','ammo-relics-v1.webp','black-stone-bridge-v1.png','lava-sea-v2.png','portal-side-v3.png','portal-rocks-v1.png','victory-title-v1.webp','antisigillo-icon-v1.png','antisigillo-tool-v1.png','sacrificio-v1.png'];
+    const sourceFiles=['vehicles-drive-v1.webp',...FoolCerbero.ASSETS.map(p=>p.replace('assets/hell-race/','')),'arsenico-v1.png','ammo-relics-v1.webp','black-stone-bridge-v1.png','lava-sea-v2.png','portal-side-v3.png','portal-rocks-v1.png','victory-title-v1.webp','sacrificio-v1.png'];
     const sources=await Promise.all(sourceFiles.map(async name=>{const img=new Image();img.src='assets/hell-race/'+name;await img.decode();return {name,width:img.naturalWidth,height:img.naturalHeight};}));
-    return {raster:[canvas.width,canvas.height],rgbaBytes:canvas.width*canvas.height*4,cssWidth:canvas.getBoundingClientRect().width,smoothing:ctx.imageSmoothingEnabled,frames:times.length,elapsedMs:elapsed,paintFPS:times.length*1000/elapsed,paintCallbackP95ms:sorted[Math.floor(sorted.length*.95)]??null,timingMetric:'RAF callback wall duration, includes scheduling and GC; not a CPU profiler',endingCrop:[frames[0].canvas.width,frames[0].canvas.height],sources};
+    return {raster:[canvas.width,canvas.height],rgbaBytes:canvas.width*canvas.height*4,cssWidth:canvas.getBoundingClientRect().width,smoothing:ctx.imageSmoothingEnabled,frames:times.length,elapsedMs:elapsed,paintFPS:times.length*1000/elapsed,paintCallbackP95ms:sorted[Math.floor(sorted.length*.95)]??null,timingMetric:'RAF callback wall duration, includes scheduling and GC; not a CPU profiler',cerberoSource:[FoolCerbero.SOURCE.width,FoolCerbero.SOURCE.height],sources};
    });
    await page.goto(`http://127.0.0.1:${server.address().port}/index.html`);
    await page.waitForFunction(()=>[...document.querySelectorAll('.home-illustration,.home-wordmark')].every(i=>i.complete&&i.naturalWidth));

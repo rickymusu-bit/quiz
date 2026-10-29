@@ -6,16 +6,16 @@ function game(){return F.Game.start(F.prepare(bank,{names:['A','B','C'],seconds:
 function item(g,type,target=null){const c={id:g.uid(),type,target,origin:'test'};g.s.groups[g.s.owner].inventory.push(c);return c;}
 function answer(g){g.reveal();g.answer(g.s.current.correct);}
 
-test('Antisigillo 20% and Sacrificio 5% use independent exact thresholds',()=>{
- for(const [type,threshold] of [['antisigillo',20],['sacrificio',5]]){
+test('Arsenico 30% and Sacrificio 5% use independent exact thresholds',()=>{
+ for(const [type,threshold] of [['arsenico',30],['sacrificio',5]]){
   assert.equal(F.DEFAULT_BONUS_WEIGHTS[type],threshold);
   for(const [roll,awarded] of [[(threshold-.001)/100,true],[threshold/100,false]]){
    const g=game();delete g.s.config.bonusWeights[type];g.s.config=F.config(g.s.config);g.random=()=>roll;answer(g);
    assert.equal(g.s.result.bonuses.some(c=>c.type===type),awarded);assert.equal(g.s.result.bonuses.length,Number(awarded));
   }
  }
- const g=game();g.s.config.bonusWeights.antisigillo=20;g.s.config.bonusWeights.sacrificio=5;g.random=()=>.049;answer(g);
- assert.deepEqual(g.s.result.bonuses.map(c=>c.type),['antisigillo','sacrificio']);
+ const g=game();g.s.config.bonusWeights.arsenico=30;g.s.config.bonusWeights.sacrificio=5;g.random=()=>.049;answer(g);
+ assert.deepEqual(g.s.result.bonuses.map(c=>c.type),['arsenico','sacrificio']);
 });
 test('Sacrificio adds 777 exactly, costs a life, consumes one copy and preserves other protections',()=>{
  const g=game(),owner=g.s.owner,target=g.s.order[1];g.s.groups[owner].score=F.rational(1,3);g.s.groups[owner].sanctions=1;g.s.groups[target].aura=3;
@@ -65,10 +65,10 @@ test('A legacy bound Tributo respects its target and charges its user on the cur
 });
 test('A 2.4 save keeps lives/progress, migrates default odds and settles existing deferred Tributi once',()=>{
  const g=game(),[owner,other]=g.s.order;g.s.groups[owner].damage=1;g.s.groups[owner].score=F.rational(1,3);const old=g.snapshot();old.version='2.4.0';old.rules='21.0.0';
- old.config.bonusWeights.antisigillo=30;delete old.config.bonusWeights.sacrificio;old.effects.push({id:g.uid(),type:'ruba',source:other,target:owner});
- const r=F.Game.restore(old);assert.equal(r.s.config.bonusWeights.antisigillo,20);assert.equal(r.s.config.bonusWeights.sacrificio,5);assert.equal(F.remainingLives(r.s,owner),2);
+ old.config.bonusWeights.arsenico=30;delete old.config.bonusWeights.sacrificio;old.effects.push({id:g.uid(),type:'ruba',source:other,target:owner});
+ const r=F.Game.restore(old);assert.equal(r.s.config.bonusWeights.arsenico,30);assert.equal(r.s.config.bonusWeights.sacrificio,5);assert.equal(F.remainingLives(r.s,owner),2);
  answer(r);assert.equal(F.exact(r.s.groups[owner].score),'451/3');assert.equal(F.exact(r.s.groups[other].score),'150');assert.equal(r.s.effects.length,0);F.Game.restore(r.snapshot());
- old.config.bonusWeights.antisigillo=17;assert.equal(F.Game.restore(old).s.config.bonusWeights.antisigillo,17);
+ old.config.bonusWeights.arsenico=17;assert.equal(F.Game.restore(old).s.config.bonusWeights.arsenico,17);
 });
 
 test('A 2.4 Ultimo Miglio save retains its queued hard question and residual lives',()=>{

@@ -1,7 +1,7 @@
 /* Presentation-only travel, gait and time. Units: logical race pixels / seconds. */
 (function (root) {
   'use strict';
-  const ROAD_SPEED = 48, STRIDE = 64, MAX_GAP = .75, RESPONSE = .35;
+  const ROAD_SPEED = 48, STRIDE = 32, MAX_GAP = .75, RESPONSE = .35;
   const CHASE = Object.freeze({left:8, ground:303, width:221, scale:1.3});
   const ORDER = [0, 3, 2, 1];
   const clamp=x=>Math.max(0,Math.min(1,x));
@@ -19,6 +19,13 @@
     if (phase === 'capture') return ROAD_SPEED * .4;
     if (phase === 'descent' || phase === 'escape' || phase === 'loading') return ROAD_SPEED * 1.25;
     return ROAD_SPEED;
+  }
+  // Fixed wheelbase follows a deterministic road profile. Only translation and
+  // rotation change: metal bodies keep the exact same sprite and dimensions.
+  function suspension(distance, x, width) {
+    const profile = p => Math.sin(p * .039) * .75 + Math.sin(p * .137 + 1) * .3;
+    const axle = width * .28, front = profile(distance + x + axle), rear = profile(distance + x - axle);
+    return {heave: -(front + rear) / 2, pitch: -Math.atan2(front - rear, axle * 2) * .25};
   }
   class Clock {
     constructor() {
@@ -39,8 +46,8 @@
       // Exact integral: acceleration and travel do not depend on refresh rate.
       this.distance += target * dt + (this.speed - target) * RESPONSE * (1 - decay);
       this.speed = target + (this.speed - target) * decay;
-      const step = STRIDE / 2, first = Math.floor(oldDistance / step) + 1,
-        last = Math.floor(this.distance / step);
+      const step = STRIDE / 2, first = Math.floor((oldDistance + 1e-7) / step) + 1,
+        last = Math.floor((this.distance + 1e-7) / step);
       for (let index = first; index <= last; index++) {
         // Invert the same distance integral so impacts do not drift with FPS.
         const targetDistance = index * step - oldDistance;
@@ -72,14 +79,14 @@
       const dt=previous?(time-previous.time):0;
       if(previous&&dt>0&&dt<=MAX_GAP&&distance>=previous.distance){
         const step=STRIDE/2;
-        for(let index=Math.floor(previous.distance/step)+1;index<=Math.floor(distance/step);index++)
+        for(let index=Math.floor((previous.distance+1e-7)/step)+1;index<=Math.floor((distance+1e-7)/step);index++)
           this.footfalls.push({index,at:previous.time+dt*(index*step-previous.distance)/(distance-previous.distance)});
       }else if(!previous||dt<0||dt>MAX_GAP||distance<previous.distance)this.footfalls=[];
       this.previous={time,distance};this.footfalls=this.footfalls.filter(e=>time-e.at<1.5).slice(-7);
       return {time,distance,roadTime:distance/ROAD_SPEED,gait:gait(distance),footfalls:this.footfalls.slice()};
     }
   }
-  const api = {ROAD_SPEED, STRIDE, MAX_GAP, CHASE, clamp, ease, lerp, travel, gait, roadTarget, Clock, ContactTracker};
+  const api = {ROAD_SPEED, STRIDE, MAX_GAP, CHASE, clamp, ease, lerp, travel, gait, roadTarget, suspension, Clock, ContactTracker};
   if (typeof module !== 'undefined') module.exports = api;
   else root.FoolMotion = api;
 })(globalThis);

@@ -1,9 +1,9 @@
 /* Hellscape: core. Shared by the static site, Node tests and offline export. */
 (function (root) {
   "use strict";
-  const RULES = "25.0.0",
-    VERSION = "2.8.0",
-    TYPES = ["salta", "ruba", "svela", "aura", "karma", "marx", "ira", "antisigillo", "sacrificio"];
+  const RULES = "26.0.0",
+    VERSION = "2.9.0",
+    TYPES = ["salta", "ruba", "svela", "aura", "karma", "marx", "ira", "arsenico", "sacrificio"];
   const LABELS = {
     salta: "Catene",
     ruba: "Tributo",
@@ -12,22 +12,23 @@
     karma: "Contrappasso",
     marx: "Livella",
     ira: "Flagello",
-    antisigillo: "Antisigillo",
+    arsenico: "Arsenico",
     sacrificio: "Sacrificio",
   };
   const AMMO_HELP = {
-    salta: "Le catene immobilizzano un avversario attivo e gli fanno saltare il prossimo turno ordinario. Più Catene si sommano, una per turno. Se riceve una domanda tramite Malocchio, risponde subito, ma le Catene restano pendenti. Nessuna vita viene tolta.",
+    salta: "Paghi l’11% esatto del tuo punteggio corrente, anche se Sigillo blocca l’attacco. Le catene immobilizzano un avversario attivo e gli fanno saltare il prossimo turno ordinario. Più Catene si sommano, una per turno. Se riceve una domanda tramite Malocchio, risponde subito, ma le Catene restano pendenti. Nessuna vita viene tolta.",
     ruba: "Prendi immediatamente il 33% esatto dei punti attuali di un avversario e rinunci subito al turno corrente, senza rispondere alla domanda. Il Sigillo blocca il furto ma non il costo del turno. Non toglie vite; i punti futuri non vengono condivisi.",
-    svela: "Svela soltanto il testo della domanda e il suo valore, senza alternative e a timer fermo. Puoi tenerla o passarla a un altro gruppo attivo: il tempo intero parte alla conferma. Chi risponde correttamente tiene tutti i punti e le Ammo guadagnate; se sbaglia o scade il tempo perde il valore della domanda, fermandosi a zero punti. Chi la riceve non può usare Ammo o ripassarla. La rotazione riparte dal gruppo successivo a chi ha usato Malocchio, rispettando Catene ed eliminazioni.",
-    aura: "Per 3 turni personali, incluso quello di attivazione, sei immune agli effetti negativi delle Ammo altrui. Le Catene e i Tributi pendenti su di te vengono rimossi; Livella non modifica i tuoi punti. Mentre è attivo non puoi usare altre Ammo, nemmeno un altro Sigillo, e le risposte corrette danno punti ma nessuna Ammo. Flagello ignora l’immunità. Un avversario può distruggere il Sigillo con Antisigillo, rimuovendo subito anche le restrizioni. Non protegge da sanzioni, errori ordinari o costi delle proprie Ammo.",
-    karma: "Attiva Contrappasso su di te: per 3 turni personali, incluso quello di attivazione, ogni risposta corretta vale il doppio dei punti. Se sbagli o scade il tempo perdi il doppio del valore della domanda, senza scendere sotto zero. Non raddoppia le Ammo né i punti di altre Ammo. Si applica anche alle domande ricevute con Malocchio: la penalità totale resta doppia, non si somma. Non si accumula e non puoi riattivarlo prima della scadenza. Sigillo impedisce di attivarlo ma non annulla il rischio di un Contrappasso già attivo.",
-    marx: "Livella redistribuisce immediatamente in parti uguali i punti di tutti i dannati ancora in gara, compreso chi la usa. Il totale resta identico anche con frazioni. Esclude gli eliminati e i protetti da Sigillo, i cui punti restano invariati.",
-    ira: "Flagello travolge contemporaneamente tutti i dannati ancora in gara, compreso chi lo evoca: ciascuno perde una vita, tutte le Ammo in inventario e fino a 666 punti, senza scendere sotto zero. Chi raggiunge zero vite è eliminato. Il Sigillo attivo resta, ma non protegge. Se nessuno sopravvive, è Game Over.",
-    antisigillo: "Dissipa immediatamente il Sigillo attivo di un solo avversario. Scegli un dannato ancora in gara e protetto: torna vulnerabile a Catene, Tributo e Malocchio. Rimuove subito anche i blocchi di Sigillo sull’uso e sul guadagno di Ammo. Non toglie punti o vite. Il Sigillo non lo blocca.",
+    svela: "Svela soltanto il testo della domanda e il suo valore, senza alternative e a timer fermo. Puoi tenerla o passarla a un altro gruppo attivo: il tempo intero parte alla conferma. Chi risponde correttamente tiene tutti i punti e le Omen guadagnate; se sbaglia o scade il tempo perde il valore della domanda, fermandosi a zero punti. Chi la riceve non può usare Omen o ripassarla. La rotazione riparte dal gruppo successivo a chi ha usato Malocchio, rispettando Catene ed eliminazioni.",
+    aura: "Per 3 turni personali, incluso quello di attivazione, sei immune agli effetti negativi delle Omen altrui. Le Catene, i Tributi e l’Arsenico pendenti su di te vengono rimossi; Livella modifica anche i tuoi punti. Mentre è attivo non puoi usare altre Omen, nemmeno un altro Sigillo, e le risposte corrette danno punti ma nessuna Omen. Flagello e Livella ignorano l’immunità. Non protegge da sanzioni, errori ordinari o costi delle proprie Omen.",
+    karma: "Attiva Contrappasso su di te: per 3 turni personali, incluso quello di attivazione, ogni risposta corretta vale il doppio dei punti. Se sbagli o scade il tempo perdi il doppio del valore della domanda, senza scendere sotto zero. Non raddoppia le Omen né i punti di altre Omen. Si applica anche alle domande ricevute con Malocchio: la penalità totale resta doppia, non si somma. Non si accumula e non puoi riattivarlo prima della scadenza. Sigillo impedisce di attivarlo ma non annulla il rischio di un Contrappasso già attivo.",
+    marx: "Livella redistribuisce immediatamente in parti uguali i punti di tutti i dannati ancora in gara, compreso chi la usa. Il totale resta identico anche con frazioni. Esclude soltanto gli eliminati. Sigillo non protegge dalla redistribuzione.",
+    ira: "Flagello travolge contemporaneamente tutti i dannati ancora in gara, compreso chi lo evoca: ciascuno perde una vita, tutte le Omen in inventario e fino a 666 punti, senza scendere sotto zero. Chi raggiunge zero vite è eliminato. Il Sigillo attivo resta, ma non protegge. Se nessuno sopravvive, è Game Over.",
+    arsenico: "Scegli un avversario e rinunci subito al turno corrente. All’inizio dei suoi prossimi 3 turni personali, anche se saltati per Catene, perde l’11% del punteggio corrente: tre riduzioni composte esatte. Sigillo blocca e rimuove l’effetto. Non si accumula: un bersaglio già avvelenato non può riceverne un altro.",
     sacrificio: "Sacrifichi una vita e ottieni immediatamente 777 punti. Si applica solo a te e non è utilizzabile con Sigillo attivo. Se era la tua ultima vita sei eliminato comunque, anche dopo aver ricevuto i punti; altrimenti puoi continuare il turno.",
   };
+  const DEFAULT_BASE_POINTS = Object.freeze({ facile: 111, media: 222, difficile: 333 });
   const DEFAULT_BONUS_WEIGHTS = Object.fromEntries(
-    TYPES.map((type) => [type, ["ira", "sacrificio"].includes(type) ? 5 : type === "marx" ? 15 : type === "antisigillo" ? 20 : 30]),
+    TYPES.map((type) => [type, ["ira", "sacrificio"].includes(type) ? 5 : type === "marx" ? 15 : 30]),
   );
   const clone = (x) => JSON.parse(JSON.stringify(x));
   function need(v, m) {
@@ -92,6 +93,7 @@
     TYPES,
     LABELS,
     DEFAULT_BONUS_WEIGHTS,
+    DEFAULT_BASE_POINTS,
     AMMO_HELP,
     clone,
     need,

@@ -3,7 +3,7 @@ const { chromium } = require('playwright');
 const assert = require('node:assert/strict');
 const fs = require('node:fs'), path = require('node:path'), http = require('node:http');
 const root = path.resolve(__dirname, '..'), offline = process.argv.includes('--offline');
-const types = ['salta','ruba','svela','aura','marx','ira','sacrificio','karma'];
+const types = ['salta','ruba','svela','aura','marx','ira','sacrificio','karma','arsenico'];
 const selected = process.argv.find(arg=>arg.startsWith('--case='))?.split('=')[1];
 const modes = ['shield','lethal','timer','reduced'];
 assert(!selected||[...types,...modes,'reload'].includes(selected),'Unknown Ammo test case');
@@ -20,6 +20,7 @@ assert(!selected||[...types,...modes,'reload'].includes(selected),'Unknown Ammo 
   const errors=[], checks=[];
   async function start(width=1440,height=900,reduced=false) {
     const page=await browser.newPage({viewport:{width,height},reducedMotion:reduced?'reduce':'no-preference'});
+    await page.clock.install();
     page.on('pageerror',e=>errors.push(e.message));
     let view=page;
     if(offline){
@@ -34,7 +35,7 @@ assert(!selected||[...types,...modes,'reload'].includes(selected),'Unknown Ammo 
     await view.getByRole('button',{name:/Inizia partita/}).click();
     await view.waitForFunction('FoolEnding.prepare(FoolEnding.load(()=>{}))!==null');
     await view.evaluate('document.fonts.ready');
-    await page.clock.install();await page.clock.pauseAt(await page.evaluate('Date.now()+100'));
+    await page.clock.pauseAt(await page.evaluate('Date.now()+100'));
     await view.evaluate(()=>{const g=HellscapeUI.game;g.s.groups.forEach((v,i)=>v.score=Fool.rational(200+i*400));HellscapeUI.changed()});
     await page.clock.runFor(2000);
     return {page,view};

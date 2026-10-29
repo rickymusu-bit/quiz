@@ -56,7 +56,7 @@ try:
                     assert page.locator('.question').evaluate('e=>parseFloat(getComputedStyle(e).fontSize)') >= 18
                     assert page.locator('#viewport-stage').evaluate('e=>getComputedStyle(e).transform') == 'none'
                     for answer in page.locator('.answer').all():
-                        assert answer.bounding_box()['height'] >= 44
+                        assert answer.is_hidden() or answer.bounding_box()['height'] >= 44
                     panel = page.locator('.operation-body').bounding_box()
                     if panel['height'] < height - 70:
                         assert panel['y'] >= 0 and panel['y'] + panel['height'] <= height + 1, (width,height,dpr,panel)

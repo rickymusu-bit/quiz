@@ -28,33 +28,9 @@ test('Flagello resolves a sole survivor and self-elimination after all effects, 
     assert.equal(F.exact(g.s.groups[owner].score),'1334');assert.deepEqual(g.s.groups[g.s.order[1]],dead);F.Game.restore(g.snapshot());
   }
 });
-test('Antisigillo refuses unprotected, eliminated, missing and self targets without consuming Ammo',()=>{
-  for(const mode of ['unprotected','out','self','missing']){
-    const g=game(),target=g.s.order[1],c=item(g,'antisigillo');g.s.groups[target].aura=mode==='unprotected'?null:g.s.turn;
-    if(mode==='out')g.eliminate(target,'test');
-    assert.throws(()=>g.use(c.id,mode==='self'?g.s.owner:mode==='missing'?null:target));
-    assert(g.s.groups[g.s.owner].inventory.some(i=>i.id===c.id));assert.equal(g.s.effects.length,0);
-  }
-});
-test('Antisigillo dissipates only the protection, bypasses reflection and enables each later attack',()=>{
-  for(const attack of ['salta','ruba','svela']){
-    const g=game(),target=g.s.order[1],c=item(g,'antisigillo');g.s.groups[target].aura=g.s.turn;
-    const karma={id:g.uid(),type:'karma',target:null,origin:'test'};g.s.groups[target].inventory.push(karma);
-    g.s.effects.push({id:g.uid(),type:'salta',source:g.s.owner,target});const before=F.clone(g.s.groups[target]);
-    g.use(c.id,target);assert.equal(g.s.groups[target].aura,null);assert.equal(karma.type,'karma');assert.equal(g.s.effects.length,1);
-    assert.deepEqual(g.s.groups[target].score,before.score);assert.equal(g.s.groups[target].damage,0);
-    const restored=F.Game.restore(g.snapshot());assert.equal(restored.s.groups[target].aura,null);
-    assert(g.attack(attack,g.s.owner,target,g.uid()));assert.equal(karma.type,'karma');
-  }
-});
-test('Antisigillo uses an independent 20% threshold and migrates old probabilities and stored copies',()=>{
-  for(const [roll,awarded] of [[.199,true],[.2,false]]){
-    const g=game();delete g.s.config.bonusWeights.antisigillo;
-    const old=g.snapshot();old.version='2.3.0';old.rules='20.0.0';old.config.bonusWeights.ruba=17;item(g,'antisigillo');old.groups=F.clone(g.s.groups);
-    const r=F.Game.restore(old);assert.equal(r.s.config.bonusWeights.antisigillo,20);assert.equal(r.s.config.bonusWeights.ruba,17);
-    r.random=()=>roll;answer(r,true);assert.equal(r.s.result.bonuses.some(c=>c.type==='antisigillo'),awarded);assert.equal(r.s.result.bonuses.length,Number(awarded));
-  }
-});
+
+
+
 test('Ultimo Miglio keeps damage, sanctions and scores; timeout and wrong answer remove exactly one life',()=>{
   const g=game();g.s.groups[0].damage=1;g.s.groups[1].sanctions=1;tie(g);
   assert.deepEqual(g.s.groups.map((_,i)=>F.remainingLives(g.s,i)),[2,2,3]);

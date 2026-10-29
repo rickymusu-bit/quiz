@@ -9,40 +9,23 @@ body[data-layout="compact"] #viewport-stage main {
   height:auto;min-height:0!important;overflow:visible;padding:16px;
 }
 body[data-layout="compact"] #viewport-stage>header { min-height:48px; }
-body[data-layout="compact"] #viewport-stage main.operational,
 body[data-layout="compact"] #viewport-stage main.final-screen {
   display:flex;flex-direction:column;height:auto;min-height:100%!important;padding:0;overflow:visible;
 }
-body[data-layout="compact"] main.operational>.hell-race,
 body[data-layout="compact"] main.final-screen .hell-race-final {
   position:relative;inset:auto;order:0;flex:none;align-self:center;
   width:min(100%,var(--scene-max-width));height:auto;aspect-ratio:var(--stage-ratio);
   margin:0;z-index:0;
 }
-body[data-layout="compact"] main.operational>.hell-race canvas,
 body[data-layout="compact"] main.final-screen .hell-race canvas { display:block;width:100%;height:100%;object-fit:contain; }
-body[data-layout="compact"] #viewport-stage main.operational>.statusline {
-  position:static;order:1;min-height:28px;margin:14px 18px 10px;flex:none;
-}
-body[data-layout="compact"] #viewport-stage main.operational>.operation-body {
-  position:static;order:2;flex:none;margin:0 12px;padding:16px;
-  width:auto;max-height:none;overflow:visible;
-}
 body[data-layout="compact"] #viewport-stage .operation-body .question { font-size:19px;line-height:1.4; }
 body[data-layout="compact"] #viewport-stage .operation-body .answers { grid-template-columns:repeat(2,minmax(0,1fr)); }
 body[data-layout="compact"] #viewport-stage .operation-body .answer { min-height:48px;font-size:17px;padding:10px; }
 body[data-layout="compact"] #viewport-stage .operation-body .solution { font-size:16px;line-height:1.5; }
 body[data-layout="compact"] #viewport-stage .question-actions button { min-height:48px; }
-body[data-layout="compact"] #viewport-stage .turn-order {
-  position:static;order:3;flex:none;width:auto;max-height:none;overflow:visible;margin:12px;padding:8px;
-}
-body[data-layout="compact"] .turn-order ol { grid-template-columns:repeat(3,minmax(0,1fr));gap:6px; }
 body[data-layout="compact"] .turn-order button { min-height:48px;font-size:20px;padding:8px 6px; }
 body[data-layout="compact"] .turn-order .player-points { font-size:18px; }
 body[data-layout="compact"] .turn-order .heart { width:14px;height:14px;flex-basis:14px; }
-body[data-layout="compact"] #viewport-stage .options-toggle {
-  position:static;order:4;align-self:flex-start;flex:none;margin:0 12px 16px;min-height:48px;
-}
 body[data-layout="compact"] #viewport-stage main.operational>.movement-cue {
   top:16px;left:6%;right:6%;font-size:clamp(28px,6vw,48px);padding:10px;
 }
@@ -114,3 +97,96 @@ body.portrait #viewport-stage{display:none!important}
 body.portrait dialog:not(#orientation-note){visibility:hidden;pointer-events:none}
 body.portrait dialog:not(#orientation-note)::backdrop{background:transparent}
 @media(orientation:portrait){#viewport-stage{display:none!important}}
+
+/* Gameplay occupies one viewport. The 4:3 illustration stays behind the HUD. */
+#viewport-stage main.operational,
+body[data-layout="compact"] #viewport-stage main.operational {
+  --hud-width:164px;--game-gap:12px;
+  display:block;position:relative;height:100%;min-height:0!important;overflow:hidden;padding:0;
+}
+body[data-layout="compact"].playing #viewport-stage {overflow:hidden;}
+#viewport-stage main.operational>.hell-race,
+body[data-layout="compact"] main.operational>.hell-race {
+  position:absolute;inset:0;width:min(100%,var(--scene-max-width));height:auto;
+  aspect-ratio:4/3;margin:auto;transform:none;z-index:-1;
+}
+#viewport-stage main.operational>.turn-order,
+body[data-layout="compact"] #viewport-stage main.operational>.turn-order {
+  position:absolute;top:var(--game-gap);left:auto;right:var(--game-gap);bottom:auto;
+  width:var(--hud-width);max-height:none;overflow:visible;margin:0;padding:5px;z-index:4;
+}
+body[data-layout="compact"] .turn-order ol {grid-template-columns:1fr;gap:4px;}
+.player-window {position:relative;background:#20140f;}
+.player-window summary {cursor:pointer;list-style-position:inside;color:#d9b87e;}
+#viewport-stage .player-window summary>button {display:inline-block;width:calc(100% - 22px);vertical-align:middle;min-height:44px;font-size:20px;padding:4px;}
+#viewport-stage .player-window .turn-name {white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#viewport-stage .player-window .turn-stats {margin-top:2px;}
+#viewport-stage .player-window .lives {display:none;position:absolute;top:100%;left:0;z-index:6;padding:5px;background:#20140f;width:100%;}
+#viewport-stage .player-window[open] .lives {display:flex;}
+.hud-inventory {position:absolute;top:calc(100% + 24px);left:0;width:100%;z-index:6;display:flex;flex-wrap:wrap;gap:4px;padding:6px;background:#20140ffa;border:1px solid #ac8055;font-size:14px;box-shadow:3px 5px 8px #000b;}
+#viewport-stage .hud-inventory .ammo-round {width:32px;height:32px;min-height:32px;}
+#viewport-stage .player-window[open] {z-index:7;}
+/* The timer travels with the question when the lower panel opens upwards. */
+#viewport-stage .operation-body>.statusline {
+  position:static;display:block;padding:0;margin:0 0 8px;min-height:28px;
+  background:none;border:0;box-shadow:none;
+}
+/* Centered hidden-question children must not shrink the progress bar. */
+#viewport-stage .operation-body.hidden-question>.statusline {width:100%;}
+#viewport-stage main.operational>.operation-body,
+body[data-layout="compact"] #viewport-stage main.operational>.operation-body {
+  position:absolute;top:auto;bottom:var(--game-gap);left:var(--game-gap);right:calc(var(--hud-width) + 2*var(--game-gap));
+  margin:0;padding:10px 12px;width:auto;max-height:none;overflow:visible;
+}
+#viewport-stage main.operational>.options-toggle,
+body[data-layout="compact"] #viewport-stage main.operational>.options-toggle {
+  position:absolute;top:var(--game-gap);left:var(--game-gap);bottom:auto;right:auto;margin:0;min-height:44px;font-size:24px;
+}
+.result-details {display:none;}
+@media(max-height:600px) {
+#viewport-stage main.operational,body[data-layout="compact"] #viewport-stage main.operational {--hud-width:140px;--game-gap:6px;}
+  body[data-layout="compact"] #viewport-stage main.operational>.operation-body {padding:6px 10px;}
+  body[data-layout="compact"] #viewport-stage .operation-body .question {font-size:18px;line-height:1.2;margin:4px 0 8px;}
+  body[data-layout="compact"] #viewport-stage .operation-body h2 {font-size:26px;margin:4px 0;}
+  body[data-layout="compact"] #viewport-stage .operation-body .answer {font-size:16px;line-height:1.15;min-height:44px;padding:5px;}
+  body[data-layout="compact"] #viewport-stage .question-actions {margin:4px 0;gap:6px;}
+  body[data-layout="compact"] #viewport-stage .question-actions button {font-size:22px;min-height:44px;}
+  #viewport-stage .operation-body .owner-status {margin:0 0 4px;}
+  #viewport-stage .operation-body .solution {margin:5px 0;padding:0;font-size:16px;}
+  #viewport-stage .operation-body .solution>p {display:none;}
+  #viewport-stage .operation-body .result-details {display:inline-block;min-height:44px;margin-right:6px;}
+  #viewport-stage .operation-body .question-risk,#viewport-stage .operation-body .malocchio-risk {font-size:14px;line-height:1.15;margin:4px 0;}
+  #viewport-stage .turn-order .effect-chip {font-size:13px;padding:2px;}
+  #viewport-stage .turn-order .ammo-impact {font-size:13px;}
+  #viewport-stage .turn-order .ammo-impact strong {font-size:13px;}
+/* The complete question and explanation remain in Dettagli esito. */
+  #viewport-stage .operation-body[data-screen=result]>.question {display:none;}
+  #viewport-stage .operation-body[data-screen=result]>.solution {margin:4px 0;padding:0;}
+  #viewport-stage .operation-body .result-details,
+  #viewport-stage .operation-body>[data-game-action=next] {vertical-align:middle;width:calc(50% - 5px);min-height:44px;font-size:20px;line-height:1.1;padding:5px;}
+#viewport-stage .operation-body[data-paused=true]>.answers{display:none;}
+ #viewport-stage .operation-body>.suspension-note{font-size:12px;line-height:1;margin:2px 0;}
+}
+
+
+@media(max-height:350px) {
+#viewport-stage main.operational,body[data-layout="compact"] #viewport-stage main.operational {--hud-width:120px;--game-gap:4px;}
+  #viewport-stage .player-window summary>button {font-size:18px;}
+#viewport-stage .operation-body[data-screen=result]>.solution{position:absolute;top:40px;right:8px;margin:0;font-size:14px;}
+body[data-layout="compact"] #viewport-stage main.operational>.operation-body{padding:4px 8px;}
+ body[data-layout="compact"] #viewport-stage .operation-body .question{margin:2px 0;}
+ #viewport-stage .operation-body .question-points{margin-bottom:2px;}
+ /* Leave room for the timer and corner control on the shortest screens. */
+ body[data-layout="compact"] #viewport-stage .operation-body .answer{font-size:15px;gap:6px;}
+ #viewport-stage .operation-body .letter{font-size:22px;flex-basis:18px;}
+ #viewport-stage .operation-body[data-screen=answer]>.statusline{margin-left:100px;}
+}
+
+
+/* The lower question dock grows upwards without moving/scaling the text. */
+#viewport-stage .operation-body.unfolding-question {animation:question-unfold .28s ease-out;transform-origin:bottom center;}
+@keyframes question-unfold {from{clip-path:inset(100% 0 0 0);transform:translateY(8px)}to{clip-path:inset(0);transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){#viewport-stage .operation-body.unfolding-question{animation:none;}}
+@media(min-height:601px){
+ #viewport-stage main.operational>.operation-body {left:180px;right:180px;}
+}
