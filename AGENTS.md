@@ -51,7 +51,6 @@ Applicare la preferenza «GIF per la dinamica, screenshot per gli stati statici,
 ## Correzione Cerbero e veicoli
 
 - Animare Cerbero con fotogrammi disegnati e articolazioni leggibili: camminata fluida, coda che scodinzola dalla base alla punta, tre teste con movimenti dei colli sfalsati durante il passo e fuoco che nasce dalle tre bocche. La deformazione elastica della sola posa statica è respinta.
-- La cattura avviene con una bocca: la testa afferra il veicolo e lo scaraventa oltre il ponte; il mezzo cade e affonda nella lava. Cerbero non usa le zampe per afferrare o portare i mezzi alla bocca.
 - I veicoli sono rigidi: vietare contrazioni e dilatazioni della carrozzeria. Mostrare le irregolarità della strada con piccoli spostamenti verticali e oscillazioni delle sospensioni, conservando le proporzioni.
 - Durante la partita Cerbero sputa fuoco ogni 60 secondi attivi dalle tre bocche, continuando il passo; l’effetto è soltanto visivo e segue pausa e movimento ridotto. Nella home Cerbero sostituisce il demone.
 - Le nuove partite durano 13 turni totali (non giri): contano anche turni saltati o ceduti; Malocchio non aggiunge un turno. Il massimo configurabile è la somma delle domande di tutte e tre le difficoltà negli argomenti selezionati divisa per il numero di giocatori, arrotondata per difetto, senza tetto fisso di 99. Non mostrare filtri di difficoltà per le nuove partite: il livello della domanda determina soltanto i punti. Ogni banca deve contenere domande facili, medie e difficili; i profili precedenti diventano misti senza perdere le altre preferenze. Impostazioni e avanzamento si esprimono in turni. Le partite già salvate conservano la durata originaria.
@@ -59,7 +58,7 @@ Applicare la preferenza «GIF per la dinamica, screenshot per gli stati statici,
 
 ## Protocollo per sprite animati
 
-- Per creare o modificare sequenze di sprite, utilizzare il documento versionato [Protocollo operativo per sprite animati coerenti](docs/PROTOCOLLO_SPRITE_ANIMATI_v1_20261029.md) come riferimento per anatomia, proporzioni, scheletro logico, punti di ancoraggio, continuità, effetti e controlli. Applicare sempre le regole di consegna di questo AGENTS.md; aggiornare il link quando viene pubblicata una versione successiva del protocollo, senza duplicarne qui il contenuto.
+- Per creare o modificare sequenze di sprite, utilizzare il documento versionato [Protocollo operativo per sprite animati coerenti — v8](docs/PROTOCOLLO_SPRITE_ANIMATI_v8_20261029.md) come riferimento vincolante per produzione di fotogrammi disegnati, anatomia, proprietà meccaniche dei materiali, punti di ancoraggio, continuità, effetti, limiti ai fallback e controlli. Applicare sempre le regole di consegna di questo AGENTS.md; aggiornare il link quando viene pubblicata una versione successiva del protocollo, senza duplicarne qui il contenuto.
 
 ## Refactoring e manutenzione del progetto
 
