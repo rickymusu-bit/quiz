@@ -35,6 +35,11 @@ Applicare la preferenza «GIF per la dinamica, screenshot per gli stati statici,
 - Sigillo protegge dagli effetti negativi delle Ammo altrui, ma blocca ogni altro uso di Ammo e la loro acquisizione da risposte corrette. Flagello ignora la protezione; Antisigillo la distrugge e rimuove subito anche le restrizioni.
 - Interpretazione operativa comunicata: tre turni personali, incluso quello di attivazione; contatore 3 → 2 → 1, scadenza all’inizio del quarto. Livella esclude il protetto, lasciandone invariati i punti. Sigillo rimuove Catene e Tributi pendenti e non evita sanzioni o rischi autoimposti.
 
+## Regola aggiornata di Contrappasso
+
+- Contrappasso è attivabile su di sé per tre turni personali, incluso quello di attivazione. Raddoppia i punti delle risposte corrette e sottrae il doppio del valore in caso di errore o timeout, con minimo zero. Non trasforma più le Ammo avversarie, non si accumula e non raddoppia i premi Ammo o i punti di altre Ammo.
+- Con Malocchio conta il Contrappasso del rispondente: penalità complessiva ×2, senza sommare un ulteriore ×1. Un Sigillo successivo non annulla un rischio proprio già attivato. Preservare contatori e copie storiche nei salvataggi senza applicare bonus retroattivi.
+
 ## Refactoring e manutenzione del progetto
 
 Queste istruzioni si applicano a **qualsiasi agente o strumento** che modifichi il repository, inclusi ChatGPT Work, Codex e interventi manuali assistiti. Non dipendono dall'ambiente di sviluppo.

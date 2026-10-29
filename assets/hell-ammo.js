@@ -4,7 +4,7 @@
   const labels = { salta: "CATENE", ruba: "TRIBUTO", svela: "MALOCCHIO",
     aura: "SIGILLO", karma: "CONTRAPPASSO", marx: "LIVELLA", ira: "FLAGELLO", antisigillo: "ANTISIGILLO", sacrificio: "SACRIFICIO" };
   const details = { salta: "Prossimo turno saltato", ruba: "33% dei punti · turno corrente ceduto",
-    svela: "Errore: perde il valore · minimo zero", aura: "3 turni personali · nessun uso/guadagno Ammo", karma: "Munizione trasformata",
+    svela: "Errore: perde il valore · minimo zero", aura: "3 turni personali · nessun uso/guadagno Ammo", karma: "3 turni · corretta ×2 · errore −2×",
     marx: "Punti divisi in parti uguali", ira: "−1 vita · tutte le Ammo · fino a −666 pt", antisigillo: "Sigillo dissipato · bersaglio vulnerabile", sacrificio: "−1 vita · +777 punti" };
   function plans(events, state) {
     const result = [];
@@ -208,10 +208,10 @@
         relic(c,4,x,y-28-(reduced?0:Math.sin(t*Math.PI)*5),52,40*(.1+.9*open),turn);
         debris(c,x,y-16,phase,12,true);
       } else if(plan.type==="karma") {
-        relic(c,5,x,y-12,49,58,turn);
-        const q=reduced ? .65 :Math.min(1,t*1.4);
-        relic(c,4,mix(x,source.x,q),mix(y,source.y-20,q)-Math.sin(q*Math.PI)*32,24,20,turn);
-        debris(c,x,y,phase,15,true);
+        const rise=reduced?1:Math.min(1,t*4);
+        relic(c,5,x,y-16-(1-rise)*20,50,64,reduced?0:Math.sin(t*Math.PI*2)*.08);
+        c.font="bold 12px monospace";c.fillStyle="#dfc59a";c.fillText("PUNTI ×2",x,y-55);
+        c.font="bold 10px monospace";c.fillStyle="#bf7868";c.fillText("ERRORE −2×",x,y+26);
       } else if(plan.type==="marx") {
         const cx=width/2,cy=210;
         // Scales are drawn once; individual tribute pouches move in, then out.

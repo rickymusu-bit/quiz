@@ -44,7 +44,7 @@ test('Antisigillo dissipates only the protection, bypasses reflection and enable
     g.use(c.id,target);assert.equal(g.s.groups[target].aura,null);assert.equal(karma.type,'karma');assert.equal(g.s.effects.length,1);
     assert.deepEqual(g.s.groups[target].score,before.score);assert.equal(g.s.groups[target].damage,0);
     const restored=F.Game.restore(g.snapshot());assert.equal(restored.s.groups[target].aura,null);
-    assert(g.attack(attack,g.s.owner,target,g.uid()));assert.equal(karma.type,attack);
+    assert(g.attack(attack,g.s.owner,target,g.uid()));assert.equal(karma.type,'karma');
   }
 });
 test('Antisigillo uses an independent 20% threshold and migrates old probabilities and stored copies',()=>{

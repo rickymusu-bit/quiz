@@ -115,3 +115,10 @@ oro antico, osso e cuore cremisi. È usato in inventario, scheda e cinematica,
 e incorporato nell’export offline. La sequenza mostra il calice sopra chi lo
 usa e il costo/ricavo −1 vita, +777 punti. Tributo mostra il trasferimento e
 il costo del turno corrente; le animazioni non modificano lo stato del motore.
+
+## Contrappasso — regole 25.0.0
+
+Lo specchio gotico dell’atlante nativo ora si innalza sul giocatore che attiva
+Contrappasso, con indicazioni di punti ×2 e rischio −2×. Non proietta più un
+attacco verso l’aggressore. Nessuna modifica ai pixel dell’atlante; l’effetto
+continua a rispettare pausa, movimento ridotto e orologio della scena.
