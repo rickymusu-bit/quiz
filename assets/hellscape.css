@@ -44,11 +44,12 @@ dialog .scoreboard{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));ga
 .time-vial{position:relative;height:34px;width:100%;border-radius:18px;border:2px solid #ae9784;background:linear-gradient(#efddc536,#160d0ae6 38%,#0b0607);box-shadow:0 2px 0 #100504,0 0 0 2px #241710,inset 0 2px 3px #fff6,inset 0 -3px 4px #000;--level:1}
 .time-vial::before,.time-vial::after{content:'';position:absolute;top:-4px;bottom:-4px;width:12px;border:2px solid #6c5143;background:linear-gradient(90deg,#39261c,#b2926c 40%,#453126);z-index:3}.time-vial::before{left:-3px;border-radius:7px 2px 2px 7px}.time-vial::after{right:-3px;border-radius:2px 7px 7px 2px}
 .vial-interior{position:absolute;inset:3px 8px;border-radius:12px;overflow:hidden;background:#10080d99;box-shadow:inset 0 2px 3px #000}
-.vial-interior::after{content:'';position:absolute;inset:2px 0 55%;border-radius:10px;background:linear-gradient(#fff5,#fff0);pointer-events:none}
-.vial-liquid{height:100%;width:calc(var(--level)*100%);min-width:0;border-radius:10px 3px 3px 10px;position:relative;background:radial-gradient(circle at 17px 9px,#ff967f88 0 2px,transparent 3px),linear-gradient(#ff543c,#c30c25 45%,#670418 90%);background-size:49px 24px,100% 100%;box-shadow:inset 0 2px #ff9a7888,inset 0 -3px #420317,3px 0 5px #ff493d66;transition:width .1s linear;animation:vial-drift 2.5s linear infinite}
-.vial-liquid::after{content:'';position:absolute;right:0;top:0;bottom:0;width:3px;background:#ff7763bb;border-radius:50%}
+.vial-interior::after{content:'';position:absolute;inset:2px 0 55%;border-radius:10px;background:linear-gradient(#ddaaa741,transparent);pointer-events:none}
+.vial-liquid{height:100%;width:calc(var(--level)*100%);min-width:0;border-radius:10px 3px 3px 10px;position:relative;background:radial-gradient(ellipse at 26% 20%,#c75c6259 0%,transparent 42%),radial-gradient(circle at 15px 7px,#a7434b80 0 2px,transparent 3px),linear-gradient(180deg,#650d19 0%,#36060f 22%,#7b0b1b 48%,#44050f 72%,#1e0207 100%);background-size:100% 100%,49px 24px,100% 100%;box-shadow:inset 0 2px #b35e6277,inset 0 -3px #0b0104,3px 0 5px #6507148c;transition:width .1s linear;animation:vial-drift 2.5s linear infinite}
+.vial-liquid::before{content:'';position:absolute;left:0;right:0;top:2px;height:6px;background:linear-gradient(90deg,transparent,#df9b9c65 18%,transparent 32%,#a6414855 56%,transparent);filter:blur(1px);pointer-events:none}
+.vial-liquid::after{content:'';position:absolute;right:0;top:0;bottom:0;width:3px;background:#a4374380;border-radius:50%}
 .time-vial[data-paused=true] .vial-liquid{animation-play-state:paused}
-@keyframes vial-drift{to{background-position:49px 0,0 0}}
+@keyframes vial-drift{to{background-position:0 0,49px 0,0 0}}
 @media(prefers-reduced-motion:reduce){.vial-liquid{animation:none;transition:none}}
 
 /* Let the entire capture/escape sequence finish before revealing the result UI. */
@@ -76,7 +77,9 @@ dialog .scoreboard{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));ga
 .turn-stats{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px 6px;margin-top:5px}
 .turn-order .player-points{font:20px/1 FoolTerminal,monospace;color:#fff0cb;overflow-wrap:anywhere;max-width:100%}
 .turn-order .lives{display:inline-flex;flex-wrap:nowrap;gap:3px;margin:0}
-.turn-order .heart{width:16px;height:16px;flex:0 0 16px}
+.turn-order .heart{display:inline-grid;place-items:center;width:16px;height:16px;flex:0 0 16px;font:20px/1 Arial,sans-serif}
+.turn-order .heart::before{content:'♥';color:#c82e3a;text-shadow:0 1px #4b0912,0 -1px #f09a8c}
+.turn-order .heart.lost::before{color:#45312d;text-shadow:0 1px #17100e,0 -1px #78605a}
 .turn-order [aria-current=step]{color:#ffe044;border-color:#ffe044;background:#392809}
 #viewport-stage .options-toggle{position:absolute;top:18px;left:18px;right:auto;min-height:44px;padding:8px 16px;font:28px/1 FoolTerminal,monospace;background:#140e0deb;border:1px solid #ac8055;box-shadow:3px 3px #0008;z-index:3}
 .options-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0 18px}.options-grid button{font-size:17px;overflow-wrap:anywhere}
