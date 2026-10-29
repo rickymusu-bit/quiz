@@ -109,7 +109,7 @@
         });
     }
   }
-  function parseDataset(text, katex) {
+  function parseDataset(text, katex, { requireAllDifficulties = false } = {}) {
     need(
       typeof text === "string" &&
         new TextEncoder().encode(text).length <= 20 * 1024 * 1024,
@@ -132,6 +132,7 @@
     );
     const ids = new Set(),
       topics = new Set(),
+      difficulties = new Set(),
       bank = [];
     const str = (v, l) => {
       need(typeof v === "string" && v.trim(), l + ": testo vuoto o non valido");
@@ -155,6 +156,7 @@
           ["facile", "media", "difficile"].includes(difficulty),
           id + ": difficoltà non valida",
         );
+        difficulties.add(difficulty);
         const body = str(q.testo, id);
         need(
           Array.isArray(q.alternative) && q.alternative.length === 4,
@@ -189,13 +191,32 @@
         });
       }
     }
+    // Enforce full coverage only when loading a new catalogue entry. During
+    // restore, saved banks can legitimately contain a single historic level.
+    if (requireAllDifficulties)
+      need(
+        ["facile", "media", "difficile"].every(d => difficulties.has(d)),
+        "La banca deve includere domande facili, medie e difficili",
+      );
     return {
       title: typeof data.titolo === "string" ? data.titolo : "Banca domande",
       bank,
     };
   }
 
-  const api = { parseDataset, validateMath, mathParts, scienceParts };
+  function topicCounts(bank, difficulty = "misto") {
+    const counts = Object.fromEntries(bank.map(q => [q.topic, 0]));
+    for (const q of bank)
+      if (difficulty === "misto" || q.difficulty === difficulty) counts[q.topic]++;
+    return counts;
+  }
+  // New matches use every level; existing saved games may keep their old filter.
+  function turnCapacity(bank, selectedTopics, players, difficulty = "misto") {
+    const counts = topicCounts(bank, difficulty);
+    const available = [...selectedTopics].reduce((sum, topic) => sum + (counts[topic] ?? 0), 0);
+    return Math.floor(available / players);
+  }
+  const api = { parseDataset, validateMath, mathParts, scienceParts, topicCounts, turnCapacity };
   if (typeof module !== "undefined") module.exports = api;
   else root.HellscapeDatasets = api;
 })(globalThis);

@@ -231,6 +231,8 @@ dialog .columns { margin: 1rem 0; }
 .setup-teams input, .setup-teams select { width: 100%; }
 .settings-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 #quotas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem 1rem; }
+#quotas .quota-topic { display: flex; align-items: center; gap: .5rem; }
+#quotas input[type="checkbox"] { width: 1.2rem; min-height: 1.2rem; flex: 0 0 1.2rem; }
 @media (max-width: 650px) { .settings-grid, #quotas { grid-template-columns: 1fr; } }
 
 .question-points { color: var(--accent); font: 400 1.8rem/1.1 FoolTerminal, monospace; }

@@ -32,7 +32,7 @@ Applicare la preferenza «GIF per la dinamica, screenshot per gli stati statici,
 
 ## Regola aggiornata di Malocchio
 
-- La consegna di Sacrificio, Tributo e probabilità è approvata («Ok va bene»). Malocchio ora mostra testo e valore senza alternative; chi risponde bene tiene punti e Ammo, chi sbaglia o lascia scadere il tempo perde il valore della domanda con minimo zero (chiarimento esplicito). La rotazione riparte da chi segue l’utilizzatore, anche dopo il passaggio a un altro gruppo, rispettando Catene ed eliminazioni. Salvare autore e rischio della domanda senza riapplicare esiti già registrati.
+- La consegna di Sacrificio, Tributo e probabilità è approvata («Ok va bene»). Malocchio mostra testo e valore senza alternative e concede 45 secondi per scegliere se tenerla o a chi passarla. Alla scadenza resta all’utilizzatore e parte il normale tempo di risposta. Pausa, orientamento, salvataggio e ripresa conservano il residuo; chi risponde bene tiene punti e Ammo, chi sbaglia o lascia scadere il tempo perde il valore della domanda con minimo zero (chiarimento esplicito). La rotazione riparte da chi segue l’utilizzatore, anche dopo il passaggio a un altro gruppo, rispettando Catene ed eliminazioni. Salvare autore e rischio della domanda senza riapplicare esiti già registrati.
 
 ## Regola aggiornata di Sigillo
 
@@ -48,8 +48,12 @@ Applicare la preferenza «GIF per la dinamica, screenshot per gli stati statici,
 
 - Applicare [la specifica Omen, Cerbero e layout v1](docs/HELLSCAPE_SPEC_OMEN_CERBERO_LAYOUT_v1.md), che supera le regole storiche discordanti di Catene, Antisigillo e Livella. I design della PR #51 sono approvati dall’utente («Approvo tutto, preferisco quello più rosso carne»): usare il Cerbero rosso/carnoso e la fiala Arsenico come riferimenti canonici per rig, animazioni e integrazione, seguendo il protocollo. Ultima disposizione richiesta: Opzioni in alto a sinistra e lista giocatori in alto a destra; domanda centrata in basso che si apre verso l’alto, barra del tempo sopra la domanda.
 
-## Punteggi iniziali
+## Correzione Cerbero e veicoli
 
+- Animare Cerbero con fotogrammi disegnati e articolazioni leggibili: camminata fluida, coda che scodinzola dalla base alla punta, tre teste con movimenti dei colli sfalsati durante il passo e fuoco che nasce dalle tre bocche. La deformazione elastica della sola posa statica è respinta.
+- I veicoli sono rigidi: vietare contrazioni e dilatazioni della carrozzeria. Mostrare le irregolarità della strada con piccoli spostamenti verticali e oscillazioni delle sospensioni, conservando le proporzioni.
+- Durante la partita Cerbero sputa fuoco ogni 60 secondi attivi dalle tre bocche, continuando il passo; l’effetto è soltanto visivo e segue pausa e movimento ridotto. Nella home Cerbero sostituisce il demone.
+- Le nuove partite durano 13 turni totali (non giri): contano anche turni saltati o ceduti; Malocchio non aggiunge un turno. Il massimo configurabile è la somma delle domande di tutte e tre le difficoltà negli argomenti selezionati divisa per il numero di giocatori, arrotondata per difetto, senza tetto fisso di 99. Non mostrare filtri di difficoltà per le nuove partite: il livello della domanda determina soltanto i punti. Ogni banca deve contenere domande facili, medie e difficili; i profili precedenti diventano misti senza perdere le altre preferenze. Impostazioni e avanzamento si esprimono in turni. Le partite già salvate conservano la durata originaria.
 - Punti predefiniti delle nuove partite: facile 111, media 222, difficile 333. Conservare i valori personalizzati dei profili e delle partite salvate.
 
 ## Protocollo per sprite animati

@@ -58,8 +58,13 @@
         "Scegli tre veicoli diversi tra i sei disponibili",
       );
     integer(c.seconds, 1, 600, "Tempo");
-    const configuredWeights = { ...DEFAULT_BONUS_WEIGHTS, ...(c.bonusWeights ?? {}) };
-    const bonusWeights = Object.fromEntries(TYPES.map(type => [type, configuredWeights[type]]));
+    const configuredWeights = {
+      ...DEFAULT_BONUS_WEIGHTS,
+      ...(c.bonusWeights ?? {}),
+    };
+    const bonusWeights = Object.fromEntries(
+      TYPES.map((type) => [type, configuredWeights[type]]),
+    );
     need(
       bonusWeights &&
         typeof bonusWeights === "object" &&
@@ -78,16 +83,26 @@
       ["misto", "facile", "media", "difficile"].includes(c.difficulty),
       "Filtro difficoltà non valido",
     );
+    // Existing saves with an explicit questionCount retain question-based play.
+    const turns =
+      c.turnCount ??
+      (c.questionCount === undefined ? core.DEFAULT_TURN_COUNT : null);
     const questionCount = integer(
-      c.questionCount ?? 33,
-      3,
-      99,
-      "Numero domande",
+      turns ?? c.questionCount,
+      turns === null ? 3 : 1,
+      turns === null ? 99 : Number.MAX_SAFE_INTEGER,
+      turns === null ? "Numero domande" : "Numero turni",
     );
-    need(
-      questionCount % 3 === 0,
-      "Il numero di domande deve essere un multiplo di 3",
-    );
+    if (turns === null)
+      need(
+        questionCount % 3 === 0,
+        "Il numero di domande deve essere un multiplo di 3",
+      );
+    if (turns !== null && c.questionCount !== undefined)
+      need(
+        c.questionCount === questionCount,
+        "Riserva e numero di turni incoerenti",
+      );
     need(
       c.quotas && Object.keys(c.quotas).length,
       "Selezionare argomenti e quote",
@@ -99,10 +114,17 @@
       sum === questionCount,
       "La somma delle quote deve essere " + questionCount,
     );
+    if (c.selectedTopics !== undefined)
+      need(Array.isArray(c.selectedTopics) && c.selectedTopics.length > 0 &&
+        new Set(c.selectedTopics).size === c.selectedTopics.length &&
+        c.selectedTopics.every(t => typeof t === "string" && Object.hasOwn(c.quotas, t)) &&
+        Object.entries(c.quotas).every(([t,n]) => !n || c.selectedTopics.includes(t)),
+        "Selezione degli argomenti non valida");
     return {
       ...clone(c),
       bonusWeights: clone(bonusWeights),
       questionCount,
+      ...(turns === null ? {} : { turnCount: questionCount }),
       names,
     };
   }
@@ -114,6 +136,14 @@
         c.quotas[q.topic] > 0 &&
         (c.difficulty === "misto" || q.difficulty === c.difficulty),
     );
+    if (c.turnCount) {
+      const topics = c.selectedTopics ?? Object.keys(c.quotas).filter(t => c.quotas[t] > 0),
+        counts = datasets.topicCounts(bank, c.difficulty),
+        available = topics.reduce((sum,t) => sum + (counts[t] ?? 0), 0),
+        maximum = datasets.turnCapacity(bank, topics, c.names.length, c.difficulty);
+      need(c.turnCount <= maximum,
+        "Massimo " + maximum + " turni: " + available + " domande disponibili ÷ " + c.names.length + " giocatori");
+    }
     let chosen = [];
     for (const [t, n] of Object.entries(c.quotas)) {
       const pool = eligible.filter((q) => q.topic === t);
@@ -178,6 +208,8 @@
         owner: order[0],
         respondent: order[0],
         turn: 1,
+        completedTurns: 0,
+        turnClosed: false,
         usedBonus: false,
         draftBonus: null,
         passLock: null,
@@ -244,6 +276,13 @@
     active() {
       return this.s.order.filter((i) => !this.s.groups[i].out);
     }
+    timeLimit() {
+      return (
+        (this.s.screen === "choice"
+          ? core.MALOCCHIO_CHOICE_SECONDS
+          : this.s.config.seconds) * 1000
+      );
+    }
     left() {
       return this.running
         ? Math.max(0, this.deadline - this.now())
@@ -256,7 +295,9 @@
     }
     run() {
       need(
-        this.s.screen === "answer" && !this.s.panel && !this.s.suspended,
+        ["answer", "choice"].includes(this.s.screen) &&
+          !this.s.panel &&
+          !this.s.suspended,
         "Timer non avviabile",
       );
       this.deadline = this.now() + this.s.remaining;
@@ -280,8 +321,9 @@
       if (this.s.current) used.add(this.s.current.id);
       return this.s.bank.filter(
         (q) =>
-          (this.s.phase === "pareggio" ? q.difficulty === "difficile" : this.s.eligible.includes(q.id)) &&
-          !used.has(q.id),
+          (this.s.phase === "pareggio"
+            ? q.difficulty === "difficile"
+            : this.s.eligible.includes(q.id)) && !used.has(q.id),
       );
     }
     take() {
@@ -316,32 +358,75 @@
         );
         if (skip >= 0) {
           s.effects.splice(skip, 1);
-          this.log(g.name + " salta un turno", { type: "turn-skipped", target: i, turn: s.turn + 1 });
+          if (s.config.turnCount) s.completedTurns++;
+          this.log(g.name + " salta un turno", {
+            type: "turn-skipped",
+            target: i,
+            turn: s.turn + 1,
+          });
+          if (s.config.turnCount && s.completedTurns >= s.config.turnCount)
+            return null;
           continue;
         }
         return i;
       }
     }
     applyArsenico(target) {
-      const s = this.s, effect = s.effects.find(e => e.type === "arsenico" && e.target === target);
+      const s = this.s,
+        effect = s.effects.find(
+          (e) => e.type === "arsenico" && e.target === target,
+        );
       if (!effect) return;
-      const g = s.groups[target], before = clone(g.score), amount = this.losePercent(target, 11);
+      const g = s.groups[target],
+        before = clone(g.score),
+        amount = this.losePercent(target, 11);
       effect.remaining--;
       effect.lastLoss = clone(amount);
-      this.log("Arsenico: " + g.name + " −" + exact(amount) + " punti · " + effect.remaining + " turni rimanenti", {
-        type: "arsenico-tick", source: effect.source, target, before, after: clone(g.score),
-        amount, remaining: effect.remaining, turn: s.turn + 1, effect: effect.id,
-      });
-      if (!effect.remaining) s.effects = s.effects.filter(e => e !== effect);
+      this.log(
+        "Arsenico: " +
+          g.name +
+          " −" +
+          exact(amount) +
+          " punti · " +
+          effect.remaining +
+          " turni rimanenti",
+        {
+          type: "arsenico-tick",
+          source: effect.source,
+          target,
+          before,
+          after: clone(g.score),
+          amount,
+          remaining: effect.remaining,
+          turn: s.turn + 1,
+          effect: effect.id,
+        },
+      );
+      if (!effect.remaining) s.effects = s.effects.filter((e) => e !== effect);
     }
     losePercent(target, percent) {
       const g = this.s.groups[target];
-      const amount = rational(BigInt(g.score.n) * BigInt(percent), BigInt(g.score.d) * 100n);
+      const amount = rational(
+        BigInt(g.score.n) * BigInt(percent),
+        BigInt(g.score.d) * 100n,
+      );
       g.score = add(g.score, rational(-BigInt(amount.n), BigInt(amount.d)));
       return amount;
     }
+    closeTurn() {
+      const s = this.s;
+      if (s.phase !== "ordinaria" || !s.config.turnCount || s.turnClosed)
+        return;
+      s.completedTurns++;
+      s.turnClosed = true;
+    }
     newTurn(from) {
       const s = this.s;
+      if (s.phase === "ordinaria") {
+        this.closeTurn();
+        this.finishCheck();
+        if (s.phase === "conclusa") return;
+      }
       let i;
       if (s.phase === "pareggio") {
         let pos = s.tieIndex + 1;
@@ -353,6 +438,12 @@
         s.tieIndex = pos;
         i = s.tieOrder[pos];
       } else i = this.nextGroup(from);
+      if (i === null) {
+        this.finishCheck();
+        if (s.phase === "pareggio") this.newTurn(from);
+        return;
+      }
+      s.turnClosed = false;
       s.owner = i;
       s.respondent = i;
       s.turn++;
@@ -360,14 +451,22 @@
         s.groups[i].aura--;
         if (s.groups[i].aura === 0) {
           s.groups[i].aura = null;
-          this.log("Sigillo di " + s.groups[i].name + " scaduto", { type: "seal-expired", target: i, turn: s.turn });
+          this.log("Sigillo di " + s.groups[i].name + " scaduto", {
+            type: "seal-expired",
+            target: i,
+            turn: s.turn,
+          });
         }
       }
       if (s.groups[i].contrappasso !== null) {
         s.groups[i].contrappasso--;
         if (s.groups[i].contrappasso === 0) {
           s.groups[i].contrappasso = null;
-          this.log("Contrappasso di " + s.groups[i].name + " scaduto", { type: "karma-expired", target: i, turn: s.turn });
+          this.log("Contrappasso di " + s.groups[i].name + " scaduto", {
+            type: "karma-expired",
+            target: i,
+            turn: s.turn,
+          });
         }
       }
       s.usedBonus = false;
@@ -389,9 +488,10 @@
     }
     pause(reason = "manuale", discipline = false) {
       const s = this.s;
-      if (s.screen !== "answer" || s.paused) return;
+      if (!["answer", "choice"].includes(s.screen) || s.paused) return;
       if (!discipline && this.left() <= 0) {
-        this.answer(null);
+        this.expire();
+        if (this.running) this.pause(reason, discipline);
         return;
       }
       this.stop();
@@ -402,13 +502,20 @@
       this.guard();
       this.revision(expected);
       const s = this.s;
-      need(s.screen === "answer" && s.paused, "Nessuna risposta in pausa");
+      need(
+        ["answer", "choice"].includes(s.screen) && s.paused,
+        "Nessun timer in pausa",
+      );
       if (s.remaining <= 0) {
         s.paused = false;
-        this.answer(null);
+        this.expire();
         return;
       }
       this.run();
+    }
+    expire() {
+      if (this.s.screen === "choice") this.pass(this.s.owner);
+      else this.answer(null);
     }
     tick() {
       if (
@@ -417,26 +524,58 @@
         !this.s.suspended &&
         this.left() <= 0
       )
-        this.answer(null);
+        this.expire();
     }
     attack(type, source, target, id) {
-      need(["salta", "ruba", "svela", "arsenico"].includes(type), "Omen di attacco non valido");
+      need(
+        ["salta", "ruba", "svela", "arsenico"].includes(type),
+        "Omen di attacco non valido",
+      );
       const s = this.s,
         g = s.groups[target];
       if (g.aura !== null) {
-        this.log(LABELS[type] + " bloccato da Sigillo di " + g.name,
-          { type: "aura-block", target, source, ammo: type, turn: s.turn });
+        this.log(LABELS[type] + " bloccato da Sigillo di " + g.name, {
+          type: "aura-block",
+          target,
+          source,
+          ammo: type,
+          turn: s.turn,
+        });
         return false;
       }
       if (type === "ruba") {
-        const amount = rational(BigInt(g.score.n) * 33n, BigInt(g.score.d) * 100n);
+        const amount = rational(
+          BigInt(g.score.n) * 33n,
+          BigInt(g.score.d) * 100n,
+        );
         g.score = add(g.score, rational(-BigInt(amount.n), BigInt(amount.d)));
         s.groups[source].score = add(s.groups[source].score, amount);
-        this.log("Tributo: " + s.groups[source].name + " prende il 33% dei punti di " + g.name + " (" + exact(amount) + ")", {
-          type: "tribute-transfer", source, target, amount: clone(amount), turn: s.turn,
+        this.log(
+          "Tributo: " +
+            s.groups[source].name +
+            " prende il 33% dei punti di " +
+            g.name +
+            " (" +
+            exact(amount) +
+            ")",
+          {
+            type: "tribute-transfer",
+            source,
+            target,
+            amount: clone(amount),
+            turn: s.turn,
+          },
+        );
+      } else if (type !== "svela")
+        s.effects.push({
+          id,
+          type,
+          source,
+          target,
+          ...(type === "arsenico"
+            ? { remaining: 3, lastLoss: rational(0) }
+            : {}),
         });
-      } else if (type !== "svela") s.effects.push({ id, type, source, target,
-        ...(type === "arsenico" ? { remaining: 3, lastLoss: rational(0) } : {}) });
       return true;
     }
     use(copyId, target, expected) {
@@ -461,7 +600,10 @@
       need(g.aura === null, "Sigillo attivo: non puoi usare altre Omen");
       const copy = g.inventory.find((c) => c.id === copyId);
       need(copy && TYPES.includes(copy.type), "Omen non disponibile");
-      need(copy.type !== "karma" || g.contrappasso === null, "Contrappasso già attivo");
+      need(
+        copy.type !== "karma" || g.contrappasso === null,
+        "Contrappasso già attivo",
+      );
       need(
         copy.type !== "svela" || s.screen === "hidden",
         "Malocchio richiede domanda nascosta",
@@ -480,7 +622,10 @@
         );
       }
       if (copy.type === "arsenico")
-        need(!s.effects.some(e => e.type === "arsenico" && e.target === target), "Arsenico già attivo sul bersaglio");
+        need(
+          !s.effects.some((e) => e.type === "arsenico" && e.target === target),
+          "Arsenico già attivo sul bersaglio",
+        );
       if (copy.type === "svela" && copy.target !== null)
         need(!s.groups[copy.target].out, "Il bersaglio vincolato è eliminato");
       if (["marx", "ira", "sacrificio", "karma"].includes(copy.type))
@@ -498,21 +643,32 @@
       });
       if (copy.type === "karma") {
         g.contrappasso = 3;
-        this.log("Contrappasso: 3 turni personali, punti e rischio raddoppiati", {
-          type: "karma-activated", source: s.respondent, target: s.respondent, remaining: 3, turn: s.turn,
-        });
+        this.log(
+          "Contrappasso: 3 turni personali, punti e rischio raddoppiati",
+          {
+            type: "karma-activated",
+            source: s.respondent,
+            target: s.respondent,
+            remaining: 3,
+            turn: s.turn,
+          },
+        );
       } else if (copy.type === "aura") {
         g.aura = 3;
-        s.effects = s.effects.filter(e => e.target !== s.respondent);
+        s.effects = s.effects.filter((e) => e.target !== s.respondent);
         this.log("Sigillo: 3 turni personali, niente uso o guadagno di Omen", {
-          type: "seal-activated", target: s.respondent, remaining: 3, turn: s.turn,
+          type: "seal-activated",
+          target: s.respondent,
+          remaining: 3,
+          turn: s.turn,
         });
       } else if (copy.type === "svela") {
         s.passLock = copy.target;
         s.malocchio = { source: s.owner, question: s.current.id };
         s.seen.push(s.current.id);
         s.screen = "choice";
-        s.remaining = s.config.seconds * 1000;
+        s.remaining = core.MALOCCHIO_CHOICE_SECONDS * 1000;
+        this.run();
       } else if (copy.type === "marx") {
         const active = this.active();
         let total = rational(0);
@@ -537,40 +693,70 @@
           },
         );
       } else if (copy.type === "sacrificio") {
-        const source = s.respondent, before = clone(g.score), lives = remainingLives(s, source);
+        const source = s.respondent,
+          before = clone(g.score),
+          lives = remainingLives(s, source);
         g.score = add(g.score, rational(777));
         g.damage++;
-        this.log("Sacrificio: " + g.name + " perde una vita e riceve 777 punti", {
-          type: "sacrifice", source, target: source, before, after: clone(g.score), livesBefore: lives, livesAfter: lives - 1, turn: s.turn,
-        });
-        if (remainingLives(s, source) === 0) this.eliminate(source, "Sacrificio");
+        this.log(
+          "Sacrificio: " + g.name + " perde una vita e riceve 777 punti",
+          {
+            type: "sacrifice",
+            source,
+            target: source,
+            before,
+            after: clone(g.score),
+            livesBefore: lives,
+            livesAfter: lives - 1,
+            turn: s.turn,
+          },
+        );
+        if (remainingLives(s, source) === 0)
+          this.eliminate(source, "Sacrificio");
         this.resolveEliminations();
       } else if (copy.type === "ira") {
         const active = this.active();
         // Resolve the shared hit before checking for a winner: the owner is hit too.
         const losses = active.map((i) => {
-          const player = s.groups[i], before = clone(player.score);
+          const player = s.groups[i],
+            before = clone(player.score);
           player.damage++;
           player.inventory = [];
-          player.score = compare(before, rational(666)) <= 0 ? rational(0) : add(before, rational(-666));
+          player.score =
+            compare(before, rational(666)) <= 0
+              ? rational(0)
+              : add(before, rational(-666));
           return { group: i, before, after: clone(player.score) };
         });
         for (const i of active)
           if (remainingLives(s, i) === 0) this.eliminate(i, "Flagello");
-        this.log("Flagello: tutti i dannati in gara perdono una vita, tutte le Omen e fino a 666 punti", {
-          type: "divine-wrath", groups: active, losses,
-        });
+        this.log(
+          "Flagello: tutti i dannati in gara perdono una vita, tutte le Omen e fino a 666 punti",
+          {
+            type: "divine-wrath",
+            groups: active,
+            losses,
+          },
+        );
         this.resolveEliminations();
       } else {
         const source = s.respondent;
         if (copy.type === "salta") {
           const amount = this.losePercent(source, 11);
-          this.log("Catene: " + g.name + " paga l’11% (" + exact(amount) + " punti)", {
-            type: "chains-cost", source, target, amount, turn: s.turn,
-          });
+          this.log(
+            "Catene: " + g.name + " paga l’11% (" + exact(amount) + " punti)",
+            {
+              type: "chains-cost",
+              source,
+              target,
+              amount,
+              turn: s.turn,
+            },
+          );
         }
         this.attack(copy.type, source, target, id);
-        if (["ruba", "arsenico"].includes(copy.type)) this.forfeitTurn(source, copy.type);
+        if (["ruba", "arsenico"].includes(copy.type))
+          this.forfeitTurn(source, copy.type);
       }
     }
     forfeitTurn(source, type = "ruba") {
@@ -580,18 +766,39 @@
       if (s.current) {
         if (s.seen.includes(s.current.id)) s.cancelled.push(s.current.id);
         else s.queue.unshift(s.current);
+        s.current = null;
       }
-      this.log(s.groups[source].name + " rinuncia al turno corrente per " + LABELS[type], {
-        type: "turn-forfeited", source, target: source, ammo: type, turn: s.turn,
-      });
+      this.log(
+        s.groups[source].name +
+          " rinuncia al turno corrente per " +
+          LABELS[type],
+        {
+          type: "turn-forfeited",
+          source,
+          target: source,
+          ammo: type,
+          turn: s.turn,
+        },
+      );
       this.newTurn(source);
-      if (s.suspendAfter) { s.suspended = true; s.suspendAfter = false; }
+      if (s.suspendAfter) {
+        s.suspended = true;
+        s.suspendAfter = false;
+      }
     }
     pass(target, expected) {
       this.guard();
       this.revision(expected);
       const s = this.s;
-      need(s.screen === "choice", "Nessuna scelta in corso");
+      need(s.screen === "choice" && !s.paused, "Nessuna scelta attiva");
+      if (this.left() <= 0) {
+        target = s.owner;
+        this.log(
+          "Malocchio: 45 secondi scaduti, la domanda resta a " +
+            s.groups[s.owner].name,
+          { type: "malocchio-choice-expired", source: s.owner, turn: s.turn },
+        );
+      }
       need(
         Number.isInteger(target) && s.groups[target] && !s.groups[target].out,
         "Destinatario non valido",
@@ -603,8 +810,12 @@
         );
         if (this.attack("svela", s.owner, target, this.uid())) {
           s.respondent = target;
-          this.log(s.groups[target].name + " riceve la domanda con Malocchio",
-            { type: "spoiler-pass", source: s.owner, target, turn: s.turn });
+          this.log(s.groups[target].name + " riceve la domanda con Malocchio", {
+            type: "spoiler-pass",
+            source: s.owner,
+            target,
+            turn: s.turn,
+          });
         }
       }
       s.screen = "answer";
@@ -647,18 +858,21 @@
       };
       if (s.phase === "ordinaria") {
         // Legacy deferred Tributi are settled once; new attacks transfer immediately.
-        const beneficiaries = s.malocchio || g.aura !== null ? [] : [
-          ...new Set(
-            s.effects
-              .filter(
-                (e) =>
-                  e.type === "ruba" &&
-                  e.target === i &&
-                  !s.groups[e.source].out,
-              )
-              .map((e) => e.source),
-          ),
-        ];
+        const beneficiaries =
+          s.malocchio || g.aura !== null
+            ? []
+            : [
+                ...new Set(
+                  s.effects
+                    .filter(
+                      (e) =>
+                        e.type === "ruba" &&
+                        e.target === i &&
+                        !s.groups[e.source].out,
+                    )
+                    .map((e) => e.source),
+                ),
+              ];
         if (correct) {
           const base = BigInt(s.config.bases[q.difficulty]);
           const gross = rational(base * BigInt(result.multiplier)),
@@ -666,7 +880,10 @@
               BigInt(gross.n),
               BigInt(gross.d) * BigInt(beneficiaries.length + 1),
             );
-          const beneficiaryShare = rational(base, BigInt(beneficiaries.length + 1));
+          const beneficiaryShare = rational(
+            base,
+            BigInt(beneficiaries.length + 1),
+          );
           g.score = add(g.score, share);
           for (const id of beneficiaries)
             s.groups[id].score = add(s.groups[id].score, beneficiaryShare);
@@ -696,15 +913,43 @@
           }
         }
         if (!correct && (s.malocchio || result.contrappasso)) {
-          const value = rational(BigInt(s.config.bases[q.difficulty]) * BigInt(result.multiplier));
+          const value = rational(
+            BigInt(s.config.bases[q.difficulty]) * BigInt(result.multiplier),
+          );
           result.base = String(s.config.bases[q.difficulty]);
-          result.penaltyCause = result.contrappasso ? "Contrappasso" : "Malocchio";
-          result.penaltyBlocked = !result.contrappasso && g.aura !== null && s.malocchio.source !== i;
-          result.penalty = result.penaltyBlocked ? rational(0) : compare(g.score, value) <= 0 ? clone(g.score) : value;
-          g.score = add(g.score, rational(-BigInt(result.penalty.n), BigInt(result.penalty.d)));
-          this.log(result.penaltyCause + ": " + g.name + " perde " + exact(result.penalty) + " punti (penalità prevista " + exact(value) + ", minimo zero)", {
-            type: result.contrappasso ? "karma-penalty" : "malocchio-penalty", source: result.contrappasso ? i : s.malocchio.source, target: i, amount: clone(result.penalty), value, questionId: q.id, turn: s.turn,
-          });
+          result.penaltyCause = result.contrappasso
+            ? "Contrappasso"
+            : "Malocchio";
+          result.penaltyBlocked =
+            !result.contrappasso && g.aura !== null && s.malocchio.source !== i;
+          result.penalty = result.penaltyBlocked
+            ? rational(0)
+            : compare(g.score, value) <= 0
+              ? clone(g.score)
+              : value;
+          g.score = add(
+            g.score,
+            rational(-BigInt(result.penalty.n), BigInt(result.penalty.d)),
+          );
+          this.log(
+            result.penaltyCause +
+              ": " +
+              g.name +
+              " perde " +
+              exact(result.penalty) +
+              " punti (penalità prevista " +
+              exact(value) +
+              ", minimo zero)",
+            {
+              type: result.contrappasso ? "karma-penalty" : "malocchio-penalty",
+              source: result.contrappasso ? i : s.malocchio.source,
+              target: i,
+              amount: clone(result.penalty),
+              value,
+              questionId: q.id,
+              turn: s.turn,
+            },
+          );
         }
         s.effects = s.effects.filter(
           (e) => !(e.type === "ruba" && e.target === i),
@@ -728,6 +973,7 @@
         (correct ? "Corretta" : "Errore / tempo scaduto") + " — " + g.name,
         { outcome: clone(result), question: clone(q) },
       );
+      this.closeTurn();
       this.finishCheck();
       if (s.suspendAfter && s.phase !== "conclusa") {
         s.suspended = true;
@@ -785,7 +1031,9 @@
       }
       if (
         s.phase === "ordinaria" &&
-        s.valid === (s.config.questionCount ?? 33)
+        (s.config.turnCount
+          ? s.completedTurns >= s.config.turnCount
+          : s.valid === (s.config.questionCount ?? 33))
       ) {
         let leaders = [active[0]];
         for (const i of active.slice(1)) {
@@ -855,11 +1103,15 @@
           const n = integer(p.counts[i], 0, 3, "Sanzioni");
           const g = s.groups[i];
           if (g.out || !n) continue;
-          const before = remainingLives(s, i), loss = Math.min(n, before);
+          const before = remainingLives(s, i),
+            loss = Math.min(n, before);
           g.sanctions = Math.min(3 - (g.damage ?? 0), g.sanctions + loss);
           this.log("Sanzione a " + g.name + ": " + p.reasons[i]);
           if (loss === before)
-            this.eliminate(i, g.sanctions === 3 && !g.damage ? "Tre sanzioni" : "Vite esaurite");
+            this.eliminate(
+              i,
+              g.sanctions === 3 && !g.damage ? "Tre sanzioni" : "Vite esaurite",
+            );
         }
       }
       this.resolveEliminations();
@@ -870,6 +1122,7 @@
       const interrupted =
         s.groups[s.respondent].out &&
         ["hidden", "answer", "choice", "supply"].includes(s.screen);
+      if (interrupted) this.closeTurn();
       this.finishCheck();
       if (s.phase === "conclusa") return;
       if (interrupted) {
@@ -898,7 +1151,7 @@
     continueSession() {
       need(this.s.suspended, "Partita non sospesa");
       this.s.suspended = false;
-      if (this.s.screen === "answer") this.s.paused = true;
+      if (["answer", "choice"].includes(this.s.screen)) this.s.paused = true;
     }
     supply(parsed) {
       const s = this.s;
@@ -916,8 +1169,12 @@
             s.config.difficulty === q.difficulty),
       );
       need(
-        s.phase === "pareggio" ? parsed.bank.some(q => q.difficulty === "difficile") : eligible.length > 0,
-        s.phase === "pareggio" ? "Ultimo Miglio: servono nuove domande difficili mai viste" : "Nessuna domanda compatibile con la partita",
+        s.phase === "pareggio"
+          ? parsed.bank.some((q) => q.difficulty === "difficile")
+          : eligible.length > 0,
+        s.phase === "pareggio"
+          ? "Ultimo Miglio: servono nuove domande difficili mai viste"
+          : "Nessuna domanda compatibile con la partita",
       );
       s.bank.push(...clone(parsed.bank));
       s.eligible.push(...eligible.map((q) => q.id));
@@ -927,7 +1184,7 @@
     snapshot() {
       const s = clone(this.s);
       s.remaining = this.left();
-      if (s.screen === "answer") {
+      if (["answer", "choice"].includes(s.screen)) {
         s.paused = true;
         s.pauseReason = "ripresa";
       }
@@ -936,8 +1193,25 @@
     static restore(raw, deps = {}) {
       const s = clone(raw),
         legacyKarma = s.version !== VERSION,
-        legacyShield = ["1.2.0", "2.0.0", "2.1.0", "2.2.0", "2.2.1", "2.3.0", "2.4.0", "2.5.0", "2.6.0"].includes(s.version),
-        legacyDamage = ["1.2.0", "2.0.0", "2.1.0", "2.2.0", "2.2.1", "2.3.0"].includes(s.version);
+        legacyShield = [
+          "1.2.0",
+          "2.0.0",
+          "2.1.0",
+          "2.2.0",
+          "2.2.1",
+          "2.3.0",
+          "2.4.0",
+          "2.5.0",
+          "2.6.0",
+        ].includes(s.version),
+        legacyDamage = [
+          "1.2.0",
+          "2.0.0",
+          "2.1.0",
+          "2.2.0",
+          "2.2.1",
+          "2.3.0",
+        ].includes(s.version);
       if (
         s.version === "1.2.0" &&
         s.rules === "18.2.0" &&
@@ -967,8 +1241,8 @@
         // Old ties really had one life. Preserve that effective life budget:
         // lost ordinary damage cannot reliably be reconstructed from old saves.
         if (s.tieRound > 0 && Array.isArray(s.groups))
-          for (const g of s.groups) if (!g.out)
-            g.damage = Math.max(g.damage ?? 0, 2 - g.sanctions);
+          for (const g of s.groups)
+            if (!g.out) g.damage = Math.max(g.damage ?? 0, 2 - g.sanctions);
         s.version = VERSION;
         s.rules = RULES;
       }
@@ -992,47 +1266,94 @@
         s.version = VERSION;
         s.rules = RULES;
       }
+      if (legacyKarma && s.screen === "choice")
+        s.remaining = core.MALOCCHIO_CHOICE_SECONDS * 1000;
+      if (s.version === "2.9.0" && s.rules === "26.0.0") {
+        if (s.screen === "choice")
+          s.remaining = core.MALOCCHIO_CHOICE_SECONDS * 1000;
+        s.version = VERSION;
+        s.rules = RULES;
+      }
+      if (s.completedTurns === undefined && !s.config?.turnCount) {
+        s.completedTurns = 0;
+        s.turnClosed = false;
+      }
       if (s.version === VERSION && s.rules === RULES) {
-        if (Array.isArray(s.groups)) for (const g of s.groups)
-          if (legacyKarma && g.contrappasso === undefined) g.contrappasso = null;
+        if (Array.isArray(s.groups))
+          for (const g of s.groups)
+            if (legacyKarma && g.contrappasso === undefined)
+              g.contrappasso = null;
         if (legacyShield && Array.isArray(s.groups)) {
-          for (const g of s.groups) if (g.aura !== null) {
-            need(Number.isSafeInteger(g.aura) && g.aura > 0 && g.aura <= s.turn, "Sigillo precedente non valido");
-            g.aura = 3;
-          }
-          if (Array.isArray(s.effects)) s.effects = s.effects.filter(e => !s.groups[e.target] || s.groups[e.target].aura === null);
+          for (const g of s.groups)
+            if (g.aura !== null) {
+              need(
+                Number.isSafeInteger(g.aura) && g.aura > 0 && g.aura <= s.turn,
+                "Sigillo precedente non valido",
+              );
+              g.aura = 3;
+            }
+          if (Array.isArray(s.effects))
+            s.effects = s.effects.filter(
+              (e) => !s.groups[e.target] || s.groups[e.target].aura === null,
+            );
         }
         if (s.malocchio === undefined) {
-          const active = s.phase === "ordinaria" && ["choice", "answer", "result"].includes(s.screen) &&
-            (s.screen === "choice" || s.respondent !== s.owner ||
-              (s.events ?? []).some(e => e.turn === s.turn && e.activation && e.copy?.type === "svela"));
-          s.malocchio = active ? { source: s.owner, question: s.current?.id } : null;
+          const active =
+            s.phase === "ordinaria" &&
+            ["choice", "answer", "result"].includes(s.screen) &&
+            (s.screen === "choice" ||
+              s.respondent !== s.owner ||
+              (s.events ?? []).some(
+                (e) =>
+                  e.turn === s.turn && e.activation && e.copy?.type === "svela",
+              ));
+          s.malocchio = active
+            ? { source: s.owner, question: s.current?.id }
+            : null;
         }
         s.config.bonusWeights = config(s.config).bonusWeights;
         // Retire old copies without replacement; historical question outcomes survive.
         if (legacyKarma) {
           for (const g of s.groups ?? [])
-            if (Array.isArray(g.inventory)) g.inventory = g.inventory.filter(c => c.type !== "antisigillo");
-          if (s.draftBonus && !s.groups?.[s.owner]?.inventory?.some(c => c.id === s.draftBonus.copyId)) s.draftBonus = null;
-          const cleanReward = r => {
+            if (Array.isArray(g.inventory))
+              g.inventory = g.inventory.filter((c) => c.type !== "antisigillo");
+          if (
+            s.draftBonus &&
+            !s.groups?.[s.owner]?.inventory?.some(
+              (c) => c.id === s.draftBonus.copyId,
+            )
+          )
+            s.draftBonus = null;
+          const cleanReward = (r) => {
             if (!r) return;
             if (r.bonus?.type === "antisigillo") r.bonus = null;
-            if (Array.isArray(r.bonuses)) r.bonuses = r.bonuses.filter(c => c.type !== "antisigillo");
+            if (Array.isArray(r.bonuses))
+              r.bonuses = r.bonuses.filter((c) => c.type !== "antisigillo");
           };
           cleanReward(s.result);
-          if (Array.isArray(s.events)) s.events = s.events.filter(e => e.copy?.type !== "antisigillo" && e.ammo !== "antisigillo" && e.type !== "seal-dispelled");
+          if (Array.isArray(s.events))
+            s.events = s.events.filter(
+              (e) =>
+                e.copy?.type !== "antisigillo" &&
+                e.ammo !== "antisigillo" &&
+                e.type !== "seal-dispelled",
+            );
           for (const e of s.events ?? []) {
             cleanReward(e.outcome);
-            if (typeof e.message === "string") e.message = e.message.replace(/ammo/gi, "Omen");
+            if (typeof e.message === "string")
+              e.message = e.message.replace(/ammo/gi, "Omen");
           }
         }
         if (Array.isArray(s.groups))
-          for (const g of s.groups) if (legacyDamage && g && g.damage === undefined) g.damage = 0;
+          for (const g of s.groups)
+            if (legacyDamage && g && g.damage === undefined) g.damage = 0;
         if (legacyDamage) {
-          for (const e of s.events ?? []) if (typeof e.message === "string")
-            e.message = e.message.replace(/spareggio/gi, "Ultimo Miglio");
-          for (const g of s.groups ?? []) if (typeof g.cause === "string")
-            g.cause = g.cause.replace(/spareggio/gi, "Ultimo Miglio");
+          for (const e of s.events ?? [])
+            if (typeof e.message === "string")
+              e.message = e.message.replace(/spareggio/gi, "Ultimo Miglio");
+          for (const g of s.groups ?? [])
+            if (typeof g.cause === "string")
+              g.cause = g.cause.replace(/spareggio/gi, "Ultimo Miglio");
         }
       }
       if (s.panel?.type === "refusal") {
@@ -1047,8 +1368,15 @@
         s.queue = [];
         // Retire a legacy easy/medium open question without replaying it or
         // advancing the roster. Historical results keep their original question.
-        if (["hidden", "answer"].includes(s.screen) && s.current?.difficulty !== "difficile") {
-          if (s.seen.includes(s.current?.id) && !s.cancelled.includes(s.current.id)) s.cancelled.push(s.current.id);
+        if (
+          ["hidden", "answer"].includes(s.screen) &&
+          s.current?.difficulty !== "difficile"
+        ) {
+          if (
+            s.seen.includes(s.current?.id) &&
+            !s.cancelled.includes(s.current.id)
+          )
+            s.cancelled.push(s.current.id);
           s.current = null;
           new Game(s, deps).take();
         }
@@ -1057,7 +1385,7 @@
       for (const e of s.events)
         if (e.outcome && !e.question && e.outcome.question === s.current?.id)
           e.question = clone(s.current);
-      if (s.screen === "answer") {
+      if (["answer", "choice"].includes(s.screen)) {
         s.paused = true;
         s.pauseReason = "ripresa";
       }
@@ -1079,8 +1407,24 @@
     );
     integer(s.revision, 0, Number.MAX_SAFE_INTEGER, "Revisione");
     integer(s.serial, 0, Number.MAX_SAFE_INTEGER, "Sequenza");
+    integer(
+      s.completedTurns,
+      0,
+      s.config.turnCount ?? Number.MAX_SAFE_INTEGER,
+      "Turni completati",
+    );
+    need(typeof s.turnClosed === "boolean", "Stato turno non valido");
     integer(s.turn, 1, Number.MAX_SAFE_INTEGER, "Turno");
     integer(s.valid, 0, s.config.questionCount ?? 33, "Domande valide");
+    if (s.config.turnCount) {
+      need(s.valid <= s.completedTurns, "Risposte oltre i turni completati");
+      if (s.phase === "ordinaria")
+        need(
+          s.completedTurns < s.config.turnCount &&
+            s.turnClosed === (s.screen === "result"),
+          "Avanzamento dei turni non valido",
+        );
+    }
     integer(s.extra, 0, Number.MAX_SAFE_INTEGER, "Domande extra");
     need(typeof s.id === "string" && s.id, "ID partita mancante");
     need(
@@ -1112,11 +1456,20 @@
       s.phase !== "ordinaria" || s.order.length === 3,
       "Rotazione ordinaria incompleta",
     );
-    need(s.malocchio === null || (
-      s.malocchio && s.phase === "ordinaria" && ["choice", "answer", "result"].includes(s.screen) &&
-      s.malocchio.source === s.owner && s.malocchio.question === s.current?.id && s.usedBonus
-    ), "Stato Malocchio non valido");
-    need(s.screen !== "choice" || s.malocchio !== null, "Scelta senza Malocchio");
+    need(
+      s.malocchio === null ||
+        (s.malocchio &&
+          s.phase === "ordinaria" &&
+          ["choice", "answer", "result"].includes(s.screen) &&
+          s.malocchio.source === s.owner &&
+          s.malocchio.question === s.current?.id &&
+          s.usedBonus),
+      "Stato Malocchio non valido",
+    );
+    need(
+      s.screen !== "choice" || s.malocchio !== null,
+      "Scelta senza Malocchio",
+    );
     const copyIds = new Set();
     for (const g of s.groups) {
       integer(g.sanctions, 0, 3, "Sanzioni");
@@ -1126,7 +1479,10 @@
         typeof g.out === "boolean" && typeof g.cause === "string",
         "Eliminazione non valida",
       );
-      need(g.sanctions + g.damage < 3 || g.out, "Vite esaurite senza eliminazione");
+      need(
+        g.sanctions + g.damage < 3 || g.out,
+        "Vite esaurite senza eliminazione",
+      );
       need(
         g.score &&
           /^\d{1,300}$/.test(g.score.n) &&
@@ -1143,7 +1499,13 @@
           (Number.isInteger(g.aura) && g.aura >= 1 && g.aura <= 3),
         "Sigillo non valida",
       );
-      need(g.contrappasso === null || (Number.isInteger(g.contrappasso) && g.contrappasso >= 1 && g.contrappasso <= 3), "Contrappasso non valido");
+      need(
+        g.contrappasso === null ||
+          (Number.isInteger(g.contrappasso) &&
+            g.contrappasso >= 1 &&
+            g.contrappasso <= 3),
+        "Contrappasso non valido",
+      );
       need(Array.isArray(g.inventory), "Inventario non valido");
       for (const c of g.inventory) {
         need(
@@ -1161,7 +1523,8 @@
         );
       }
       need(
-        !g.out || (!g.inventory.length && g.aura === null && g.contrappasso === null),
+        !g.out ||
+          (!g.inventory.length && g.aura === null && g.contrappasso === null),
         "Eliminato con Omen",
       );
     }
@@ -1189,16 +1552,14 @@
         topics.set(q.topic, t);
         converted.argomenti.push(t);
       }
-      topics
-        .get(q.topic)
-        .domande.push({
-          id: q.id,
-          testo: q.body,
-          alternative: q.options,
-          corretta: "ABCD"[q.correct],
-          spiegazione: q.explanation,
-          difficolta: q.difficulty,
-        });
+      topics.get(q.topic).domande.push({
+        id: q.id,
+        testo: q.body,
+        alternative: q.options,
+        corretta: "ABCD"[q.correct],
+        spiegazione: q.explanation,
+        difficolta: q.difficulty,
+      });
     }
     const validated = parseDataset(JSON.stringify(converted), root.katex);
     const byId = new Map(validated.bank.map((q) => [q.id, q]));
@@ -1231,10 +1592,16 @@
     };
     for (const q of s.queue) checkQ(q);
     if (s.phase === "pareggio")
-      need(s.queue.every(q => q.difficulty === "difficile"), "Ultimo Miglio: coda con domande non difficili");
+      need(
+        s.queue.every((q) => q.difficulty === "difficile"),
+        "Ultimo Miglio: coda con domande non difficili",
+      );
     if (s.current) checkQ(s.current);
     if (s.phase === "pareggio" && ["hidden", "answer"].includes(s.screen))
-      need(s.current?.difficulty === "difficile", "Ultimo Miglio: domanda non difficile");
+      need(
+        s.current?.difficulty === "difficile",
+        "Ultimo Miglio: domanda non difficile",
+      );
     need(
       !["hidden", "answer", "choice", "result"].includes(s.screen) || s.current,
       "Domanda mancante",
@@ -1271,7 +1638,11 @@
       typeof s.remaining === "number" &&
         Number.isFinite(s.remaining) &&
         s.remaining >= 0 &&
-        s.remaining <= s.config.seconds * 1000,
+        s.remaining <=
+          (s.screen === "choice"
+            ? core.MALOCCHIO_CHOICE_SECONDS
+            : s.config.seconds) *
+            1000,
       "Tempo residuo non valido",
     );
     need(Array.isArray(s.effects), "Effetti non validi");
@@ -1290,8 +1661,21 @@
       );
       if (e.type === "arsenico") {
         integer(e.remaining, 1, 3, "Turni Arsenico");
-        need(!s.effects.some(other => other !== e && other.type === "arsenico" && other.target === e.target), "Arsenico duplicato");
-        need(e.lastLoss && /^\d{1,300}$/.test(e.lastLoss.n) && /^[1-9]\d{0,299}$/.test(e.lastLoss.d), "Decremento Arsenico non valido");
+        need(
+          !s.effects.some(
+            (other) =>
+              other !== e &&
+              other.type === "arsenico" &&
+              other.target === e.target,
+          ),
+          "Arsenico duplicato",
+        );
+        need(
+          e.lastLoss &&
+            /^\d{1,300}$/.test(e.lastLoss.n) &&
+            /^[1-9]\d{0,299}$/.test(e.lastLoss.d),
+          "Decremento Arsenico non valido",
+        );
       }
       effectIds.add(e.id);
     }
@@ -1315,7 +1699,10 @@
     );
     need(
       s.phase !== "pareggio" ||
-        (s.groups.every((g) => !g.inventory.length && g.aura === null && g.contrappasso === null) &&
+        (s.groups.every(
+          (g) =>
+            !g.inventory.length && g.aura === null && g.contrappasso === null,
+        ) &&
           !s.effects.length),
       "Omen presenti nello Ultimo Miglio",
     );

@@ -55,7 +55,8 @@
     shield: ["⛨", "Scudo"],
     crown: ["♛", "Corona"],
   };
-  let settingsTab = "general",
+  let settingsTopics = new Set(),
+    settingsTab = "general",
     passiveReturn = null,
     vialRefillFrom = null;
   const node = (tag, text, cls) => {
@@ -197,16 +198,9 @@
     try {
       const saved = JSON.parse(raw),
         count = saved?.config?.questionCount ?? 33;
-      if (count < 33)
-        parent.append(
-          node(
-            "p",
-            "La partita salvata prevede soltanto " +
-              count +
-              " domande. Per iniziare una nuova partita da 33, scegli Inizia partita.",
-            "help",
-          ),
-        );
+      if (!saved?.config?.turnCount)
+        parent.append(node("p", "La partita salvata conserva la durata originaria di " + count +
+          " domande. Le nuove partite durano 13 turni totali.", "help"));
     } catch (e) {}
   }
   function leaveForHome() {
@@ -260,24 +254,22 @@
     act(goHome);
   });
   function defaultSettings() {
+    const total = Math.min(F.DEFAULT_TURN_COUNT, Math.floor(bank.bank.length / teamDraft.names.length));
     return {
       seconds: 45,
       bonusWeights: { ...F.DEFAULT_BONUS_WEIGHTS },
       difficulty: "misto",
-      questionCount: 33,
+      turnCount: total,
+      questionCount: total,
+      selectedTopics: Object.keys(F.topicCounts(bank.bank)),
       bases: { ...F.DEFAULT_BASE_POINTS },
-      quotas: balancedQuotas("misto", 33),
+      quotas: balancedQuotas(total),
     };
   }
-  function balancedQuotas(filter, total = 33) {
-    const topics = [...new Set(bank.bank.map((q) => q.topic))],
-      counts = topics.map(
-        (t) =>
-          bank.bank.filter(
-            (q) =>
-              q.topic === t && (filter === "misto" || q.difficulty === filter),
-          ).length,
-      ),
+  function balancedQuotas(total = F.DEFAULT_TURN_COUNT, selected = null) {
+    const available = F.topicCounts(bank.bank),
+      topics = Object.keys(available),
+      counts = topics.map(t => !selected || selected.has(t) ? available[t] : 0),
       values = topics.map(() => 0);
     let remaining = total;
     while (remaining && values.some((n, i) => n < counts[i]))
@@ -298,30 +290,48 @@
         ...F.DEFAULT_BONUS_WEIGHTS,
         ...(value.bonusWeights ?? {}),
       },
-      difficulty: value.difficulty,
-      questionCount: value.questionCount ?? 33,
+      difficulty: "misto",
+      turnCount: value.turnCount ?? F.DEFAULT_TURN_COUNT,
+      questionCount: value.turnCount ?? F.DEFAULT_TURN_COUNT,
       bases: value.bases,
       quotas: value.quotas,
+      ...(value.selectedTopics ? {selectedTopics:value.selectedTopics} : {}),
       names,
       icons: teamDraft.icons.slice(),
       vehicles: teamDraft.vehicles.slice(),
     };
   }
+  function migrateQuotas(value, total) {
+    const entries = Object.entries(value.quotas ?? {}).filter(([, n]) => n > 0);
+    const sum = entries.reduce((n, [, weight]) => n + weight, 0);
+    if (!sum) return balancedQuotas(total, new Set(value.selectedTopics ?? Object.keys(F.topicCounts(bank.bank))));
+    const quotas = Object.fromEntries(Object.keys(value.quotas).map(t => [t, 0]));
+    const fractions = entries.map(([topic, weight]) => {
+      const exact = weight / sum * total;
+      quotas[topic] = Math.floor(exact);
+      return {topic, fraction: exact - Math.floor(exact)};
+    }).sort((a,b) => b.fraction - a.fraction);
+    let left = total - Object.values(quotas).reduce((a,b) => a+b, 0);
+    for (const item of fractions) if (left-- > 0) quotas[item.topic]++;
+    return quotas;
+  }
   function savedSettings() {
     try {
       const value = settingsStore().profiles[selectedBankId];
       if (value) {
-        /* I vecchi profili non attestano che una partita di 3/6/... domande sia una scelta consapevole. */
-        const legacyShort =
-          (value.questionCount ?? 33) < 33 &&
-          value.questionCountConfirmed !== true;
-        const safe = legacyShort
-          ? {
-              ...value,
-              questionCount: 33,
-              quotas: balancedQuotas(value.difficulty, 33),
-            }
-          : value;
+        const total = value.turnCount ?? (value.questionCountConfirmed && value.questionCount !== 33
+          ? value.questionCount : F.DEFAULT_TURN_COUNT);
+        let safe = value.turnCount ? value : {
+          ...value, turnCount: total, questionCount: total,
+          quotas: migrateQuotas(value, total),
+        };
+        // Normalize previously filtered profiles only for new games.
+        // Already-started games keep their original filter when restored.
+        safe = {...safe, difficulty: "misto"};
+        const topics = safe.selectedTopics ?? Object.keys(safe.quotas).filter(t => safe.quotas[t] > 0),
+          maximum = F.turnCapacity(bank.bank, topics, teamDraft.names.length);
+        if (maximum > 0 && safe.turnCount > maximum)
+          safe = {...safe, turnCount:maximum, questionCount:maximum, quotas:migrateQuotas(safe,maximum)};
         F.prepare(
           bank.bank,
           settingsConfig(safe, ["Giocatore 1", "Giocatore 2", "Giocatore 3"]),
@@ -448,20 +458,20 @@
       p.append(grid);
       syncVehicleChoices();
       const currentSettings = savedSettings();
-      const count = currentSettings.questionCount ?? 33;
+      const count = currentSettings.turnCount ?? F.DEFAULT_TURN_COUNT;
       p.append(
         node(
           "p",
           "Partita ordinaria: " +
             count +
-            " domande. Lo Ultimo Miglio si apre soltanto alla fine, in caso di parità al primo posto.",
+            " turni totali. Lo Ultimo Miglio si apre soltanto alla fine, in caso di parità al primo posto.",
           "help",
         ),
       );
       const row = node("div", undefined, "row");
       row.append(
         btn(
-          "Inizia partita (" + count + " domande)",
+          "Inizia partita (" + count + " turni)",
           () => {
             rememberTeams();
             const chosen = savedSettings();
@@ -491,23 +501,12 @@
     time.append(
       node("h3", "Tempo e Omen"),
       input(
-        "Numero di domande (multipli di 3, massimo 99)",
-        "question-count",
-        value.questionCount ?? 33,
+        "Turni totali",
+        "turn-count",
+        value.turnCount ?? F.DEFAULT_TURN_COUNT,
         "number",
       ),
       input("Secondi per domanda", "seconds", value.seconds, "number"),
-      select(
-        "Difficoltà",
-        "difficulty",
-        [
-          ["misto", "Misto"],
-          ["facile", "Facile"],
-          ["media", "Media"],
-          ["difficile", "Difficile"],
-        ],
-        value.difficulty,
-      ),
     );
     grid.append(time);
     const bonusPanel = node("section", undefined, "panel");
@@ -540,7 +539,7 @@
       node("h3", "Distribuzione delle domande"),
       node(
         "p",
-        "Le quote devono sommare al numero di domande scelto. Le altre domande restano in riserva per sostituzioni e Ultimo Miglio.",
+        "Massimo turni = tutte le domande (facili + medie + difficili) negli argomenti selezionati ÷ numero di giocatori, arrotondato per difetto. Le quote devono sommare ai turni. Turni saltati o ceduti contano comunque; Malocchio non aggiunge un turno.",
         "muted",
       ),
     );
@@ -548,12 +547,11 @@
     list.id = "quotas";
     topics.append(list);
     p.append(topics);
+    settingsTopics = new Set(value.selectedTopics ?? Object.keys(value.quotas).filter(t => value.quotas[t] > 0));
     drawQuotas(value.quotas);
-    $("difficulty").onchange = () => act(rebalance);
-    $("question-count").onchange = () => act(rebalance);
-    $("question-count").step = "3";
-    $("question-count").min = "3";
-    $("question-count").max = "99";
+    $("turn-count").onchange = () => act(rebalance);
+    $("turn-count").step = "1";
+    $("turn-count").min = "1";
     topics.append(btn("Ribilancia quote", rebalance));
     const row = node("div", undefined, "row");
     row.append(
@@ -584,6 +582,7 @@
       btn("Torna alla schermata iniziale", goHome),
     );
     p.append(row);
+    updateTurnLimit();
     showSettingsTab(settingsTab);
   }
   function showSettingsTab(tab) {
@@ -604,30 +603,45 @@
 
   function drawQuotas(quotas) {
     const list = $("quotas"),
-      filter = $("difficulty").value;
+      counts = F.topicCounts(bank.bank),
+      previousPage = Number(main.querySelector(".quota-pages")?.dataset.page ?? 0);
     list.replaceChildren();
     main.querySelector(".quota-pages")?.remove();
     const labels = [
       ...new Map(bank.bank.map((q) => [q.topic, q.topicName])),
     ].map(([t, name], i) => {
-      const count = bank.bank.filter(
-        (q) => q.topic === t && (filter === "misto" || q.difficulty === filter),
-      ).length;
+      const count = counts[t];
       const l = input(
-        name + " (" + count + " disponibili)",
+        "Quota",
         "quota-" + i,
-        quotas[t] ?? 0,
+        settingsTopics.has(t) ? Math.min(quotas[t] ?? 0, count) : 0,
         "number",
       );
-      l.querySelector("input").dataset.topic = t;
-      list.append(l);
-      return l;
+      const amount = l.querySelector("input");
+      amount.dataset.topic = t;
+      amount.min = "0"; amount.max = String(count); amount.step = "1";
+      amount.disabled = !settingsTopics.has(t) || count === 0;
+      const row = node("div", undefined, "quota-row"),
+        choice = node("label", undefined, "quota-topic"),
+        check = node("input");
+      check.type = "checkbox"; check.id = "topic-" + i;
+      check.checked = settingsTopics.has(t);
+      check.setAttribute("aria-label", "Seleziona " + name);
+      check.onchange = () => act(() => {
+        if(check.checked) settingsTopics.add(t); else settingsTopics.delete(t);
+        rebalance(); $(check.id)?.focus();
+      });
+      choice.append(check, node("span", name + " (" + count + " disponibili)"));
+      amount.setAttribute("aria-label", "Quota " + name);
+      row.append(choice, l); list.append(row);
+      return row;
     });
-    let page = 0;
+    let page = Math.min(previousPage, Math.max(0, Math.ceil(labels.length / 4) - 1));
     const nav = node("nav", undefined, "row quota-pages"),
       count = node("span");
     nav.setAttribute("aria-label", "Pagine degli argomenti");
     const show = () => {
+      nav.dataset.page = String(page);
       labels.forEach((label, i) => (label.hidden = Math.floor(i / 4) !== page));
       count.textContent = page + 1 + " / " + Math.ceil(labels.length / 4);
       previous.disabled = page === 0;
@@ -648,10 +662,27 @@
     show();
   }
   function rebalance() {
-    const total = number("question-count");
-    if (!Number.isInteger(total) || total < 3 || total > 99 || total % 3 !== 0)
-      throw Error("Scegli un multiplo di 3 compreso tra 3 e 99");
-    drawQuotas(balancedQuotas($("difficulty").value, total));
+    const maximum = updateTurnLimit();
+    if (!maximum) { drawQuotas({}); return; }
+    const total = number("turn-count");
+    if (!Number.isInteger(total) || total < 1)
+      throw Error("Scegli un numero intero di turni compreso tra 1 e " + maximum);
+    drawQuotas(balancedQuotas(total, settingsTopics));
+  }
+  function updateTurnLimit() {
+    const counts = F.topicCounts(bank.bank),
+      available = [...settingsTopics].reduce((sum, t) => sum + (counts[t] ?? 0), 0),
+      maximum = F.turnCapacity(bank.bank, settingsTopics, teamDraft.names.length),
+      field = $("turn-count"),
+      wasDisabled = field.disabled;
+    field.max = String(maximum);
+    field.disabled = maximum === 0;
+    field.parentElement.firstChild.textContent = maximum
+      ? "Turni totali (massimo " + maximum + ": " + available + " ÷ " + teamDraft.names.length + ") "
+      : "Seleziona almeno " + teamDraft.names.length + " domande disponibili ";
+    if (!maximum || Number(field.value) > maximum) field.value = String(maximum);
+    else if (wasDisabled) field.value = String(Math.min(F.DEFAULT_TURN_COUNT, maximum));
+    return maximum;
   }
   function number(id) {
     const x = $(id).value.trim();
@@ -661,18 +692,22 @@
     return n;
   }
   function readSettings() {
+    if ($("turn-count").disabled)
+      throw Error("Seleziona argomenti con almeno " + teamDraft.names.length + " domande disponibili");
     return {
       seconds: number("seconds"),
       bonusWeights: Object.fromEntries(
         F.TYPES.map((type) => [type, number("weight-" + type)]),
       ),
-      difficulty: $("difficulty").value,
-      questionCount: number("question-count"),
+      difficulty: "misto",
+      selectedTopics: [...settingsTopics],
+      turnCount: number("turn-count"),
+      questionCount: number("turn-count"),
       bases: Object.fromEntries(
         ["facile", "media", "difficile"].map((d) => [d, number("base-" + d)]),
       ),
       quotas: Object.fromEntries(
-        [...$("quotas").querySelectorAll("input")].map((i) => [
+        [...$("quotas").querySelectorAll('input[type="number"]')].map((i) => [
           i.dataset.topic,
           number(i.id),
         ]),
@@ -1098,7 +1133,7 @@
       d.dataset.passive = "options";
       const bar = node("div", undefined, "options-grid");
       if (s.phase !== "conclusa" && !s.suspended) {
-        if (s.screen === "answer")
+        if (["answer", "choice"].includes(s.screen))
           bar.append(btn(wasRunning ? "Pausa" : "Riprendi timer", () => {
             closeDialog();
             if (!wasRunning && !fitBlocked) game.resume(s.revision);
@@ -1219,7 +1254,7 @@
       const held = cinematicPause;
       cinematicPause = null;
       if (held.game === game && game.s.current?.id === held.question &&
-          game.s.screen === "answer" && game.s.paused && game.s.pauseReason === "animazione" &&
+          ["answer", "choice"].includes(game.s.screen) && game.s.paused && game.s.pauseReason === "animazione" &&
           !game.s.panel && !game.s.suspended && !fitBlocked && !FoolLayout.portrait) {
         game.resume(game.s.revision);
         changed();
@@ -1234,10 +1269,13 @@
   }
   function gameStage(state, final = false) {
     const stage = FoolHellRace.createStage(state, final);
+    // A skipped or forfeited final turn already prepared the first tie question.
+    if(state.phase === "pareggio" && state.screen === "hidden") FoolHellRace.beginTie(state);
     stage.addEventListener("foolscenepause",()=>{if(stage.isConnected)pauseCinematic();});
     stage.addEventListener("fooltiecomplete", event => {
       if(!stage.isConnected || game.s.id!==event.detail.id || game.s.result?.id!==event.detail.result)return;
-      advanceQuestion(game.s.revision);
+      if(game.s.screen === "result") advanceQuestion(game.s.revision);
+      else focusReveal();
       changed();
     });
     stage.addEventListener("foolanimationchange", () => {
@@ -1366,6 +1404,10 @@
     b.dataset.screen = s.screen;
     b.dataset.question = s.current?.id ?? "";
     b.dataset.paused = String(s.paused);
+    if (s.phase === "ordinaria" && s.config.turnCount) {
+      const number = Math.min(s.config.turnCount, s.completedTurns + (s.turnClosed ? 0 : 1));
+      b.append(node("div", "Turno " + number + " di " + s.config.turnCount, "eyebrow turn-progress"));
+    }
     if (s.suspended) {
       b.append(
         node("h2", "Partita sospesa"),
@@ -1395,7 +1437,7 @@
       return b;
     }
     if (s.screen === "hidden") {
-      b.append(
+      if (!s.config.turnCount || s.phase === "pareggio") b.append(
         node(
           "div",
           s.phase === "pareggio"
@@ -1411,8 +1453,8 @@
                 (s.config.questionCount ?? 33),
           "eyebrow",
         ),
-        questionActions(),
       );
+      b.append(questionActions());
       return b;
     }
     if (s.current) {
@@ -1446,10 +1488,13 @@
       }
     }
     if (s.screen === "choice") {
+      const decisionTime = node("p", Math.ceil(game.left()/1000) + " s per scegliere", "malocchio-choice-time");
+      decisionTime.id = "malocchio-choice-time";
+      b.append(decisionTime);
       b.append(
         node(
           "p",
-          "Malocchio: scegli a timer fermo. Chi sbaglia o lascia scadere il tempo perde il valore della domanda, fino a zero. Chi risponde bene tiene punti e Omen. Dopo risponde il gruppo successivo a " + s.groups[s.owner].name + ".",
+          "Scegli a chi assegnare la domanda. Alla scadenza resta a te e parte il tempo di risposta. Errore o timeout: perdi il valore della domanda, minimo zero.",
           "good",
         ),
       );
@@ -1463,6 +1508,7 @@
             btn(
               i === s.owner ? "Tieni la domanda" : "Passa a " + g.name,
               command(() => game.pass(i, revision)),
+              "", s.paused || !!s.panel || fitBlocked,
             ),
           );
       });
@@ -1490,7 +1536,7 @@
           "muted keyboard-hint",
         ),
       );
-    if (s.screen === "answer" && s.paused)
+    if (["answer", "choice"].includes(s.screen) && s.paused)
       b.append(
         node(
           "p",
@@ -1498,7 +1544,7 @@
           "good",
         ),
       );
-    if(s.screen === "answer" && s.paused && !s.panel)
+    if(["answer", "choice"].includes(s.screen) && s.paused && !s.panel)
       b.append(btn("Riprendi partita",command(()=>game.resume(revision)),"primary resume-question"));
     if (s.screen === "result") {
       const r = s.result,
@@ -1572,6 +1618,9 @@
     game.next(revision);
     if(game.s.current)preflight([game.s.current]);
     vialRefillFrom=game.s.screen==='hidden'&&game.s.phase!=='conclusa'?from:null;
+    focusReveal();
+  }
+  function focusReveal() {
     requestAnimationFrame(()=>main.querySelector('[data-game-action="reveal"]')?.focus({preventScroll:true}));
   }
   function renderGame() {
@@ -1912,10 +1961,14 @@
     if (!vial || !game) return;
     const level = Math.max(
       0,
-      Math.min(1, game.left() / (game.s.config.seconds * 1000)),
+      Math.min(1, game.left() / game.timeLimit()),
     );
     vial.style.setProperty("--level", String(level));
     vial.dataset.paused = String(!game.running);
+    const choice = game.s.screen === "choice";
+    vial.setAttribute("aria-label", choice ? "Tempo per scegliere a chi passare Malocchio" : "Tempo a disposizione");
+    const choiceTime = $("malocchio-choice-time");
+    if (choiceTime) choiceTime.textContent = Math.ceil(game.left()/1000) + " s per scegliere";
     vial.setAttribute("aria-valuenow", String(Math.round(level * 100)));
     vial.setAttribute(
       "aria-valuetext",
@@ -1950,7 +2003,7 @@
     const original = game;
     return () => {
       if (
-        wasRunning && game === original && game.s.screen === "answer" &&
+        wasRunning && game === original && ["answer", "choice"].includes(game.s.screen) &&
         game.s.paused && !game.s.panel && !game.s.draftBonus &&
         !game.s.suspended && !fitBlocked && !FoolLayout.portrait
       ) game.resume(game.s.revision);
@@ -2570,7 +2623,7 @@
     if (s.suspended) return;
     if (key === "p") {
       event.preventDefault();
-      if (s.screen === "answer")
+      if (["answer", "choice"].includes(s.screen))
         act(command(() => (s.paused ? game.resume(s.revision) : game.pause())));
       return;
     }

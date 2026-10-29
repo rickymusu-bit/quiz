@@ -2,7 +2,7 @@
 
 **Data:** 29 ottobre 2026  
 **Versione del rapporto:** v1  
-**Protocollo:** [PROTOCOLLO_SPRITE_ANIMATI_v6_20261029.md](PROTOCOLLO_SPRITE_ANIMATI_v6_20261029.md)  
+**Protocollo applicato al test:** v6 (versione storica rintracciabile nella cronologia Git); **protocollo attuale:** [v8](PROTOCOLLO_SPRITE_ANIMATI_v8_20261029.md)  
 **Stato:** prototipo **non approvato**; nessuna integrazione nel gioco.
 
 ## Obiettivo
