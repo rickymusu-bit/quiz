@@ -28,7 +28,8 @@ for key in ['cerbero','arsenico']:
 
 source=(ROOT/'assets/hell-race.js').read_text()
 marker='  function blendChase(c, pose, x, y, width, height) {'
-assert source.count(marker)==1
+if source.count(marker)!=1:
+ raise SystemExit('Revisione storica delle proposte: eseguire sul commit efef34cb7d2fcec89dd9d5b41f4a1b5cd7f9ccbe della PR #51. Per il rig integrato usare scripts/review-cerbero.py.')
 replacement=marker+'''
     // Static proposal only: this body is injected by the review capture tool.
     const review = root.HellscapeDesignReview;

@@ -1,0 +1,229 @@
+{
+  "version": 1,
+  "canonical_asset": "assets/hell-race/cerbero/carne-v1.png",
+  "sha256": "cd8e0f70fd44931f058339ed1313edc5bbf46309ddaed07d72c4935717324820",
+  "source": {
+    "width": 1536,
+    "height": 1024,
+    "left": 51,
+    "top": 28,
+    "right": 1502,
+    "bottom": 998
+  },
+  "reference_width": 221,
+  "control_points": {
+    "rump": [
+      535,
+      550
+    ],
+    "back": [
+      765,
+      395
+    ],
+    "chest": [
+      1010,
+      550
+    ],
+    "belly": [
+      820,
+      755
+    ],
+    "neck_left": [
+      1050,
+      310
+    ],
+    "head_left": [
+      1220,
+      152
+    ],
+    "mouth_left": [
+      1358,
+      216
+    ],
+    "jaw_left": [
+      1300,
+      278
+    ],
+    "neck_center": [
+      1085,
+      490
+    ],
+    "head_center": [
+      1240,
+      358
+    ],
+    "mouth_center": [
+      1361,
+      406
+    ],
+    "jaw_center": [
+      1310,
+      477
+    ],
+    "neck_right": [
+      1180,
+      630
+    ],
+    "head_right": [
+      1370,
+      600
+    ],
+    "mouth_right": [
+      1452,
+      655
+    ],
+    "jaw_right": [
+      1390,
+      724
+    ],
+    "hip_hind_near": [
+      575,
+      605
+    ],
+    "knee_hind_near": [
+      395,
+      790
+    ],
+    "paw_hind_near": [
+      287,
+      947
+    ],
+    "hip_hind_far": [
+      800,
+      650
+    ],
+    "knee_hind_far": [
+      660,
+      785
+    ],
+    "paw_hind_far": [
+      745,
+      907
+    ],
+    "hip_front_near": [
+      970,
+      680
+    ],
+    "knee_front_near": [
+      1005,
+      845
+    ],
+    "paw_front_near": [
+      1054,
+      996
+    ],
+    "hip_front_far": [
+      1205,
+      700
+    ],
+    "knee_front_far": [
+      1300,
+      830
+    ],
+    "paw_front_far": [
+      1362,
+      953
+    ],
+    "tail_root": [
+      485,
+      590
+    ],
+    "tail_tip": [
+      65,
+      440
+    ]
+  },
+  "head_ids": {
+    "left": "testa alta e lontana",
+    "center": "testa mediana",
+    "right": "testa bassa e vicina"
+  },
+  "hierarchy": {
+    "body": [
+      "rump",
+      "back",
+      "chest",
+      "belly"
+    ],
+    "heads": [
+      [
+        "chest",
+        "neck_left",
+        "head_left",
+        [
+          "mouth_left",
+          "jaw_left"
+        ]
+      ],
+      [
+        "chest",
+        "neck_center",
+        "head_center",
+        [
+          "mouth_center",
+          "jaw_center"
+        ]
+      ],
+      [
+        "chest",
+        "neck_right",
+        "head_right",
+        [
+          "mouth_right",
+          "jaw_right"
+        ]
+      ]
+    ],
+    "legs": [
+      [
+        "hip_hind_near",
+        "knee_hind_near",
+        "paw_hind_near"
+      ],
+      [
+        "hip_hind_far",
+        "knee_hind_far",
+        "paw_hind_far"
+      ],
+      [
+        "hip_front_near",
+        "knee_front_near",
+        "paw_front_near"
+      ],
+      [
+        "hip_front_far",
+        "knee_front_far",
+        "paw_front_far"
+      ]
+    ],
+    "tail": [
+      "rump",
+      "tail_root",
+      "tail_tip"
+    ]
+  },
+  "mesh": {
+    "columns": 16,
+    "rows": 12,
+    "triangles": 384,
+    "method": "thin-plate spline interpolation of one immutable texture"
+  },
+  "timing": {
+    "stride_world_pixels": 64,
+    "stance_fraction": 0.6,
+    "diagonal_offsets": [
+      0,
+      0.5,
+      0.5,
+      0
+    ],
+    "capture_seconds": 5.2,
+    "fire": "three simultaneous mouth emissions after portal collapse"
+  },
+  "limits": {
+    "head_fire_rotation_radians": -0.18,
+    "forepaw_reach_source_pixels": 100,
+    "forepaw_lift_source_pixels": 150
+  },
+  "runtime_authority": "assets/hell-cerbero.js"
+}

@@ -1,0 +1,374 @@
+[
+  {
+    "revision": "1caa1f47d9a1672b939247a510210bd87ec49d0f",
+    "viewport": [
+      1440,
+      1080
+    ],
+    "dpr": 1,
+    "raster": [
+      1440,
+      1080
+    ],
+    "rgbaBytes": 6220800,
+    "cssWidth": 1440,
+    "smoothing": true,
+    "frames": 53,
+    "elapsedMs": 2590.599999997765,
+    "paintFPS": 20.458581023718725,
+    "paintCallbackP95ms": 60,
+    "timingMetric": "RAF callback wall duration, includes scheduling and GC; not a CPU profiler",
+    "cerberoSource": [
+      1536,
+      1024
+    ],
+    "sources": [
+      {
+        "name": "vehicles-drive-v1.webp",
+        "width": 1254,
+        "height": 1254
+      },
+      {
+        "name": "cerbero-v2/body-a.webp",
+        "width": 1536,
+        "height": 1024
+      },
+      {
+        "name": "cerbero-v2/body-b.webp",
+        "width": 1536,
+        "height": 1024
+      },
+      {
+        "name": "cerbero-v2/parts.webp",
+        "width": 1536,
+        "height": 1024
+      },
+      {
+        "name": "cerbero-v2/jaw.webp",
+        "width": 1536,
+        "height": 1024
+      },
+      {
+        "name": "cerbero-v2/flames.webp",
+        "width": 1536,
+        "height": 1024
+      },
+      {
+        "name": "arsenico-v1.png",
+        "width": 1254,
+        "height": 1254
+      },
+      {
+        "name": "ammo-relics-v1.webp",
+        "width": 1330,
+        "height": 1182
+      },
+      {
+        "name": "black-stone-bridge-v1.png",
+        "width": 2172,
+        "height": 724
+      },
+      {
+        "name": "lava-sea-v2.png",
+        "width": 1448,
+        "height": 1086
+      },
+      {
+        "name": "portal-side-v3.png",
+        "width": 1024,
+        "height": 1536
+      },
+      {
+        "name": "portal-rocks-v1.png",
+        "width": 1536,
+        "height": 1024
+      },
+      {
+        "name": "victory-title-v1.webp",
+        "width": 1981,
+        "height": 793
+      },
+      {
+        "name": "sacrificio-v1.png",
+        "width": 1254,
+        "height": 1254
+      }
+    ],
+    "home": [
+      {
+        "className": "home-illustration",
+        "native": [
+          1448,
+          1086
+        ],
+        "css": [
+          1162.4853515625,
+          871.875
+        ],
+        "dpr": 1,
+        "physicalScale": 0.8028314917127072
+      },
+      {
+        "className": "home-wordmark",
+        "native": [
+          2172,
+          724
+        ],
+        "css": [
+          1012.5,
+          337.5
+        ],
+        "dpr": 1,
+        "physicalScale": 0.4661602209944751
+      }
+    ]
+  },
+  {
+    "revision": "1caa1f47d9a1672b939247a510210bd87ec49d0f",
+    "viewport": [
+      1440,
+      1080
+    ],
+    "dpr": 2,
+    "raster": [
+      1536,
+      1152
+    ],
+    "rgbaBytes": 7077888,
+    "cssWidth": 1440,
+    "smoothing": true,
+    "frames": 31,
+    "elapsedMs": 2600.800000000745,
+    "paintFPS": 11.91940941248505,
+    "paintCallbackP95ms": 85.89999999850988,
+    "timingMetric": "RAF callback wall duration, includes scheduling and GC; not a CPU profiler",
+    "cerberoSource": [
+      1536,
+      1024
+    ],
+    "sources": [
+      {
+        "name": "vehicles-drive-v1.webp",
+        "width": 1254,
+        "height": 1254
+      },
+      {
+        "name": "cerbero-v2/body-a.webp",
+        "width": 1536,
+        "height": 1024
+      },
+      {
+        "name": "cerbero-v2/body-b.webp",
+        "width": 1536,
+        "height": 1024
+      },
+      {
+        "name": "cerbero-v2/parts.webp",
+        "width": 1536,
+        "height": 1024
+      },
+      {
+        "name": "cerbero-v2/jaw.webp",
+        "width": 1536,
+        "height": 1024
+      },
+      {
+        "name": "cerbero-v2/flames.webp",
+        "width": 1536,
+        "height": 1024
+      },
+      {
+        "name": "arsenico-v1.png",
+        "width": 1254,
+        "height": 1254
+      },
+      {
+        "name": "ammo-relics-v1.webp",
+        "width": 1330,
+        "height": 1182
+      },
+      {
+        "name": "black-stone-bridge-v1.png",
+        "width": 2172,
+        "height": 724
+      },
+      {
+        "name": "lava-sea-v2.png",
+        "width": 1448,
+        "height": 1086
+      },
+      {
+        "name": "portal-side-v3.png",
+        "width": 1024,
+        "height": 1536
+      },
+      {
+        "name": "portal-rocks-v1.png",
+        "width": 1536,
+        "height": 1024
+      },
+      {
+        "name": "victory-title-v1.webp",
+        "width": 1981,
+        "height": 793
+      },
+      {
+        "name": "sacrificio-v1.png",
+        "width": 1254,
+        "height": 1254
+      }
+    ],
+    "home": [
+      {
+        "className": "home-illustration",
+        "native": [
+          1448,
+          1086
+        ],
+        "css": [
+          1162.4853515625,
+          871.875
+        ],
+        "dpr": 2,
+        "physicalScale": 1.6056629834254144
+      },
+      {
+        "className": "home-wordmark",
+        "native": [
+          2172,
+          724
+        ],
+        "css": [
+          1012.5,
+          337.5
+        ],
+        "dpr": 2,
+        "physicalScale": 0.9323204419889503
+      }
+    ]
+  },
+  {
+    "revision": "1caa1f47d9a1672b939247a510210bd87ec49d0f",
+    "viewport": [
+      667,
+      375
+    ],
+    "dpr": 2,
+    "raster": [
+      1000,
+      750
+    ],
+    "rgbaBytes": 3000000,
+    "cssWidth": 500,
+    "smoothing": true,
+    "frames": 55,
+    "elapsedMs": 2544.800000000745,
+    "paintFPS": 21.61270040867019,
+    "paintCallbackP95ms": 89.19999999925494,
+    "timingMetric": "RAF callback wall duration, includes scheduling and GC; not a CPU profiler",
+    "cerberoSource": [
+      1536,
+      1024
+    ],
+    "sources": [
+      {
+        "name": "vehicles-drive-v1.webp",
+        "width": 1254,
+        "height": 1254
+      },
+      {
+        "name": "cerbero-v2/body-a.webp",
+        "width": 1536,
+        "height": 1024
+      },
+      {
+        "name": "cerbero-v2/body-b.webp",
+        "width": 1536,
+        "height": 1024
+      },
+      {
+        "name": "cerbero-v2/parts.webp",
+        "width": 1536,
+        "height": 1024
+      },
+      {
+        "name": "cerbero-v2/jaw.webp",
+        "width": 1536,
+        "height": 1024
+      },
+      {
+        "name": "cerbero-v2/flames.webp",
+        "width": 1536,
+        "height": 1024
+      },
+      {
+        "name": "arsenico-v1.png",
+        "width": 1254,
+        "height": 1254
+      },
+      {
+        "name": "ammo-relics-v1.webp",
+        "width": 1330,
+        "height": 1182
+      },
+      {
+        "name": "black-stone-bridge-v1.png",
+        "width": 2172,
+        "height": 724
+      },
+      {
+        "name": "lava-sea-v2.png",
+        "width": 1448,
+        "height": 1086
+      },
+      {
+        "name": "portal-side-v3.png",
+        "width": 1024,
+        "height": 1536
+      },
+      {
+        "name": "portal-rocks-v1.png",
+        "width": 1536,
+        "height": 1024
+      },
+      {
+        "name": "victory-title-v1.webp",
+        "width": 1981,
+        "height": 793
+      },
+      {
+        "name": "sacrificio-v1.png",
+        "width": 1254,
+        "height": 1254
+      }
+    ],
+    "home": [
+      {
+        "className": "home-illustration",
+        "native": [
+          1448,
+          1086
+        ],
+        "css": [
+          260,
+          195
+        ],
+        "dpr": 2,
+        "physicalScale": 0.35911602209944754
+      },
+      {
+        "className": "home-wordmark",
+        "native": [
+          2172,
+          724
+        ],
+        "css": [
+          249.59375,
+          83.1875
+        ],
+        "dpr": 2,
+        "physicalScale": 0.22982849907918967
+      }
+    ]
+  }
+]

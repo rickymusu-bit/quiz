@@ -1,13 +1,15 @@
 'use strict';
 const {createCanvas}=require('@napi-rs/canvas'),vm=require('node:vm'),fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
 const root={FoolMotion:require('../assets/hell-motion.js'),FoolLayout:require('../assets/hell-layout.js'),matchMedia:()=>({matches:false})};
-const source=fs.readFileSync(path.join(__dirname,'../assets/hell-race.js'),'utf8').replace('root.FoolHellRace = { createStage, vehiclePreview };','root.FoolHellRace = { vehicleDust, demonDust, dustPuff, dirtChip, flyingDevils };');
+const source=fs.readFileSync(path.join(__dirname,'../assets/hell-race.js'),'utf8').replace('root.FoolHellRace = { createStage, vehiclePreview };','root.FoolHellRace = { vehicleDust, dustPuff, dirtChip, flyingDevils };');
 const math=Object.create(Math);math.random=()=>{throw Error('Dust must not consume game RNG')};
 vm.runInNewContext(source,{window:root,Math:math,document:{createElement:()=>createCanvas(1,1)}});const dust=root.FoolHellRace;
+const K=require('../assets/hell-cerbero.js');
+const cerberoDust=(c,t)=>K.dust(c,{left:10,ground:150,width:221,runWeight:1},{time:t,distance:t*48,footfalls:[{index:Math.floor(t*1.5),at:Math.floor(t*1.5)/1.5}]});
 function render(fn){const canvas=createCanvas(360,180),c=canvas.getContext('2d');c.globalAlpha=.7;const alpha=c.globalAlpha;fn(c);assert.equal(c.globalAlpha,alpha,'Effect must restore canvas opacity');return canvas;}
 function pixels(canvas){return canvas.getContext('2d').getImageData(0,0,canvas.width,canvas.height).data;}
 for(const type of ['vehicle','demon','sky']){
- const paint=(c,t)=>type==='vehicle'?dust.vehicleDust(c,260,145,t,2):type==='demon'?dust.demonDust(c,150,t,'chase',0):dust.flyingDevils(c,360,t);
+ const paint=(c,t)=>type==='vehicle'?dust.vehicleDust(c,260,145,t,2):type==='demon'?cerberoDust(c,t):dust.flyingDevils(c,360,t);
  const a=render(c=>paint(c,2)),b=render(c=>paint(c,2)),later=render(c=>paint(c,2.16));
  assert.deepEqual(pixels(a),pixels(b),'Same clock must reproduce frozen dust');assert.notDeepEqual(pixels(a),pixels(later),'Dust must evolve with motion');
  let calls=0;render(c=>{const fill=c.fillRect.bind(c);c.fillRect=(...args)=>{calls++;assert(args.every(Number.isFinite));fill(...args)};paint(c,1e8)});
@@ -20,7 +22,7 @@ const board=createCanvas(960,420),ctx=board.getContext('2d');ctx.fillStyle='#171
 for(let frame=0;frame<4;frame++){
  const t=2+frame*.16;ctx.save();ctx.translate(frame*240,0);ctx.fillStyle='#e7c594';ctx.fillText('t + '+(frame*.16).toFixed(2)+' s',10,22);
  ctx.fillStyle='#332b25';ctx.fillRect(0,150,240,2);ctx.fillRect(0,360,240,2);
- dust.vehicleDust(ctx,205,150,t,2);ctx.save();ctx.translate(10,227);dust.demonDust(ctx,90,t,'chase',0);ctx.restore();ctx.restore();
+ dust.vehicleDust(ctx,205,150,t,2);ctx.save();ctx.translate(10,227);cerberoDust(ctx,t);ctx.restore();ctx.restore();
 }
 fs.mkdirSync(path.join(__dirname,'../artifacts'),{recursive:true});fs.writeFileSync(path.join(__dirname,'../artifacts/dust-sequence.png'),board.toBuffer('image/png'));
 console.log('PASS: evolving dust, deterministic freeze, bounded particles, lifetime and isolated canvas state; no game RNG');

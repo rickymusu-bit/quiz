@@ -21,7 +21,7 @@ with sync_playwright() as p:
   page.goto('http://chase.test/preview');page.evaluate("HellscapeQuality.show('corsa')");page.locator('#quality-tools').evaluate('e=>e.style.display="none"')
   return context,page,page.frames[1]
  def setup(f,remaining=2):
-  f.evaluate('''remaining=>{const g=HellscapeUI.game;g.s.id+='-chase-'+remaining;g.s.groups.forEach((v,i)=>v.score=Fool.rational([1000,600,200][i]));if(remaining<2)g.eliminate(2,'già divorato');if(remaining<1)g.eliminate(1,'già divorato');HellscapeUI.changed()}''',remaining)
+  f.evaluate('''remaining=>{const g=HellscapeUI.game;g.s.id+='-chase-'+remaining;g.s.groups.forEach((v,i)=>v.score=Fool.rational([1000,600,200][i]));if(remaining<2)g.eliminate(2,'già eliminato');if(remaining<1)g.eliminate(1,'già eliminato');HellscapeUI.changed()}''',remaining)
  def state(f):return f.evaluate('JSON.stringify(HellscapeUI.game.snapshot())')
  def snap(f):return f.evaluate('FoolHellRace.presentationSnapshot()')
  def raw(f):return f.locator('.hell-race canvas').evaluate('c=>c.toDataURL()')
@@ -35,12 +35,12 @@ with sync_playwright() as p:
   frames=[];phases=set();seen_consumed=set();shots=set();pause_checked=False
   for step in range(math.ceil((plan['duration']+.3)*10)):
    page.clock.run_for(100);data=snap(f);fr=data['frame'];phases.add(data['phase'])
-   for index in seen_consumed:assert fr['positions'][index].get('visible') is False,'A swallowed vehicle cannot return'
+   for index in seen_consumed:assert fr['positions'][index].get('visible') is False,'A submerged vehicle cannot return'
    seen_consumed.update(data['consumed'])
-   if fr.get('gripped'):
-    v=fr['positions'][fr['victim']];assert abs(v['x']-fr['anchors']['hand']['x'])<.01;assert abs(v['ground']-v['height']/2-fr['anchors']['hand']['y'])<.01
+   if fr.get('attached'):
+    v=fr['positions'][fr['victim']];m=fr['anchors']['mouths']['right'];a=v['rotation'];assert abs(v['x']-math.cos(a)*v['width']*.35-m['x'])<.01;assert abs(v['ground']-v['height']/2-math.sin(a)*v['width']*.35-m['y'])<.01
    assert fr.get('victim')!=0,'The winner is never caught';assert abs(fr['demon']['width']-221)<.01
-   if remaining==2 and not pause_checked and fr.get('gripped'):
+   if remaining==2 and not pause_checked and fr.get('attached'):
     pause_checked=True;f.get_by_role('button',name='Pausa scena',exact=True).click();page.clock.run_for(100);frozen=raw(f);held=state(f);page.clock.run_for(500)
     assert raw(f)==frozen and state(f)==held
     f.evaluate('HellscapeUI.changed()');page.clock.run_for(100);assert raw(f)==frozen
@@ -50,12 +50,13 @@ with sync_playwright() as p:
     f.evaluate("Object.defineProperty(document,'hidden',{configurable:true,get:()=>false});document.dispatchEvent(new Event('visibilitychange'))")
     f.get_by_role('button',name='Riprendi scena',exact=True).focus();page.keyboard.press('Enter');page.clock.run_for(100)
    if remaining==2:
-    shot='fila' if data['phase']=='lineup' and step>=6 else 'presa' if fr.get('gripped') else 'bocca' if fr.get('swallowing') else 'rincorsa' if data['phase']=='winner-chase' else None
+    shot='fila' if data['phase']=='lineup' and step>=6 else 'presa' if fr.get('attached') else 'volo' if fr.get('airborne') else 'lava' if fr.get('sinking') else 'rincorsa' if data['phase']=='winner-chase' else None
     if shot and shot not in shots:
      shots.add(shot);page.screenshot(path=str(ART/f'{shot}.png'))
     if step%2==0 and data['phase'] not in ['roar','fire','rage','done']:
      frames.append(Image.open(BytesIO(base64.b64decode(raw(f).split(',')[1]))).convert('RGB'))
    assert state(f)==before,'Cinematic must not write points, outs, winner, timer or saved questions'
+  assert remaining!=2 or pause_checked,'Pause must actually be tested during mouth attachment'
   assert snap(f)['phase']=='done';assert f.evaluate('__complete')==1;expect(f.locator('.final-title')).to_be_visible()
   f.evaluate('HellscapeUI.changed()');page.clock.run_for(100);assert f.evaluate('__complete')==1
   if frames:frames[0].save(ART/'chase.gif',save_all=True,append_images=frames[1:],duration=[200]*(len(frames)-1)+[1200],loop=0,optimize=True)
@@ -64,10 +65,10 @@ with sync_playwright() as p:
  for width,height in VIEWPORTS:
   for dpr in DPRS:
    context,page,f=start(width,height,dpr);setup(f);f.wait_for_timeout(50)
-   f.evaluate('''()=>{const E=FoolEnding,render=E.render,frame=E.frame;window.__sample='line';const at=p=>__sample==='line'?p.lineupEnd:__sample==='grip'?p.lineupEnd+1.1:__sample==='mouth'?p.lineupEnd+2.75:p.captureEnd+1.4;E.frame=(...a)=>{a[2]=at(a[0]);return frame(...a)};E.render=(...a)=>{a[4]=at(a[3]);return render(...a)};HellscapeUI.game.complete(0);HellscapeUI.changed()}''')
+   f.evaluate('''()=>{const E=FoolEnding,render=E.render,frame=E.frame;window.__sample='line';const at=p=>__sample==='line'?p.lineupEnd:__sample==='grip'?p.lineupEnd+1.1:__sample==='flight'?p.lineupEnd+2.75:__sample==='sink'?p.lineupEnd+3.9:p.captureEnd+1.4;E.frame=(...a)=>{a[2]=at(a[0]);return frame(...a)};E.render=(...a)=>{a[4]=at(a[3]);return render(...a)};HellscapeUI.game.complete(0);HellscapeUI.changed()}''')
    f.wait_for_function("FoolHellRace.presentationSnapshot().frame?.phase==='capture'")
    f.evaluate('FoolHellRace.pauseScene()')
-   for key in ['line','grip','mouth','chase']:
+   for key in ['line','grip','flight','sink','chase']:
     f.evaluate("key=>{window.__sample=key;HellscapeUI.changed()}",key);page.wait_for_timeout(70)
     data=snap(f);fr=data['frame'];d=fr['demon'];assert d['left']>=0 and d['left']+d['width']<=512 and 0<d['ground']<=350
     box=f.locator('.hell-race canvas').bounding_box();assert abs(box['width']/box['height']-4/3)<.001,box

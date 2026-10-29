@@ -377,4 +377,4 @@ button.ammo-round:focus-visible{outline:2px solid #ffe044;outline-offset:2px}
 .movement-cue .score-loss{display:block;font-size:clamp(22px,5vw,48px);margin-top:.4rem;color:#e3bc76}
 
 .question-risk{color:#e3bc76;font-size:.9rem;line-height:1.35}
-.ammo-round[data-ammo="arsenico"]{background-image:none;background:radial-gradient(circle,#50442a,#16100d);border:2px dashed #bca378;position:relative}.ammo-round[data-ammo="arsenico"]::after{content:"As";font:bold 20px/1 monospace;color:#ded0a6}.ammo-detail-art[data-ammo="arsenico"]::after{font-size:36px}
+.ammo-round[data-ammo="arsenico"]{background:transparent url("../hell-race/arsenico-v1.png") center/contain no-repeat;border:0}

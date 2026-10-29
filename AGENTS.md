@@ -46,7 +46,14 @@ Applicare la preferenza «GIF per la dinamica, screenshot per gli stati statici,
 
 ## Specifica Omen della PR #49
 
-- Applicare [la specifica Omen, Cerbero e layout v1](docs/HELLSCAPE_SPEC_OMEN_CERBERO_LAYOUT_v1.md), che supera le regole storiche discordanti di Catene, Antisigillo e Livella. La grafica definitiva di Arsenico e Cerbero resta una fase separata da approvare; per questa implementazione Arsenico usa un segnaposto.
+- Applicare [la specifica Omen, Cerbero e layout v1](docs/HELLSCAPE_SPEC_OMEN_CERBERO_LAYOUT_v1.md), che supera le regole storiche discordanti di Catene, Antisigillo e Livella. I design della PR #51 sono approvati dall’utente («Approvo tutto, preferisco quello più rosso carne»): usare il Cerbero rosso/carnoso e la fiala Arsenico come riferimenti canonici per rig, animazioni e integrazione, seguendo il protocollo. Ultima disposizione richiesta: Opzioni in alto a sinistra e lista giocatori in alto a destra; domanda centrata in basso che si apre verso l’alto, barra del tempo sopra la domanda.
+
+## Correzione Cerbero e veicoli
+
+- Animare Cerbero con fotogrammi disegnati e articolazioni leggibili: camminata fluida, coda che scodinzola dalla base alla punta, tre teste con movimenti dei colli sfalsati durante il passo e fuoco che nasce dalle tre bocche. La deformazione elastica della sola posa statica è respinta.
+- La cattura avviene con una bocca: la testa afferra il veicolo e lo scaraventa oltre il ponte; il mezzo cade e affonda nella lava. Cerbero non usa le zampe per afferrare o portare i mezzi alla bocca.
+- I veicoli sono rigidi: vietare contrazioni e dilatazioni della carrozzeria. Mostrare le irregolarità della strada con piccoli spostamenti verticali e oscillazioni delle sospensioni, conservando le proporzioni.
+- Punti predefiniti delle nuove partite: facile 111, media 222, difficile 333. Conservare i valori personalizzati dei profili e delle partite salvate.
 
 ## Protocollo per sprite animati
 

@@ -1,7 +1,7 @@
 'use strict';
 const {test}=require('node:test'),assert=require('node:assert/strict'),C=require('../assets/hell-chase.js'),M=require('../assets/hell-motion.js');
 const near=(a,b,tol=1e-6)=>assert(Math.abs(a-b)<tol,`${a} != ${b}`);
-const metrics=Array.from({length:16},(_,i)=>({height:.6,hand:{x:[.92,.88,.85,.83,.78][Math.min(i,4)],y:[.5,.5,.4,.3,.27][Math.min(i,4)]},mouth:{x:.74,y:.28}}));
+const K=require('../assets/hell-cerbero.js'),metrics=K.metrics();
 function fixture(winner=0,consumed=[]){const state={winner,respondent:2,groups:[0,1,2].map(i=>({out:consumed.includes(i)}))},entry={time:10,camera:{distance:200,speed:48},demon:{...M.CHASE,runWeight:1,pose:C.pose(0)},positions:[0,1,2].map(i=>({index:i,row:i,x:[410,350,290][i],ground:270+i*25,width:[27,36,25][i],height:[25,23,30][i]}))};const p=C.plan(state,consumed,[],entry);return {state,entry,p,route:C.prepare(p,entry,metrics)};}
 test('All actors retain their lanes while the hunter captures without resurrected actors',()=>{
  const {state,entry,p,route}=fixture();const before=JSON.stringify(state);assert.deepEqual(p.victims,[2,1]);
@@ -11,25 +11,27 @@ test('All actors retain their lanes while the hunter captures without resurrecte
  const zero=fixture(0,[1,2]);assert.equal(zero.p.victims.length,0);assert.equal(C.sample(zero.p,zero.p.captureEnd+.1).phase,'winner-chase');
  for(let t=0;t<p.duration;t+=.01)C.frame(route,t);assert.equal(JSON.stringify(state),before);
 });
-test('Grip matches the actual hand, feeding reaches the mouth before geometric occlusion hides the vehicle',()=>{
+test('A canine mouth grips the rigid car, throws it across the parapet and submerges it',()=>{
  const {route}=fixture(),r=route.routes[0];
- const contact=C.captureFrame(r,C.T.grip);near(contact.positions[r.index].x,r.victim.x);near(contact.positions[r.index].ground,r.victim.ground);
- for(let t=C.T.grip;t<C.T.mouth;t+=.01){const f=C.captureFrame(r,t),v=f.positions[r.index];near(v.x,f.anchors.hand.x);near(v.ground-v.height/2,f.anchors.hand.y);assert(v.visible);assert.equal(v.clip,undefined);}
- const mouth=C.captureFrame(r,C.T.swallow),v=mouth.positions[r.index];near(v.x-v.width/2,mouth.anchors.mouth.x);near(v.ground-v.height/2,mouth.anchors.mouth.y);
- const almost=C.captureFrame(r,C.T.hidden-.001);assert(almost.positions[r.index].x+v.width/2<almost.anchors.mouth.x+.01);
+ const contact=C.captureFrame(r,C.T.bite);near(contact.positions[r.index].x,r.victim.x);near(contact.positions[r.index].ground,r.victim.ground);near(contact.positions[r.index].rotation,0);
+ for(let t=C.T.bite;t<C.T.release;t+=.01){const f=C.captureFrame(r,t),v=f.positions[r.index],mouth=f.anchors.mouths.right;assert(f.attached);assert.equal(f.anchors.hand,undefined);
+  near(v.x-Math.cos(v.rotation)*v.width*.35,mouth.x);near(v.ground-v.height/2-Math.sin(v.rotation)*v.width*.35,mouth.y);
+  near(v.width,r.victim.width);near(v.height,r.victim.height);assert(v.visible);assert.equal(v.clip,undefined);}
+ const released=C.captureFrame(r,C.T.release);assert(released.airborne&&!released.attached);assert.equal(released.positions[r.index].clipWater,false);
+ const impact=C.captureFrame(r,C.T.impact);assert(impact.sinking);near(impact.lavaImpact.age,0);assert(impact.positions[r.index].foreground&&impact.positions[r.index].clipWater);
  assert.equal(C.captureFrame(r,C.T.hidden).positions[r.index].visible,false);
 });
 test('Hunter advances throughout the capture; recovery and camera never reverse world travel',()=>{
  for(const winner of [0,null]){
   const {route,p}=fixture(winner);let previous=C.frame(route,0);
   for(let t=.001;t<=p.chaseEnd;t+=.001){const f=C.frame(route,t);assert(f.demon.worldDistance>=previous.demon.worldDistance-1e-6,'Demon must not moonwalk');assert(f.camera.distance>=previous.camera.distance-1e-6);previous=f;}
-  const r=route.routes[0],a=C.captureFrame(r,C.T.grip),b=C.captureFrame(r,C.T.recover);assert(b.demon.worldDistance>a.demon.worldDistance);assert(b.camera.distance>a.camera.distance);
-  for(const boundary of [C.T.grip,C.T.lift,C.T.mouth,C.T.swallow,C.T.hidden,C.T.recover,C.T.capture]){
+  const r=route.routes[0],a=C.captureFrame(r,C.T.bite),b=C.captureFrame(r,C.T.recover);assert(b.demon.worldDistance>a.demon.worldDistance);assert(b.camera.distance>a.camera.distance);
+  for(const boundary of [C.T.bite,C.T.lift,C.T.release,C.T.impact,C.T.hidden,C.T.recover,C.T.capture]){
    const a=C.captureFrame(r,boundary-1e-7),b=C.captureFrame(r,boundary);near(a.demon.left,b.demon.left,.001);near(a.demon.ground,b.demon.ground,.001);near(a.camera.distance,b.camera.distance,.001);
   }
  }
 });
-test('The winner is never gripped and the final pursuit closes to a visible gap before escape',()=>{
+test('The winner is never bitten and the final pursuit closes to a visible gap before escape',()=>{
  const {route,p}=fixture();const a=C.frame(route,p.captureEnd),b=C.frame(route,p.chaseEnd);
  const gap=f=>f.positions[p.winner].x-f.positions[p.winner].width/2-f.demon.left-f.demon.width;
  assert(gap(a)>gap(b));near(gap(b),6);

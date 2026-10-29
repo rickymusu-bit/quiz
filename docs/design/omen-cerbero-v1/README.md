@@ -1,6 +1,10 @@
 # Proposte Arsenico e Cerbero — v1
 
-Stato: **proposte statiche da approvare**, prima di sprite animati e integrazione.
+Stato: **design approvati** dall’utente («Approvo tutto, preferisco quello più rosso carne»).
+Le immagini e la revisione statica qui conservate documentano la PR #51;
+per l’integrazione animata vedere [la consegna del rig](../../cerbero/README.md).
+
+Il testo seguente descrive la fase di proposta, precedente all’approvazione.
 Riferimenti: [specifica della PR #49](../../HELLSCAPE_SPEC_OMEN_CERBERO_LAYOUT_v1.md),
 [protocollo sprite v1](../../PROTOCOLLO_SPRITE_ANIMATI_v1_20261029.md).
 
@@ -31,6 +35,7 @@ ancoraggi verificati e GIF reali dopo l’approvazione del design.
 
 ## Revisione nel browser
 
+Sul commit `efef34cb7d2fcec89dd9d5b41f4a1b5cd7f9ccbe`,
 `python3 scripts/review-omen-designs.py` avvia il gioco vero in Chromium e applica
 la proposta **soltanto nel contesto isolato di revisione**. Il renderer intercettato
 usa la posa di Cerbero al posto del solo disegno di corsa; una regola CSS locale
