@@ -59,7 +59,7 @@ with sync_playwright() as p:
  assert gif.n_frames==72 and duration==6000
  report.update({'viewport':[1024,768],'gif_pixels':[640,480],'frames':72,'duration_ms':6000,'capture_fps':12,'bytes':file.stat().st_size,'sha256':hashlib.sha256(file.read_bytes()).hexdigest(),'world_distance':end['distance']-start['distance'],'engine_unchanged':True,'foreground_occlusion':'PASS','pause':'PASS'})
  # Verify packaged textures as well, without producing an HTML deliverable.
- ctx=browser.new_context(offline=True,viewport={'width':390,'height':844},reduced_motion='reduce');requests=[]
+ ctx=browser.new_context(offline=True,viewport={'width':667,'height':375},reduced_motion='reduce');requests=[]
  def route(r):
   if r.request.url=='http://bridge.test/':r.fulfill(content_type='text/html',body=(ROOT/'dist/Hellscape-offline.html').read_text())
   else:requests.append(r.request.url);r.abort()

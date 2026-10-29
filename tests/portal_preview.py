@@ -107,7 +107,7 @@ with sync_playwright() as p:
           'bytes':file.stat().st_size,'sha256':hashlib.sha256(file.read_bytes()).hexdigest(),'phases':phases,
           'engine_unchanged':True,'pause':'PASS','completion_events':1,'samples':snapshots})
         # Same production asset and finale, in the fully embedded offline build.
-        context = browser.new_context(offline=True, viewport={'width':390,'height':844}, device_scale_factor=2, reduced_motion='reduce')
+        context = browser.new_context(offline=True, viewport={'width':667,'height':375}, device_scale_factor=2, reduced_motion='reduce')
         external = []
         def route(r):
             if r.request.url=='http://portal.test/': r.fulfill(content_type='text/html',body=(ROOT/'dist/Hellscape-offline.html').read_text())

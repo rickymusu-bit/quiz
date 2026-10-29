@@ -17,7 +17,7 @@ threading.Thread(target=server.serve_forever,daemon=True).start()
 base=f'http://127.0.0.1:{server.server_port}/'
 with sync_playwright() as p:
  browser=p.chromium.launch(executable_path=os.environ.get('CHROMIUM_PATH','/usr/bin/chromium'),args=['--no-sandbox']);errors=[];checks=[]
- for fullscreen,home_width,home_height in [(False,1440,900),(False,390,844),(True,844,390)]:
+ for fullscreen,home_width,home_height in [(False,1440,900),(False,667,375),(True,844,390)]:
   for bank in ['termologia','introduzione-fisica-misura']:
    page=browser.new_page(viewport={'width':home_width,'height':home_height});page.on('pageerror',lambda e:errors.append(str(e)))
    page.goto(base)

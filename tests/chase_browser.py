@@ -7,8 +7,8 @@ import os,json,subprocess,base64,math,sys
 ROOT=Path(__file__).resolve().parent.parent;ART=ROOT/'artifacts/chase';ART.mkdir(parents=True,exist_ok=True)
 HTML=(ROOT/'dist/Hellscape-review.html').read_text()
 report={'revision':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),'movies':[],'renders':[],'errors':[],'external_requests':[]}
-VIEWPORTS=[(1920,1080),(1366,768),(1024,768),(844,390),(390,844)];DPRS=[1,2]
-if '--quick' in sys.argv:VIEWPORTS=[(1366,768),(390,844)];DPRS=[1]
+VIEWPORTS=[(1920,1080),(1366,768),(1024,768),(844,390),(667,375)];DPRS=[1,2]
+if '--quick' in sys.argv:VIEWPORTS=[(1366,768),(667,375)];DPRS=[1]
 with sync_playwright() as p:
  browser=p.chromium.launch(executable_path=os.environ.get('CHROMIUM_PATH','/usr/bin/chromium'),args=['--no-sandbox'])
  def start(width=1366,height=768,dpr=1,reduced=False):
@@ -76,7 +76,7 @@ with sync_playwright() as p:
    context.close()
  # Static reduced-motion ending keeps complete information and never blocks the result.
  for winner in [0,None]:
-  context,page,f=start(390,844,2,True);setup(f)
+  context,page,f=start(667,375,2,True);setup(f)
   f.evaluate('''winner=>{const g=HellscapeUI.game;if(winner===null){g.eliminate(0,'test');g.eliminate(1,'test');g.eliminate(2,'test');}g.complete(winner);HellscapeUI.changed()}''',winner)
   f.wait_for_function("document.querySelector('.hell-race').dataset.endingPhase==='done'");before=state(f);image=raw(f);page.wait_for_timeout(300);assert image==raw(f) and state(f)==before
   expect(f.locator('.final-title')).to_be_visible();context.close()

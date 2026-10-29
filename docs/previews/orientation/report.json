@@ -1,0 +1,42 @@
+{
+  "revision": "34741bcce18df11de27e0f2af67ec0804deee62b",
+  "errors": [],
+  "checks": [
+    "home/setup/rules: portrait gate, blocked shortcuts",
+    {
+      "offline": false,
+      "reduced": false,
+      "timer_state_pixels_cinematic_modal_square": "PASS"
+    },
+    {
+      "offline": true,
+      "reduced": true,
+      "timer_state_pixels_cinematic_modal_square": "PASS"
+    },
+    "saved match reload: remaining time and question retained",
+    "fullscreen iframe: portrait gate and landscape return"
+  ],
+  "capture": {
+    "viewports": [
+      [
+        844,
+        390
+      ],
+      [
+        390,
+        844
+      ]
+    ],
+    "gif_pixels": [
+      640,
+      640
+    ],
+    "frames": 92,
+    "duration_ms": 11500,
+    "capture_fps": 8,
+    "letterbox": "uniform scale, centered actual browser screenshots",
+    "encoded_frames": 54,
+    "bytes": 311836,
+    "sha256": "200e3932811cde9edcc2a1b3ff99bff08247134440663cbc2f62f0147670612e"
+  }
+}

@@ -6,8 +6,8 @@ from io import BytesIO
 import os,json,subprocess,base64,math,sys
 ROOT=Path(__file__).resolve().parent.parent;ART=ROOT/'artifacts/portal';ART.mkdir(parents=True,exist_ok=True)
 HTML=(ROOT/'dist/Hellscape-review.html').read_text()
-VIEWPORTS=[(1920,1080),(1366,768),(1024,768),(844,390),(390,844)];DPRS=[1,2]
-if '--quick' in sys.argv:VIEWPORTS=[(1366,768),(390,844)];DPRS=[1]
+VIEWPORTS=[(1920,1080),(1366,768),(1024,768),(844,390),(667,375)];DPRS=[1,2]
+if '--quick' in sys.argv:VIEWPORTS=[(1366,768),(667,375)];DPRS=[1]
 report={'revision':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),'movies':[],'renders':[],'errors':[],'external_requests':[]}
 VEHICLES=['chopper','pickup','truck','coupe','offroad','ape']
 with sync_playwright() as p:
@@ -88,7 +88,7 @@ with sync_playwright() as p:
    context.close()
  # Game Over and reduced motion must stay independent of victory architecture.
  for reduced,winner in [(False,None),(True,None),(True,0)]:
-  context,page,f=start(390,844,2,reduced);finish(f,winner);page.clock.run_for(100)
+  context,page,f=start(667,375,2,reduced);finish(f,winner);page.clock.run_for(100)
   if not reduced:page.clock.run_for(math.ceil(snap(f)['plan']['duration']*1000)+200)
   assert snap(f)['phase']=='done';before=state(f);image=raw(f);page.clock.run_for(500);assert (not reduced or raw(f)==image) and state(f)==before
   if winner is None:assert not snap(f)['frame'].get('portal');expect(f.locator('.end-wordmark')).to_have_attribute('alt','GAME OVER')

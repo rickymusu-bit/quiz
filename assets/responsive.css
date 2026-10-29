@@ -1,4 +1,4 @@
-/* UI reflows at native CSS size; only the illustrated race remains 4:3.
+/* UI reflows at native CSS size in landscape; only the illustrated race remains 4:3.
    Dimensions and mode are provided by hell-layout.js on every page. */
 body[data-layout="compact"] #viewport-stage {
   position:fixed;inset:0;left:0;top:0;width:100%!important;height:100%;
@@ -29,7 +29,7 @@ body[data-layout="compact"] #viewport-stage main.operational>.operation-body {
   width:auto;max-height:none;overflow:visible;
 }
 body[data-layout="compact"] #viewport-stage .operation-body .question { font-size:19px;line-height:1.4; }
-body[data-layout="compact"] #viewport-stage .operation-body .answers { grid-template-columns:1fr; }
+body[data-layout="compact"] #viewport-stage .operation-body .answers { grid-template-columns:repeat(2,minmax(0,1fr)); }
 body[data-layout="compact"] #viewport-stage .operation-body .answer { min-height:48px;font-size:17px;padding:10px; }
 body[data-layout="compact"] #viewport-stage .operation-body .solution { font-size:16px;line-height:1.5; }
 body[data-layout="compact"] #viewport-stage .question-actions button { min-height:48px; }
@@ -74,7 +74,6 @@ body[data-layout="compact"] dialog select { min-height:44px; }
 body[data-layout="compact"] .rules-content { max-height:60dvh; }
 @media (min-width:700px) {
   body[data-layout="compact"] .setup-teams { grid-template-columns:repeat(3,minmax(0,1fr)); }
-  body[data-layout="compact"] #viewport-stage .operation-body .answers { grid-template-columns:repeat(2,minmax(0,1fr)); }
 }
 
 /* The home illustration keeps its geometry while its actions stay touch-sized. */
@@ -103,3 +102,15 @@ body[data-layout="compact"] #viewport-stage .menu a,
 body[data-layout="compact"] #viewport-stage .menu button { font-size:22px;min-height:48px;line-height:1.1; }
 body[data-layout="compact"] #viewport-stage .menu .home-primary { font-size:28px;min-height:52px; }
 body[data-layout="compact"] .home-keys { display:none; }
+
+/* Portrait is a rotation gate, never a second playable layout. */
+#orientation-note{display:none;position:fixed;inset:0;width:100%;height:100%;max-width:none;max-height:none;margin:0;padding:24px;box-sizing:border-box;border:0;border-radius:0;box-shadow:none;background:#100b0b;color:#e3c9a2;text-align:center;visibility:visible;overflow:auto}
+#orientation-note[open]{display:grid;align-content:center;justify-items:center;gap:16px}
+#orientation-note::backdrop{background:#100b0b}
+#orientation-note h2{font:clamp(32px,9vw,48px)/1.1 FoolTerminal,system-ui,sans-serif;color:#e3bd76;margin:0}
+#orientation-note p{font:18px/1.45 system-ui,sans-serif;max-width:28rem;margin:0}
+.orientation-phone{width:58px;height:94px;border:3px solid #ac8052;border-radius:10px;display:grid;place-items:center;font:48px/1 system-ui,sans-serif;transform:rotate(-90deg);margin:12px 0 20px;color:#e3bd76}
+body.portrait #viewport-stage{display:none!important}
+body.portrait dialog:not(#orientation-note){visibility:hidden;pointer-events:none}
+body.portrait dialog:not(#orientation-note)::backdrop{background:transparent}
+@media(orientation:portrait){#viewport-stage{display:none!important}}

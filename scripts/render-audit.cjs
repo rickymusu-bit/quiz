@@ -39,7 +39,7 @@ async function nativeCoverage(){
  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium',args:['--no-sandbox','--disable-dev-shm-usage']});
  try{
   const samples=[];
-  for(const [width,height,dpr] of [[1440,1080,1],[1440,1080,2],[390,844,2]]){
+  for(const [width,height,dpr] of [[1440,1080,1],[1440,1080,2],[667,375,2]]){
    const page=await browser.newPage({viewport:{width,height},deviceScaleFactor:dpr});
    await page.goto(`http://127.0.0.1:${server.address().port}/Fool.html?start=1`);await page.getByRole('button',{name:/Inizia partita/}).click();
    await page.waitForFunction(()=>FoolEnding.prepare(FoolEnding.load(()=>{}))!==null);

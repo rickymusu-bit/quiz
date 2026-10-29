@@ -6,9 +6,9 @@ from io import BytesIO
 import os,json,subprocess,sys
 ROOT=Path(__file__).resolve().parent.parent;ART=ROOT/'artifacts/tie';ART.mkdir(parents=True,exist_ok=True)
 HTML=(ROOT/'dist/Hellscape-review.html').read_text()
-VIEWPORTS=[(1920,1080),(1366,768),(1024,768),(844,390),(390,844)]
+VIEWPORTS=[(1920,1080),(1366,768),(1024,768),(844,390),(667,375)]
 DPRS=[1,2]
-if '--quick' in sys.argv:VIEWPORTS=[(1366,768),(390,844)];DPRS=[1]
+if '--quick' in sys.argv:VIEWPORTS=[(1366,768),(667,375)];DPRS=[1]
 report={'revision':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),'cases':[],'errors':[],'external_requests':[]}
 with sync_playwright() as p:
  browser=p.chromium.launch(executable_path=os.environ.get('CHROMIUM_PATH','/usr/bin/chromium'),args=['--no-sandbox'])
@@ -123,7 +123,7 @@ with sync_playwright() as p:
    assert f.evaluate('__tiePlan.victims')==[respondent];assert f.locator('.hell-race').get_attribute('data-ending-phase')=='done'
  context.close()
  # Reduced motion has a stable readable card and an explicit continuation, without starting the timer.
- context,page,f=start(390,844,2,True);ordinary(page,f);f.get_by_role('button',name='Prossima domanda',exact=True).click();run(page,100)
+ context,page,f=start(667,375,2,True);ordinary(page,f);f.get_by_role('button',name='Prossima domanda',exact=True).click();run(page,100)
  before=snapshot(f);image=f.locator('.hell-race canvas').evaluate('c=>c.toDataURL()');run(page,4000)
  assert snapshot(f)==before and f.locator('.hell-race canvas').evaluate('c=>c.toDataURL()')==image
  page.screenshot(path=str(ART/'intro-reduced.png'))

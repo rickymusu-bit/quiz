@@ -3,7 +3,7 @@ const {chromium}=require('playwright'),fs=require('node:fs'),assert=require('nod
  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium',args:['--no-sandbox']});
  const errors=[],requests=[];
  try{
-  for(const [width,height] of [[1280,1100],[390,844],[844,390]]){
+  for(const [width,height] of [[1280,1100],[667,375],[844,390]]){
    const context=await browser.newContext({viewport:{width,height},offline:true});
    await context.route('**/*',r=>{if(r.request().url()==='http://preview.test/')r.fulfill({contentType:'text/html',body:fs.readFileSync('dist/Hellscape-Ammo.html','utf8')});else{requests.push(r.request().url());r.abort()}});
    const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));await page.goto('http://preview.test/');

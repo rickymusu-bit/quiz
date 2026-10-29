@@ -17,6 +17,10 @@ Per ogni modifica visiva o funzionale a Hellscape/Fool:
 
 Applicare la preferenza «GIF per la dinamica, screenshot per gli stati statici, nessun HTML embedded» anche agli altri siti e alle altre interfacce sviluppati per l'utente.
 
+## Orientamento del gioco
+
+- Il gioco si usa esclusivamente con schermo orizzontale (larghezza maggiore dell’altezza), su sito, schermo intero ed export offline. In verticale o su finestra quadrata mostrare l’invito a ruotare, impedire comandi e fermare timer e animazioni. Conservare domanda, stato e pannelli aperti; tornare in orizzontale permette la ripresa esplicita della domanda. Le vecchie prove in verticale sono documentazione storica.
+
 ## Direzione grafica e fase di approvazione del ponte
 
 - La coerenza fisica della scena prevale sulla leggibilità costante dei veicoli. Strutture in primo piano possono occluderli: rispettare profondità, prospettiva, ombre, materiali e punti d’appoggio, senza spostare o abbassare gli elementi soltanto per lasciare visibili i mezzi.
