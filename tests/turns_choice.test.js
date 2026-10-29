@@ -88,13 +88,16 @@ test("Exactly 13 total turns end the ordinary game; answering and moving next ca
   assert.equal(g.s.valid, 13);
   assert.equal(g.s.completedTurns, 13);
 });
-test("Turn capacity follows selected topics and difficulty, including banks above 99 questions", () => {
+test("Turn capacity includes all three difficulties and selected topics; legacy filters still restore", () => {
   const large = Array.from({length:150}, (_,i) => ({
     ...bank[i % bank.length], id:"capacity"+i, topic:i%2 ? "b":"a",
     difficulty:["facile","media","difficile"][i%3],
   }));
   assert.deepEqual(F.topicCounts(large), {a:75,b:75});
   assert.deepEqual(F.topicCounts(large,"facile"), {a:25,b:25});
+  assert.equal(F.turnCapacity(large, ["a","b"], 3), 50);
+  assert.equal(F.turnCapacity(large, ["a"], 3), 25);
+  assert.equal(F.turnCapacity(large, ["a"], 3, "facile"), 8); // Legacy saves only.
   const config = {...setup().g.s.config, turnCount:50, questionCount:50, quotas:{a:25,b:25}};
   const g = F.Game.start(F.prepare(large,config,()=>.25));
   assert.equal(g.s.queue.length,49);
@@ -102,6 +105,16 @@ test("Turn capacity follows selected topics and difficulty, including banks abov
   assert.throws(()=>F.prepare(large,{...config,turnCount:26,questionCount:26,quotas:{a:26,b:0}}),/Massimo 25 turni: 75 domande/);
   assert.throws(()=>F.prepare(large,{...config,difficulty:"facile",turnCount:17,questionCount:17,quotas:{a:9,b:8}}),/Massimo 16 turni: 50 domande/);
   assert.throws(()=>F.prepare(large,{...config,turnCount:100,questionCount:100,quotas:{a:80,b:20}}),/Massimo 50 turni/);
+});
+test("A bank must include easy, medium and hard questions", () => {
+  const questions = ["facile", "media", "difficile"].map((difficulty, i) => ({
+    id: "d" + i, difficolta: difficulty, testo: "Domanda " + i,
+    alternative: ["A","B","C","D"], corretta: "A", spiegazione: "Risposta A",
+  }));
+  const dataset = {versione:1, argomenti:[{id:"arg", nome:"Argomento", domande:questions}]};
+  assert.equal(F.parseDataset(JSON.stringify(dataset)).bank.length,3);
+  dataset.argomenti[0].domande = questions.slice(0,2);
+  assert.throws(() => F.parseDataset(JSON.stringify(dataset)), /banca deve includere domande facili, medie e difficili/);
 });
 test("Forfeited turns end at the configured limit even with no valid answers", () => {
   for (const type of ["ruba", "arsenico"]) {
