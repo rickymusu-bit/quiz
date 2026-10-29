@@ -1239,10 +1239,13 @@
   }
   function gameStage(state, final = false) {
     const stage = FoolHellRace.createStage(state, final);
+    // A skipped or forfeited final turn already prepared the first tie question.
+    if(state.phase === "pareggio" && state.screen === "hidden") FoolHellRace.beginTie(state);
     stage.addEventListener("foolscenepause",()=>{if(stage.isConnected)pauseCinematic();});
     stage.addEventListener("fooltiecomplete", event => {
       if(!stage.isConnected || game.s.id!==event.detail.id || game.s.result?.id!==event.detail.result)return;
-      advanceQuestion(game.s.revision);
+      if(game.s.screen === "result") advanceQuestion(game.s.revision);
+      else focusReveal();
       changed();
     });
     stage.addEventListener("foolanimationchange", () => {
@@ -1585,6 +1588,9 @@
     game.next(revision);
     if(game.s.current)preflight([game.s.current]);
     vialRefillFrom=game.s.screen==='hidden'&&game.s.phase!=='conclusa'?from:null;
+    focusReveal();
+  }
+  function focusReveal() {
     requestAnimationFrame(()=>main.querySelector('[data-game-action="reveal"]')?.focus({preventScroll:true}));
   }
   function renderGame() {

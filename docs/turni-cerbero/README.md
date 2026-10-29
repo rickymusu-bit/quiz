@@ -6,6 +6,8 @@ Le nuove partite durano **13 turni totali**, non tredici giri. Il numero è conf
 
 Il confronto dei punti avviene alla fine del turno limite, anche quando questo è saltato o ceduto. Arsenico si applica all’inizio di un turno saltato prima del confronto finale. Un solo primo classificato vince; la parità apre l’Ultimo Miglio. Restano invariati punti, vite e regole dello spareggio.
 
+Se la parità arriva da un salto o una rinuncia, l’introduzione si apre anche senza una schermata di esito. Alla fine conserva la prima domanda già preparata, senza avanzare al secondo partecipante.
+
 Malocchio concede **45 secondi attivi** per tenere la domanda o assegnarla. Le alternative restano assenti dal DOM. Alla conferma o alla scadenza della scelta parte l’intero tempo di risposta configurato. Se non viene effettuata una scelta, la domanda rimane all’utilizzatore. Anche un clic arrivato dopo la scadenza rispetta questa regola. Pausa, pannelli, orientamento e salvataggio conservano il tempo residuo; la ripresa richiede un comando esplicito.
 
 ## Compatibilità
@@ -30,6 +32,7 @@ La home usa `assets/hellscape-cerbero-home.webp`, nuova illustrazione dal riferi
 - `npm run test:frames`: sagome, articolazioni, veicoli rigidi ed effetti.
 - `python3 tests/configurable.py`: impostazioni su due banche e due viewport, durate 1/4/13/99, probabilità e vecchi profili.
 - `python3 tests/tie_browser.py --quick`: Ultimo Miglio offline, avanzamento, input, pausa e ripresa.
+- `python3 tests/turn_limit_browser.py`: spareggio dopo l’ultimo turno saltato o ceduto, domanda iniziale e focus, pausa e comandi su desktop/mobile e movimento ridotto; incluso in `test:ties`.
 - `python3 tests/periodic_fire.py`: tre emettitori effettivi in corsa, pausa/ripresa della fiammata e movimento ridotto; incluso in `test:motion`.
 - `node scripts/build.cjs --offline` e `--quality-preview`: asset incorporati e scenari di verifica aggiornati.
 - `python3 scripts/review-turns-cerbero.py`: acquisizioni reali Chromium e controlli sito/offline di Malocchio, pausa, ripresa, orientamento e chiusura al tredicesimo turno.
