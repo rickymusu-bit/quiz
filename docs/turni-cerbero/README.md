@@ -30,6 +30,7 @@ La home usa `assets/hellscape-cerbero-home.webp`, nuova illustrazione dal riferi
 
 - `npm test`: regole, turni, conteggi idempotenti, scadenze, migrazioni, punteggi e dataset.
 - `npm run test:frames`: sagome, articolazioni, veicoli rigidi ed effetti.
+- `npm run test:ammo`: animazioni delle nove Omen, tre viewport, pausa/ripresa, ricaricamento e dimostrazione offline.
 - `python3 tests/configurable.py`: impostazioni su due banche e due viewport, durate 1/4/13/99, probabilità e vecchi profili.
 - `python3 tests/tie_browser.py --quick`: Ultimo Miglio offline, avanzamento, input, pausa e ripresa.
 - `python3 tests/turn_limit_browser.py`: spareggio dopo l’ultimo turno saltato o ceduto, domanda iniziale e focus, pausa e comandi su desktop/mobile e movimento ridotto; incluso in `test:ties`.
@@ -39,4 +40,4 @@ La home usa `assets/hellscape-cerbero-home.webp`, nuova illustrazione dal riferi
 
 Le GIF sono registrazioni reali del browser a 20 FPS. `fuoco-periodico.gif` mostra 3,8 secondi della corsa ordinaria. `malocchio-scadenza.gif` mostra gli ultimi 2 secondi della scelta e l’avvio del tempo intero per rispondere, configurato a 90 secondi per distinguere i due conti alla rovescia: il tempo precedente viene saltato **prima** dell’acquisizione. La finestra desktop è 1366×768, export GIF 640×360; il controllo offline usa 844×390. Revisione e impronte dei file sono nel rapporto.
 
-Acquisizioni dal runtime `2638fd45aaab2ad0a105226bd9a1749355e94a78`. Il commit degli allegati aggiunge anche il controllo browser delle fiammate alla suite motion, senza modificare i file runtime. Esiti locali: 170 test Node e dataset, suite frame, configurazione e Ultimo Miglio, verifica browser di Malocchio/Flagello/catture/portale, acquisizioni sito/offline e controllo degli emettitori durante pausa/ripresa riusciti.
+Acquisizioni dal runtime `278c5c94dbdd00eb96462093acf9770f1e897339`. Il commit degli allegati aggiorna soltanto le prove e la documentazione, senza modificare i file runtime. I nuovi casi browser verificano anche la prima domanda dello spareggio dopo turno saltato o ceduto, su desktop/mobile e con movimento ridotto. Esiti locali: 170 test Node e dataset, suite frame, configurazione e Ultimo Miglio, verifica browser di Malocchio/Flagello/catture/portale, acquisizioni sito/offline e controllo degli emettitori durante pausa/ripresa riusciti.

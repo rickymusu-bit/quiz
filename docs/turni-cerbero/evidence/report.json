@@ -1,5 +1,5 @@
 {
-  "revision": "2638fd45aaab2ad0a105226bd9a1749355e94a78",
+  "revision": "278c5c94dbdd00eb96462093acf9770f1e897339",
   "runtime_sha256": {
     "assets/README.md": "46f358670eb0cea830ec6530290f72ec221df49904009c47e4ef4f4d28a7f883",
     "assets/ammo-hellscape-v1.png": "0f6a8adb8db705c4f0188fedeba3a89d344f6ff787d4b92214c8ba092e98cc05",
@@ -72,7 +72,7 @@
     "assets/js/engine.js": "a2fda62f38c594531351fc862e32f7be6176fce2ebe92e8c14037c2bcb03656f",
     "assets/js/loader.js": "cae0962092fd5e6b324cc69d5d7da643e6d17c559b1a1ee62e55a8804932e47c",
     "assets/js/persistence.js": "5056fcab553f0ab70aa5e73dfcfa83475387e7f58b9ee8bc825633590f3b0e15",
-    "assets/js/ui.js": "ece99f5ba8280cbe6b49edabdfa6b069355ec8bf7a6606a22e4a78cde6260e52",
+    "assets/js/ui.js": "85166db32d49208edcf318afa4f05f10eb57345d4062d78734028f6755cefb91",
     "assets/responsive.css": "ee1c3982437f0c579a86fe7fffe9d25953b8ac0dd82a613c09374555da850db4",
     "assets/vendor/README.md": "1e7c6ba532cef613dad06bf3092c054d856e3f6ae8816ca42ac2f85bbce3bb6f",
     "assets/vendor/katex.css": "454ccc9eddfcca1c7a2f62b026891d60b55b9d713d56993d60a9722b8c35bf4b",
@@ -100,7 +100,7 @@
       "fps": 20,
       "duration_ms": 3800,
       "kind": "Real ordinary gameplay: anticipation, three jets while walking, recovery; first breath at active scene time 8s",
-      "sha256": "d6fe1affc0df5ccc51781c2a0e0300d2c5bf069bf8c10576ece99592a578a2a6"
+      "sha256": "b15e9c1c518dc67f90ecab1cce0be933d940b96f332ada6c8cc9d41477b2ff41"
     },
     {
       "file": "malocchio-scadenza.gif",
@@ -115,7 +115,7 @@
       "fps": 20,
       "duration_ms": 3500,
       "kind": "Last 2s of the 45s decision, automatic keep and full configured 90s response timer; earlier elapsed choice time is skipped before recording",
-      "sha256": "7a96e360747fdb7522ccf894f5355972a781be955b8065402a3938792875d218"
+      "sha256": "526b63357cb2e58799e82529c01c64db346abcbd695cde26604956555e22de1b"
     }
   ],
   "errors": []
