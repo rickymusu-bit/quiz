@@ -1,6 +1,6 @@
 # Asset della corsa infernale
 
-Versione grafica **1.7.2** — 28/10/2026.
+Versione grafica **1.8.0** — 28/10/2026.
 
 Direzione corrente: ponte nero approvato e veicoli al doppio della prima GIF; lava e struttura condividono la camera. Il portale `portal-side-v3.png` è disegnato nativamente di taglio, in marmo bianco, azzurro e oro, con stipiti, tetto e fiancata già presenti nei pixel. Il renderer lo posiziona con sola traslazione e scala uniforme; non deforma una facciata frontale. Discesa, impatto, passaggio e crollo mantengono la timeline approvata. Le macerie restano nel mondo. Le sezioni delle versioni precedenti sotto sono storiche e non prevalgono su [v1.3.0](../../docs/HELLSCAPE_CORREZIONI_CODEX_v1.3.0.md) e sulle correzioni approvate dall’utente.
 
@@ -15,6 +15,8 @@ Pixel art infernale dal riferimento approvato: ferro annerito, ruggine, cuoio, e
 | `portal-rocks-v1.png` | 6 rocce, atlante 1536 × 1024, RGBA | Frammenti di marmo grigio/bianco, superfici di frattura e volume nativo; usati durante caduta e riposo |
 | `black-stone-bridge-v1.png` | 2172 × 724, RGBA | Ponte approvato, pietra e metallo neri, archi trasparenti |
 | `lava-sea-v2.png` | 1448 × 1086, RGB | Lava sotto il ponte, nello stesso riferimento della struttura |
+| `antisigillo-icon-v1.png` | 1254 × 1254, RGBA | Reliquia in ferro nero e osso: cuneo biforcuto che spezza il collare protettivo; inventario e scheda Ammo |
+| `antisigillo-tool-v1.png` | 1254 × 1254, RGBA | Cuneo isolato per volo, contatto e frattura; sprite rigido con scala uniforme |
 | `victory-title-v1.webp` | 1981 × 793, RGBA | Titolo VITTORIA, trasparente |
 | `infernal-world-v1.webp` | Panorama | Fortezze, strada e lava con velocità di scorrimento diverse |
 
@@ -88,3 +90,19 @@ La regia attuale sostituisce il precedente epilogo: attraversamento completo,
 sprofondamento, pugni piantati, una fiammata, affanno e titolo. Le sezioni
 v1.3–1.5 sopra documentano le versioni precedenti. Geometria e verifiche sono
 in [HELLSCAPE_PORTAL.md](../../docs/HELLSCAPE_PORTAL.md).
+
+## Antisigillo — v1.8.0
+
+Icona e utensile sono due PNG nativi generati con imagegen, conservati senza
+ridimensionamento né ritocchi. I master sono `exec-108b1a85-f9e8-475c-a8fd-132676b4e4ef.png`
+e `exec-d30732e4-bade-497a-b688-1e67fc57368c.png`. Ferro annerito, ruggine,
+osso e piccole fenditure verde spento riprendono le altre reliquie.
+
+Il cuneo raggiunge il Sigillo sul veicolo bersaglio, entra nella protezione
+e separa due metà frastagliate di osso e ferro. Frammenti, rotazione, caduta e
+scomparsa completano la sequenza di 2,6 secondi. Le fasi dipendono solo
+dall’orologio della scena; pausa e movimento ridotto restano rispettati.
+Il renderer non modifica stato, punteggi, vite o inventari. Le regole esistenti
+restano invariate: un solo avversario protetto, una copia consumata, rimozione
+del Sigillo senza danni né Contrappasso. Entrambi i PNG sono incorporati
+anche nelle versioni offline. Il vecchio SVG non referenziato è rimosso.

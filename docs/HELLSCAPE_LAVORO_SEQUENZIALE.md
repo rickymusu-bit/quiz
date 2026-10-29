@@ -7,8 +7,9 @@ Consegne separate, una modifica giudicabile per volta. Per la dinamica si applic
 Le colonne proposte sono **scartate** e rimosse dall’intervento. La richiesta intermedia di alzare anche quelle anteriori è superata dal nuovo progetto integrale della strada.
 
 1. **Approvato:** ponte di metallo e pietra neri sopra un mare di lava, in stile junkpunk, gotico e horror. Dare priorità alla coerenza e all’aderenza fisica della grafica. I veicoli possono essere occlusi dagli elementi della scena.
-2. **Ora:** ridisegnare il portale e consegnare la GIF reale di discesa, impatto, attraversamento e crollo. L’utente ha approvato il ponte della seconda GIF («Ok è perfetto. Prosegui con gli altri modifiche»).
-3. **Consegne successive separate:** icona e animazione Antisigillo, poi nuova Ammo **Sacrificio**, che cede una vita dell’utilizzatore e gli dona **1717 punti**. Le modifiche dinamiche integrate saranno mostrate con GIF reali del browser.
+2. **Approvato:** portale disegnato nativamente di taglio, dettagli dorati e crollo in rocce di pietra. L’utente ha approvato la GIF corretta («Ok bellissimo. Vai avanti»).
+3. **Ora:** nuova icona e animazione Antisigillo, con una GIF reale del browser per questa sola consegna.
+4. **Successiva consegna separata:** nuova Ammo **Sacrificio**, che cede una vita dell’utilizzatore e gli dona **1717 punti**. Da implementare dopo la verifica visiva dell’Antisigillo.
 
 Le consegne precedenti con soli PNG restano documentazione storica, non sono sufficienti per giudicare le nuove modifiche dinamiche.
 
