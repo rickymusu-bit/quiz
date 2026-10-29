@@ -1,5 +1,7 @@
 # Contrappasso · motore 2.8.0 / regole 25.0.0
 
+Stato integrato e accettazione: [verifica finale del 28/10/2026](docs/HELLSCAPE_VERIFICA_FINALE_2026-10-28.md). Le sezioni storiche non prevalgono sulle regole correnti.
+
 Contrappasso diventa un’Ammo **attivabile su di sé**: per tre turni personali,
 incluso quello di attivazione, le risposte corrette assegnano il doppio dei punti;
 errore o tempo scaduto sottraggono il doppio del valore della domanda, con

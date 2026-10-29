@@ -1,4 +1,6 @@
-# Verifica delle correzioni v1.3.0
+# Verifica storica delle correzioni v1.3.0
+
+> Questo rapporto riguarda la prima attuazione sul ramo base. Regole, asset e misure correnti sono nella [verifica finale del 28/10/2026](HELLSCAPE_VERIFICA_FINALE_2026-10-28.md). I limiti sotto non descrivono automaticamente la revisione attuale.
 
 Base richiesta: `fix/malocchio-preview-spec-20261028`, commit `3dec47a`.
 Versioni: applicazione 3.9.0, motore/salvataggi 2.4.0, regole 21.0.0.

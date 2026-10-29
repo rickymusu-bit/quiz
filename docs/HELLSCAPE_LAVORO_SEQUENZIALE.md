@@ -15,7 +15,11 @@ Le colonne proposte sono **scartate** e rimosse dall’intervento. La richiesta 
 
 6. **Consegnato, in verifica visiva:** Sigillo: immunità per tre turni personali, niente uso o guadagno Ammo; Flagello e Antisigillo restano efficaci. Livella esclude i protetti. [GIF reale e verifiche](previews/sigillo/README.md).
 
-7. **Consegnato, in verifica visiva:** Contrappasso attivabile per tre turni personali: punti doppi alle corrette, penalità doppia agli errori/timeout fino a zero. Niente riflesso automatico o accumulo. [GIF reale e verifiche](previews/contrappasso/README.md).
+7. **Approvato («Ok procedi con le istruzioni»):** Contrappasso attivabile per tre turni personali: punti doppi alle corrette, penalità doppia agli errori/timeout fino a zero. Niente riflesso automatico o accumulo. [GIF reale e verifiche](previews/contrappasso/README.md).
+
+8. **Consegnato:** verifica integrata di regressione, qualità nativa e rendering; allineamento dei test alle regole correnti e disambiguazione dei documenti storici. Nessuna nuova regola o ridisegno degli elementi approvati. [GIF integrata e log](previews/final-review/README.md).
+
+9. **Residuo individuato dall’audit, intervento separato:** definizione dell’illustrazione della home su desktop DPR 2 (ingrandimento 1,61×) e prestazioni al raster massimo (circa 15,4 FPS nel Chromium headless).
 
 Le consegne precedenti con soli PNG restano documentazione storica, non sono sufficienti per giudicare le nuove modifiche dinamiche.
 

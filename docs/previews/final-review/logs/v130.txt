@@ -1,0 +1,119 @@
+
+> hellscape@3.9.0 test:v130
+> node --test tests/v130.test.js && node tests/v130_browser.cjs
+
+✔ Flagello subtracts exact rational amounts at every boundary, wipes fresh Ammo and preserves seals (75.974682ms)
+✔ Flagello resolves a sole survivor and self-elimination after all effects, leaving the eliminated state unchanged (2.921962ms)
+✔ Antisigillo refuses unprotected, eliminated, missing and self targets without consuming Ammo (1.494059ms)
+✔ Antisigillo dissipates only the protection, bypasses reflection and enables each later attack (9.622743ms)
+✔ Antisigillo uses an independent 20% threshold and migrates old probabilities and stored copies (7.221361ms)
+✔ Ultimo Miglio keeps damage, sanctions and scores; timeout and wrong answer remove exactly one life (13.249024ms)
+✔ Ultimo Miglio completes all due questions, including the last elimination, before Game Over (3.614703ms)
+✔ Exhaustion and supply never fall back to easy/medium; restore keeps the due turn and seen questions (7.1346ms)
+✔ Legacy ties retain their actual one-life budget and retire non-hard open questions without replay (6.298275ms)
+✔ A current-format tie save rejects an easy queued question before it can bypass the hard-only reserve (2.898281ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 358.338842
+Screenshot: ordinary-1440x1080-dpr1.png
+Screenshot: malocchio-1440x1080-dpr1.png
+Screenshot: antisigillo-1440x1080-dpr1.png
+Screenshot: flagello-confirm-1440x1080-dpr1.png
+Screenshot: flagello-result-1440x1080-dpr1.png
+Screenshot: ultimo-miglio-1440x1080-dpr1.png
+Screenshot: capture-flame-1440x1080-dpr1.png
+Screenshot: portal-descent-1440x1080-dpr1.png
+Screenshot: portal-impact-1440x1080-dpr1.png
+Screenshot: portal-crossing-1440x1080-dpr1.png
+Screenshot: portal-rubble-1440x1080-dpr1.png
+Screenshot: ordinary-390x844-dpr2.png
+Screenshot: malocchio-390x844-dpr2.png
+Screenshot: antisigillo-390x844-dpr2.png
+Screenshot: flagello-confirm-390x844-dpr2.png
+Screenshot: flagello-result-390x844-dpr2.png
+Screenshot: ultimo-miglio-390x844-dpr2.png
+Screenshot: capture-flame-390x844-dpr2.png
+Screenshot: portal-descent-390x844-dpr2.png
+Screenshot: portal-impact-390x844-dpr2.png
+Screenshot: portal-crossing-390x844-dpr2.png
+Screenshot: portal-rubble-390x844-dpr2.png
+Screenshot: ordinary-844x390-dpr2.png
+Screenshot: malocchio-844x390-dpr2.png
+Screenshot: antisigillo-844x390-dpr2.png
+Screenshot: flagello-confirm-844x390-dpr2.png
+Screenshot: flagello-result-844x390-dpr2.png
+Screenshot: ultimo-miglio-844x390-dpr2.png
+Screenshot: capture-flame-844x390-dpr2.png
+Screenshot: portal-descent-844x390-dpr2.png
+Screenshot: portal-impact-844x390-dpr2.png
+Screenshot: portal-crossing-844x390-dpr2.png
+Screenshot: portal-rubble-844x390-dpr2.png
+[
+  {
+    "viewport": [
+      1440,
+      1080
+    ],
+    "dpr": 1,
+    "raster": {
+      "width": 1440,
+      "height": 1080,
+      "css": 1440,
+      "smoothing": true
+    },
+    "malocchio": "PASS",
+    "antisigillo": "PASS",
+    "flagello": "PASS",
+    "ultimoMiglio": "PASS",
+    "capture": "PASS",
+    "portal": "PASS"
+  },
+  {
+    "viewport": [
+      390,
+      844
+    ],
+    "dpr": 2,
+    "raster": {
+      "width": 780,
+      "height": 585,
+      "css": 390,
+      "smoothing": true
+    },
+    "malocchio": "PASS",
+    "antisigillo": "PASS",
+    "flagello": "PASS",
+    "ultimoMiglio": "PASS",
+    "capture": "PASS",
+    "portal": "PASS"
+  },
+  {
+    "viewport": [
+      844,
+      390
+    ],
+    "dpr": 2,
+    "raster": {
+      "width": 1040,
+      "height": 780,
+      "css": 520,
+      "smoothing": true
+    },
+    "malocchio": "PASS",
+    "antisigillo": "PASS",
+    "flagello": "PASS",
+    "ultimoMiglio": "PASS",
+    "capture": "PASS",
+    "portal": "PASS"
+  }
+]
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1
+npm notice To update run: npm install -g npm@12.2.1
+npm notice

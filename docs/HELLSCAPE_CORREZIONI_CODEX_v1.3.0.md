@@ -2,9 +2,11 @@
 
 > Aggiornamento dell’utente del 28/10/2026: per le modifiche dinamiche allegare **GIF reali del browser**, non soltanto screenshot. Per gli stati statici restano validi gli screenshot; niente HTML di anteprima. Questa richiesta prevale sui riferimenti «solo screenshot» presenti nel testo storico seguente. Procedere con [un intervento per volta](HELLSCAPE_LAVORO_SEQUENZIALE.md).
 
+> **Stato aggiornato:** il testo seguente conserva la specifica iniziale. Le richieste successive dell’utente prevalgono: colonne scartate, ponte e portale approvati, Antisigillo al 20%, Sacrificio al 5% e +777 punti/−1 vita, Tributo immediato al 33%, nuove regole di Malocchio, Sigillo e Contrappasso. Stato integrato, prove e limiti sono nella [verifica finale](HELLSCAPE_VERIFICA_FINALE_2026-10-28.md). Non ripristinare i comportamenti storici incompatibili.
+
 **Versione:** 1.3.0 · **Data:** 28 ottobre 2026  
 **Repository:** `rickymusu-bit/quiz` · **Base di lavoro:** ramo `fix/malocchio-preview-spec-20261028` (PR contenente le prime correzioni)  
-**Stato:** specifica vincolante da IMPLEMENTARE e VERIFICARE; non equivale a funzionalità già presenti.
+**Stato:** specifica operativa iniziale; implementazione e verifiche correnti sono tracciate nel rapporto finale e nel piano sequenziale.
 
 > **Istruzione principale per Codex:** esamina il codice realmente presente nella head del ramo, implementa le modifiche indicate, crea o aggiorna i test, acquisisci screenshot effettivi e apri/aggiorna una PR per revisione. **Non eseguire merge autonomamente.** Non creare file HTML allegati o incorporati per l'anteprima. Non dichiarare test eseguiti se non lo sono.
 
