@@ -57,7 +57,7 @@
     return data.banche;
   }
   async function loadBank(entry) {
-    const parsed = datasets.parseDataset(await fetchSiteText(entry.url), katex);
+    const parsed = datasets.parseDataset(await fetchSiteText(entry.url), katex, { requireAllDifficulties: true });
     return { ...parsed, source: entry.id };
   }
 

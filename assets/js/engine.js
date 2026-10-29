@@ -140,7 +140,7 @@
       const topics = c.selectedTopics ?? Object.keys(c.quotas).filter(t => c.quotas[t] > 0),
         counts = datasets.topicCounts(bank, c.difficulty),
         available = topics.reduce((sum,t) => sum + (counts[t] ?? 0), 0),
-        maximum = Math.floor(available / c.names.length);
+        maximum = datasets.turnCapacity(bank, topics, c.names.length, c.difficulty);
       need(c.turnCount <= maximum,
         "Massimo " + maximum + " turni: " + available + " domande disponibili ÷ " + c.names.length + " giocatori");
     }
