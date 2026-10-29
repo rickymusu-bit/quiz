@@ -1,5 +1,5 @@
 {
-  "revision": "278c5c94dbdd00eb96462093acf9770f1e897339",
+  "revision": "65862e643907f0a82f19c70e88e73335d9e88a3b",
   "runtime_sha256": {
     "assets/README.md": "46f358670eb0cea830ec6530290f72ec221df49904009c47e4ef4f4d28a7f883",
     "assets/ammo-hellscape-v1.png": "0f6a8adb8db705c4f0188fedeba3a89d344f6ff787d4b92214c8ba092e98cc05",
@@ -13,7 +13,7 @@
     "assets/characters/skull.svg": "c1dc12a9b619d705604705364269f460429311cf899bf6d2602eaf8873c3494b",
     "assets/characters/star.svg": "b71e776ab734e97ad2b194b661f1d389f14429582af3c9c857b75651edc1c448",
     "assets/characters/swords.svg": "2d4d74bb3d76382bfc0adcea1c9d2ccc02bb2dc9989f24fd9e5b99cccf17b7fe",
-    "assets/css/game.css": "6d2a94d75e57161e5d9774f1201df2f8ae96bf905d91d13c261618cdb4fea145",
+    "assets/css/game.css": "33c688c378743fecd51db40297943937ca062d633de5236757653fd1f3e6b806",
     "assets/doom-background.png": "8fc71908d231f6a050c96d0d30ef53c886e3f72550c959eaffd9c6d5e0d7a286",
     "assets/eliminated-x.png": "149f246e1bcd480e63055085fcefedf78117c9a6c43c2855ee6fc43d9e2f0946",
     "assets/eliminated-x.svg": "39345b8a6e05639f96e79ea2a81455bca024ca11763654bb5635eabb4eee08d9",
@@ -23,7 +23,7 @@
     "assets/hell-ammo.js": "c04fcf4e168d93392dfb751315003222f946549c181f3a5eb26659233cb5a4e6",
     "assets/hell-bridge.js": "e17322ed01ab9bbd9d880693c016d06643b4f92bd2cf1b3376e25c2b5a19b38e",
     "assets/hell-cerbero-frames.js": "466ed6fbf8647b3bc182c02ae3323c3080213d84df6dc832d5f48a0e35bef725",
-    "assets/hell-cerbero.js": "ef5de2dcfc9c8e0ab529e1cfb2754a6b58e199a21875c6d673db5a4205c8267e",
+    "assets/hell-cerbero.js": "72537b11050d84acfc11e2cc1a066e8e969b03f13e1932581f9685d334d591b5",
     "assets/hell-chase.js": "3c54e3cbafd180720d7f70da7ca541e1d492cae4b0303b33d2e90132044f4734",
     "assets/hell-ending.js": "bcf517cf060c96ac69581d6c19375e51cb392c94bd23a4e3c082b7ab036af159",
     "assets/hell-epilogue.js": "7da92892ba2d248e51a48b5228df1d53dbf04f1868bc62642b4b3cafb2e818bc",
@@ -68,11 +68,11 @@
     "assets/hellscape.css": "fb30a8503b8ac49895c029eddf01a828372b53f62103a897ba6e9856eac52ea7",
     "assets/home.css": "afd844f1bc238aabde41e74b1b5913b640b0d5378c6656c9d34d9a61d8758323",
     "assets/js/core.js": "1842d875b4537cb90489e667897586505cdd8673ca7495c34212c763c225bc65",
-    "assets/js/datasets.js": "1f2ba568c8376e40d983c954c55dfdfce854c13e170cbd176db7990c90d6dde6",
-    "assets/js/engine.js": "a2fda62f38c594531351fc862e32f7be6176fce2ebe92e8c14037c2bcb03656f",
+    "assets/js/datasets.js": "931d69c70f52be7c1173b5dcbd19d7f14c02f815c7e52f2d78f671de241b3638",
+    "assets/js/engine.js": "9c78892cfec3120a233bf05ca8a590acf20a4f77b44fbdc0329051ce417524f4",
     "assets/js/loader.js": "cae0962092fd5e6b324cc69d5d7da643e6d17c559b1a1ee62e55a8804932e47c",
     "assets/js/persistence.js": "5056fcab553f0ab70aa5e73dfcfa83475387e7f58b9ee8bc825633590f3b0e15",
-    "assets/js/ui.js": "85166db32d49208edcf318afa4f05f10eb57345d4062d78734028f6755cefb91",
+    "assets/js/ui.js": "a468dbec80216ab86809d8b660bb8675481076247d0a14d805c0f61de9ceb383",
     "assets/responsive.css": "ee1c3982437f0c579a86fe7fffe9d25953b8ac0dd82a613c09374555da850db4",
     "assets/vendor/README.md": "1e7c6ba532cef613dad06bf3092c054d856e3f6ae8816ca42ac2f85bbce3bb6f",
     "assets/vendor/katex.css": "454ccc9eddfcca1c7a2f62b026891d60b55b9d713d56993d60a9722b8c35bf4b",
@@ -99,8 +99,8 @@
       ],
       "fps": 20,
       "duration_ms": 3800,
-      "kind": "Real ordinary gameplay: anticipation, three jets while walking, recovery; first breath at active scene time 8s",
-      "sha256": "b15e9c1c518dc67f90ecab1cce0be933d940b96f332ada6c8cc9d41477b2ff41"
+      "kind": "Real ordinary gameplay: anticipation, three jets while walking, recovery; first breath at active scene time 60s",
+      "sha256": "59c0c181febcd17daea1d41138d487a3b80a1ee08abd556b01186412d45669bb"
     },
     {
       "file": "malocchio-scadenza.gif",
@@ -115,7 +115,7 @@
       "fps": 20,
       "duration_ms": 3500,
       "kind": "Last 2s of the 45s decision, automatic keep and full configured 90s response timer; earlier elapsed choice time is skipped before recording",
-      "sha256": "526b63357cb2e58799e82529c01c64db346abcbd695cde26604956555e22de1b"
+      "sha256": "cf18e9c875340d4a7153b36cc22f774866773be67d785e010f8a9b6e391b58d1"
     }
   ],
   "errors": []

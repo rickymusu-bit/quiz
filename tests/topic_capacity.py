@@ -6,6 +6,7 @@ from playwright.sync_api import sync_playwright, expect
 import threading, os, sys, json, subprocess, hashlib
 
 ROOT = Path(__file__).resolve().parent.parent
+subprocess.run(['node', 'scripts/build.cjs', '--offline'], cwd=ROOT, check=True, stdout=subprocess.DEVNULL)
 OUT = ROOT / 'docs/turni-cerbero/evidence'
 record = '--record' in sys.argv
 frames = []

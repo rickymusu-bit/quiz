@@ -28,10 +28,11 @@ La home usa `assets/hellscape-cerbero-home.webp`, nuova illustrazione dal riferi
 
 ## Verifiche
 
-- `npm test`: regole, turni, conteggi idempotenti, scadenze, migrazioni, punteggi e dataset.
+- `npm test`: regole, turni, conteggi idempotenti, scadenze, migrazioni, punteggi e dataset; limite domande/giocatori e cadenza di 60 secondi.
 - `npm run test:frames`: sagome, articolazioni, veicoli rigidi ed effetti.
 - `npm run test:ammo`: animazioni delle nove Omen, tre viewport, pausa/ripresa, ricaricamento e dimostrazione offline.
 - `python3 tests/configurable.py`: impostazioni su due banche e due viewport, durate 1/4/13/33, probabilità e vecchi profili.
+- `python3 tests/topic_capacity.py`: selezione esplicita, massimo diviso i giocatori e arrotondato per difetto, difficoltà, selezione vuota, avvio, profili ridotti senza perdere le personalizzazioni, sito/offline. `--record` acquisisce `limite-turni.gif` e screenshot.
 - `python3 tests/tie_browser.py --quick`: Ultimo Miglio offline, avanzamento, input, pausa e ripresa.
 - `python3 tests/turn_limit_browser.py`: spareggio dopo l’ultimo turno saltato o ceduto, domanda iniziale e focus, pausa e comandi su desktop/mobile e movimento ridotto; incluso in `test:ties`.
 - `python3 tests/periodic_fire.py`: tre emettitori effettivi in corsa, pausa/ripresa della fiammata e movimento ridotto; incluso in `test:motion`.
@@ -40,4 +41,6 @@ La home usa `assets/hellscape-cerbero-home.webp`, nuova illustrazione dal riferi
 
 Le GIF sono registrazioni reali del browser a 20 FPS. `fuoco-periodico.gif` mostra 3,8 secondi della corsa ordinaria. `malocchio-scadenza.gif` mostra gli ultimi 2 secondi della scelta e l’avvio del tempo intero per rispondere, configurato a 90 secondi per distinguere i due conti alla rovescia: il tempo precedente viene saltato **prima** dell’acquisizione. La finestra desktop è 1366×768, export GIF 640×360; il controllo offline usa 844×390. Revisione e impronte dei file sono nel rapporto.
 
-Acquisizioni dal runtime `278c5c94dbdd00eb96462093acf9770f1e897339`. Il commit degli allegati aggiorna soltanto le prove e la documentazione, senza modificare i file runtime. I nuovi casi browser verificano anche la prima domanda dello spareggio dopo turno saltato o ceduto, su desktop/mobile e con movimento ridotto. Esiti locali: 170 test Node e dataset, suite frame, configurazione e Ultimo Miglio, verifica browser di Malocchio/Flagello/catture/portale, acquisizioni sito/offline e controllo degli emettitori durante pausa/ripresa riusciti.
+Acquisizioni dal runtime `65862e643907f0a82f19c70e88e73335d9e88a3b`. Il commit degli allegati aggiorna soltanto le prove e la documentazione, senza modificare i file runtime. I nuovi casi browser verificano anche la prima domanda dello spareggio dopo turno saltato o ceduto, su desktop/mobile e con movimento ridotto. Esiti locali: 171 test Node e dataset, suite frame, configurazione e Ultimo Miglio, verifica browser di Malocchio/Flagello/catture/portale, acquisizioni sito/offline e controllo degli emettitori durante pausa/ripresa riusciti.
+
+`limite-turni.gif` mostra il massimo passare da 33 (100 domande ÷ 3 giocatori) a 3 (10 ÷ 3), poi 1 con la difficoltà facile (3 ÷ 3), e 6 selezionando due argomenti (20 ÷ 3). Registrazione browser 1366×768, GIF 960×540 a 4 FPS, durata 3,75 secondi. `capacity-report.json` riporta revisioni, casi desktop/mobile e impronta della GIF.
