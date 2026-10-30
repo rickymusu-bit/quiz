@@ -39,3 +39,28 @@ test('Pause remains available through a capture without holding its approach for
  const elapsed=t.sample().elapsed;t.togglePause();t.advance(3,{captures:true});assert.equal(t.sample().elapsed,elapsed);
  t.togglePause();t.advance(1,{captures:true});assert(t.sample().blocking);t.completeCapture();assert(!t.sample().blocking);
 });
+
+test('Completed victories clear a pending or active tie notice so navigation unlocks',()=>{
+ const t=createTracker();
+ const base={id:'victory-home',phase:'ordinaria',tieRound:0,result:null,
+   groups:[{out:false},{out:false},{out:false}],suspended:false};
+ t.sync(base);
+ const tied={...base,phase:'pareggio',tieRound:1};
+ t.sync(tied);
+ assert(t.sample().waiting);
+ assert(t.begin(tied));
+ assert(t.sample().blocking);
+ t.sync({...tied,phase:'conclusa'});
+ assert(!t.sample().blocking);
+ assert(!t.sample().waiting);
+ const t2=createTracker();
+ t2.sync(tied);
+ const eliminated={...tied,result:{id:'bad-answer',respondent:1,correct:false},
+   groups:[{out:false},{out:true},{out:false}]};
+ t2.sync(eliminated);
+ assert.equal(t2.sample().kind,'elimination');
+ assert(t2.sample().blocking);
+ t2.sync({...eliminated,phase:'conclusa'});
+ assert(!t2.sample().blocking);
+ assert.equal(t2.sample().phase,'idle');
+});
