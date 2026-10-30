@@ -9,8 +9,8 @@
   const VEHICLES = ['chopper', 'pickup', 'truck', 'coupe', 'offroad', 'ape'];
   // Widths in logical race pixels; preserve each complete silhouette's aspect ratio.
   const vehicleWidths = [44, 58, 62, 54, 56, 40];
-  const sheets = { vehicles: null, world: null };
-  const files = { vehicles: 'vehicles-drive-v1.webp', world: 'infernal-world-v1.webp' };
+  const sheets = { vehicles: null };
+  const files = { vehicles: 'vehicles-drive-v1.webp' };
   // Shared atlases are decoded once; every state uses the same images.
   if (typeof root.Image === 'function') {
     for (const key of Object.keys(sheets)) {
@@ -366,54 +366,7 @@
       root.FoolBridge.draw(c,W,tick,progress,null,effectTime,layers);
       return;
     }
-    if(imageReady(sheets.world)){
-      const img=sheets.world;
-      // Distant architecture and foreground scroll at different velocities.
-      for(const [sy,sh,dy,dh,speed] of [[0,.63,0,190,5],[.74,.26,365,19,48]]){
-        const tw=W*2,offset=(tick*speed)%tw;
-        for(let x=-offset;x<W;x+=tw)c.drawImage(img,0,img.naturalHeight*sy,img.naturalWidth,img.naturalHeight*sh,Math.floor(x),dy,tw,dh);
-      }
-      flyingDevils(c,W,effectTime);
-      if(root.FoolBridge)root.FoolBridge.draw(c,W,tick,progress,img,effectTime,layers);
-      else if(root.FoolTerrain)root.FoolTerrain.draw(c,W,tick,progress,img,effectTime);
-      else{c.fillStyle='#161614';c.fillRect(0,184,W,181);}
-      return;
-    }
-
-    c.save();c.scale(1,H/156);
-    c.fillStyle = '#2c101b'; c.fillRect(0, 0, W, 156);
-    r(c, 0, 0, W, 23, '#180b19');
-    r(c, 0, 23, W, 17, '#431622');
-    r(c, 0, 40, W, 30, '#6a2420');
-    // Astro color zolfo.
-    r(c, W * .72, 6, 33, 33, '#e26b34');
-    r(c, W * .72 + 5, 11, 23, 23, '#ffbc64');
-    // Vulcani e fumarole in parallasse lento.
-    const offset = (tick * 6) % 180;
-    for (let x = -220 - offset; x < W + 180; x += 180) {
-      for (let j = 0; j < 36; j++) {
-        const top = 64 - j * .9;
-        r(c, x + j * 2, top, 145 - j * 4, 2, '#27121a');
-      }
-      r(c, x + 74, 18, 12, 42, '#2b1920');
-      r(c, x + 76, 8, 8, 14, '#775044');
-      r(c, x + 77, 5, 6, 6, '#e58448');
-    }
-    for (let j = 0; j < 20; j++) {
-      const x = ((j * 113 - tick * (8 + (j % 3) * 8)) % (W + 50) + W + 50) % (W + 50);
-      r(c, x, (j * 31) % 57, 2, 2, j % 2 ? '#cc6036' : '#ef9d4f');
-    }
-    // Colate laviche oltre la strada.
-    r(c, 0, 66, W, 7, '#101018');
-    for (let x = -60 - (tick * 28) % 54; x < W; x += 54) {
-      r(c, x, 65, 29, 3, '#fa7533');
-      r(c, x + 9, 69, 12, 2, '#e4a143');
-    }
-    r(c, 0, 73, W, 156 - 73, '#1c1c24');
-    c.restore();
-    flyingDevils(c,W,effectTime);
-    if(root.FoolBridge)root.FoolBridge.draw(c,W,tick,progress,null,effectTime,layers);
-    else if(root.FoolTerrain)root.FoolTerrain.draw(c,W,tick,progress,null,effectTime);
+    // No substitute textures: rendering remains hidden until the real environment is ready.
   }
   function drawChaser(c,travel,advance=0,breath=null){drawChaserAt(c,travel,{...motion.CHASE,left:motion.CHASE.left+advance},true,breath);}
   function drawChaserAt(c,travel,geometry,dust=true,breath=null){
