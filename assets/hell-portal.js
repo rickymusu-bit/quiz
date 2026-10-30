@@ -16,14 +16,14 @@
   let stone=null;
   function loadRocks(redraw=()=>{}){
     if(!stone&&typeof root.Image==='function'){
-      stone=new root.Image();stone.decoding='async';stone.src=root.HellscapeOffline?.assets?.[ROCK_ASSET]||ROCK_ASSET;
+      stone=new root.Image();stone.decoding='async';stone.src=root.HellscapePreviewResources?.assets?.[ROCK_ASSET]||ROCK_ASSET;
       stone.addEventListener('load',redraw,{once:true});stone.addEventListener('error',()=>{stone.failed=true;redraw();},{once:true});
     }return stone;
   }
   function load(redraw=()=>{}){
     loadRocks(redraw);
     if(!art&&typeof root.Image==='function'){
-      art=new root.Image();art.decoding='async';art.src=root.HellscapeOffline?.assets?.[ASSET]||ASSET;
+      art=new root.Image();art.decoding='async';art.src=root.HellscapePreviewResources?.assets?.[ASSET]||ASSET;
       art.addEventListener('load',redraw,{once:true});art.addEventListener('error',()=>{art.failed=true;redraw();},{once:true});
     }return art;
   }
