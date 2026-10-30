@@ -41,6 +41,15 @@ body[data-layout="compact"].showing-cinematic #viewport-stage main.operational>.
 body[data-layout="compact"] #viewport-stage main.final-screen .ending {
   display:flex;flex-direction:column;gap:16px;width:100%;height:auto;min-height:100%;padding:0 0 16px;
 }
+/* The Home row stays accessible during compact scrolling, and the focused
+   ending title is offset below it rather than sliding underneath it. */
+body[data-layout="compact"] #viewport-stage main.final-screen .ending>.ending-home {
+  position:sticky;top:8px;order:-1;align-self:flex-start;
+  margin:8px 0 0 12px;background:#130d0b;
+}
+body[data-layout="compact"] #viewport-stage main.final-screen .ending .final-title {
+  scroll-margin-top:90px;
+}
 body[data-layout="compact"] .ending .final-title { order:1;padding:12px; }
 body[data-layout="compact"] #viewport-stage .ending .final-answer { order:2;margin:0 12px; }
 body[data-layout="compact"] .ending>.row { order:3;padding:0 12px; }

@@ -1,13 +1,13 @@
 /* Hellscape interface 3.6.0 — fixed 1024×768 stage. */
 html,body{width:100%;height:100%;overflow:hidden;background:#080605}
-#viewport-stage{position:fixed;left:50%;top:50%;width:var(--stage-width)!important;height:var(--stage-height);transform-origin:center center;margin:0;overflow:hidden;background:#1a0b08;box-shadow:0 0 70px #000}
+#viewport-stage{position:fixed;left:50%;top:50%;width:var(--stage-width)!important;height:var(--stage-height);transform-origin:center center;margin:0;overflow:clip;background:#1a0b08;box-shadow:0 0 70px #000}
 .hellscape-wordmark{display:block;font:400 100px/.95 FoolTerminal,monospace;letter-spacing:.055em;color:#ffb46a;text-shadow:3px 3px #5c170c,6px 6px #090504;line-height:1}
 header .hellscape-wordmark{font-size:32px;letter-spacing:.04em}header .brand{line-height:1;text-decoration:none}
 #viewport-stage main{height:calc(var(--stage-height) - 48px);min-height:0!important;max-width:none;overflow:auto;padding:18px}
 #viewport-stage .home-content{gap:24px;width:100%}#viewport-stage .home-content h1{line-height:1}#viewport-stage .home-content .hellscape-wordmark{font-size:145px}#viewport-stage .subtitle{font-size:44px}#viewport-stage .menu{width:330px;gap:12px}#viewport-stage .menu a,#viewport-stage .menu button{font-size:38px;min-height:60px}
 #viewport-stage:has(.home-content) main{height:var(--stage-height)}
 body.playing #viewport-stage>header{display:none}
-#viewport-stage main.operational,#viewport-stage main.final-screen{position:relative;height:var(--stage-height);min-height:var(--stage-height)!important;padding:0;overflow:hidden;display:block;isolation:isolate;background:#26110c}
+#viewport-stage main.operational,#viewport-stage main.final-screen{position:relative;height:var(--stage-height);min-height:var(--stage-height)!important;padding:0;overflow:clip;display:block;isolation:isolate;background:#26110c}
 main.operational>.hell-race,main.final-screen .hell-race-final{position:absolute;inset:0;width:100%;height:100%;margin:0;border:0;z-index:-1}
 main.operational>.hell-race canvas,main.final-screen .hell-race canvas{width:100%;height:100%;object-fit:fill}
 .statusline .timer{font:26px/1 FoolTerminal,monospace}
@@ -23,7 +23,7 @@ main.operational>.hell-race canvas,main.final-screen .hell-race canvas{width:100
 #viewport-stage main.operational>.movement-cue[data-outcome=incorrect]{color:#ff735c;border-color:#bb392c}
 @keyframes outcome-flash{50%{filter:brightness(1.4)}}
 @media(prefers-reduced-motion:reduce){#viewport-stage main.operational>.movement-cue{animation:none}}
-#viewport-stage main.final-screen .ending{width:100%;height:100%;position:relative;isolation:isolate;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:20px;background:none}#viewport-stage .ending .final-answer{max-width:800px;background:#130d0bd9;padding:12px;font-size:16px}#viewport-stage .ending .game-options{background:#130d0be8;padding:6px}.ending .final-title{margin:0}.ending .end-wordmark{max-height:110px}
+#viewport-stage main.final-screen .ending{width:100%;height:100%;position:relative;isolation:isolate;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:0;background:none}#viewport-stage .ending .final-answer{max-width:800px;background:#130d0bd9;padding:12px;font-size:16px}#viewport-stage .ending .game-options{background:#130d0be8;padding:6px}.ending .final-title{margin:0}.ending .end-wordmark{max-height:110px}
 dialog .scoreboard{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}dialog .team{background:#1b1714;padding:12px}dialog{overscroll-behavior:contain}dialog button{min-height:44px}
 /* Keep the question and all four alternatives above the explanation. */
 #viewport-stage .operation-body .solution{max-height:none;overflow:visible;margin:12px 0 10px}
@@ -96,6 +96,21 @@ body.showing-cinematic #fit-warning{visibility:hidden!important;pointer-events:n
 body.showing-cinematic dialog:not(#orientation-note)::backdrop{background:transparent!important;box-shadow:none!important}
 .hell-race .ammo-status{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
 
+/* The Canvas fills the figure: without absolute positioning scene controls
+   follow it in normal flow and the pause button ends up below the viewport. */
+.hell-race .scene-controls{
+  position:absolute;top:16px;right:16px;z-index:8;
+  display:flex;align-items:center;justify-content:flex-end;
+}
+.hell-race .scene-controls button{
+  min-height:48px;max-width:100%;padding:6px 14px;
+  color:#fff0dc;background:#311e18;border:2px solid #cba176;
+  font:24px/1 FoolTerminal,monospace;
+}
+body.showing-cinematic #viewport-stage main.operational>.hell-race,
+body.showing-cinematic #viewport-stage main.final-screen .hell-race-final{z-index:1}
+
+
 /* Combat feedback belongs to the player windows above the scene. */
 #viewport-stage .turn-order { overflow: visible; }
 #viewport-stage .turn-order .active-ammo-effects { display: grid; gap: 3px; margin-top: 5px; }
@@ -110,11 +125,14 @@ body.showing-cinematic dialog:not(#orientation-note)::backdrop{background:transp
 #viewport-stage .ending .winner-escape{font:clamp(24px,3.4vw,36px)/1.15 FoolTerminal,monospace;color:#f1e5bc;max-width:90%;text-shadow:2px 2px #100b09}
 body[data-layout="compact"] #viewport-stage .ending .victory-wordmark .end-wordmark{max-height:none}
 
-/* Keep the final return action inside the viewport, even when the long
-   victory artwork and answer summary fill the remaining height. */
+/* Overflow clip on the fixed stage prevents focus/scrollIntoView from moving
+   the complete results screen above the viewport. Compact layouts retain
+   intentional scrolling through responsive.css. */
+/* Reserve a dedicated toolbar row for Home. An overlaid fixed button
+   could cover the VITTORIA / GAME OVER artwork on the results screen. */
 #viewport-stage main.final-screen .ending>.ending-home{
-  position:absolute;top:16px;left:16px;z-index:6;margin:0;
-  max-width:calc(100% - 32px);
+  position:relative;inset:auto;order:-1;align-self:flex-start;flex:0 0 auto;
+  z-index:6;margin:16px 0 0 16px;max-width:calc(100% - 32px);
 }
 #viewport-stage main.final-screen .ending>.ending-home button{
   max-width:100%;white-space:normal;min-height:48px;

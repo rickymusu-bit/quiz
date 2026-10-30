@@ -11,15 +11,20 @@
   const TILE=768,ROAD_TOP=110,ROAD_BOTTOM=180,FRONT_RISE=12;
   const ASSETS=Object.freeze({bridge:'assets/hell-race/black-stone-bridge-v1.png',sea:'assets/hell-race/lava-sea-v2.png'});
   let art=null,lake=null,water=null;
+  let loadError=false;
+  function ready(){return !!(art?.complete&&art.naturalWidth&&lake?.complete&&lake.naturalWidth);}
+  function failed(){return loadError || !!(art?.complete&&!art.naturalWidth) || !!(lake?.complete&&!lake.naturalWidth);}
   function load(redraw=()=>{}){
     if(!art&&typeof root.Image==='function'){
       art=new root.Image();const path=ASSETS.bridge;
       art.src=root.HellscapePreviewResources?.assets?.[path]||path;
       art.addEventListener('load',redraw,{once:true});
+       art.addEventListener('error',()=>{loadError=true;redraw();},{once:true});
     }
     if(!lake&&typeof root.Image==='function'){
       lake=new root.Image();const path=ASSETS.sea;
       lake.src=root.HellscapePreviewResources?.assets?.[path]||path;lake.addEventListener('load',redraw,{once:true});
+       lake.addEventListener('error',()=>{loadError=true;redraw();},{once:true});
     }
     return art;
   }
@@ -130,6 +135,6 @@
     roadDebris(c,width,camera);fractures(c,layers?.damage);layers?.behind?.();layers?.above?.();debris(c,layers?.damage,false);
     c.restore();
   }
-  const api={TOP,BOTTOM,GAP,RACE_SCALE,DEPTH,SHEAR,project,worldX,grounds,draw,load,debris,features,environment,front,tiles,ASSETS,TILE,FRONT_RISE};
+  const api={TOP,BOTTOM,GAP,RACE_SCALE,DEPTH,SHEAR,project,worldX,grounds,draw,load,ready,failed,debris,features,environment,front,tiles,ASSETS,TILE,FRONT_RISE};
   if(typeof module!=='undefined')module.exports=api;else root.FoolBridge=api;
 })(globalThis);

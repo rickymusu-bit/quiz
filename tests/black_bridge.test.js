@@ -41,7 +41,7 @@ test('Actual lava and masonry pixels translate together, including a change in c
 test('Every race vehicle is twice its previous width and height, with tyre contacts on the deck',async()=>{
  const image=await loadImage('assets/hell-race/vehicles-drive-v1.webp');
  const root={FoolMotion:require('../assets/hell-motion.js'),FoolLayout:L,FoolBridge:B,__sheets:{vehicles:image},matchMedia:()=>({matches:false})};
- const source=fs.readFileSync('assets/hell-race.js','utf8').replace('const sheets = { vehicles: null, world: null };','const sheets=root.__sheets;').replace('root.FoolHellRace = { createStage, vehiclePreview };','root.FoolHellRace={vehicleSize};');
+ const source=fs.readFileSync('assets/hell-race.js','utf8').replace('const sheets = { vehicles: null };','const sheets=root.__sheets;').replace('root.FoolHellRace = { createStage, vehiclePreview };','root.FoolHellRace={vehicleSize};');
  vm.runInNewContext(source,{window:root,document:{createElement:()=>createCanvas(1,1)}});
  const current=[0,1,2,3,4,5].map(row=>root.FoolHellRace.vehicleSize(row));
  root.FoolBridge={...B,RACE_SCALE:.62};
