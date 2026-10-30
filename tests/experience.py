@@ -21,7 +21,7 @@ with sync_playwright() as p:
   expect(page.get_by_role('button',name='Domanda precedente',exact=True)).not_to_be_visible()
   expect(page.get_by_role('button',name='Scorciatoie da tastiera',exact=True)).not_to_be_visible()
   page.get_by_role('button',name='Opzioni',exact=True).click();expect(page.get_by_role('button',name='Scorciatoie da tastiera',exact=True)).to_be_visible();page.get_by_role('button',name='Chiudi',exact=True).click()
-  assert page.locator('.turn-order .heart:not(.lost)').count()==9
+  assert page.locator('.turn-order .life-skull:not(.lost)').count()==9
   # All current-bank notation must render through the same renderer as the UI.
   count=page.evaluate('''()=>{let n=0;for(const q of HellscapeUI.game.s.bank)for(const value of [q.body,...q.options,q.explanation]){const el=document.createElement('div');HellscapeUI.math(el,value);for(const part of Fool.scienceParts(value))if(part.math!==undefined){katex.renderToString(part.math,{throwOnError:true});n++}}return n}''');assert count>10
   page.keyboard.press('F1');expect(page.get_by_role('heading',name='Scorciatoie da tastiera')).to_be_visible();expect(page.locator('.shortcut-list dt')).to_have_count(16);page.keyboard.press('Escape');expect(page.locator('#dialog')).not_to_be_visible()
