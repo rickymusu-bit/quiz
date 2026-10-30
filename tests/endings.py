@@ -46,6 +46,10 @@ with sync_playwright() as p:
   expect(page.locator('.final-title')).to_be_visible()
   home=page.get_by_role('button',name='Torna alla schermata iniziale',exact=True)
   expect(home).to_be_visible()
+  page.evaluate("document.body.classList.add('showing-cinematic')")
+  expect(home).to_be_visible()
+  assert home.evaluate("e=>getComputedStyle(e).pointerEvents") != 'none'
+  page.evaluate("document.body.classList.remove('showing-cinematic')")
   box=home.bounding_box()
   assert box and box['x']>=0 and box['y']>=0 and box['x']+box['width']<=page.viewport_size['width'] and box['y']+box['height']<=page.viewport_size['height'],box
   if winner==0:
