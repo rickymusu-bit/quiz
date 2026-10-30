@@ -114,7 +114,9 @@ else if (process.argv.includes("--offline")) {offline();ammoPreview();}
 else {
   const site = path.join(out, "site");
   fs.mkdirSync(site, { recursive: true });
-  for (const p of [
+  // Preserve every published route and its assets, including the preview page.
+  // Offline packaging is a separate optional branch above, not a site dependency.
+  const publishedPaths = [
     "index.html",
     "Fool.html",
     "Fool_regole.html",
@@ -123,6 +125,7 @@ else {
     ".nojekyll",
     "dataset",
     "assets",
-  ])
+  ];
+  for (const p of publishedPaths)
     fs.cpSync(path.join(root, p), path.join(site, p), { recursive: true });
 }
