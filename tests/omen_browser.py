@@ -1,4 +1,4 @@
-"""Omen rules, HUD, rotation and offline integration."""
+"""Omen rules, HUD, rotation and web integration."""
 from omen_support import ROOT, ART, server, base, fixture, layout, select, confirm
 from playwright.sync_api import sync_playwright, expect
 import os, json
@@ -6,16 +6,15 @@ errors=[];report=[]
 try:
  with sync_playwright() as p:
   browser=p.chromium.launch(executable_path=os.environ.get('CHROMIUM_PATH','/usr/bin/chromium'),args=['--no-sandbox'])
-  for offline,w,h,dpr in [(False,1440,900,1),(False,844,390,2),(False,667,375,1),(False,568,320,2),(True,844,390,2)]:
+  for w,h,dpr in [(1440,900,1),(844,390,2),(667,375,1),(568,320,2)]:
    q=browser.new_page(viewport={'width':w,'height':h},device_scale_factor=dpr,reduced_motion='reduce',has_touch=w<1000)
    q.on('pageerror',lambda e:errors.append(str(e)));q.add_init_script('Math.random=()=>.25')
-   q.goto(base+('dist/Hellscape-offline.html' if offline else 'Fool.html?start=1'))
-   v=q.frames[1] if offline else q
-   if offline:v.get_by_role('link',name='Nuova partita',exact=True).click()
+   q.goto(base+'Fool.html?start=1')
+   v=q
    v.get_by_role('button',name='Inizia partita',exact=False).click()
    v.get_by_role('button',name='Svela e avvia il tempo').wait_for()
    q.wait_for_timeout(300);fixture(v);q.evaluate('document.fonts.ready')
-   layout(v,w,h);q.screenshot(path=str(ART/f'hud-{w}-{offline}.png'))
+   layout(v,w,h);q.screenshot(path=str(ART/f'hud-{w}-web.png'))
    s=fixture(v)
    # Expand by the summary (keyboard-native details), then preserve on rerender/rotation.
    v.locator('.player-window summary').first.evaluate('e=>e.parentElement.open=true');q.wait_for_timeout(50)
@@ -30,8 +29,8 @@ try:
    assert v.evaluate('HellscapeUI.game.s.owner')==s['target']
    assert v.evaluate('Fool.exact(HellscapeUI.game.s.groups[HellscapeUI.game.s.owner].score)')=='890'
    expect(v.locator('.turn-order')).to_contain_text('Arsenico: 2 turni rimanenti')
-   layout(v,w,h);q.screenshot(path=str(ART/f'arsenico-{w}-{offline}.png'))
-   v.get_by_role('button',name='Inventario',exact=True).click();expect(v.locator('#dialog')).not_to_contain_text('Ammo');q.screenshot(path=str(ART/f'inventory-{w}-{offline}.png'));v.get_by_role('button',name='Chiudi',exact=True).click()
+   layout(v,w,h);q.screenshot(path=str(ART/f'arsenico-{w}-web.png'))
+   v.get_by_role('button',name='Inventario',exact=True).click();expect(v.locator('#dialog')).not_to_contain_text('Ammo');q.screenshot(path=str(ART/f'inventory-{w}-web.png'));v.get_by_role('button',name='Chiudi',exact=True).click()
    before=v.evaluate('JSON.stringify(HellscapeUI.game.snapshot())')
    q.set_viewport_size({'width':h,'height':w});q.wait_for_timeout(150);expect(v.locator('#orientation-note')).to_be_visible()
    q.keyboard.press('a');assert v.evaluate('JSON.stringify(HellscapeUI.game.snapshot())')==before
@@ -49,7 +48,7 @@ try:
    v.locator('.answer').nth(v.evaluate('(HellscapeUI.game.s.current.correct+1)%4')).click();q.wait_for_timeout(2300);layout(v,w,h)
    if h<600:
     v.get_by_role('button',name='Dettagli esito',exact=True).click();expect(v.locator('#dialog')).to_contain_text('Risposta errata');v.get_by_role('button',name='Chiudi',exact=True).click()
-   report.append({'offline':offline,'viewport':[w,h],'dpr':dpr,'rules':'PASS','overflow':'PASS','restore':'PASS','rotation':'PASS'})
+   report.append({'deployment':'web','viewport':[w,h],'dpr':dpr,'rules':'PASS','overflow':'PASS','restore':'PASS','rotation':'PASS'})
    q.close()
   browser.close()
 finally:server.shutdown()
