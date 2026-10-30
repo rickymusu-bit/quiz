@@ -31,38 +31,5 @@
     "scale": 0.5,
     "landmarks": "manual visual estimates; diagnostic registration, not certified anatomical alignment",
     "type": "local PNG comparison, not browser/game recording"
-  },
-  {
-    "file": "confronto_A_v1_A_v2.gif",
-    "inputs": [
-      {
-        "path": "generated_images/exec-3631d33b-b705-4cf3-8ba8-9a7693003310.png",
-        "offset": [
-          0,
-          0
-        ],
-        "label": "A v1 - membrane precedenti"
-      },
-      {
-        "path": "generated_images/exec-0cf4899a-e5f0-4c50-b226-1ec001112aa2.png",
-        "offset": [
-          0,
-          14
-        ],
-        "label": "A v2 CANDIDATA - membrane forate; offset Y +14 stimato"
-      }
-    ],
-    "size": [
-      768,
-      550
-    ],
-    "durations_ms": [
-      650,
-      650
-    ],
-    "loop_ms": 1300,
-    "scale": 0.5,
-    "landmarks": "manual visual estimates; diagnostic registration, not certified anatomical alignment",
-    "type": "local PNG comparison, not browser/game recording"
   }
 ]

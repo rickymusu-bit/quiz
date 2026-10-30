@@ -28,3 +28,6 @@ Design statico A approvato: «Va bene». Proseguire con B ali abbassate mantenen
 
 ## Correzione utente — 30/10/2026
 B v1 respinta: ali allungate e membrane prive di fori. La sola registrazione del corpo non risolve il difetto anatomico. Revisione mirata A per membrane forate, poi nuova B dal riferimento accettato. Ogni nuovo PNG deve essere accompagnato da GIF diagnostica reale dei PNG allineati (§7.6 protocollo v9). Nessun nuovo PNG considerato approvato automaticamente.
+
+## Rettifica dell'interpretazione — 30/10/2026
+L'utente chiarisce che in B mancavano i piccoli fori già presenti nel riferimento A originale. Non ha chiesto fori più grandi né una nuova A. La revisione 003 è respinta per errore di interpretazione dell'assistente; A originale torna riferimento canonico senza modifiche. Eliminata su richiesta la GIF confronto_A_v1_A_v2.gif. Restano da correggere lunghezza delle ali e continuità dei piccoli fori nella sola B. La regola GIF riguarda le transizioni fra pose del movimento, non dimostrazioni di modifiche decorative non richieste.

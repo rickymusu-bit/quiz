@@ -12,3 +12,6 @@ reports/gifs/confronto_A_B_respinta_v1.gif: A v1 ↔ B v1 respinta.
 Ciascuna GIF ha 2 frame 768×550, durate 650+650 ms, loop 1,3 s; controllati numero frame, dimensioni e durate riaprendo i file Pillow. Nessun morph/crossfade o posa inventata.
 I PNG originali sono immutati: solo traslazione rigida su canvas comune, checkerboard di verifica alpha e stessa riduzione uniforme 50% per tutte le immagini. Offset B +60 px e A2 +14 px stimati visivamente, non landmark certificati.
 Queste GIF mostrano l'alternanza diagnostica; non attestano fluidità del volo, timing definitivo, identità anatomica o integrazione nel gioco. La verifica alla scala runtime e il loop disegnato restano da fare.
+
+## Rettifica utente
+Tentativo 003 respinto: modifica non richiesta del design A e fori ingranditi. L'intento era mantenere i piccoli fori originali nella sola posa B. GIF confronto_A_v1_A_v2.gif eliminata su richiesta; i riferimenti sopra descrivono soltanto l'output storico, non un file ancora consegnabile. Nessuna approvazione di 003. Ripartire da A originale.

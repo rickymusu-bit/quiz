@@ -28,7 +28,6 @@ def frame(path, offset, label):
 
 items = [
  ('confronto_A_B_respinta_v1.gif', [(A,(0,0),'A v1 - riferimento precedente'),(B,(0,60),'B v1 RESPINTA - ali allungate; offset Y +60 stimato')]),
- ('confronto_A_v1_A_v2.gif', [(A,(0,0),'A v1 - membrane precedenti'),(A2,(0,14),'A v2 CANDIDATA - membrane forate; offset Y +14 stimato')]),
 ]
 meta=[]
 for name, inputs in items:
