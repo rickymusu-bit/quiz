@@ -1,0 +1,18 @@
+# Midpoint M — v1
+
+Data: 30 ottobre 2026. L'utente approva la coppia A/B con «Perfetto» e chiede un midpoint. Approvazione delle pose non equivale ad approvazione del merge.
+
+Input effettivo: tavola A/B `exec-f5e24ce2-2dee-4ce2-8d07-3b4a7e2e028d.png`, anche disponibile come Demone alato, due pose di volo.png (`libfile_fcf4dd7146dc8191bf59d7f1b1b31b70`). Entrambi gli estremi nella stessa immagine di riferimento, aperta direttamente prima dell'editing. Strumento: generatore integrato, referenced_image_paths con il file locale completo; transparent_background=true.
+
+Posa M: breakdown del colpo verso il basso, indicativamente al 50% della fase geometrica, senza assumere timing finale uniforme. Corpo invariato, ali a quota intermedia con scorcio plausibile nella vista laterale. Non è un nuovo design.
+
+## Prompt esplicito esatto
+
+Use case: identity-preserve / animation inbetween.
+Edit from the attached approved two-pose sheet. The LEFT figure is endpoint A (wings fully raised), RIGHT figure endpoint B (wings fully lowered). Generate exactly ONE new complete full-body pose M: the anatomical BREAKDOWN approximately halfway through the DOWNSTROKE from A to B. Do NOT return the two endpoints, a sprite sheet, a composite, or multiple demons. One demon only on genuine transparent background.
+
+Keep the SAME horror junkpunk devil in STRICT RIGHT-FACING SIDE PROFILE: identical skull/face, horns, neck, torso, arm and hand pose, tucked hind legs, trailing tail, shoulder armor, wrist armor, hip armor and short chain; same burgundy/oxblood flesh, soot black iron, corroded bronze, dirty bone, textures and subtle orange light from below. Preserve the proportions and detailed design of the approved reference with high fidelity. No redesign, no front view or three-quarter camera. No additional accessories, body parts or effects.
+
+Change ONLY the wing articulation to a plausible intermediate downstroke. Both wings are attached to the same shoulder roots on the upper back. The NEAR wing has travelled down from the high position of A, but not yet into the fully lowered B position: wrist approximately at shoulder height, extended outward from the body and slightly rearward. In a true side view the intermediate wing can be naturally foreshortened/partially edge-on, but it must retain visible bat-wing construction, correct perspective, correct full bone lengths in 3D and a coherent membrane. Do not simply shrink the wing or paste the lowered pose, and do not turn the body to expose it. The far wing follows the same beat slightly behind and is naturally occluded. Preserve the same upper wing bone, forearm, elongated finger supports and SINGLE wing-thumb claw attached at the WRIST joint, never the elbow or tip. The membrane's small holes and ragged cuts remain in corresponding membrane panels, moving with the same tissue, not randomly regenerated. Wing membrane bends between bones; rigid bones, horns, claws and metal plates do not stretch. Avoid a wing that emerges from an arm, cuts through the torso, covers the face, or disconnects from the shoulder.
+
+Match the reference's detailed dark fantasy game-sprite paintwork and restrained palette. Compact crisp readable silhouette, sinister grotesque anatomy, no cute cartoon styling, no new gore. Frame the ENTIRE single figure with ample transparent padding for horns, wings, claws and tail; no crop. Place the body around the center with trailing tail left and head right. No scenery, floor, shadows, text, labels, grid, checkerboard pattern or watermark. This is one actual intermediate pose drawn from BOTH approved endpoints, not a pixel blend, fade or ghosted overlay.
