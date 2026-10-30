@@ -43,12 +43,24 @@ try:
    opened=v.locator('.operation-body').bounding_box()
    assert abs((dock['y']+dock['height'])-(opened['y']+opened['height']))<2
    assert opened['y']<dock['y'],(dock,opened)
-   if w<1000:
-    owner=v.evaluate('HellscapeUI.game.s.owner');q.keyboard.press('a');assert v.evaluate('HellscapeUI.game.s.screen')=='answer'
-   v.locator('.answer').nth(v.evaluate('(HellscapeUI.game.s.current.correct+1)%4')).click();q.wait_for_timeout(2300);layout(v,w,h)
+   # Complete the rotation scenario using a normal on-screen answer.
+   v.locator('.answer').nth(v.evaluate('(HellscapeUI.game.s.current.correct+1)%4')).click()
+   q.wait_for_timeout(2300);layout(v,w,h)
    if h<600:
     v.get_by_role('button',name='Dettagli esito',exact=True).click();expect(v.locator('#dialog')).to_contain_text('Risposta errata');v.get_by_role('button',name='Chiudi',exact=True).click()
    report.append({'deployment':'web','viewport':[w,h],'dpr':dpr,'rules':'PASS','overflow':'PASS','restore':'PASS','rotation':'PASS'})
+   q.close()
+  # Independent hardware-keyboard check: landscape, active game, no rotation.
+  for touch in (False, True):
+   q=browser.new_page(viewport={'width':1280,'height':800},has_touch=touch,reduced_motion='reduce')
+   q.goto(base+'Fool.html?start=1')
+   q.get_by_role('button',name='Inizia partita',exact=False).click()
+   q.get_by_role('button',name='Svela e avvia il tempo').click()
+   expect(q.locator('.answer')).to_have_count(4)
+   assert q.evaluate('HellscapeUI.game.s.screen')=='answer'
+   q.keyboard.press('a')
+   assert q.evaluate('HellscapeUI.game.s.screen')=='result'
+   report.append({'keyboard':'PASS','touch':touch,'orientation':'landscape'})
    q.close()
   browser.close()
 finally:server.shutdown()
