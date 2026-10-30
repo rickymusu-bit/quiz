@@ -1,12 +1,13 @@
 # Protocollo operativo per sprite animati coerenti
 
-**Versione documento:** v9  
-**Ultimo aggiornamento:** 30 ottobre 2026 — Europe/Rome  
-**Progetto di riferimento:** Hellscape – Fuga dall'inferno  
-**Ambito:** riutilizzabile per qualsiasi personaggio, creatura, veicolo, oggetto animato o effetto collegato  
-**Stato:** specifica operativa proposta; non attesta che gli asset del gioco siano già stati sostituiti o validati  
-**Destinatari:** Codex, ChatGPT Work, artisti, altri agenti e sviluppatori  
-**Repository:** rickymusu-bit/quiz  
+**Versione documento:** v12.0.0\
+**Ultimo aggiornamento:** 30 ottobre 2026 — Europe/Rome\
+**Progetto di riferimento:** Hellscape – Fuga dall'inferno\
+**Ambito:** riutilizzabile per qualsiasi personaggio, creatura, veicolo, oggetto animato o effetto collegato\
+**Stato:** revisione documentale richiesta dall'utente; proposta in PR, non attesta che nuovi rig o asset siano già stati prodotti, validati o integrati\
+**Destinatari:** Codex, ChatGPT Work, artisti, altri agenti e sviluppatori\
+**Repository:** rickymusu-bit/quiz\
+**Fonte di questa revisione:** v11.0.0 della PR #89, commit `afae26867311d25b8c608f7693c4b9f809c66142`; nuova disposizione utente del 30/10/2026 dopo la prova del diavolo: A e B, M eventuale, approvazione dei riferimenti, generazione dello spritesheet completo e successive correzioni mirate. La prova locale del diavolo è approvata; l'integrazione è proposta separatamente nella PR #91, non attestata come mergiata da questa revisione.\
 **Convenzioni prevalenti:** [AGENTS.md](../AGENTS.md); in caso di conflitto prevalgono le istruzioni più recenti esplicitamente approvate dall'utente.
 
 > **Principio guida:** uno sprite animato rappresenta **un unico soggetto articolato che evolve nel tempo**, non una serie di illustrazioni indipendenti. Le parti anatomiche, i punti di ancoraggio e la causalità degli effetti sono vincoli di produzione e di accettazione, non semplici suggerimenti stilistici.
@@ -18,9 +19,11 @@ Questo protocollo disciplina due casi distinti:
 1. **Da immagine di riferimento:** generare una nuova sequenza di un soggetto del quale esiste una posa o illustrazione canonica.
 2. **Da animazione precedente:** generare una nuova azione (per esempio fuoco dopo camminata), conservando **identità, anatomia, proporzioni, orientamento e palette** dello sprite già approvato.
 
-La produzione comprende analisi del riferimento, definizione dei vincoli, schema anatomico e meccanico, pose chiave disegnate, fotogrammi intermedi disegnati, effetti, verifica e integrazione. Lo schema articolare è un riferimento per l'artista, **non** l'autorizzazione a manipolare uno sprite statico con rig procedurali. Non sostituisce la direzione artistica esistente di Hellscape, non autorizza un nuovo design e non modifica autonomamente le meccaniche di gioco.
+La produzione comprende analisi del riferimento, scelta motivata della tecnica (§3.1), schema anatomico e meccanico, pose chiave, intermedi disegnati o calcolati dal rig validato, effetti, verifica e integrazione. Rig, disegno per fotogrammi e tecnica mista sono strumenti ammessi secondo i criteri di questa edizione. Non è autorizzato un nuovo design né un cambiamento autonomo delle meccaniche di gioco.
 
 ## 2. Fonti e gerarchia di riferimento
+
+Per cercare sprite esistenti, consultare il [catalogo di fonti e candidati](FONTI_SPRITE_ANIMATI_v1.0.0_20261030.md). Le piste non sono asset approvati: verificare pagina dell'autore, licenza del singolo file, animazioni e compatibilità prima del riuso.
 
 Prima di disegnare o generare fotogrammi:
 
@@ -28,7 +31,7 @@ Prima di disegnare o generare fotogrammi:
 2. Isolare le caratteristiche invarianti dal materiale approvato, senza importare errori o artefatti di generazioni scartate.
 3. Identificare, per l'azione richiesta, **quali parti possono muoversi** e quali connessioni rimangono obbligatorie.
 4. Se due riferimenti sono incompatibili, dichiarare il conflitto e assumere come vincolante il design più recente esplicitamente approvato; non fondere automaticamente anatomie diverse.
-5. Disegnare ogni fotogramma necessario come posa completa, coerente con la medesima base anatomica e con i riferimenti approvati: evitare redesign casuali, ma **non** sostituire il disegno con deformazioni o ritagli animati dello sprite originale.
+5. Scegliere e verificare la tecnica secondo §3.1; ogni posa, disegnata o ottenuta dal rig, deve rappresentare il medesimo soggetto completo e coerente. Evitare redesign casuali e deformazioni usate per nascondere errori.
 
 La variazione di forma è consentita solo dove il materiale e la biomeccanica la giustificano. Il semplice desiderio di rendere il movimento più dinamico non autorizza deformazioni del soggetto.
 
@@ -60,7 +63,7 @@ Prima del primo concept, produrre e conservare una scheda sintetica, compilata *
 - **Scala:** dimensioni nominali nel renderer, scala di esportazione, minimo di leggibilità osservabile.
 - **Riferimenti:** percorsi, revisioni, palette, livelli di dettaglio, illuminazione e campionamento degli asset canonici.
 - **Anatomia/materiali:** connessioni, caratteristiche invarianti e possibilità di movimento/deformazione.
-- **Azioni:** pose, cicli, frame intermedi e ancoraggi necessari.
+- **Azioni e tecnica:** pose, cicli, intermedi, ancoraggi; tecnica proposta per parte/intervallo, esito della prova §3.1 e motivazione, disegni correttivi e formato di consegna.
 - **Stato:** concept proposto / design approvato / keyframe approvati / sprite integrato, ciascuno distinto.
 
 **Gate di ingresso:** se camera, ruolo, collocazione e riferimenti non sono stati controllati o le ipotesi non sono dichiarate, **non è consentito presentare il concept come pronto per il gioco**. La generazione esplorativa è possibile soltanto se esplicitamente marcata come tale, non come asset approvato.
@@ -83,7 +86,7 @@ Al 29/10/2026, dal codice e dalla documentazione del repository si ricavano ques
 | --- | --- |
 | Identità | Stesso personaggio, segni distintivi, materiali, palette, silhouette e livello di dettaglio. |
 | Conteggi anatomici | Numero di teste, arti, corna, code e altri componenti stabile, salvo occlusioni fisicamente plausibili. |
-| Proporzioni | Rapporti tra testa, collo, tronco, arti e articolazioni coerenti lungo tutta la sequenza; vietato squash/stretch arbitrario; eventuale deformazione solo se fisicamente plausibile per il materiale e disegnata nelle pose approvate. |
+| Proporzioni | Rapporti tra testa, collo, tronco, arti e articolazioni coerenti lungo tutta la sequenza; vietato squash/stretch arbitrario; eventuale deformazione solo se fisicamente plausibile per il materiale e verificata nelle pose approvate. |
 | Connessioni | Teste collegate ai colli, colli al tronco; arti collegati alle articolazioni; parti mai flottanti o saldate arbitrariamente. |
 | Orientamento | Prospettiva, verso di movimento, disposizione relativa delle parti e punto di vista coerenti. |
 | Scala e quadro | Stesso sistema di coordinate, scala base, centro/pivot e dimensione nominale dei frame. |
@@ -93,20 +96,38 @@ Al 29/10/2026, dal codice e dalla documentazione del repository si ricavano ques
 
 **Un'occlusione non è una mutilazione:** una zampa nascosta dietro il torso può essere corretta; una zampa che ricompare sul lato sbagliato senza percorso plausibile non lo è. Nel movimento delle creature fantastiche conta la coerenza dell'anatomia *progettata*, non l'aderenza letterale all'anatomia di un animale reale.
 
-### 3.1 Metodo di produzione obbligatorio: fotogrammi disegnati
+### 3.1 Scelta della tecnica: spritesheet da riferimenti, rig o tecnica mista
 
-Per **camminata, corsa, morso, attacco, presa, salto e altre azioni anatomiche complesse** usare come impostazione predefinita spritesheet costituiti da **pose disegnate individualmente**, inclusi i fotogrammi intermedi necessari. Ogni frame deve rappresentare un'anatomia intera e coerente, anche quando parti del corpo sono occluse.
+**Procedura generativa predefinita:** A/B approvati, M facoltativo, quindi spritesheet completo e retake mirati (§7.3). Non è obbligatorio provare un rig prima di applicarla. Rig e tecnica mista restano alternative documentate, quando adatte al movimento e agli strumenti.
 
-**Non usare come scorciatoia per evitare di produrre fotogrammi:**
-- mesh deformation, mesh warping, skinning o deformazioni dei vertici;
-- rigging scheletrico automatico, rotazione di ritagli di teste/arti/mandibole, deformazione dei colli mediante pivot approssimati;
-- scala non uniforme (scaleX/scaleY), skew, stretch, compressione, morphing o trasformazioni CSS/Canvas/SVG applicate a corpi o parti corporee per simulare la locomozione;
-- alternanza di una o due pose statiche deformate per simulare le fasi mancanti;
-- generazione automatica di frame mediante deformazione geometrica del singolo riferimento, anche se il risultato è fluido dal punto di vista temporale.
+**Rettifica esplicita delle edizioni precedenti (richiesta utente del 30/10/2026).** Il divieto generale di usare rig/mesh per produrre movimento è sostituito da una scelta motivata e da prove verificabili. Restano vietati pivot approssimati, parti scollegate, stretching di strutture rigide e deformazioni che mascherano anatomie errate. Un rig riutilizza gli stessi componenti ma **non garantisce automaticamente** anatomia, prospettiva, illuminazione o qualità.
 
-**Consentito:** tradurre o ruotare un corpo *rigido intero* in maniera coerente; aggiornare camera, fondale, livelli e particelle; ruotare ruote e componenti meccanici effettivamente articolati; riprodurre i frame disegnati con un clock appropriato. La rotazione di un pezzo **non** è un sostituto automatico delle pose anatomiche di una creatura. L'uso di rig come *scheda di progettazione* non autorizza lo skinning a runtime.
+| Condizione del movimento | Prima tecnica da valutare | Limite da verificare |
+| --- | --- | --- |
+| Rotazione/spostamento di segmenti con prospettiva quasi costante | Rig 2D con segmenti rigidi e giunti anatomici | Attacco, lunghezze, sovrapposizioni e assenza di effetto sagoma piatta |
+| Flessione locale di membrane, pelle o tessuti | Rig con mesh e pesi controllati sulle sole parti flessibili | Stiramenti, pieghe, volume e persistenza di fori/segni |
+| Comparsa di superfici nascoste o forte cambio di prospettiva/silhouette | Nuovi disegni delle pose/parti necessarie | Un rig 2D non ricostruisce ciò che la reference non mostra |
+| Parti riutilizzabili e pochi passaggi difficili | Tecnica mista: rig e immagini sostitutive/correttive | Continuità al cambio di disegno, senza scatti o variazioni di identità |
+| Rotazioni spaziali ampie e ricorrenti | Valutazione di modello e rig 3D | Costo di preparazione, materiali, camera e stile coerenti; non soluzione automatica |
+| Fiamme, fumo, liquidi, fratture o trasformazioni | Disegni/animazione specifica degli effetti | Causalità e ancoraggi; non forzare una sagoma rigida |
 
-Una tecnica diversa può essere adottata solo con **approvazione esplicita e preventiva**. L'assenza di asset è un impedimento da dichiarare, non una delega implicita a introdurre fallback estetici.
+**Prova prima della produzione.** Dopo l'audit e il piano di movimento, preparare i due estremi A/B. Per la generazione dello spritesheet, M è facoltativo: aggiungerlo se gli estremi non chiariscono arco, articolazioni, prospettiva o occlusioni; registrare la motivazione. Per un rig, verificare anche un breakdown rappresentativo, inizialmente schematico. Per il rig provare anche la traiettoria continua fra le pose: estremi corretti non dimostrano che il passaggio sia corretto. Mostrare il ciclo alla velocità prevista e alla scala finale, controllando:
+
+- articolazioni, lunghezze e volumi plausibili; ossa, artigli, crani e metallo conservano la forma;
+- membrane flessibili senza stiramenti gratuiti; fori e segni restano sullo stesso lembo;
+- prospettiva, occlusioni, superfici visibili e illuminazione coerenti;
+- silhouette leggibile, contatti, assenza di giunti scoperti, tremolio o salti;
+- continuità del loop e differenze necessarie fra andata e ritorno.
+
+**Decisione registrata:** rig se supera la prova; tecnica mista se i difetti sono locali e risolvibili con disegni correttivi; disegno per fotogrammi se il rig richiede correzioni pervasive o non conserva prospettiva e silhouette. Non fissare soglie numeriche universali: motivare l'esito con evidenze alla scala reale. Considerare anche preparazione dei livelli, ricostruzione delle parti nascoste, numero di riusi, strumenti disponibili e costo dei retake; il rig non è sempre la strada più rapida.
+
+**Scheda di decisione.** Registrare: soggetto/azione e riferimento canonico; parti interessate; camera e cambi di prospettiva; tecnica candidata; preparazione richiesta; esito di estremi/breakdown/percorso; difetti residui; tecnica scelta e motivazione; sorgenti ed evidenze; stato dell'approvazione. Una proposta di rig non è un rig già realizzato.
+
+**Preparazione e tracciabilità del rig.** Conservare originale, livelli separati, parti nascoste ricostruite, gerarchia, pivot anatomici, limiti, mesh/pesi, immagini alternative, curve temporali e file sorgente modificabile. Dichiarare le ricostruzioni ipotetiche. Gli elementi rigidi ruotano ai giunti; si deformano soltanto i materiali che lo consentono. Non animare l'intera ala come una paletta se la prospettiva richiede un diverso disegno.
+
+**Produzione ed esecuzione sono scelte distinte.** Un rig può servire soltanto nell'editor ed essere esportato in PNG/atlante, senza introdurre un rig nel motore. Usare preferibilmente il formato già supportato dal gioco; un rig a runtime richiede una scelta tecnica documentata e verifiche di caricamento, prestazioni, pause, frame rate, movimento ridotto e ancoraggi. L'approvazione del protocollo non equivale all'approvazione di un nuovo asset o della sua integrazione.
+
+**Vincoli specifici conservati.** Per Cerbero resta respinta la deformazione elastica della sola posa statica; le sequenze complesse già prescritte in AGENTS.md rimangono disegnate. Questa revisione introduce la valutazione del rig per nuovi movimenti e parti idonee, senza sostituire automaticamente quel lavoro. Per nuove sequenze del diavolo volante applicare il percorso generativo §7.3; rig e tecnica mista restano alternative motivate, senza sostituire automaticamente le pose già approvate.
 
 ### 3.2 Coerenza meccanica dei materiali
 
@@ -128,7 +149,7 @@ Le regole valgono per **tutti gli oggetti animati**: non solo Cerbero e veicoli 
 
 ## 4. Scheletro logico, coordinate e ancoraggi
 
-Prima dei frame definire uno **schema articolare logico** (anche come scheda annotata, senza deformazione procedurale degli sprite) che elenchi:
+Prima dei frame definire uno **schema articolare logico**, utilizzabile come riferimento di disegno o come base del rig selezionato secondo §3.1, che elenchi:
 
 - componenti e gerarchia padre-figlio (tronco → collo → testa → mandibola);
 - punti di articolazione e gradi di libertà consentiti;
@@ -148,6 +169,40 @@ direzione(t)   = orientamento della bocca trasformato nello stesso sistema
 ~~~
 
 Non inserire coordinate arbitrarie della fiammata indipendenti dalla testa. La formula è un **contratto geometrico**: non impone una specifica libreria o l'uso obbligatorio di matrici nel codice.
+
+### 4.1 Allineamento obbligatorio degli output generativi
+
+**Obiettivo e tolleranza.** Il generatore non garantisce che due PNG dello stesso soggetto abbiano posizione, scala e tratto identici. Dopo **ogni** generazione o retake, normalizzare il fotogramma prima delle GIF, dell'approvazione e della generazione successiva. La corrispondenza pixel per pixel al 100% non è un requisito di accettazione: contano continuità anatomica, proporzioni, identità, dettagli persistenti e resa alla scala d'uso. Una variazione lieve di texture può essere accettabile; un osso che cambia lunghezza, un giunto aggiunto o un foro che cambia lembo non diventano corretti soltanto perché piccoli.
+
+#### 4.1.1 Riferimento e punti stabili
+1. Conservare il PNG grezzo immutato e identificare il modello canonico approvato, il pivot e il canvas comune della sequenza.
+2. Separare **movimento previsto** (posa, spostamento, inclinazione, prospettiva e oscillazione intenzionale) da errore del generatore. Normalizzare solo il secondo; non immobilizzare il gesto o cancellare un movimento corporeo approvato.
+3. Annotare, quando visibili, almeno tre landmark non coincidenti sul corpo relativamente stabile: per esempio centro del torace, attacchi delle spalle e bacino. Usare nomi anatomici persistenti, coordinate, attendibilità e occlusioni. La testa è utile solo quando il piano la prevede stabile.
+4. **Non** allineare usando estremità delle ali, coda, arti in movimento o bounding box dell'intera sagoma. La diversa apertura alare non è una diversa taglia del corpo. Un landmark occluso o poco affidabile va escluso, non inventato.
+5. Confrontare sempre anche con il riferimento canonico, non soltanto con il fotogramma precedente, per evitare accumulo di deriva lungo la sequenza.
+
+#### 4.1.2 Trasformazioni consentite e metodo
+- Applicare all'**intero fotogramma** una sola trasformazione: traslazione; scala uniforme per recuperare la scala corporea; eventuale rotazione rigida solo per correggere una variazione di orientamento non prevista dal piano. Bloccare la rotazione quando deve restare invariata e non compensare un cambiamento reale di prospettiva con una rotazione 2D.
+- Stimare i parametri dai landmark stabili, con adattamento manuale documentato oppure stima automatica di similitudine pesata per attendibilità. Se i punti affidabili non bastano, dichiarare l'allineamento provvisorio; non attribuirgli precisione anatomica.
+- Correlazione di una regione corporea e metodi automatici di confronto immagini possono inizializzare o verificare la stima, ma non certificano anatomia o perfetta corrispondenza dei dettagli.
+- Nell'allineamento degli output generativi sono vietati scala diversa sui due assi, allineamento indipendente di teste/ali/arti, warp e morphing per far coincidere a forza pose incoerenti. Questa registrazione globale è distinta dall'animazione articolata del rig validato (§3.1); non genera intermedi e non sostituisce un retake.
+- Trasformare con gli stessi parametri pivot e ancoraggi funzionali. Conservare separatamente la traiettoria e i movimenti corporei intenzionali della sequenza.
+- Comporre le trasformazioni e ricampionare una sola volta dall'originale quando possibile; scegliere il campionamento coerente con lo stile approvato. Conservare alpha e piccoli fori. Una traslazione intera può evitare ricampionamento; se occorre una scala frazionaria, controllare perdita di dettagli e tremolio alla scala finale.
+- Impostare padding/canvas comuni sull'ingombro complessivo delle pose estreme, senza tagliare ali o coda e senza ridimensionare ogni sagoma per riempire il riquadro. Conservare il medesimo riferimento geometrico per export e runtime.
+
+#### 4.1.3 Verifiche e decisione
+Dopo la normalizzazione:
+1. Misurare lo scarto residuo dei landmark affidabili (medio/quadratico e massimo, con unità), distinguendo coordinate dell'asset e pixel effettivi alla scala di gioco. Una stima visuale non va presentata come misura.
+2. Verificare separatamente le proporzioni e la topologia: lunghezze relative dei segmenti, connessioni, numero di parti, volumi, attacchi delle membrane, posizione anatomica di fori e strappi. La prospettiva può cambiare la lunghezza **proiettata**; non richiedere che tutte le distanze 2D siano identiche tra pose diverse.
+3. Eseguire flip/GIF del nuovo fotogramma con i vicini e onion skin sulle zone pertinenti, a vista ingrandita e alla dimensione effettiva d'uso (§5.5 e §7.6). Le ali in movimento non devono coincidere nella sovrapposizione: devono seguire l'arco previsto.
+4. Calibrare tolleranze e limiti di scala/rotazione sulla sequenza, sull'attendibilità dei punti, sullo stile e sulla leggibilità reale. Registrare criterio e motivazione; niente percentuali universali o rigenerazioni per ogni differenza di pixel.
+5. Esito **allineato e candidato alla revisione**, **provvisorio per dati insufficienti** oppure **respinto per incoerenza residua**. Se una sola trasformazione globale non basta a preservare le proporzioni, correggere il disegno responsabile. Non alterare il modello approvato per inseguire la posa difettosa.
+6. Solo dopo il controllo tecnico, presentare la posa e la GIF per il gate artistico previsto. Una normalizzazione riuscita non costituisce approvazione automatica.
+
+#### 4.1.4 Tracciabilità obbligatoria
+Nel manifest/rapporto registrare: PNG grezzo e derivato allineato (oppure trasformazione riproducibile), hash/revisione, riferimento canonico e pose vicine, landmark e attendibilità, metodo, scala uniforme, angolo, offset, canvas/padding, pivot e ancoraggi trasformati, movimento intenzionale conservato, campionamento, scarti e unità, tolleranza motivata, GIF/onion skin, difetti residui ed esito. Distinguere controlli eseguiti e mancanti.
+
+**Ordine operativo:** generazione della posa di riferimento o dello spritesheet → conservazione originale → estrazione delle celle quando presenti → allineamento globale di ogni posa → verifica anatomica e alla scala reale → GIF diagnostica o ciclo completo → approvazione dei riferimenti oppure retake e approvazione del ciclo (§7.3). L'impacchettamento finale riusa queste trasformazioni; non rimanda il primo allineamento alla fine della produzione.
 
 ## 5. Progettare l'azione: fasi, keyframe e tempi
 
@@ -179,7 +234,7 @@ La tabella descrive una **proposta di regia**, non frame già prodotti. Se i get
 
 - Distribuire pose e accelerazioni per evitare spostamenti a scatti; non ottenere un rallentamento ripetendo occasionalmente frame casuali.
 - Verificare velocità angolare e traslazione anche **al passaggio tra gli ultimi frame di un ciclo e i primi del successivo**, se l'azione è in loop.
-- Non confondere **numero di disegni** con **frame rate di rendering**: il motore può aggiornare la scena a frame rate elevato scegliendo e temporizzando i fotogrammi disegnati. L'interpolazione del tempo, della posizione della scena o della camera **non** autorizza interpolazioni geometriche che deformino la silhouette per inventare pose mancanti.
+- Non confondere **numero di disegni** con **frame rate di rendering**: tempi di esposizione, clock e interpolazione del rig validato sono distinti. L'interpolazione geometrica è ammessa nel rig scelto secondo §3.1; non è ammessa come rimedio automatico a disegni incoerenti.
 - Collegare l'avanzamento dell'animazione al tempo attivo della scena, non al numero di render del dispositivo, evitando divergenze 30/60/144 Hz.
 - Prevedere ingressi/uscite e raccordi tra azioni diverse, non solo cicli isolati.
 - Se richiesta la modalità movimento ridotto, mantenere una posa rappresentativa senza inventare nuovi effetti o modificare lo stato di gioco.
@@ -189,10 +244,10 @@ La tabella descrive una **proposta di regia**, non frame già prodotti. Se i get
 **Distinguere tre tipi di disegno.** Non confondere «fotogramma centrale» con «posa che spiega il movimento»:
 
 1. **Key / extreme pose:** le posizioni e gli eventi fondamentali che definiscono azione, silhouette, peso e intenzione (per il diavolo: ali massimamente alzate e abbassate). Sono disegni approvati, non automaticamente il primo e l'ultimo frame di un loop.
-2. **Breakdown:** disegno strutturale che indica **come** si attraversa l'intervallo: arco di movimento, articolazioni, orientamento delle superfici, cambio di volume apparente, occlusioni, ritardo di coda/membrane. Può trovarsi a qualsiasi posizione temporale, **non necessariamente al 50%**. Per un movimento articolato importante approvare almeno il breakdown essenziale prima di chiedere molti intermedi.
-3. **Inbetween:** disegno aggiuntivo fra key e breakdown o fra due pose già valide, per ottenere lo spacing desiderato. Nella fase ricorsiva (§7.4), generare **un solo inbetween per chiamata**, controllarlo, quindi decidere se dividere di nuovo uno specifico intervallo.
+2. **Breakdown:** disegno strutturale che indica **come** si attraversa l'intervallo: arco di movimento, articolazioni, orientamento delle superfici, cambio di volume apparente, occlusioni, ritardo di coda/membrane. Può trovarsi a qualsiasi posizione temporale, **non necessariamente al 50%**. Nel percorso generativo §7.3, M è facoltativo e si approva prima dello spritesheet solo quando serve a chiarire il passaggio; non è un requisito universale.
+3. **Inbetween:** disegno aggiuntivo fra key e breakdown o fra due pose già valide, per ottenere lo spacing desiderato. Lo spritesheet può produrre più intermedi insieme dopo l’approvazione dei riferimenti (§7.3). La generazione di un singolo inbetween è disponibile per riparazioni mirate (§7.4), non è la procedura predefinita.
 
-**Blocking prima della rifinitura:** ricavare dalle pose principali una bozza dell'azione completa; verificare ritmo, silhouette, direzione e gerarchia del movimento alla **dimensione reale nel gioco**, prima di moltiplicare il numero di immagini o aggiungere texture fini. Nel rendering finale usare pose effettivamente disegnate, senza deformazioni mesh/rig improprie (sezione 3.1).
+**Blocking prima della rifinitura:** ricavare dalle pose principali una bozza dell'azione completa; verificare ritmo, silhouette, direzione e gerarchia del movimento alla **dimensione reale nel gioco**, prima di moltiplicare il numero di immagini o aggiungere texture fini. Nel rendering finale usare pose disegnate o prodotte dal rig validato secondo §3.1, verificando anatomia e materiali.
 
 **Principi professionali applicati con giudizio fisico:**
 
@@ -226,7 +281,7 @@ Un ciclo con pochi disegni ben temporizzati può essere migliore di uno con molt
 
 ### 5.5 Controlli di disegno professionali: flip, onion skin e silhouette
 
-A ogni key e breakdown, e periodicamente sugli inbetween:
+Dopo la normalizzazione obbligatoria di ogni output (§4.1), controllare ogni key, breakdown e inbetween:
 
 1. Eseguire **flip/alternanza rapida** tra pose adiacenti e controllo **onion skin** semitrasparente su corpo e giunti. Lo scopo è scoprire drift del pivot, parti che cambiano lunghezza, tremolio di contorni e salti tra livelli.
 2. Sovrapporre landmark/traiettorie nella medesima referenza geometrica; dichiarare quando i landmark sono annotati manualmente o solo stimati. Il generatore di immagini **non** fornisce automaticamente uno scheletro verificato.
@@ -277,22 +332,22 @@ La distinzione sinistra/centro/destra è **anatomica**, riferita alla creatura; 
 
 1. **Analizzare gli asset già approvati** e registrare i riferimenti. Non prendere come nuova fonte una variante respinta.
 2. **Bloccare gli invarianti:** anatomia, rapporti dimensionali, stile, camera, pivot e palette.
-3. **Preparare schema articolare e ancoraggi** (almeno una scheda o tracciato con nomi persistenti), senza introdurre skinning o mesh animate come metodo sostitutivo.
-4. **Disegnare i keyframe**; controllare anatomia, sovrapposizioni e silhouette.
-5. **Disegnare gli intermedi** usando riferimenti anatomici costanti e keyframe approvati; non generarli deformando la singola immagine statica. Confrontare sistematicamente frame adiacenti.
+3. **Preparare schema articolare e ancoraggi**, scegliere la tecnica e documentare la prova §3.1 prima della produzione completa.
+4. **Preparare e approvare A/B**, con M facoltativo quando serve a chiarire il movimento; controllare anatomia, sovrapposizioni e silhouette (§7.3).
+5. **Generare lo spritesheet completo** dai riferimenti approvati; estrarre e allineare le pose, montare la GIF e correggere solo celle/intervalli difettosi. Per un rig scelto esplicitamente, esportare il ciclo validato. Approvare la sequenza completa prima dell’integrazione.
 6. **Creare gli effetti su livelli separati**, quando tecnicamente fattibile, collegati agli ancoraggi al runtime.
 7. **Montare e riprodurre l'azione** alla velocità effettiva, verificando onset, durata e recupero.
 8. **Controllare la qualità** con overlay/onion skin, controlli geometrici e riproduzione integrale.
 9. **Esportare e integrare** foglio sprite, eventuali effetti e metadati; non rimpiazzare asset approvati prima della revisione.
 10. **Acquisire prove reali** dal browser o dalla build pertinente e preparare la PR per approvazione.
 
-Quando la tecnologia di generazione non garantisce vincoli esatti, eseguire correzioni mirate ai **disegni dei frame**, eventualmente componendo livelli statici coerenti; non usare la composizione per introdurre un rig deformabile nascosto. **La qualità verificata prevale sulla comodità di generare l'intera spritesheet in un solo passaggio**.
+Quando il generatore non rispetta i vincoli, correggere i disegni responsabili o rivalutare la tecnica secondo §3.1. Non introdurre rig nascosti né cambiare metodo senza registrarlo. **La qualità verificata prevale sulla comodità di una generazione unica**.
 
 ### 7.1 Gate di approvazione e fallback non autorizzati
 
 Per una **nuova animazione complessa**, procedere in due fasi verificabili:
 
-1. **Fase artistica:** storyboard, pose chiave, fotogrammi intermedi e spritesheet completo. Presentare i frame rappresentativi e ottenere l'approvazione **prima** di integrarli.
+1. **Fase artistica:** scelta della tecnica, storyboard, pose chiave, intermedi e ciclo completo; file sorgente del rig quando impiegato. Presentare i frame rappresentativi e ottenere l'approvazione **prima** di integrarli.
 2. **Fase tecnica:** implementare playback, timing, transizioni, eventi, camera e collisioni sul materiale approvato; raccogliere una **GIF reale** dal browser e screenshot dei punti critici, secondo AGENTS.md.
 
 Non dichiarare «animazione completata» perché il codice gira o supera test unitari. Se non è possibile generare i frame approvabili, fermare la parte artistica, elencare gli asset mancanti e proporre alternative **solo come opzioni da approvare**. Non sostituire tacitamente con rig, mesh, CSS transform, deformazioni, un'animazione temporanea spacciata per finale o ripetizioni di un frame.
@@ -301,18 +356,18 @@ Per correzioni minori a un effetto già approvato, evitare burocrazia inutile: a
 
 ### 7.2 Workflow operativo ChatGPT → Codex: dalla creazione del personaggio all'animazione
 
-**Divisione dei ruoli:** ChatGPT e gli strumenti di creazione/modifica immagini producono e correggono **una posa per volta** per anatomie articolate; Codex è responsabile di automazione, controlli, impacchettamento e integrazione nel motore. Codex **non** deve improvvisare il disegno anatomico tramite trasformazioni runtime. Le immagini generate dall'IA possono presentare variazioni tra frame e richiedono revisione o ritocco: non presumere coerenza automatica solo perché condividono il prompt.
+**Divisione dei ruoli:** gli strumenti grafici producono e correggono i disegni; Codex può preparare e animare un rig secondo §3.1, automatizzare controlli, esportazione e integrazione. La tecnica scelta e i limiti degli strumenti devono essere dichiarati. Le immagini generate richiedono verifica: condividere il prompt non garantisce coerenza.
 
 | Fase | Responsabile principale | Output obbligatorio | Gate prima della fase successiva |
 | --- | --- | --- | --- |
 | 0. Audit del gioco | ChatGPT + Codex | Analisi reale di camera, viewport, profondità, ruolo, asset canonici, rendering, screenshot e scala finale (sezione 2.1) | Scheda contestuale verificata, ipotesi segnalate |
 | 1. Brief e vincoli | ChatGPT + utente | Scheda del soggetto: identità, anatomia/parti, silhouette, materiali, palette, prospettiva, risoluzione effettiva, azioni richieste | Requisiti fissati |
 | 2. Design canonico | ChatGPT + strumento immagini | Immagine di riferimento approvata e, se necessario, viste ortogonali/tre quarti e dettagli; percorso/versione asset | **Approvazione del design statico**, senza redesign nelle fasi successive |
-| 3. Blocking, key e timing | ChatGPT | Storyboard, estremi A/B, silhouette, traiettorie/landmark e **X-sheet** (durate, eventi, direzione, easing); anticipazione/follow-through se pertinenti | Approvazione del piano di movimento e dei tempi |
-| 4. Key e breakdown incrementali | ChatGPT + editing immagini | **Un PNG alla volta**: A, B, poi breakdown del percorso anatomico; prompt e reference registrati; canvas/scala coerenti | Verifica delle singole pose estreme e del percorso prima di procedere |
-| 5. Inbetweening selettivo | ChatGPT + editing/ritocco assistito | **Un frame per chiamata** fra pose approvate; flip/onion skin, refiner solo sugli intervalli critici, aggiornamento X-sheet e report difetti | **Approvazione dei singoli PNG e del loop locale**; niente warp/mesh/rig come surrogato |
+| 3. Blocking, tecnica e timing | ChatGPT + Codex | Scelta §3.1, prova A/B e M eventuale (breakdown/percorso obbligatori se si sceglie un rig), traiettorie, X-sheet e confronto alla scala reale | Piano verificato e problemi espliciti |
+| 4. Riferimenti A/B ed eventuale M | Strumenti grafici + Codex | A e B coerenti; M solo se utile; originali, allineamento §4.1 e GIF diagnostica | Approvazione esplicita di tutti i riferimenti usati prima dello spritesheet |
+| 5. Spritesheet completo e correzioni | Strumenti grafici + Codex | Tavola generata da A/B ed eventuale M; celle estratte e allineate; retake mirati e GIF completa | Verifica di tutte le pose e approvazione del loop corretto; nessuna approvazione separata obbligatoria per ogni cella iniziale |
 | 6. Preparazione tecnica | Codex | Asset finali impacchettati in spritesheet/atlante, metadata per frame (durata, canvas, pivot, ancoraggi, evento), nomi e versioni stabili | Controlli di dimensioni, trasparenza, margini, tagli, allineamento e riferimenti |
-| 7. Implementazione runtime | Codex | Riproduzione dei frame disegnati, macchina a stati, transizioni, effetti legati agli ancoraggi, velocità e spostamento nel mondo, telecamera separata | Test di timing indipendente da FPS, input, pause, persistenza, collisioni |
+| 7. Implementazione runtime | Codex | Riproduzione dell'atlante, oppure rig runtime motivato §3.1; stati, eventi, ancoraggi e camera separata | Timing, input, pause, persistenza, collisioni e prestazioni |
 | 8. Validazione reale e consegna | Codex + ChatGPT + utente | GIF **acquisita dal gioco nel browser**, screenshot dei punti chiave, test desktop/mobile, PR con diff ed evidenze | Approvazione esplicita **prima** del merge |
 
 #### Regole di handoff e responsabilità
@@ -320,7 +375,7 @@ Per correzioni minori a un effetto già approvato, evitare burocrazia inutile: a
 - **Una sola azione alla volta.** Un personaggio può richiedere atlas separati per idle, camminata, corsa, attacco, morso, morte e raccordi. Non costruire tutta la pipeline prima che almeno un'azione completa sia stata approvata.
 - **Il riferimento approvato è immutabile per default.** Ogni nuova posa deve derivarne per identità e anatomia; eventuali variazioni del design richiedono approvazione separata.
 - **Una singola immagine non è uno spritesheet funzionante.** Per azioni anatomiche complesse produrre effettivamente le pose; una griglia artificiale di duplicati o ritagli deformati non soddisfa la consegna.
-- **Ritaglio e atlas non equivalgono al disegno.** Codex può automatizzare import, crop, padding, ordinamento dei PNG, naming, packing e generazione di JSON, ma non è autorizzato a creare movimento piegando o scalando le parti del soggetto.
+- **Ritaglio e atlas non equivalgono al movimento.** L'impacchettamento non dimostra che il ciclo sia corretto; se si usa un rig, conservare sorgenti e decisione §3.1.
 - **Controllo alla scala finale.** Verificare a dimensione di gioco leggibilità delle silhouette, qualità dei dettagli e continuità; il file ad alta risoluzione da solo non attesta qualità nel renderer.
 - **Ancoraggi e allineamento.** Piedi, ruote e contatti utilizzano coordinate e pivot per-frame coerenti; lo spostamento nel mondo non viene disegnato duplicando coordinate nello spritesheet. Il renderer posiziona ogni frame sul medesimo riferimento.
 - **Materiali prima del movimento.** Una testa/arto si articola anatomicamente; un telaio metallico si muove rigidamente, mentre le sospensioni e gli pneumatici lavorano in modo differenziato. Non trasferire squash/stretch da un soggetto organico a un veicolo.
@@ -334,27 +389,30 @@ Per **Cerbero** creare distinte sequenze disegnate di locomozione, slancio, emis
 
 Per **i veicoli** mantenere stabile la sagoma rigida della carrozzeria; animare ruote, sospensioni, inclinazioni del telaio e spostamento rispetto al mondo. Vietata la contrazione/dilatazione orizzontale del mezzo per simulare velocità.
 
-### 7.3 Strategia di generazione: una posa per volta come default
+### 7.3 Procedura predefinita: A/B, M facoltativo, spritesheet completo e correzioni
 
-**Precedenza esplicita (rettifica della v5):** per personaggi, creature, anatomie complesse e veicoli con parti articolate **non** richiedere al generatore l'intero spritesheet come prima operazione. Il flusso autorizzato è: design canonico → key/extremes A e B **una per volta** → breakdown che definisce la traiettoria → singoli inbetweens ricorsivi, uno per chiamata → verifica → atlante. **Non saltare i gate** per produrre più velocemente un output finale.
+**Precedenza esplicita — disposizione utente del 30/10/2026.** Questo percorso sostituisce l'obbligo generale di generare e approvare ogni intermedio singolarmente. Non si parte dallo spritesheet senza riferimenti: si approvano prima A/B ed eventuale M, poi si genera la tavola completa. Le pose della tavola restano candidate fino alla verifica del ciclo.
 
-**Quando è ammessa una generazione multiposa?** Solo come studio esplorativo esplicitamente etichettato (non come asset approvato) oppure per sequenze elementari/effetti non anatomici dopo valutazione dei rischi, **mai** al posto della generazione incrementale concordata per un asset. Anche una griglia molto convincente non equivale a una verifica di continuità anatomica.
+1. **Generare A e B.** Definire i due estremi dello stesso soggetto e della stessa azione, con camera, proporzioni, palette, materiali e dettagli persistenti coerenti. È ammessa una tavola con due estremi oppure A seguita da B usando A come reference. Estrarre, allineare e verificare ciascuno: l'approvazione di A non approva automaticamente B. Se una posa è errata, conservare quella valida e correggere l'altra.
+2. **Valutare M, senza renderlo obbligatorio.** Aggiungerlo quando serve a chiarire arco, piega delle membrane, articolazioni, cambio di faccia visibile o occlusioni. M descrive come attraversare il passaggio e non deve necessariamente coincidere con metà tempo o metà spostamento. Se A/B bastano, procedere senza M; registrare la decisione.
+3. **Approvare i riferimenti.** Mostrare A/B ed eventuale M normalizzati e una GIF diagnostica. Ottenere l'approvazione dei riferimenti effettivamente usati prima di generare il ciclo. Riutilizzare approvazioni già espresse nella sessione: non richiederle di nuovo per gli stessi file invariati. L'alternanza A/B è una prova dei riferimenti, non un ciclo fluido già realizzato.
+4. **Generare lo spritesheet completo.** Fornire realmente al generatore A/B e M se presente, insieme alla reference canonica. Dichiarare azione, numero di pose motivato da durata e scala finale, ordine di lettura, griglia, estremi da raggiungere, percorso, camera, proporzioni, dettagli persistenti, canvas comune, margini e alpha richiesto. Chiedere pose complete e distinte, senza sovrapposizioni, tagli, testo o cambio di design. Non promettere che il generatore copierà esattamente i riferimenti o rispetterà conteggio e griglia: controllare l'output. Se lo strumento non riceve tutte le reference, dichiararlo e predisporre una tavola di riferimento utilizzabile; non attestare input mai forniti.
+5. **Estrarre, allineare e montare.** Conservare l'originale, separare le celle reali senza presumere una griglia perfetta, applicare §4.1 usando il corpo e i pivot, verificare alpha e margini, quindi produrre una GIF con tempi dichiarati. Controllare tutte le pose, gli estremi rispetto ad A/B, l'eventuale passaggio M, anatomia, materiali, palette, dettagli persistenti e raccordi. Uno spritesheet appena generato non è automaticamente approvato.
+6. **Correggere lo spritesheet.** Individuare le celle difettose e preservare quelle valide. Rimuovere duplicati involontari solo se il movimento rimane continuo; distinguere un duplicato spurio da un hold intenzionale rappresentato con la durata. Riordinare pose fuori sequenza, correggere crop/padding/scala globale e palette dove giustificato; per errori anatomici, estremi mancanti o salti, rigenerare o ritoccare la sola posa/intervallo responsabile con i riferimenti e i due vicini. Non deformare parti corporee per nascondere il difetto. Se la rimozione lascia un salto, creare il frame mancante. Rigenerare l'intera tavola solo se i difetti sono diffusi, motivandolo; non reintrodurre automaticamente la produzione incrementale di tutti i frame.
+7. **Approvare il ciclo corretto.** Dopo ogni revisione produrre la GIF completa aggiornata; per retake locali mostrare anche il passaggio interessato. Annotare ordine effettivo, durate, pose rimosse/sostituite e limiti residui. Ottenere l'approvazione della sequenza prima dell'integrazione. Per un movimento reversibile usare A→…→B→…→A senza duplicare gli estremi; per movimenti asimmetrici produrre il ritorno necessario (§7.4).
+8. **Esportare e verificare nel gioco.** Salvare frame/atlas, metadati, prompt effettivi, riferimenti e decisioni; integrare e acquisire la GIF reale del browser secondo AGENTS.md. L'approvazione della GIF locale non attesta il corretto rendering nel motore.
 
-**Output del singolo passaggio:** un PNG del soggetto completo e isolato, senza scena, testo o griglia; preferire il canale alpha reale quando disponibile e verificabile. Stesso orientamento, proporzioni, camera, stile, coordinate del pivot, ingombro comprensivo di margine. Salvare reference, prompt effettivo, risultato e criterio di accettazione nella cartella per-asset definita in §8.1 **prima del passo successivo**.
+**Limiti conservati.** Nessuna garanzia di corrispondenza al 100%, anatomia corretta, alpha reale o assenza di duplicati. La generazione completa è un passaggio di produzione sottoposto a correzione e revisione. Rig e tecnica mista restano disponibili secondo §3.1; non sono fallback taciti dopo un risultato insoddisfacente.
 
-**Atlante finale:** soltanto dopo aver approvato i singoli PNG, Codex li ordina, allinea su pivot, aggiunge margini, esporta atlas e JSON di tempi/ancoraggi, produce GIF locale e verifica alpha/ritagli. La riproduzione nel gioco sarà attestata da **GIF registrata dal browser** come da AGENTS.md.
+### 7.4 Riparazioni mirate, temporizzazione e verifica misurabile
 
-**Soglia di fallimento:** sfondo illustrato invece di alpha, redesign, arti flottanti, estremo non raggiunto, più pose quando se ne richiedeva una, parti tagliate o anatomia errata = **tentativo respinto**, non «quasi pronto». Correggere un solo vincolo difettoso per iterazione; conservare errore e prompt per tracciabilità. Non produrre una nuova tavola di 12–16 pose come rimedio a una singola posa fallita.
+**Ambito e precedenza.** Il percorso ordinario è §7.3. L'inbetweening ricorsivo è una tecnica opzionale per riparare una lacuna dello spritesheet, non un requisito prima di generarlo. Per intervalli risolti dal rig si verificano percorso e tempi senza imporre nuove generazioni.
 
-### 7.4 Inbetweening ricorsivo adattivo e verifica misurabile
+**1. Localizzare il difetto.** Indicare frame, intervallo, riferimenti validi e problema osservato: salto, duplicato, anatomia, dettaglio scomparso o estremo non raggiunto. Non modificare A/B approvati per adattarli a una posa sbagliata.
 
-**Ambito e precedenza.** Questa è la **procedura ordinaria obbligatoria** per azioni articolate (§7.3): key pose A/B prima, breakdown espliciti, poi generazione ricorsiva di singoli inbetweens, un'immagine per chiamata. Il metodo della v5 basato su un'intera spritesheet generata subito è superato per queste azioni. Non è necessario generare tutti i frame in una sola richiesta. Per cicli reversibili semplici è sufficiente disegnare una sola tratta e riprodurla anche al contrario; per azioni non reversibili disegnare tratte distinte.
+**2. Retake del passaggio.** Se serve, generare un singolo disegno usando i due vicini validi e A/B (M quando presente). Il disegno deve essere anatomicamente corretto, non una fusione, crossfade o warp. Aggiungere un breakdown solo se chiarisce un arco ancora ambiguo.
 
-**1. Pose estreme.** Disegnare e approvare A e B, per esempio ali in massima elevazione e massima discesa. Annotare reference, camera, pivot, articolazioni, materiali, angoli e coordinate indicative. Le due pose devono riguardare **lo stesso identico soggetto** e la medesima vista.
-
-**2. Breakdown prima degli intermedi.** Pianificare e approvare la posa di passaggio che esplicita l'arco anatomico fra A e B; successivamente generare M fra due pose di riferimento approvate come *nuovo disegno anatomicamente corretto*, non come fusione, crossfade, interpolazione dei pixel o mesh warping. La posizione temporale di M può essere 50%, 25%, 70% o altra frazione motivata dalla dinamica; **metà del tempo non implica metà dello spostamento**.
-
-**3. Suddivisione selettiva.** Analizzare A→M e M→B e ripetere solo dove esistono discontinuità o lacune visivamente rilevanti. Non imporre suddivisioni uniformi o potenze di due: negli intervalli lenti si possono usare più pose ravvicinate o durate più lunghe, in quelli rapidi meno pose o durate più brevi, purché leggibilità, continuità e tempo totale siano preservati.
+**3. Suddivisione selettiva.** Dividere nuovamente solo l'intervallo che resta discontinuo. Non imporre potenze di due o un numero universale di pose; preservare durata complessiva, leggibilità e parti valide. Se la tavola funziona dopo estrazione, rimozione dei duplicati e allineamento, non aggiungere intermedi senza motivo.
 
 **4. Inversione quando lecita.** Per un battito d'ali semplificato e dichiaratamente reversibile usare A→…→B→…→A, riutilizzando i frame intermedi all'indietro **senza duplicare gli estremi nel ciclo**. La risalita può avere timing differente dalla discesa. Se aerodinamica, piegamento delle membrane, inerzia, anticipazione o follow-through richiedono pose differenti, l'inversione è un prototipo e occorre disegnare il ritorno separatamente.
 
@@ -381,8 +439,8 @@ Per **i veicoli** mantenere stabile la sagoma rigida della carrozzeria; animare 
 
 - Analizzare la sequenza preesistente e registrare il risultato come **baseline**, distinguendo dati calcolati da valutazioni artistiche.
 - Selezionare due estremi anatomicamente corretti (ali alte/ali basse); se la sequenza preesistente non ne contiene uno, **non spacciarla per completa** e creare il nuovo estremo.
-- Generare almeno una posa mediana effettiva fra i due estremi approvati; verificare spalle, ossa alari, membrane, corpo, coda, testa e prospettiva.
-- Costruire un primo loop con riproduzione in avanti e all'indietro, timestamp documentati e senza frame estremi duplicati nel passaggio.
+- Valutare M facoltativo; approvare A/B e M se creato, poi generare lo spritesheet completo usando questi riferimenti. Verificare spalle, ossa alari, membrane, corpo, coda, testa e prospettiva in ogni cella.
+- Correggere le celle difettose e rimuovere duplicati involontari solo senza lasciare salti; montare A→B→A quando reversibile, con tempi documentati e senza estremi duplicati. Il risultato del diavolo di questa sessione è un esempio pratico, non una garanzia generale del generatore.
 - Produrre estrazione PNG, GIF e report di misure/limiti; **nessuna integrazione nel gioco e nessun merge prima dell'approvazione**.
 
 ### 7.5 Capacità e limiti operativi del generatore di immagini
@@ -396,23 +454,25 @@ Le istruzioni sono formulate in base a ciò che un generatore di immagini **può
 | Generare un inbetween | Fornire **entrambe** le pose approvate e l'intento di movimento, chiedendo **una sola** posa intermedia disegnata | Interpolazione geometrica esatta al tempo t, movimento 3D corretto o determinismo |
 | Fondo trasparente | Richiedere PNG con alpha quando supportato | L'alpha reale: verificare il file, non fidarsi della scacchiera apparente |
 | Controllare traiettoria | Descrivere spalle/giunti, archi e occlusioni, eventualmente aggiungere una scheda di costruzione | Obbedienza millimetrica, coordinate verificabili o vincoli biomeccanici incorporati |
-| Generare più pose | Possibile per **bozzetti esplorativi** oppure effetti semplici non articolati | Una spritesheet pronta o un set di frame indipendenti con anatomia garantita |
+| Generare più pose | A/B iniziali e spritesheet completo dopo approvazione di A/B ed eventuale M (§7.3) | Coerenza garantita, estremi esatti, conteggio, alpha, assenza di duplicati o tavola già pronta al runtime |
 | Timing, pivot, tests | Il modello può **proporre** tempi/ancoraggi, non certificarli | Misura oggettiva senza landmarks e strumenti; spettano a script, editor e revisione |
 | Correggere un errore | Modificare **un frame** indicando l'elemento responsabile (ala, membrana, effetto) e ciò che resta invariato | Assenza di modifiche collaterali: ogni retake va confrontato con il precedente |
 
 **Regola delle istruzioni:** chiedere esplicitamente **una** immagine quando il gate richiede una posa, e dichiarare fase, estremi visivi, quota o orientamento richiesto e parti intoccabili. Non scrivere «16 frame», «spritesheet» o «tutte le fasi» nella richiesta che mira a un singolo disegno. Non inviare prompt generici che permettano al generatore di reinterpretare il soggetto senza ancoraggi. Quando lo strumento non accetta realmente due immagini in un'unica operazione, **non** dichiarare di aver usato entrambe; produrre una scheda di confronto o usare un editor/strumento che supporti il caso.
 
-**Regola del retake:** dopo un esito non conforme non avanzare alla fase successiva. Identificare **il difetto principale**, mantenere il riferimento corretto, riscrivere il prompt per il solo frame fallito e chiedere nuovamente la medesima posa. Limitare tentativi ripetitivi con lo stesso prompt senza nuove informazioni; se non si raggiunge la posa, segnare il blocco e usare un editor di sprite o un artista per il ridisegno prima di proseguire. Non trasformare una prova fallita in un attestato di «metodo ricorsivo non riuscito» se la procedura non è stata eseguita.
+**Regola del retake:** dopo un esito non conforme non avanzare all’approvazione o all’integrazione; applicare prima le correzioni dello spritesheet §7.3 senza scartare le celle valide. Identificare **il difetto principale**, mantenere il riferimento corretto, riscrivere il prompt per il solo frame fallito e chiedere nuovamente la medesima posa. Limitare tentativi ripetitivi con lo stesso prompt senza nuove informazioni; se non si raggiunge la posa, segnare il blocco e usare un editor di sprite o un artista per il ridisegno prima di proseguire. Non trasformare una prova fallita in un attestato di «metodo ricorsivo non riuscito» se la procedura non è stata eseguita.
 
 **Tracciabilità reale:** salvare il **testo di istruzione esplicito** e i riferimenti realmente forniti; se il servizio non espone il prompt interno o altri parametri, dichiarare il limite nel log, senza inventare un prompt retrospettivo. L'output del generatore è un **candidato da validare**; Codex controlla bitmap/tempi/packing e l'utente approva i risultati artistici. Queste condizioni valgono anche quando il modello produce immagini visivamente persuasive.
 
-### 7.6 GIF incrementale obbligatoria a ogni fotogramma (30/10/2026)
+### 7.6 GIF dei riferimenti, dello spritesheet e dei retake (30/10/2026)
 
-Disposizione utente: «per ogni fotogramma che crei produci una GIF che mostra la transizione da uno all'altro».
+La disposizione precedente sulle GIF dopo ogni fotogramma è applicata al nuovo flusso: GIF diagnostica per A/B ed eventuale M; una GIF del ciclo per ogni spritesheet generato o corretto; dettaglio del passaggio per i retake locali. Non occorre una consegna separata per ciascuna cella estratta dalla stessa tavola.
 
-- Dopo ogni PNG candidato nuovo o corretto, prima di chiedere approvazione o generare il successivo, produrre e mostrare una GIF ricavata dai PNG effettivi: alternanza della nuova posa e del riferimento/adiacente pertinente e, quando disponibile, sequenza progressiva aggiornata. Per gli inbetween mostrare entrambi i vicini.
-- Allineare il pivot corporeo con traslazione rigida e padding comuni; conservare scala e proporzioni. Non ridimensionare ciascuna sagoma indipendentemente per riempire il riquadro. Registrare offset e metodo; eventuali landmark stimati restano dichiarati tali.
-- Nessuna dissolvenza, morphing, mesh o deformazione per simulare fotogrammi mancanti. Distinguere una GIF diagnostica a due estremi, che può mostrare salti, dal loop finale con timing approvato.
+Per il rig, mostrare la prova dopo ogni revisione significativa del movimento e per ogni nuova posa chiave candidata; il campionamento automatico di molti frame nello stesso export non richiede una GIF diversa per ciascun campione. Conservare la GIF del ciclo completo effettivo e l'origine degli output. Questa prova resta distinta dalla registrazione del browser dopo l'integrazione.
+
+- Dopo ogni revisione di A/B o M mostrare la GIF diagnostica pertinente prima del gate dei riferimenti. Dopo la generazione o correzione dello spritesheet mostrare il ciclo completo ricavato dalle celle effettive, e per un retake locale anche i due vicini. Non imporre GIF/approvazioni separate per tutti gli intermedi prodotti insieme.
+- Prima di ogni GIF di output generativi eseguire l'allineamento globale obbligatorio del §4.1: riferimenti corporei stabili, scala uniforme, padding comuni e trasformazioni documentate. Non adattare separatamente arti o sagome per mascherare difetti.
+- Nelle GIF diagnostiche dei PNG nessuna dissolvenza, morphing o warp per fingere fotogrammi mancanti. Distinguere l'alternanza di due estremi dal ciclo completo. Per prove di rig mostrare il movimento effettivamente calcolato dal rig validato, dichiarandolo e conservandone il sorgente; nessuna interpolazione inventata per nascondere errori.
 - Documentare PNG sorgenti, versione, stato candidato/respinto/approvato, ordine, durate, scala e correzioni. Mostrare anche i tentativi respinti quando servono a capire il difetto. La GIF locale non sostituisce la GIF browser dopo l'integrazione.
 - Confrontare esplicitamente lunghezza e numero dei segmenti delle ali e degli arti, dimensioni del corpo e topologia delle membrane. Fori, strappi e segni distintivi seguono lo stesso lembo di membrana tra pose; non spariscono o si rigenerano casualmente.
 - Dopo un difetto tecnico o anatomico, segnare la posa respinta e non usarla come base approvata per gli intermedi. Correggere il riferimento se la richiesta modifica anche il design; poi ottenere l'approvazione della revisione.
@@ -422,7 +482,7 @@ Disposizione utente: «per ogni fotogramma che crei produci una GIF che mostra l
 La consegna può comprendere, secondo le necessità:
 
 - reference sheet canonico e sua revisione;
-- scheda di rig/ancoraggi con identificatori non ambigui;
+- scheda di rig/ancoraggi con identificatori non ambigui; se si usa un rig, sorgente modificabile, livelli, mesh/pesi, limiti e curve temporali secondo §3.1;
 - keyframe approvati e sprite sheet finale con frame omogenei;
 - livelli separati per fuoco, particelle, impatti e altre emissioni;
 - metadati per durata dei frame, pivot, origine, bounding box e ancoraggi;
@@ -465,7 +525,7 @@ Questa procedura è **vincolante** quando si crea, si modifica o si rigenera un 
 1. Prima di generare il primo candidato dell'asset, creare un **branch temporaneo** dal `main` aggiornato, nominato `asset/<soggetto>-<azione>-vN` (per esempio `asset/diavolo-volante-volo-v1`). Un branch per asset/azione coerente, **non** uno per ogni fotogramma; le altre lavorazioni rimangono isolate.
 2. Creare una PR **in bozza** per consentire il monitoraggio della cronologia dei commit. Il branch non è permanente e la PR rimane non mergiata fino all'approvazione esplicita dell'utente.
 3. Prima di qualunque nuova generazione, salvare nel branch **il prompt che verrà effettivamente inviato**, associato alla sua versione e ai file di riferimento. Dopo l'esito, salvare il risultato, i dati disponibili del generatore e la valutazione. Non aggiornare retroattivamente il testo per farlo sembrare conforme al risultato.
-4. Eseguire le generazioni in maniera **incrementale**, rispettando §7.4: A, B, poi **un** intermedio M alla volta; ogni tentativo come nuova versione tracciata. La presenza della cartella non autorizza a ripiegare su una spritesheet completa.
+4. Procedere per checkpoint secondo §§3.1 e 7.3–7.4: A/B, M eventuale, approvazione dei riferimenti, spritesheet completo, correzioni mirate e approvazione del ciclo. Tracciare ogni tentativo e la corrispondenza fra tavola, celle estratte e retake. Rig e tecnica mista seguono la decisione registrata.
 5. Terminati i controlli, approvazione esplicita → merge della PR → eliminazione del branch temporaneo. **Solo `main` rimane permanente.** In caso di lavoro abbandonato, chiudere la PR e valutare quali registrazioni o immagini occorra preservare nel `main` prima di cancellare il branch.
 
 **Struttura standard da creare nel branch** (adattare solo quando il repository usa già una struttura equivalente; non duplicare asset canonicali):
@@ -501,7 +561,7 @@ assets/hell-race/production/<slug-asset>/
 
 `references/` può contenere una copia controllata o un **rimando verificabile** a un asset già presente, con path e SHA/versione; non serve duplicare grandi file. `approved/` contiene **solo** immagini esplicitamente approvate. Le GIF locali provano il loop dei PNG, mentre la GIF catturata dal browser è richiesta **dopo l'integrazione**, come da AGENTS.md.
 
-**README obbligatorio.** Documentare soggetto e azione, ruolo, posizione e piano della scena, orientamento della camera, scala effettiva, immagine canonica, limiti anatomici, stato (concept / A / B / M / ciclo / integrazione), decisioni di approvazione e problemi noti. Non descrivere «approvato» un candidato soltanto perché è stato generato.
+**README obbligatorio.** Documentare tecnica scelta, prova §3.1, eventuale generazione A/B congiunta e relativi esiti individuali, soggetto e azione, ruolo, posizione e piano della scena, orientamento della camera, scala effettiva, immagine canonica, limiti anatomici, stato (concept / A / B / M / ciclo / integrazione), decisioni di approvazione e problemi noti. Non descrivere «approvato» un candidato soltanto perché è stato generato.
 
 **Prompt: registrazione rigorosa e riproducibile.** Ogni `prompts/NNN_<fase>.md` deve indicare:
 
@@ -517,7 +577,7 @@ assets/hell-race/production/<slug-asset>/
 
 Se il generatore combina automaticamente contesto visivo o istruzioni non esposte, **non affermare di aver registrato il prompt interno completo**: salvare fedelmente l'istruzione esplicita disponibile e indicare quali dettagli dell'elaborazione non sono accessibili. Se il prompt esatto di un risultato storico non è recuperabile, marcarlo **«prompt non disponibile»**; una ricostruzione non può essere presentata come originale.
 
-**Manifest e collegamenti.** `manifest.json` collega ogni PNG al suo prompt ID, riferimento sorgente, versione, SHA ove disponibile, stato e posizioni/durate previste. Ogni frame approvato deve avere una catena navigabile **input → prompt → PNG candidato → verifica → approvazione → atlas/loop**. Per le generazioni ricorsive, dichiarare anche l'intervallo padre (A–B, A–M ecc.).
+**Manifest e collegamenti.** `manifest.json` collega ogni PNG al suo prompt ID quando generativo, riferimento sorgente, versione, SHA ove disponibile, stato e posizioni/durate previste. Per PNG esportati da rig registrare invece sorgente e revisione del rig, configurazione, tempo campionato, immagini alternative e impostazioni di esportazione: non inventare prompt di generazione per output calcolati. Ogni frame approvato deve avere una catena navigabile **input → prompt → PNG candidato → verifica → approvazione → atlas/loop**. Per la generazione multiposa, più celle possono condividere lo stesso prompt e lo stesso originale: registrare indice/crop della cella, allineamento, ID di eventuali retake e approvazione del ciclo; non inventare una generazione o un’approvazione separata per ogni cella. Per le generazioni ricorsive, dichiarare anche l'intervallo padre (A–B, A–M ecc.).
 
 **Politica di pulizia.** Durante la PR, conservare i PNG candidati collegati a prompt e valutazioni per rendere possibili ispezioni e riproduzioni. Prima del merge rimuovere duplicati identici, output intermedi obsoleti e file voluminosi privi di valore, ma conservare nel `main` **i prompt rilevanti, i frame approvati, i fallimenti diagnostici essenziali e il resoconto delle decisioni**. Se una candidata respinta è indispensabile per capire un errore, non cancellarla senza una copia o un riferimento durevole: dopo l'eliminazione del branch non fare affidamento su commit irraggiungibili. La cronologia Git non sostituisce un registro di prompt accurato.
 
@@ -532,7 +592,7 @@ Se il generatore combina automaticamente contesto visivo o istruzioni non espost
 - [ ] Proporzioni e lunghezze relative non cambiano accidentalmente.
 - [ ] Nessuna testa o parte corporea fluttua senza connessione.
 - [ ] La prospettiva e i punti di appoggio sono coerenti.
-- [ ] La sequenza anatomica complessa è composta da frame realmente disegnati; non da parti ruotate/deformate per sostituire i disegni.
+- [ ] Tecnica motivata secondo §3.1; pose e percorso verificati. Il rig conserva articolazioni, materiali, prospettiva e dettagli; gli intervalli disegnati conservano anatomia e continuità.
 - [ ] Il comportamento di ogni oggetto è coerente con i materiali: nessuno squash/stretch orizzontale della carrozzeria o delle strutture rigide.
 - [ ] Deformazioni, danni e oscillazioni hanno origine fisica leggibile e conseguenze coerenti.
 - [ ] Ogni effetto nasce nel punto corretto, nel momento corretto.
@@ -570,8 +630,8 @@ Classificare il difetto in modo causale:
 | Fiamma lontana dalla bocca | Agganciare il getto alla bocca; non muovere la testa per inseguire il getto. |
 | Testa flottante | Ripristinare l'attacco collo/testa e il percorso articolare, preservando la posa canonica. |
 | Arto scomparso o duplicato | Ricostruire continuità e corretto ordinamento/occlusione, senza cambiare numero di arti. |
-| Forma differente tra frame | Riprendere proporzioni dal rig approvato; rigenerare solo i frame difettosi. |
-| Movimento a scatti | Correggere disegni intermedi, timing o clock; non nascondere il problema con frame ripetuti o warp elastico. |
+| Forma differente tra frame | Confrontare con il modello canonico; correggere il disegno difettoso oppure pivot, pesi o immagini alternative del rig. Ricontrollare i frame che dipendono dalla modifica. |
+| Movimento a scatti | Identificare se dipende da disegni, curve del rig, timing o clock; correggere la causa e verificare il percorso, senza warp elastico che mascheri l'errore. |
 | Morso con testa ruotata o staccata | Ridisegnare la sequenza di pose complete, incluse mandibola, collo e busto, senza ritagli e rotazioni artificiali. |
 | Veicolo che si allunga/accorcia durante la marcia | Eliminare lo squash/stretch e animare ruote, sospensioni e posizione/orientamento del corpo rigido. |
 | Testa o corna tagliate | Adeguare padding o inquadratura senza rimpicciolire arbitrariamente il personaggio. |
@@ -581,17 +641,17 @@ Dopo ogni correzione ricontrollare **il frame interessato e i due adiacenti**, o
 
 ## 11. Istruzione standard per agenti di generazione e Codex
 
-> Genera una nuova sequenza animata di **[PERSONAGGIO]** che esegue **[AZIONE]**, usando **[PERCORSO/RIFERIMENTO APPROVATO]** come modello canonico e **[AZIONE PRECEDENTE, SE PRESENTE]** come riferimento di continuità.  
-> Mantieni identità, anatomia, numero di parti, proporzioni, silhouette, palette, prospettiva, pivot e stile. Non ridisegnare il personaggio per ogni fotogramma.  
-> Definisci schema articolare *solo come riferimento di disegno*, ancoraggi funzionali, pose chiave, temporizzazione e transizioni prima di **disegnare** gli intermedi. Non usare mesh, skinning, rig runtime, rotate/scaleX/scaleY/skew di ritagli corporei come sostituti dello spritesheet. Nessuna testa o parte corporea può fluttuare o cambiare attacco senza motivazione anatomica.  
-> Ogni effetto deve partire dal punto anatomico corretto e seguirlo; una fiammata parte dalla bocca relativa, non da coordinate arbitrarie. Se l'effetto è fuori posizione, correggi **l'effetto** e non spostare la parte anatomica corretta per inseguirlo.  
-> Per azioni articolate **produci una sola posa per generazione**: estremi A e B, breakdown e poi inbetween solo negli intervalli necessari; non chiedere una spritesheet intera per saltare l'approvazione. Produci il numero finale di fotogrammi realmente richiesto dal blocking e dall'X-sheet, con raccordi fluidi; mantieni scala e coordinate coerenti, evitando tagli, drift e salti. Rispetta i materiali: le strutture metalliche non si contraggono né si dilatano per simulare la marcia; usa ruote e sospensioni. Preferisci livelli separati per emissioni ed effetti quando possibile.  
-> Presenta prima keyframe e controllo anatomico, poi sequenza completa. Verifica frame adiacenti, continuità, punti di emissione e rendering reale. Non sostituire asset approvati e non eseguire merge senza approvazione.  
+> Genera una nuova sequenza animata di **[PERSONAGGIO]** che esegue **[AZIONE]**, usando **[PERCORSO/RIFERIMENTO APPROVATO]** come modello canonico e **[AZIONE PRECEDENTE, SE PRESENTE]** come riferimento di continuità.\
+> Mantieni identità, anatomia, numero di parti, proporzioni, silhouette, palette, prospettiva, pivot e stile. Non ridisegnare il personaggio per ogni fotogramma.\
+> Applica il percorso generativo predefinito §7.3; se scegli rig o tecnica mista secondo §3.1, registra motivazione e prova con estremi, breakdown e percorso. Definisci giunti anatomici, materiali, ancoraggi e tempi; conserva i sorgenti del rig. Nessuna parte deve fluttuare, cambiare attacco o allungarsi senza una causa plausibile.\
+> Ogni effetto deve partire dal punto anatomico corretto e seguirlo; una fiammata parte dalla bocca relativa, non da coordinate arbitrarie. Se l'effetto è fuori posizione, correggi **l'effetto** e non spostare la parte anatomica corretta per inseguirlo.\
+> Genera A e B coerenti, aggiungi M solo se serve a chiarire il passaggio, quindi ottieni l'approvazione di tutti i riferimenti usati. Genera lo spritesheet completo fornendo realmente tali immagini; estrai e allinea le celle, controlla anatomia, estremi e duplicati, monta la GIF e correggi solo pose/intervalli difettosi preservando quelli validi. Non imporre la generazione singola di tutti gli intermedi. L'approvazione dei riferimenti non approva la tavola: mostra e fai approvare il ciclo corretto prima dell'integrazione. La coerenza non è garantita dal generatore.\
+> Presenta prima keyframe e controllo anatomico, poi sequenza completa. Verifica frame adiacenti, continuità, punti di emissione e rendering reale. Non sostituire asset approvati e non eseguire merge senza approvazione.\
 > Segui AGENTS.md e consegna le evidenze effettivamente richieste dalla natura della modifica; non presentare mockup come prove runtime.
 
 ### 11.1 Parametri da valorizzare a ogni nuova azione
 
-**Riferimento canonico;** eventuale animazione precedente; **azione;** orientamento/camera; **durata totale e X-sheet, senza fissare a priori il numero di PNG;** key/breakdown e articolazioni coinvolte; **punti di origine degli effetti;** stile e risoluzione di output; **criteri di loop/raccordo;** file destinazione; **test e preview.**
+**Riferimento canonico;** eventuale animazione precedente; **tecnica scelta e prova §3.1; modalità di produzione A/B §7.3; azione;** orientamento/camera; **durata totale e X-sheet, numero di pose motivato per la richiesta dello spritesheet, M facoltativo;** key/breakdown e articolazioni coinvolte; **punti di origine degli effetti;** stile e risoluzione di output; **criteri di loop/raccordo;** file destinazione; **test e preview.**
 
 I parametri mancanti si derivano dall'asset approvato e dal codice corrente quando disponibili, senza inventare coordinate o misure. Il progetto può procedere per fasi verificabili senza chiedere nuovamente dettagli già documentati.
 
@@ -599,11 +659,11 @@ I parametri mancanti si derivano dall'asset approvato e dal codice corrente quan
 
 Questa sezione riguarda **il documento di lavoro**; per refactoring del codice di gioco restano autoritative le regole di AGENTS.md.
 
-1. **Nome versionato:** PROTOCOLLO_SPRITE_ANIMATI_vN_YYYYMMDD.md, data locale Europe/Rome. Questa edizione è **v9_20261030**.
-2. **Numerazione progressiva:** le revisioni sostanziali producono un **nuovo file** (v2, v3, …). Non sovrascrivere la versione precedente per un cambiamento sostanziale; i ripristini generano una versione successiva, senza decrementare N.
+1. **Nome versionato:** PROTOCOLLO_SPRITE_ANIMATI_vMAJOR.MINOR.PATCH_YYYYMMDD.md secondo AGENTS.md. Questa edizione è **v12.0.0_20261030**, successiva alla v11.0.0; non rinominare retroattivamente le edizioni precedenti.
+2. **Numerazione progressiva:** le revisioni sostanziali producono un **nuovo file** con versione successiva. Non sovrascrivere la versione precedente per un cambiamento sostanziale; i ripristini generano una versione successiva, senza decrementare N.
 3. **Piccole correzioni:** refusi, punteggiatura o collegamenti senza variazioni di significato possono essere corretti nella stessa versione, tracciando il commit.
 4. **Data e stato:** aggiornare data locale, versione, stato e registro modifiche quando nasce una nuova edizione. Distinguere proposta, approvazione e implementazione.
-5. **Conservazione:** mantenere direttamente nella cartella di lavoro **ultima e penultima versione** del documento; le versioni più vecchie rimangono rintracciabili nella cronologia Git. Non cancellare documenti storici di altra famiglia.
+5. **Conservazione:** mantenere direttamente nella cartella di lavoro **ultima e penultima versione** del documento; le versioni più vecchie rimangono rintracciabili nella cronologia Git. Per v10 usare la revisione `afae26867311d25b8c608f7693c4b9f809c66142`, nella quale il file è ancora presente. Per v8/v9 del protocollo, i rimandi di provenienza nel fascicolo del diavolo si riferiscono alla revisione storica `bc96436cebbd6979c871cae36f66475bfbbdf3a1`, dove tali file restano recuperabili; i prompt storici non vanno riscritti. Non cancellare documenti storici di altra famiglia.
 6. **Refactoring editoriale continuo:** dopo aggiornamenti significativi eliminare duplicazioni, sezioni obsolete, contraddizioni, rimandi rotti e istruzioni ormai superate; preservare tutte le regole ancora valide.
 7. **Refactoring strutturale:** programmare una revisione di struttura **al più tardi a ogni decima versione sostanziale** (v10, v20, …), anticipandola se il documento diventa complesso. Una correzione ortografica non fa avanzare il contatore.
 8. **No regressioni normative:** la riorganizzazione editoriale non può cancellare vincoli approvati né cambiarne significato. Prima di sostituire un criterio segnalare esplicitamente il conflitto con le istruzioni precedenti.
@@ -615,13 +675,17 @@ Questa sezione riguarda **il documento di lavoro**; per refactoring del codice d
 | Versione | Data Europe/Rome | Modifica |
 | --- | --- | --- |
 | v1 | 2026-10-29 | Prima stesura: invarianti, scheletro logico e ancoraggi, keyframe, causalità degli effetti, caso Cerbero, pipeline, verifica, correzione mirata, template per agenti, versioning e refactoring. |
-| v2 | 2026-10-29 | Metodo vincolante con pose disegnate; divieto di fallback tramite mesh/rig/stretch per azioni complesse; coerenza fisica dei materiali, carrozzerie rigide, gate di approvazione, controlli e refactoring della terminologia. |\n| v3 | 2026-10-29 | Workflow operativo ChatGPT → Codex dall'ideazione alla GIF reale: ruoli, asset, handoff, gate di approvazione, packaging, materiali, esempio Cerbero e veicoli. |
+| v2 | 2026-10-29 | Metodo vincolante con pose disegnate; divieto di fallback tramite mesh/rig/stretch per azioni complesse; coerenza fisica dei materiali, carrozzerie rigide, gate di approvazione, controlli e refactoring della terminologia. |
+| v3 | 2026-10-29 | Workflow operativo ChatGPT → Codex dall'ideazione alla GIF reale: ruoli, asset, handoff, gate di approvazione, packaging, materiali, esempio Cerbero e veicoli. |
 | v4 | 2026-10-29 | Audit obbligatorio degli asset preesistenti; orientamento della camera, posizione, profondità, ruolo, LOD e scala; scheda contestuale e gate prima della generazione; caso diavoli atmosferici Hellscape. |
 | v5 | 2026-10-29 | Generazione diretta di spritesheet PNG RGBA trasparenti come procedura predefinita; ritaglio dei frame, loop GIF di controllo, verifica alpha e criteri per correggere atlanti illustrativi imperfetti. |
 | v6 | 2026-10-29 | Inbetweening ricorsivo adattivo, doppio estremo A/B, inversione del tratto quando giustificata, timing non uniforme, controlli oggettivi e gate tecnico/artistico, test col diavolo volante. |
 | v7 | 2026-10-29 | Branch temporaneo dedicato a ogni asset/azione; struttura standard cartelle; logging rigoroso prompt e riferimenti; manifest PNG, versioning, verifiche, approvazioni, PR e pulizia dopo merge. |
-| v9 | 2026-10-30 | GIF diagnostica dopo ogni PNG, allineamento su pivot e controllo di lunghezze e topologia delle membrane. |
 | v8 | 2026-10-29 | Integra pose-to-pose professionale, key/breakdown/inbetween, archi, volumi, timing/X-sheet, onion skin e controllo silhouette; rettifica generazione multiposa predefinita: una posa per volta con limiti IA espliciti e retake mirati. |
+| v9 | 2026-10-30 | GIF diagnostica dopo ogni PNG, allineamento su pivot e controllo di lunghezze e topologia delle membrane. |
+| v10 | 2026-10-30 | Normalizzazione obbligatoria dopo ogni generazione: landmark corporei, trasformazioni globali, tolleranze alla scala reale, controlli anatomici separati e tracciabilità. Revisione strutturale: regole di allineamento centralizzate in §4.1 e rinvii coerenti nelle fasi operative, senza cambiare i gate. Corretto ordine del registro revisioni e separatore storico. |
+| v11.0.0 | 2026-10-30 | Scelta motivata rig/disegno/tecnica mista con prova agli estremi e nel percorso; materiali e file sorgenti; rig in produzione distinto da runtime; coppia A/B congiunta ammessa con verifica individuale, senza garanzie di coerenza; conservati allineamento, GIF, vincoli Cerbero e approvazioni. Aggiornati pipeline, prompt e controlli per eliminare i divieti generali superati. |
+| v12.0.0 | 2026-10-30 | Nuovo flusso predefinito richiesto dall’utente: A/B, M facoltativo, approvazione dei riferimenti, generazione dello spritesheet completo, estrazione/allineamento e correzioni mirate, quindi approvazione della GIF del ciclo e prova runtime. Inbetweening ricorsivo opzionale per riparazioni; rimossi obblighi contraddittori di singolo intermedio e M universale. Conservati rig alternativi, anatomia, materiali, prompt, versioning e gate di integrazione/merge. |
 
 ### 12.2 Fonti professionali usate nella revisione v8
 
@@ -637,4 +701,4 @@ Letture di riferimento consultate il 29/10/2026; **fonti sul metodo di animazion
 
 ---
 
-**Versione:** v9 · **Ultimo aggiornamento:** 30 ottobre 2026 (Europe/Rome)
+**Versione:** v12.0.0 · **Ultimo aggiornamento:** 30 ottobre 2026 (Europe/Rome)

@@ -1,6 +1,6 @@
 # Diavolo volante — volo v1
 Data: 30 ottobre 2026. Fonte: main ec4eb85057da38b821e3c2ae00ee0dcc017f418f.
-Protocollo: docs/PROTOCOLLO_SPRITE_ANIMATI_v10_20261030.md (§2.1, §7.2–7.5, §8.1).
+Protocollo storico della produzione: `docs/PROTOCOLLO_SPRITE_ANIMATI_v10_20261030.md` (§2.1, §7.2–7.5, §8.1), recuperabile al commit `afae26867311d25b8c608f7693c4b9f809c66142`. Per nuove lavorazioni usare la versione corrente indicata in AGENTS.md; i prompt storici restano invariati.
 Stato: produzione artistica; design candidato generato, in attesa di approvazione, nessuna approvazione o integrazione.
 
 ## Audit verificato
