@@ -1,0 +1,14 @@
+{
+  "version": "1.0.0",
+  "source_revision": "ec4eb85057da38b821e3c2ae00ee0dcc017f418f",
+  "status": "design_pending",
+  "frames": [
+    {
+      "id": "001",
+      "prompt": "prompts/001_design_A_v1.md",
+      "output": "candidates/001_design_A_v1.png",
+      "status": "not_generated",
+      "approval": null
+    }
+  ]
+}
