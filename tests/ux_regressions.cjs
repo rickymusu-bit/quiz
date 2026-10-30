@@ -60,11 +60,11 @@ const assert = require("node:assert/strict");
     assert.equal(await players.count(), 3);
     assert.equal(await page.locator(".turn-order .player-window[open]").count(), 0);
     for (const card of await players.all()) {
-      assert.equal(await card.locator(".lives .heart").count(), 3);
+      assert.equal(await card.locator(".lives .life-skull").count(), 3);
       assert(await card.locator(".lives").isVisible());
       assert.equal(
-        await card.locator(".heart").first().evaluate(el => getComputedStyle(el, "::before").content),
-        '"♥"',
+        await card.locator(".life-skull").first().evaluate(el => getComputedStyle(el).backgroundImage.includes("skull-active.png")),
+        true,
       );
     }
     await page.evaluate(() => {
@@ -78,7 +78,7 @@ const assert = require("node:assert/strict");
     assert(!/domanda\s+\d+\s+di\s+\d+/i.test(await page.locator(".operation-body").innerText()));
     const damaged = page.locator('.turn-order button[data-team="0"] .lives');
     assert.match(await damaged.getAttribute("aria-label"), /2 vite su 3/);
-    assert.equal(await damaged.locator(".heart.lost").count(), 1);
+    assert.equal(await damaged.locator(".life-skull.lost").count(), 1);
     assert(await damaged.isVisible());
     const liquid = await page.locator(".vial-liquid").evaluate(el => getComputedStyle(el).backgroundImage);
     assert(liquid.includes("rgb(101, 13, 25)"), "The timer must use the dark blood-red palette");
