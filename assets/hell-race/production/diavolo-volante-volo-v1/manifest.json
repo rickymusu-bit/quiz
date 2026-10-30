@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "source_revision": "ec4eb85057da38b821e3c2ae00ee0dcc017f418f",
-  "status": "B_v2_candidate_pending_approval",
+  "status": "B_v2_globally_aligned_pending_artistic_review",
   "reference": {
     "path": "references/scena-reale-20261030.jpg",
     "git_blob": "ab349ca62d2285964ad805a785f3db2dc99c882e",
@@ -91,7 +91,7 @@
         "approved/pose_A.png"
       ],
       "output": "candidates/004_posa_B_v2.png",
-      "status": "candidate_pending_approval",
+      "status": "globally_aligned_candidate_pending_approval",
       "approval": null,
       "git_blob": "18b3096767d9168815d0441d36da438ea123b6c7",
       "sha256": "b2272812ade507323c9aaa862bfb4bc39895bdc2b6eda7c54b0dff6de6329374",
@@ -104,23 +104,59 @@
         254
       ],
       "registration": {
-        "method": "normalized luminance correlation on central body only; no anatomy guarantee",
-        "template_A_halfres": [
-          335,
-          200,
-          440,
-          390
+        "uniform_scale": 0.8738605010300837,
+        "rotation_degrees": 0,
+        "translation": [
+          95.62053539131705,
+          173.23671519501875
         ],
-        "uniform_source_scale_B": 0.8850000000000001,
-        "whole_image_offset_B": [
-          86,
-          164
+        "matrix": [
+          [
+            0.8738605010300837,
+            0,
+            95.62053539131705
+          ],
+          [
+            0,
+            0.8738605010300837,
+            173.23671519501875
+          ],
+          [
+            0,
+            0,
+            1
+          ]
         ],
-        "correlation": 0.8332940936088562,
-        "no_warp": true
+        "resampling": "one affine resampling, bicubic, original RGBA preserved",
+        "canvas": [
+          1536,
+          1024
+        ],
+        "body_pivot_reference": [
+          768.2631578947369,
+          521.2631578947369
+        ],
+        "body_pivot_target_raw": [
+          769.7368421052632,
+          398.2631578947369
+        ],
+        "intended_motion_preserved": "wings remain down; no local adjustment or skeletal deformation"
       },
-      "comparison_gif": "reports/gifs/confronto_A_B_v2.gif",
-      "report": "reports/verifica_004_v1.0.0_20261030.md"
+      "comparison_gif": "reports/gifs/confronto_A_B_allineata_v1.gif",
+      "report": "reports/verifica_004_v1.0.0_20261030.md",
+      "aligned_output": "aligned/004_posa_B_v2_allineata_v1.png",
+      "aligned_sha256": "34a5e4e562ab9d560972f43f4f3200941c7791d795735c8c28841b89dd0f30f5",
+      "aligned_git_blob": "bb3385a615c22ae942963226bec28f8c76835caa",
+      "normalization_report": "reports/ALLINEAMENTO_A_B_v1.0.0_20261030.md",
+      "normalization_metadata": "reports/allineamento_v1.json",
+      "landmark_residuals": {
+        "weighted_rms_before": 123.54990468376907,
+        "weighted_rms_after": 0.9890395049679216,
+        "maximum_after": 1.4085027901536944,
+        "median_after": 1.0012369885876782,
+        "units": "source image pixels",
+        "interpretation": "residual comparable to manual annotation uncertainty; does not certify limb or wing equivalence"
+      }
     }
   ],
   "replacement_instruction": {
