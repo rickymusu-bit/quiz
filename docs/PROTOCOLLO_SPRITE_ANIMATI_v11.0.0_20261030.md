@@ -23,6 +23,8 @@ La produzione comprende analisi del riferimento, scelta motivata della tecnica (
 
 ## 2. Fonti e gerarchia di riferimento
 
+Per cercare sprite esistenti, consultare il [catalogo di fonti e candidati](FONTI_SPRITE_ANIMATI_v1.0.0_20261030.md). Le piste non sono asset approvati: verificare pagina dell'autore, licenza del singolo file, animazioni e compatibilità prima del riuso.
+
 Prima di disegnare o generare fotogrammi:
 
 1. Identificare la **versione approvata** del personaggio e, se esiste, il foglio sprite di una precedente azione; annotare percorso e revisione.
