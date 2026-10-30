@@ -1,0 +1,31 @@
+name: Sprite post-processing tool
+on:
+  pull_request:
+    paths:
+      - scripts/sprite_postprocess.py
+      - tests/test_sprite_postprocess.py
+      - docs/SPRITE_POSTPROCESS_*.md
+      - requirements-test.txt
+      - .github/workflows/sprite-postprocess.yml
+  push:
+    branches: [main]
+    paths:
+      - scripts/sprite_postprocess.py
+      - tests/test_sprite_postprocess.py
+      - requirements-test.txt
+      - .github/workflows/sprite-postprocess.yml
+permissions:
+  contents: read
+jobs:
+  sprite-postprocess:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.10', '3.12']
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: python3 -m pip install -r requirements-test.txt
+      - run: python3 -m unittest discover -s tests -p 'test_sprite_postprocess.py' -v
