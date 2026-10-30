@@ -96,6 +96,21 @@ body.showing-cinematic #fit-warning{visibility:hidden!important;pointer-events:n
 body.showing-cinematic dialog:not(#orientation-note)::backdrop{background:transparent!important;box-shadow:none!important}
 .hell-race .ammo-status{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
 
+/* The Canvas fills the figure: without absolute positioning scene controls
+   follow it in normal flow and the pause button ends up below the viewport. */
+.hell-race .scene-controls{
+  position:absolute;top:16px;right:16px;z-index:8;
+  display:flex;align-items:center;justify-content:flex-end;
+}
+.hell-race .scene-controls button{
+  min-height:48px;max-width:100%;padding:6px 14px;
+  color:#fff0dc;background:#311e18;border:2px solid #cba176;
+  font:24px/1 FoolTerminal,monospace;
+}
+body.showing-cinematic #viewport-stage main.operational>.hell-race,
+body.showing-cinematic #viewport-stage main.final-screen .hell-race-final{z-index:1}
+
+
 /* Combat feedback belongs to the player windows above the scene. */
 #viewport-stage .turn-order { overflow: visible; }
 #viewport-stage .turn-order .active-ammo-effects { display: grid; gap: 3px; margin-top: 5px; }
