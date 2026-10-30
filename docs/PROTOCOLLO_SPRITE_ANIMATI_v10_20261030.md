@@ -1,7 +1,7 @@
 # Protocollo operativo per sprite animati coerenti
 
-**Versione documento:** v8  
-**Ultimo aggiornamento:** 29 ottobre 2026 — Europe/Rome  
+**Versione documento:** v10  
+**Ultimo aggiornamento:** 30 ottobre 2026 — Europe/Rome  
 **Progetto di riferimento:** Hellscape – Fuga dall'inferno  
 **Ambito:** riutilizzabile per qualsiasi personaggio, creatura, veicolo, oggetto animato o effetto collegato  
 **Stato:** specifica operativa proposta; non attesta che gli asset del gioco siano già stati sostituiti o validati  
@@ -149,6 +149,40 @@ direzione(t)   = orientamento della bocca trasformato nello stesso sistema
 
 Non inserire coordinate arbitrarie della fiammata indipendenti dalla testa. La formula è un **contratto geometrico**: non impone una specifica libreria o l'uso obbligatorio di matrici nel codice.
 
+### 4.1 Allineamento obbligatorio degli output generativi
+
+**Obiettivo e tolleranza.** Il generatore non garantisce che due PNG dello stesso soggetto abbiano posizione, scala e tratto identici. Dopo **ogni** generazione o retake, normalizzare il fotogramma prima delle GIF, dell'approvazione e della generazione successiva. La corrispondenza pixel per pixel al 100% non è un requisito di accettazione: contano continuità anatomica, proporzioni, identità, dettagli persistenti e resa alla scala d'uso. Una variazione lieve di texture può essere accettabile; un osso che cambia lunghezza, un giunto aggiunto o un foro che cambia lembo non diventano corretti soltanto perché piccoli.
+
+#### 4.1.1 Riferimento e punti stabili
+1. Conservare il PNG grezzo immutato e identificare il modello canonico approvato, il pivot e il canvas comune della sequenza.
+2. Separare **movimento previsto** (posa, spostamento, inclinazione, prospettiva e oscillazione intenzionale) da errore del generatore. Normalizzare solo il secondo; non immobilizzare il gesto o cancellare un movimento corporeo approvato.
+3. Annotare, quando visibili, almeno tre landmark non coincidenti sul corpo relativamente stabile: per esempio centro del torace, attacchi delle spalle e bacino. Usare nomi anatomici persistenti, coordinate, attendibilità e occlusioni. La testa è utile solo quando il piano la prevede stabile.
+4. **Non** allineare usando estremità delle ali, coda, arti in movimento o bounding box dell'intera sagoma. La diversa apertura alare non è una diversa taglia del corpo. Un landmark occluso o poco affidabile va escluso, non inventato.
+5. Confrontare sempre anche con il riferimento canonico, non soltanto con il fotogramma precedente, per evitare accumulo di deriva lungo la sequenza.
+
+#### 4.1.2 Trasformazioni consentite e metodo
+- Applicare all'**intero fotogramma** una sola trasformazione: traslazione; scala uniforme per recuperare la scala corporea; eventuale rotazione rigida solo per correggere una variazione di orientamento non prevista dal piano. Bloccare la rotazione quando deve restare invariata e non compensare un cambiamento reale di prospettiva con una rotazione 2D.
+- Stimare i parametri dai landmark stabili, con adattamento manuale documentato oppure stima automatica di similitudine pesata per attendibilità. Se i punti affidabili non bastano, dichiarare l'allineamento provvisorio; non attribuirgli precisione anatomica.
+- Correlazione di una regione corporea e metodi automatici di confronto immagini possono inizializzare o verificare la stima, ma non certificano anatomia o perfetta corrispondenza dei dettagli.
+- Vietati scala diversa sui due assi, allineamento indipendente di teste/ali/arti, warp, morphing e altri adattamenti locali per far coincidere a forza pose incoerenti. L'allineamento non genera disegni intermedi e non sostituisce un retake.
+- Trasformare con gli stessi parametri pivot e ancoraggi funzionali. Conservare separatamente la traiettoria e i movimenti corporei intenzionali della sequenza.
+- Comporre le trasformazioni e ricampionare una sola volta dall'originale quando possibile; scegliere il campionamento coerente con lo stile approvato. Conservare alpha e piccoli fori. Una traslazione intera può evitare ricampionamento; se occorre una scala frazionaria, controllare perdita di dettagli e tremolio alla scala finale.
+- Impostare padding/canvas comuni sull'ingombro complessivo delle pose estreme, senza tagliare ali o coda e senza ridimensionare ogni sagoma per riempire il riquadro. Conservare il medesimo riferimento geometrico per export e runtime.
+
+#### 4.1.3 Verifiche e decisione
+Dopo la normalizzazione:
+1. Misurare lo scarto residuo dei landmark affidabili (medio/quadratico e massimo, con unità), distinguendo coordinate dell'asset e pixel effettivi alla scala di gioco. Una stima visuale non va presentata come misura.
+2. Verificare separatamente le proporzioni e la topologia: lunghezze relative dei segmenti, connessioni, numero di parti, volumi, attacchi delle membrane, posizione anatomica di fori e strappi. La prospettiva può cambiare la lunghezza **proiettata**; non richiedere che tutte le distanze 2D siano identiche tra pose diverse.
+3. Eseguire flip/GIF del nuovo fotogramma con i vicini e onion skin sulle zone pertinenti, a vista ingrandita e alla dimensione effettiva d'uso (§5.5 e §7.6). Le ali in movimento non devono coincidere nella sovrapposizione: devono seguire l'arco previsto.
+4. Calibrare tolleranze e limiti di scala/rotazione sulla sequenza, sull'attendibilità dei punti, sullo stile e sulla leggibilità reale. Registrare criterio e motivazione; niente percentuali universali o rigenerazioni per ogni differenza di pixel.
+5. Esito **allineato e candidato alla revisione**, **provvisorio per dati insufficienti** oppure **respinto per incoerenza residua**. Se una sola trasformazione globale non basta a preservare le proporzioni, correggere il disegno responsabile. Non alterare il modello approvato per inseguire la posa difettosa.
+6. Solo dopo il controllo tecnico, presentare la posa e la GIF per il gate artistico previsto. Una normalizzazione riuscita non costituisce approvazione automatica.
+
+#### 4.1.4 Tracciabilità obbligatoria
+Nel manifest/rapporto registrare: PNG grezzo e derivato allineato (oppure trasformazione riproducibile), hash/revisione, riferimento canonico e pose vicine, landmark e attendibilità, metodo, scala uniforme, angolo, offset, canvas/padding, pivot e ancoraggi trasformati, movimento intenzionale conservato, campionamento, scarti e unità, tolleranza motivata, GIF/onion skin, difetti residui ed esito. Distinguere controlli eseguiti e mancanti.
+
+**Ordine operativo:** generazione → conservazione originale → allineamento globale → verifica anatomica e alla scala reale → GIF incrementale → approvazione → posa successiva. L'impacchettamento finale riusa queste trasformazioni; non rimanda il primo allineamento alla fine della produzione.
+
 ## 5. Progettare l'azione: fasi, keyframe e tempi
 
 **Prima i keyframe, poi gli intermedi.** Per ciascuna azione descrivere:
@@ -226,7 +260,7 @@ Un ciclo con pochi disegni ben temporizzati può essere migliore di uno con molt
 
 ### 5.5 Controlli di disegno professionali: flip, onion skin e silhouette
 
-A ogni key e breakdown, e periodicamente sugli inbetween:
+Dopo la normalizzazione obbligatoria di ogni output (§4.1), controllare ogni key, breakdown e inbetween:
 
 1. Eseguire **flip/alternanza rapida** tra pose adiacenti e controllo **onion skin** semitrasparente su corpo e giunti. Lo scopo è scoprire drift del pivot, parti che cambiano lunghezza, tremolio di contorni e salti tra livelli.
 2. Sovrapporre landmark/traiettorie nella medesima referenza geometrica; dichiarare quando i landmark sono annotati manualmente o solo stimati. Il generatore di immagini **non** fornisce automaticamente uno scheletro verificato.
@@ -309,7 +343,7 @@ Per correzioni minori a un effetto già approvato, evitare burocrazia inutile: a
 | 1. Brief e vincoli | ChatGPT + utente | Scheda del soggetto: identità, anatomia/parti, silhouette, materiali, palette, prospettiva, risoluzione effettiva, azioni richieste | Requisiti fissati |
 | 2. Design canonico | ChatGPT + strumento immagini | Immagine di riferimento approvata e, se necessario, viste ortogonali/tre quarti e dettagli; percorso/versione asset | **Approvazione del design statico**, senza redesign nelle fasi successive |
 | 3. Blocking, key e timing | ChatGPT | Storyboard, estremi A/B, silhouette, traiettorie/landmark e **X-sheet** (durate, eventi, direzione, easing); anticipazione/follow-through se pertinenti | Approvazione del piano di movimento e dei tempi |
-| 4. Key e breakdown incrementali | ChatGPT + editing immagini | **Un PNG alla volta**: A, B, poi breakdown del percorso anatomico; prompt e reference registrati; canvas/scala coerenti | Verifica delle singole pose estreme e del percorso prima di procedere |
+| 4. Key e breakdown incrementali | ChatGPT + editing immagini | **Un PNG alla volta**: A, B, poi breakdown; prompt/reference, originale immutato, normalizzazione e rapporto §4.1, GIF §7.6 | Verifica tecnica e artistica della posa allineata e del percorso prima di procedere |
 | 5. Inbetweening selettivo | ChatGPT + editing/ritocco assistito | **Un frame per chiamata** fra pose approvate; flip/onion skin, refiner solo sugli intervalli critici, aggiornamento X-sheet e report difetti | **Approvazione dei singoli PNG e del loop locale**; niente warp/mesh/rig come surrogato |
 | 6. Preparazione tecnica | Codex | Asset finali impacchettati in spritesheet/atlante, metadata per frame (durata, canvas, pivot, ancoraggi, evento), nomi e versioni stabili | Controlli di dimensioni, trasparenza, margini, tagli, allineamento e riferimenti |
 | 7. Implementazione runtime | Codex | Riproduzione dei frame disegnati, macchina a stati, transizioni, effetti legati agli ancoraggi, velocità e spostamento nel mondo, telecamera separata | Test di timing indipendente da FPS, input, pause, persistenza, collisioni |
@@ -340,9 +374,9 @@ Per **i veicoli** mantenere stabile la sagoma rigida della carrozzeria; animare 
 
 **Quando è ammessa una generazione multiposa?** Solo come studio esplorativo esplicitamente etichettato (non come asset approvato) oppure per sequenze elementari/effetti non anatomici dopo valutazione dei rischi, **mai** al posto della generazione incrementale concordata per un asset. Anche una griglia molto convincente non equivale a una verifica di continuità anatomica.
 
-**Output del singolo passaggio:** un PNG del soggetto completo e isolato, senza scena, testo o griglia; preferire il canale alpha reale quando disponibile e verificabile. Stesso orientamento, proporzioni, camera, stile, coordinate del pivot, ingombro comprensivo di margine. Salvare reference, prompt effettivo, risultato e criterio di accettazione nella cartella per-asset definita in §8.1 **prima del passo successivo**.
+**Output del singolo passaggio:** un PNG del soggetto completo e isolato, senza scena, testo o griglia; preferire il canale alpha reale quando disponibile e verificabile. Orientamento, proporzioni, camera e stile devono essere coerenti col riferimento. Normalizzare scala, pivot e canvas secondo §4.1 prima del confronto, senza pretendere identità pixel per pixel. Salvare reference, prompt effettivo, risultato e criterio di accettazione nella cartella per-asset definita in §8.1 **prima del passo successivo**.
 
-**Atlante finale:** soltanto dopo aver approvato i singoli PNG, Codex li ordina, allinea su pivot, aggiunge margini, esporta atlas e JSON di tempi/ancoraggi, produce GIF locale e verifica alpha/ritagli. La riproduzione nel gioco sarà attestata da **GIF registrata dal browser** come da AGENTS.md.
+**Atlante finale:** soltanto dopo aver approvato i singoli PNG, Codex li ordina, riusa l'allineamento già verificato secondo §4.1, controlla margini comuni, esporta atlas e JSON di tempi/ancoraggi, produce GIF locale e verifica alpha/ritagli. La riproduzione nel gioco sarà attestata da **GIF registrata dal browser** come da AGENTS.md.
 
 **Soglia di fallimento:** sfondo illustrato invece di alpha, redesign, arti flottanti, estremo non raggiunto, più pose quando se ne richiedeva una, parti tagliate o anatomia errata = **tentativo respinto**, non «quasi pronto». Correggere un solo vincolo difettoso per iterazione; conservare errore e prompt per tracciabilità. Non produrre una nuova tavola di 12–16 pose come rimedio a una singola posa fallita.
 
@@ -405,6 +439,17 @@ Le istruzioni sono formulate in base a ciò che un generatore di immagini **può
 **Regola del retake:** dopo un esito non conforme non avanzare alla fase successiva. Identificare **il difetto principale**, mantenere il riferimento corretto, riscrivere il prompt per il solo frame fallito e chiedere nuovamente la medesima posa. Limitare tentativi ripetitivi con lo stesso prompt senza nuove informazioni; se non si raggiunge la posa, segnare il blocco e usare un editor di sprite o un artista per il ridisegno prima di proseguire. Non trasformare una prova fallita in un attestato di «metodo ricorsivo non riuscito» se la procedura non è stata eseguita.
 
 **Tracciabilità reale:** salvare il **testo di istruzione esplicito** e i riferimenti realmente forniti; se il servizio non espone il prompt interno o altri parametri, dichiarare il limite nel log, senza inventare un prompt retrospettivo. L'output del generatore è un **candidato da validare**; Codex controlla bitmap/tempi/packing e l'utente approva i risultati artistici. Queste condizioni valgono anche quando il modello produce immagini visivamente persuasive.
+
+### 7.6 GIF incrementale obbligatoria a ogni fotogramma (30/10/2026)
+
+Disposizione utente: «per ogni fotogramma che crei produci una GIF che mostra la transizione da uno all'altro».
+
+- Dopo ogni PNG candidato nuovo o corretto, prima di chiedere approvazione o generare il successivo, produrre e mostrare una GIF ricavata dai PNG effettivi: alternanza della nuova posa e del riferimento/adiacente pertinente e, quando disponibile, sequenza progressiva aggiornata. Per gli inbetween mostrare entrambi i vicini.
+- Prima di ogni GIF eseguire l'allineamento globale obbligatorio del §4.1: riferimenti corporei stabili, scala uniforme, padding comuni e trasformazioni documentate. Non adattare separatamente arti o sagome per mascherare difetti.
+- Nessuna dissolvenza, morphing, mesh o deformazione per simulare fotogrammi mancanti. Distinguere una GIF diagnostica a due estremi, che può mostrare salti, dal loop finale con timing approvato.
+- Documentare PNG sorgenti, versione, stato candidato/respinto/approvato, ordine, durate, scala e correzioni. Mostrare anche i tentativi respinti quando servono a capire il difetto. La GIF locale non sostituisce la GIF browser dopo l'integrazione.
+- Confrontare esplicitamente lunghezza e numero dei segmenti delle ali e degli arti, dimensioni del corpo e topologia delle membrane. Fori, strappi e segni distintivi seguono lo stesso lembo di membrana tra pose; non spariscono o si rigenerano casualmente.
+- Dopo un difetto tecnico o anatomico, segnare la posa respinta e non usarla come base approvata per gli intermedi. Correggere il riferimento se la richiesta modifica anche il design; poi ottenere l'approvazione della revisione.
 
 ## 8. Asset, struttura tecnica e metadati
 
@@ -588,7 +633,7 @@ I parametri mancanti si derivano dall'asset approvato e dal codice corrente quan
 
 Questa sezione riguarda **il documento di lavoro**; per refactoring del codice di gioco restano autoritative le regole di AGENTS.md.
 
-1. **Nome versionato:** PROTOCOLLO_SPRITE_ANIMATI_vN_YYYYMMDD.md, data locale Europe/Rome. Questa edizione è **v8_20261029**.
+1. **Nome versionato:** PROTOCOLLO_SPRITE_ANIMATI_vN_YYYYMMDD.md, data locale Europe/Rome. Questa edizione è **v10_20261030**.
 2. **Numerazione progressiva:** le revisioni sostanziali producono un **nuovo file** (v2, v3, …). Non sovrascrivere la versione precedente per un cambiamento sostanziale; i ripristini generano una versione successiva, senza decrementare N.
 3. **Piccole correzioni:** refusi, punteggiatura o collegamenti senza variazioni di significato possono essere corretti nella stessa versione, tracciando il commit.
 4. **Data e stato:** aggiornare data locale, versione, stato e registro modifiche quando nasce una nuova edizione. Distinguere proposta, approvazione e implementazione.
@@ -604,12 +649,15 @@ Questa sezione riguarda **il documento di lavoro**; per refactoring del codice d
 | Versione | Data Europe/Rome | Modifica |
 | --- | --- | --- |
 | v1 | 2026-10-29 | Prima stesura: invarianti, scheletro logico e ancoraggi, keyframe, causalità degli effetti, caso Cerbero, pipeline, verifica, correzione mirata, template per agenti, versioning e refactoring. |
-| v2 | 2026-10-29 | Metodo vincolante con pose disegnate; divieto di fallback tramite mesh/rig/stretch per azioni complesse; coerenza fisica dei materiali, carrozzerie rigide, gate di approvazione, controlli e refactoring della terminologia. |\n| v3 | 2026-10-29 | Workflow operativo ChatGPT → Codex dall'ideazione alla GIF reale: ruoli, asset, handoff, gate di approvazione, packaging, materiali, esempio Cerbero e veicoli. |
+| v2 | 2026-10-29 | Metodo vincolante con pose disegnate; divieto di fallback tramite mesh/rig/stretch per azioni complesse; coerenza fisica dei materiali, carrozzerie rigide, gate di approvazione, controlli e refactoring della terminologia. |
+| v3 | 2026-10-29 | Workflow operativo ChatGPT → Codex dall'ideazione alla GIF reale: ruoli, asset, handoff, gate di approvazione, packaging, materiali, esempio Cerbero e veicoli. |
 | v4 | 2026-10-29 | Audit obbligatorio degli asset preesistenti; orientamento della camera, posizione, profondità, ruolo, LOD e scala; scheda contestuale e gate prima della generazione; caso diavoli atmosferici Hellscape. |
 | v5 | 2026-10-29 | Generazione diretta di spritesheet PNG RGBA trasparenti come procedura predefinita; ritaglio dei frame, loop GIF di controllo, verifica alpha e criteri per correggere atlanti illustrativi imperfetti. |
 | v6 | 2026-10-29 | Inbetweening ricorsivo adattivo, doppio estremo A/B, inversione del tratto quando giustificata, timing non uniforme, controlli oggettivi e gate tecnico/artistico, test col diavolo volante. |
 | v7 | 2026-10-29 | Branch temporaneo dedicato a ogni asset/azione; struttura standard cartelle; logging rigoroso prompt e riferimenti; manifest PNG, versioning, verifiche, approvazioni, PR e pulizia dopo merge. |
 | v8 | 2026-10-29 | Integra pose-to-pose professionale, key/breakdown/inbetween, archi, volumi, timing/X-sheet, onion skin e controllo silhouette; rettifica generazione multiposa predefinita: una posa per volta con limiti IA espliciti e retake mirati. |
+| v9 | 2026-10-30 | GIF diagnostica dopo ogni PNG, allineamento su pivot e controllo di lunghezze e topologia delle membrane. |
+| v10 | 2026-10-30 | Normalizzazione obbligatoria dopo ogni generazione: landmark corporei, trasformazioni globali, tolleranze alla scala reale, controlli anatomici separati e tracciabilità. Revisione strutturale: regole di allineamento centralizzate in §4.1 e rinvii coerenti nelle fasi operative, senza cambiare i gate. Corretto ordine del registro revisioni e separatore storico. |
 
 ### 12.2 Fonti professionali usate nella revisione v8
 
@@ -625,4 +673,4 @@ Letture di riferimento consultate il 29/10/2026; **fonti sul metodo di animazion
 
 ---
 
-**Versione:** v8 · **Ultimo aggiornamento:** 29 ottobre 2026 (Europe/Rome)
+**Versione:** v10 · **Ultimo aggiornamento:** 30 ottobre 2026 (Europe/Rome)

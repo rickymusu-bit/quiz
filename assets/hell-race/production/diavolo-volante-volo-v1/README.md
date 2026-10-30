@@ -1,6 +1,6 @@
 # Diavolo volante — volo v1
 Data: 30 ottobre 2026. Fonte: main ec4eb85057da38b821e3c2ae00ee0dcc017f418f.
-Protocollo: docs/PROTOCOLLO_SPRITE_ANIMATI_v8_20261029.md (§2.1, §7.2–7.5, §8.1).
+Protocollo: docs/PROTOCOLLO_SPRITE_ANIMATI_v10_20261030.md (§2.1, §7.2–7.5, §8.1).
 Stato: produzione artistica; design candidato generato, in attesa di approvazione, nessuna approvazione o integrazione.
 
 ## Audit verificato
@@ -31,3 +31,6 @@ B v1 respinta: ali allungate e membrane prive di fori. La sola registrazione del
 
 ## Rettifica dell'interpretazione — 30/10/2026
 L'utente chiarisce che in B mancavano i piccoli fori già presenti nel riferimento A originale. Non ha chiesto fori più grandi né una nuova A. La revisione 003 è respinta per errore di interpretazione dell'assistente; A originale torna riferimento canonico senza modifiche. Eliminata su richiesta la GIF confronto_A_v1_A_v2.gif. Restano da correggere lunghezza delle ali e continuità dei piccoli fori nella sola B. La regola GIF riguarda le transizioni fra pose del movimento, non dimostrazioni di modifiche decorative non richieste.
+
+## Allineamento sistematico — 30/10/2026
+Applicare §4.1 del protocollo v10 dopo ogni generazione: originale immutato, punti stabili sul corpo, scala uniforme e traslazione globali, canvas comune, controllo separato dell'anatomia, GIF e tolleranze motivate alla scala reale. L'uguaglianza pixel per pixel non è richiesta. Le stime di correlazione già presenti nelle prove A/B restano registrazioni preliminari: non attestano landmark misurati o accettazione anatomica.
