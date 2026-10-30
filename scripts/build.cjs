@@ -94,7 +94,7 @@ function qualityPreview() {
 function ammoPreview(){
   const assets={};
 
-  for(const name of ['vehicles-drive-v1.webp','ammo-relics-v1.webp','lava-bridge-v1.webp','lava-lake-v1.webp','black-stone-bridge-v1.png','lava-sea-v2.png','sacrificio-v1.png','arsenico-v1.png']){
+  for(const name of ['vehicles-drive-v1.webp','ammo-relics-v1.webp','black-stone-bridge-v1.png','lava-sea-v2.png','sacrificio-v1.png','arsenico-v1.png']){
     const p='assets/hell-race/'+name;assets[p]=data(p);
   }
   addCerberoAssets(assets);
