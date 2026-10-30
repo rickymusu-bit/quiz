@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "source_revision": "ec4eb85057da38b821e3c2ae00ee0dcc017f418f",
-  "status": "original_A_restored_B_retake_pending",
+  "status": "B_physical_consistency_retake_pending",
   "reference": {
     "path": "references/scena-reale-20261030.jpg",
     "git_blob": "ab349ca62d2285964ad805a785f3db2dc99c882e",
@@ -81,6 +81,18 @@
       ],
       "report": "reports/verifica_003_v1.0.0_20261030.md",
       "rejection": "L'utente chiedeva di conservare in B i piccoli fori originali, non di ingrandirli o ridisegnare A."
+    },
+    {
+      "id": "004",
+      "phase": "key_B_retake",
+      "prompt": "prompts/004_posa_B_v2.md",
+      "source": [
+        "candidates/002_posa_B_v1.png",
+        "approved/pose_A.png"
+      ],
+      "output": "candidates/004_posa_B_v2.png",
+      "status": "not_generated",
+      "approval": null
     }
   ],
   "replacement_instruction": {
