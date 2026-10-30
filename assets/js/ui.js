@@ -2545,61 +2545,38 @@
   });
   window.addEventListener("beforeunload", persist);
   // Shortcuts share the same guards and actions as the visible controls.
-  document.addEventListener("keydown", (event) => {
-    if (
-      document.body.dataset.input === "mobile" ||
-      event.defaultPrevented ||
-      event.isComposing ||
-      event.ctrlKey ||
-      event.altKey ||
-      event.metaKey
-    )
-      return;
-    const target = event.target instanceof Element ? event.target : null;
-    if (
-      target?.closest(
-        'input,select,textarea,[contenteditable]:not([contenteditable="false"]),[role="textbox"]',
-      )
-    )
-      return;
-    if (cinematicActive()) {
-      const key = event.key.toLowerCase();
-      if(target?.closest(".tie-controls,.scene-controls") && ["enter"," "].includes(key)){if(event.repeat)event.preventDefault();return;}
-      if(key==='p'&&(FoolHellRace.tieStatus().blocking||FoolHellRace.canPauseScene()||
-          (game?.s.screen==='answer'&&game.s.pauseReason==='animazione'))){
-        event.preventDefault();if(!event.repeat)pauseCinematic();
-      } else if (["enter", " ", "a", "b", "c", "d", "i", "s", "v", "l", "o", "arrowleft", "f1", "?"].includes(key))
-        event.preventDefault();
-      return;
-    }
-    if ($("ammo-info")?.open) return;
-    const key = event.key.toLowerCase(),
-      dialogOpen = $("dialog").open;
-    if (target?.closest("summary") && (key === "enter" || key === " ")) return;
-    if (dialogOpen) {
-      if (key === "o" && $("dialog").dataset.passive === "options") {
-        event.preventDefault();
-        if (!event.repeat) closePassiveDialog();
-        return;
-      }
-      if (event.repeat && event.key === "Enter") event.preventDefault();
-      if (
-        $("dialog").dataset.passive === "review" &&
-        ["ArrowLeft", "ArrowRight"].includes(event.key)
-      ) {
-        event.preventDefault();
-        if (event.repeat) return;
-        const buttons = $("dialog").querySelectorAll(".row button");
-        const button = buttons[event.key === "ArrowLeft" ? 0 : 1];
-        if (button && !button.disabled) button.click();
-      }
-      return;
-    }
-    if (key === "f1" || key === "?") {
+  // Keep each shortcut context independent: cinematics, dialogs and gameplay
+  // share the same entry guards without duplicating their action dispatch.
+  function handleCinematicShortcut(event, target) {
+    const key = event.key.toLowerCase();
+    if(target?.closest(".tie-controls,.scene-controls") && ["enter"," "].includes(key)){if(event.repeat)event.preventDefault();return;}
+    if(key==='p'&&(FoolHellRace.tieStatus().blocking||FoolHellRace.canPauseScene()||
+        (game?.s.screen==='answer'&&game.s.pauseReason==='animazione'))){
+      event.preventDefault();if(!event.repeat)pauseCinematic();
+    } else if (["enter", " ", "a", "b", "c", "d", "i", "s", "v", "l", "o", "arrowleft", "f1", "?"].includes(key))
       event.preventDefault();
-      if (!event.repeat) act(showShortcuts);
+    return;
+  }
+  function handleDialogShortcut(event, key) {
+    if (key === "o" && $("dialog").dataset.passive === "options") {
+      event.preventDefault();
+      if (!event.repeat) closePassiveDialog();
       return;
     }
+    if (event.repeat && event.key === "Enter") event.preventDefault();
+    if (
+      $("dialog").dataset.passive === "review" &&
+      ["ArrowLeft", "ArrowRight"].includes(event.key)
+    ) {
+      event.preventDefault();
+      if (event.repeat) return;
+      const buttons = $("dialog").querySelectorAll(".row button");
+      const button = buttons[event.key === "ArrowLeft" ? 0 : 1];
+      if (button && !button.disabled) button.click();
+    }
+    return;
+  }
+  function handleGameShortcut(event, target, key) {
     if (!game || ui !== "game" || main.classList.contains("showing-movement"))
       return;
     const known = [
@@ -2693,8 +2670,43 @@
     if (!button || button.disabled) return;
     event.preventDefault();
     button.click();
-  });
-
+  }
+  function onShortcutKeydown(event) {
+    if (
+      document.body.dataset.input === "mobile" ||
+      event.defaultPrevented ||
+      event.isComposing ||
+      event.ctrlKey ||
+      event.altKey ||
+      event.metaKey
+    )
+      return;
+    const target = event.target instanceof Element ? event.target : null;
+    if (
+      target?.closest(
+        'input,select,textarea,[contenteditable]:not([contenteditable="false"]),[role="textbox"]',
+      )
+    )
+      return;
+    if (cinematicActive()) {
+      handleCinematicShortcut(event, target);
+      return;
+    }
+    if ($("ammo-info")?.open) return;
+    const key = event.key.toLowerCase();
+    if (target?.closest("summary") && (key === "enter" || key === " ")) return;
+    if ($("dialog").open) {
+      handleDialogShortcut(event, key);
+      return;
+    }
+    if (key === "f1" || key === "?") {
+      event.preventDefault();
+      if (!event.repeat) act(showShortcuts);
+      return;
+    }
+    handleGameShortcut(event, target, key);
+  }
+  document.addEventListener("keydown", onShortcutKeydown);
   document.addEventListener("foolorientation", () => {
     if (FoolLayout.portrait && game?.running) {
       game.pause("orientamento schermo");
