@@ -69,6 +69,8 @@ Queste istruzioni si applicano a **qualsiasi agente o strumento** che modifichi 
 - Avviare una revisione complessiva solo quando la struttura del progetto lo richiede: non utilizzare il semplice numero di modifiche come soglia automatica.
 - Separare responsabilità distinte (stato del gioco, turni, punteggi, ammo, UI, rendering, animazioni, persistenza) dove ciò riduce realmente la complessità. Evitare astrazioni e frammentazioni inutili.
 - Eliminare codice morto, duplicazioni, CSS e asset obsoleti, verificando prima che non siano ancora referenziati.
+- Mantenere `main` come unico branch permanente. Chiudere e cancellare i branch temporanei dopo il merge verificato; non eliminare branch con PR aperte o modifiche non integrate.
+- Produrre di norma screenshot, GIF e log temporanei in `artifacts/` (ignorata da Git). Versionare soltanto prove visive canoniche necessarie e mantenere, quando applicabile, le ultime due revisioni utili; conservare asset approvati, originali di riferimento e indicazioni di riproduzione.
 - Preservare invariati regole di gioco, interfaccia, qualità e risoluzione degli asset, prestazioni e compatibilità delle partite salvate, salvo richiesta esplicita contraria.
 - Verificare il risultato con test pertinenti, inclusi test di regressione per calcolo punteggi, ammo, turnazione, spareggio, persistenza e caricamento degli asset. Non dichiarare eseguiti test che non sono stati realmente eseguiti.
 - Se il refactoring è significativo, preferire una PR dedicata, distinta da nuove funzionalità, con sintesi delle modifiche e dei controlli effettuati.
