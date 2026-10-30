@@ -72,5 +72,32 @@ with sync_playwright() as p:
    assert page.locator('.hell-race-final').get_attribute('data-ending-phase')=='done'
    assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+1 && document.documentElement.scrollHeight<=innerHeight+1')
    page.screenshot(path=str(ART/f'ending-{width}x{height}-{"win" if winner==0 else "over"}.png'));page.close()
+ # Previously untested path: a fullscreen game is hosted in the homepage
+ # iframe. A terminal tie status must never swallow the click or strand the
+ # player in the frame after the victory cinematic.
+ page=browser.new_page(viewport={'width':844,'height':390},reduced_motion='reduce')
+ page.on('pageerror',lambda e:errors.append(str(e)))
+ page.goto(base.replace('Fool.html?start=1',''))
+ page.get_by_role('button',name='Schermo intero',exact=True).click()
+ page.wait_for_function('!!document.fullscreenElement')
+ page.get_by_role('link',name='Nuova partita',exact=True).click()
+ view=page.frame_locator('#play-frame')
+ view.get_by_role('button',name='Inizia partita').click()
+ frame=next(f for f in page.frames if 'Fool.html' in f.url)
+ frame.evaluate('''()=>{const g=HellscapeUI.game;g.complete(0);HellscapeUI.changed();
+   // Simulate a stale blocking notice left by Ultimo Miglio while the final
+   // scene is visible: the terminal home action must still work.
+   FoolHellRace.tieStatus=()=>({blocking:true});HellscapeUI.changed();}''')
+ expect(view.locator('.hell-race-final')).to_have_attribute('data-ending-phase','done',timeout=20000)
+ home=view.get_by_role('button',name='Torna alla schermata iniziale',exact=True)
+ expect(home).to_be_visible()
+ assert not home.evaluate('el=>el.inert||el.closest("[inert]")!==null')
+ page.screenshot(path=str(ART/'victory-home-fullscreen-before.png'))
+ home.click()
+ expect(page.locator('#play-frame')).to_have_count(0)
+ expect(page.get_by_role('link',name='Nuova partita',exact=True)).to_be_visible()
+ page.screenshot(path=str(ART/'victory-home-fullscreen-after.png'))
+ checks.append({'ending':'fullscreen-victory-home','parent_home':'PASS','terminal_tie_block':'PASS'})
+ page.close()
  assert not errors,errors;browser.close();print(json.dumps({'endings':checks,'pause_hidden_reduced':'PASS','errors':errors},indent=2))
 server.shutdown()

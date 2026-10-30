@@ -17,7 +17,9 @@
           notice={kind:'elimination',key:id+':out:'+s.result.id,index:s.result.respondent,elapsed:0};
         }
       }
-      if(s.phase!=='pareggio'){pending=null;active=null;}
+      // Keep the last elimination notice long enough for its readable card
+      // and capture. Finished-game navigation is unlocked separately by UI.
+      if(s.phase!=='pareggio'){pending=null;active=null;completion=null;paused=false;}
       previous={phase:s.phase,round:s.tieRound,result:s.result?.id};
     }
     function begin(s) {

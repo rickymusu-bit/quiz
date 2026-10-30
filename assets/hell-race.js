@@ -625,7 +625,10 @@
       const updated=tie?.sample({reduced,captures:visualState?.queue.length>0});
       if(updated){fig.dataset.tiePhase=updated.phase;tieLayer.update(updated);}
       if(final&&fig.dataset.endingPhase!==phase){fig.dataset.endingPhase=phase;if(phase==='done'&&!visualState.completed){for(const index of visualState.plan?.victims||[])visualState.consumed.add(index);visualState.completed=true;fig.dispatchEvent(new CustomEvent('foolendingcomplete',{bubbles:true}));}}
-      const busy = !!tie?.sample().blocking || (!blocked() && (phase === 'ammo' || (!reduced && (final ? phase !== 'done' : phase === 'capture' || (moving && elapsed < ADVANCE_SECONDS)))));
+      // Preserve the last elimination notice, but do not let it lock the
+      // winner's controls once the final cinematic has finished.
+      const tieBusy = !(final && phase === 'done') && !!tie?.sample().blocking;
+      const busy = tieBusy || (!blocked() && (phase === 'ammo' || (!reduced && (final ? phase !== 'done' : phase === 'capture' || (moving && elapsed < ADVANCE_SECONDS)))));
       if(fig.dataset.animationBusy !== String(busy)) {
         fig.dataset.animationBusy = String(busy);
         fig.dispatchEvent(new CustomEvent('foolanimationchange',{bubbles:true,detail:{busy,phase}}));
@@ -637,7 +640,7 @@
       if(pauseButton.textContent!==label)pauseButton.textContent=label;
       const complete=tie?.takeCompletion();
       if(complete)fig.dispatchEvent(new CustomEvent('fooltiecomplete',{bubbles:true,detail:complete}));
-      if (live === record && (tie?.sample().blocking || ammo?.current() || !reduced)) record.frame = root.requestAnimationFrame(draw);
+      if (live === record && ((!(final && phase === 'done') && tie?.sample().blocking) || ammo?.current() || !reduced)) record.frame = root.requestAnimationFrame(draw);
     };
     record.redraw = () => {
       if (live !== record || !canvas.isConnected) return;
