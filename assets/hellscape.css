@@ -1,13 +1,13 @@
 /* Hellscape interface 3.6.0 — fixed 1024×768 stage. */
 html,body{width:100%;height:100%;overflow:hidden;background:#080605}
-#viewport-stage{position:fixed;left:50%;top:50%;width:var(--stage-width)!important;height:var(--stage-height);transform-origin:center center;margin:0;overflow:hidden;background:#1a0b08;box-shadow:0 0 70px #000}
+#viewport-stage{position:fixed;left:50%;top:50%;width:var(--stage-width)!important;height:var(--stage-height);transform-origin:center center;margin:0;overflow:clip;background:#1a0b08;box-shadow:0 0 70px #000}
 .hellscape-wordmark{display:block;font:400 100px/.95 FoolTerminal,monospace;letter-spacing:.055em;color:#ffb46a;text-shadow:3px 3px #5c170c,6px 6px #090504;line-height:1}
 header .hellscape-wordmark{font-size:32px;letter-spacing:.04em}header .brand{line-height:1;text-decoration:none}
 #viewport-stage main{height:calc(var(--stage-height) - 48px);min-height:0!important;max-width:none;overflow:auto;padding:18px}
 #viewport-stage .home-content{gap:24px;width:100%}#viewport-stage .home-content h1{line-height:1}#viewport-stage .home-content .hellscape-wordmark{font-size:145px}#viewport-stage .subtitle{font-size:44px}#viewport-stage .menu{width:330px;gap:12px}#viewport-stage .menu a,#viewport-stage .menu button{font-size:38px;min-height:60px}
 #viewport-stage:has(.home-content) main{height:var(--stage-height)}
 body.playing #viewport-stage>header{display:none}
-#viewport-stage main.operational,#viewport-stage main.final-screen{position:relative;height:var(--stage-height);min-height:var(--stage-height)!important;padding:0;overflow:hidden;display:block;isolation:isolate;background:#26110c}
+#viewport-stage main.operational,#viewport-stage main.final-screen{position:relative;height:var(--stage-height);min-height:var(--stage-height)!important;padding:0;overflow:clip;display:block;isolation:isolate;background:#26110c}
 main.operational>.hell-race,main.final-screen .hell-race-final{position:absolute;inset:0;width:100%;height:100%;margin:0;border:0;z-index:-1}
 main.operational>.hell-race canvas,main.final-screen .hell-race canvas{width:100%;height:100%;object-fit:fill}
 .statusline .timer{font:26px/1 FoolTerminal,monospace}
@@ -110,6 +110,9 @@ body.showing-cinematic dialog:not(#orientation-note)::backdrop{background:transp
 #viewport-stage .ending .winner-escape{font:clamp(24px,3.4vw,36px)/1.15 FoolTerminal,monospace;color:#f1e5bc;max-width:90%;text-shadow:2px 2px #100b09}
 body[data-layout="compact"] #viewport-stage .ending .victory-wordmark .end-wordmark{max-height:none}
 
+/* Overflow clip on the fixed stage prevents focus/scrollIntoView from moving
+   the complete results screen above the viewport. Compact layouts retain
+   intentional scrolling through responsive.css. */
 /* Reserve a dedicated toolbar row for Home. An overlaid fixed button
    could cover the VITTORIA / GAME OVER artwork on the results screen. */
 #viewport-stage main.final-screen .ending>.ending-home{
