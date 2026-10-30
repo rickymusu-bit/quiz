@@ -1,0 +1,293 @@
+{
+  "version": "v1.1.0",
+  "reference": "A",
+  "sources": [
+    {
+      "name": "exec-f5e24ce2-2dee-4ce2-8d07-3b4a7e2e028d.png",
+      "sha256": "863f14e9267cbade0d7d74642dba67ae87829d9afa3010fbaf1da42af806f049"
+    },
+    {
+      "name": "exec-225046d4-a7b8-49ac-af15-1f2574119052.png",
+      "sha256": "718f9578778814c1fe93c614586ce95f6470a4c6d03b09d70403f2f4550cf3c7"
+    }
+  ],
+  "landmark_names": [
+    "eye",
+    "shoulder_plate_hole",
+    "hip_plate_hole",
+    "chain_ring",
+    "pelvis"
+  ],
+  "landmark_status": "manual visual annotations; uncertain anatomical correspondence",
+  "A": [
+    [
+      872.0,
+      405.0
+    ],
+    [
+      755.0,
+      424.0
+    ],
+    [
+      568.0,
+      504.0
+    ],
+    [
+      550.0,
+      586.0
+    ],
+    [
+      604.0,
+      558.0
+    ]
+  ],
+  "M": [
+    [
+      1465.0,
+      438.0
+    ],
+    [
+      1254.0,
+      467.0
+    ],
+    [
+      1005.0,
+      583.0
+    ],
+    [
+      962.0,
+      691.0
+    ],
+    [
+      1084.0,
+      653.0
+    ]
+  ],
+  "scale_M": 0.6795326775376986,
+  "translation_M_to_A": [
+    -114.38070987850426,
+    110.51269144264751
+  ],
+  "M_residual_asset_pixels": [
+    9.661883531281243,
+    17.672197720101067,
+    2.7360178842749647,
+    12.207471389339567,
+    18.614855352301706
+  ],
+  "rms_residual": 13.480946235350995,
+  "B_translation_to_A": [
+    -842,
+    0
+  ],
+  "B_registration_status": "visual translation, no scale change",
+  "padding": [
+    35.0,
+    35.0
+  ],
+  "canvas": [
+    1000,
+    960
+  ],
+  "display": [
+    800,
+    768
+  ],
+  "sequence": [
+    "A",
+    "M",
+    "B",
+    "M"
+  ],
+  "durations_ms": [
+    550,
+    550,
+    550,
+    550
+  ],
+  "color_method": "global per-channel monotonic quantile curves from corresponding stable-body ROIs; alpha unmodified",
+  "color_report": [
+    {
+      "pose": "M",
+      "stable_pixels": 23024,
+      "median_rgb_before": [
+        72.0,
+        39.0,
+        30.0
+      ],
+      "median_rgb_after": [
+        65.0,
+        38.0,
+        30.0
+      ],
+      "reference_median_rgb": [
+        65.0,
+        38.0,
+        30.0
+      ],
+      "curves": [
+        {
+          "source": [
+            0.0,
+            2.0,
+            19.0,
+            42.0,
+            72.0,
+            114.0,
+            162.0,
+            230.0,
+            255.0
+          ],
+          "target": [
+            0.0,
+            6.0,
+            20.0,
+            38.0,
+            65.0,
+            101.0,
+            138.0,
+            200.0,
+            255.0
+          ]
+        },
+        {
+          "source": [
+            0.0,
+            4.0,
+            17.0,
+            39.0,
+            67.0,
+            108.0,
+            187.0,
+            255.0
+          ],
+          "target": [
+            0.0,
+            8.0,
+            19.0,
+            38.0,
+            63.0,
+            97.0,
+            159.0,
+            255.0
+          ]
+        },
+        {
+          "source": [
+            0.0,
+            1.0,
+            10.0,
+            30.0,
+            57.0,
+            92.0,
+            165.54000000000087,
+            255.0
+          ],
+          "target": [
+            0.0,
+            5.0,
+            13.0,
+            30.0,
+            53.0,
+            81.0,
+            135.0,
+            255.0
+          ]
+        }
+      ]
+    },
+    {
+      "pose": "B",
+      "stable_pixels": 22977,
+      "median_rgb_before": [
+        64.0,
+        39.0,
+        31.0
+      ],
+      "median_rgb_after": [
+        65.0,
+        38.0,
+        31.0
+      ],
+      "reference_median_rgb": [
+        65.0,
+        38.0,
+        31.0
+      ],
+      "curves": [
+        {
+          "source": [
+            0.0,
+            4.0,
+            19.0,
+            39.0,
+            64.0,
+            101.0,
+            139.0,
+            197.0,
+            255.0
+          ],
+          "target": [
+            0.0,
+            6.0,
+            20.0,
+            38.0,
+            65.0,
+            101.0,
+            139.0,
+            200.0,
+            255.0
+          ]
+        },
+        {
+          "source": [
+            0.0,
+            1.0,
+            7.0,
+            20.0,
+            39.0,
+            62.0,
+            94.0,
+            153.0,
+            255.0
+          ],
+          "target": [
+            0.0,
+            1.0,
+            8.0,
+            19.0,
+            38.0,
+            63.0,
+            97.0,
+            159.0,
+            255.0
+          ]
+        },
+        {
+          "source": [
+            0.0,
+            5.0,
+            14.0,
+            31.0,
+            51.0,
+            77.0,
+            129.0,
+            255.0
+          ],
+          "target": [
+            0.0,
+            5.0,
+            13.0,
+            31.0,
+            53.0,
+            81.0,
+            135.0,
+            255.0
+          ]
+        }
+      ]
+    }
+  ],
+  "generative_color_edit": "exec-0c542b35-014f-4f58-9c72-900b1c91ee22.png not used: changed framing; approved M retained",
+  "limitations": "global normalization cannot correct differing anatomy or topology; no local warp, rotation, redraw, or final timing claim"
+}
