@@ -67,6 +67,12 @@ Applicare la preferenza «GIF per la dinamica, screenshot per gli stati statici,
 
 - Per creare o modificare sequenze di sprite, utilizzare il documento versionato [Protocollo operativo per sprite animati coerenti — v8](docs/PROTOCOLLO_SPRITE_ANIMATI_v8_20261029.md) come riferimento vincolante per produzione di fotogrammi disegnati, anatomia, proprietà meccaniche dei materiali, punti di ancoraggio, continuità, effetti, limiti ai fallback e controlli. Applicare sempre le regole di consegna di questo AGENTS.md; aggiornare il link quando viene pubblicata una versione successiva del protocollo, senza duplicarne qui il contenuto.
 
+## Controlli CI e copertura (30/10/2026)
+
+- La CI deve mantenere la verifica completa del gioco sulle modifiche funzionali, inclusi motore, finale, spareggio, layout, Omen, persistenza, animazioni e asset. I test di scenario possono essere suddivisi in shard, mai omessi: l'unione deve coincidere con la suite integrale.
+- Le modifiche limitate a documentazione, regole degli agenti, `.gitignore` e materiale storico in `docs/` possono usare una verifica breve del solo impatto. In caso di classificazione incerta o errore del rilevamento, eseguire la CI completa.
+- Conservare `npm run test:browser`, `npm run test:ties` e `npm run test:chase` come comandi integrali riproducibili localmente. Non allegare HTML autonomi come anteprime; caricare screenshot, GIF e rapporti pertinenti, privilegiando gli artefatti necessari per la revisione.
+
 ## Refactoring e manutenzione del progetto
 
 Queste istruzioni si applicano a **qualsiasi agente o strumento** che modifichi il repository, inclusi ChatGPT Work, Codex e interventi manuali assistiti. Non dipendono dall'ambiente di sviluppo.
