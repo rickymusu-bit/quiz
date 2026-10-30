@@ -769,15 +769,15 @@
       "aria-label",
       count + " " + (count === 1 ? "vita" : "vite") + " su " + max,
     );
-    row.title = count + " vite su 3 · errori e timeout nell’Ultimo Miglio, sanzioni e Flagello tolgono un cuore";
+    row.title = count + " vite su 3 · errori e timeout nell’Ultimo Miglio, sanzioni e Flagello tolgono una vita";
     for (let i = 0; i < max; i++) {
-      const heart = node(
+      const skull = node(
         "span",
         undefined,
-        "heart" + (i >= count ? " lost" : ""),
+        "life-skull" + (i >= count ? " lost" : ""),
       );
-      heart.setAttribute("aria-hidden", "true");
-      row.append(heart);
+      skull.setAttribute("aria-hidden", "true");
+      row.append(skull);
     }
     return row;
   }
