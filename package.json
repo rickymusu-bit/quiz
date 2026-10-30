@@ -11,9 +11,7 @@
     "test:frames": "node tests/ammo_icons.cjs && node tests/vehicle_frames.cjs && node tests/demon_frames.cjs && node tests/vehicle_layout.cjs && node tests/hell_dust.cjs && node tests/ending_frames.cjs && node tests/terrain_frames.cjs",
     "test:ammo": "node tests/ammo_animation.cjs && node tests/bridge_layout.cjs && npm run preview:ammo && node tests/gothic_preview.cjs",
     "build": "node scripts/build.cjs",
-    "preview:offline": "node scripts/build.cjs --offline",
     "preview:ammo": "node scripts/build.cjs --ammo-preview",
-    "test:offline": "npm run preview:offline && python3 tests/offline.py && node tests/ammo_animation.cjs --offline",
     "test:endings": "python3 tests/endings.py",
     "test:terrain": "python3 tests/terrain_browser.py",
     "test:quality": "node scripts/build.cjs --quality-preview && python3 tests/visual_quality.py",
@@ -25,7 +23,9 @@
     "test:chase": "node --test tests/chase.test.js && node scripts/build.cjs --quality-preview && python3 tests/chase_browser.py",
     "test:portal": "node --test tests/portal.test.js && node scripts/build.cjs --quality-preview && python3 tests/portal_browser.py",
     "test:v130": "node --test tests/v130.test.js && node tests/v130_browser.cjs",
-    "audit:render": "node scripts/render-audit.cjs"
+    "audit:render": "node scripts/render-audit.cjs",
+    "preview:offline": "node scripts/build.cjs --offline",
+    "test:offline": "npm run preview:offline && python3 tests/offline.py && node tests/ammo_animation.cjs --offline"
   },
   "devDependencies": {
     "@napi-rs/canvas": "0.1.100",
