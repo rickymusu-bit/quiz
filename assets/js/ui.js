@@ -1273,6 +1273,22 @@
     for (const child of main.querySelectorAll(':scope > :not(.hell-race):not(.ending), .ending > :not(.hell-race)'))
       child.inert = blocked;
   }
+  function pauseForCinematic() {
+    cinematicPause = {game, question:game.s.current?.id};
+    game.pause("animazione");
+    persist();
+    updateTimeVial();
+  }
+  function resumeAfterCinematic() {
+    const held = cinematicPause;
+    cinematicPause = null;
+    if (held.game === game && game.s.current?.id === held.question &&
+        ["answer", "choice"].includes(game.s.screen) && game.s.paused && game.s.pauseReason === "animazione" &&
+        !game.s.panel && !game.s.suspended && !fitBlocked && !FoolLayout.portrait) {
+      game.resume(game.s.revision);
+      changed();
+    }
+  }
   function syncCinematic() {
     const malocchioAnswer = game?.s.screen === "answer" && !!game.s.malocchio;
     // The full response timer starts at confirmation, including a passed question.
@@ -1282,19 +1298,9 @@
     setTieScreenInert(tieActive);
     document.body.classList.toggle("showing-cinematic", active);
     if (active && game.running) {
-      cinematicPause = {game, question:game.s.current?.id};
-      game.pause("animazione");
-      persist();
-      updateTimeVial();
+      pauseForCinematic();
     } else if (!active && cinematicPause) {
-      const held = cinematicPause;
-      cinematicPause = null;
-      if (held.game === game && game.s.current?.id === held.question &&
-          ["answer", "choice"].includes(game.s.screen) && game.s.paused && game.s.pauseReason === "animazione" &&
-          !game.s.panel && !game.s.suspended && !fitBlocked && !FoolLayout.portrait) {
-        game.resume(game.s.revision);
-        changed();
-      }
+      resumeAfterCinematic();
     }
   }
   function pauseCinematic(){
