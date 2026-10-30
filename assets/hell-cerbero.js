@@ -64,7 +64,7 @@
         const im = new root.Image();
         images[path] = im;
         im.decoding = "async";
-        im.src = root.HellscapeOffline?.assets?.[path] || path;
+        im.src = root.HellscapePreviewResources?.assets?.[path] || path;
         im.addEventListener(
           "load",
           () => {
