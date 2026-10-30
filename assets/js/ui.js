@@ -1531,9 +1531,6 @@
       }
     }
     if (s.screen === "choice") {
-      const decisionTime = node("p", Math.ceil(game.left()/1000) + " s per scegliere", "malocchio-choice-time");
-      decisionTime.id = "malocchio-choice-time";
-      b.append(decisionTime);
       b.append(
         node(
           "p",
@@ -2016,8 +2013,6 @@
     vial.dataset.paused = String(!game.running);
     const choice = game.s.screen === "choice";
     vial.setAttribute("aria-label", choice ? "Tempo per scegliere a chi passare Malocchio" : "Tempo a disposizione");
-    const choiceTime = $("malocchio-choice-time");
-    if (choiceTime) choiceTime.textContent = Math.ceil(game.left()/1000) + " s per scegliere";
     vial.setAttribute("aria-valuenow", String(Math.round(level * 100)));
     vial.setAttribute(
       "aria-valuetext",
@@ -2701,7 +2696,6 @@
   }
   function onShortcutKeydown(event) {
     if (
-      document.body.dataset.input === "mobile" ||
       event.defaultPrevented ||
       event.isComposing ||
       event.ctrlKey ||
