@@ -2026,13 +2026,16 @@
     d.querySelector("button,input,select")?.focus();
     return d;
   }
+  function restoreFocusAfterDialog() {
+    main.tabIndex = -1;
+    main.focus({ preventScroll: true });
+  }
   function closeDialog() {
     passiveReturn = null;
     const d = $("dialog");
     if (d.open) {
       d.close();
-      main.tabIndex = -1;
-      main.focus({ preventScroll: true });
+      restoreFocusAfterDialog();
     }
   }
   function resumeAfterModal(wasRunning) {
