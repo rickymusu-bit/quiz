@@ -76,7 +76,7 @@ function qualityPreview() {
   const pages = {};
   for (const file of ["index.html", "Fool.html", "Fool_regole.html"]) {
     let html = inline(file);
-    const runtime = `window.HellscapeOffline={...parent.HellscapePreview.resources,search:parent.HellscapePreview.search};window.hellscapePreviewHome=()=>parent.HellscapePreview.navigate('index.html');document.addEventListener('click',e=>{const a=e.target.closest('a[href]');if(!a)return;const url=new URL(a.getAttribute('href'),'https://offline.invalid/');const file=url.pathname.split('/').pop()||'index.html';if(['index.html','Fool.html','Fool_regole.html'].includes(file)){e.preventDefault();e.stopImmediatePropagation();parent.HellscapePreview.navigate(file+url.search);}},true);`;
+    const runtime = `window.HellscapePreviewResources={...parent.HellscapePreview.resources,search:parent.HellscapePreview.search};window.hellscapePreviewHome=()=>parent.HellscapePreview.navigate('index.html');document.addEventListener('click',e=>{const a=e.target.closest('a[href]');if(!a)return;const url=new URL(a.getAttribute('href'),'https://offline.invalid/');const file=url.pathname.split('/').pop()||'index.html';if(['index.html','Fool.html','Fool_regole.html'].includes(file)){e.preventDefault();e.stopImmediatePropagation();parent.HellscapePreview.navigate(file+url.search);}},true);`;
     // The iframe receives launch parameters without relying on file:// query handling.
     html = html.replace("<head>", "<head><script>" + runtime + "</script>");
     pages[file] = html;
@@ -98,7 +98,7 @@ function ammoPreview(){
     const p='assets/hell-race/'+name;assets[p]=data(p);
   }
   addCerberoAssets(assets);
-  const html=inline('Ammo-preview.html').replace('<head>','<head><meta name="hellscape-revision" content="'+revision+'"><script>window.HellscapeOffline={assets:'+safe(assets)+'};</script>');
+  const html=inline('Ammo-preview.html').replace('<head>','<head><meta name="hellscape-revision" content="'+revision+'"><script>window.HellscapePreviewResources={assets:'+safe(assets)+'};</script>');
   fs.writeFileSync(path.join(out,'Hellscape-Ammo.html'),html);
 }
 fs.mkdirSync(out, { recursive: true });
@@ -112,7 +112,7 @@ else {
   const site = path.join(out, "site");
   fs.mkdirSync(site, { recursive: true });
   // Preserve every published route and its assets, including the preview page.
-  // Offline packaging is a separate optional branch above, not a site dependency.
+  // Browser review harnesses are separate from the published site.
   const publishedPaths = [
     "index.html",
     "Fool.html",
