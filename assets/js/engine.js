@@ -24,6 +24,9 @@
     shuffle,
   } = core;
   const { parseDataset } = datasets;
+  function isSupportedVehicle(vehicle) {
+    return ["chopper", "pickup", "truck", "coupe", "offroad", "ape"].includes(vehicle);
+  }
   function config(c) {
     need(
       Array.isArray(c.names) && c.names.length === 3,
@@ -49,11 +52,7 @@
       need(
         Array.isArray(c.vehicles) &&
           c.vehicles.length === 3 &&
-          c.vehicles.every((x) =>
-            ["chopper", "pickup", "truck", "coupe", "offroad", "ape"].includes(
-              x,
-            ),
-          ) &&
+          c.vehicles.every(isSupportedVehicle) &&
           new Set(c.vehicles).size === 3,
         "Scegli tre veicoli diversi tra i sei disponibili",
       );
