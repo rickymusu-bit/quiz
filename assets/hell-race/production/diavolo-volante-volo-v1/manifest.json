@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "source_revision": "ec4eb85057da38b821e3c2ae00ee0dcc017f418f",
-  "status": "retake_design_A_membrane_holes",
+  "status": "revised_membrane_design_pending_review",
   "reference": {
     "path": "references/scena-reale-20261030.jpg",
     "git_blob": "ab349ca62d2285964ad805a785f3db2dc99c882e",
@@ -57,7 +57,8 @@
       ],
       "report": "reports/verifica_002_v1.0.0_20261030.md",
       "registration_note": "B body approximately 60 pixels above A; visual estimate. Measure/align rigid whole frame during packing; ensure lower wing padding before any loop approval.",
-      "rejection": "Ali allungate e membrane prive dei fori richiesti; non basta allineare il busto. Non usare per intermedi."
+      "rejection": "Ali allungate e membrane prive dei fori richiesti; non basta allineare il busto. Non usare per intermedi.",
+      "comparison_gif": "reports/gifs/confronto_A_B_respinta_v1.gif"
     },
     {
       "id": "003",
@@ -65,8 +66,20 @@
       "prompt": "prompts/003_design_A_v2.md",
       "source": "approved/pose_A.png",
       "output": "candidates/003_design_A_v2.png",
-      "status": "not_generated",
-      "approval": null
+      "status": "candidate_design_revision_pending_review",
+      "approval": null,
+      "git_blob": "0ee92d6e71a9091fd2ef8badb3177800cf70a997",
+      "sha256": "5bae4b2ae1f4379a7a10f6389850b7034fc1570bd9108988668b9aad40eebbdc",
+      "size": [
+        1536,
+        1024
+      ],
+      "alpha_extrema": [
+        0,
+        254
+      ],
+      "comparison_gif": "reports/gifs/confronto_A_v1_A_v2.gif",
+      "report": "reports/verifica_003_v1.0.0_20261030.md"
     }
   ],
   "replacement_instruction": {
