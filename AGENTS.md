@@ -13,16 +13,16 @@ Per ogni modifica visiva o funzionale a Hellscape/Fool:
 - Documentare le schermate fondamentali e, quando pertinenti, stati alternativi e proporzioni desktop/mobile. Non sostituire screenshot reali con mockup o immagini generate.
 - Non dichiarare completata una verifica visuale senza avere realmente acquisito la GIF o gli screenshot pertinenti. Non spacciare immagini generate o animazioni illustrative per registrazioni del gioco. In caso di impedimenti, descrivere cosa non è stato possibile verificare.
 - Quando l'utente chiede di procedere una cosa per volta, consegnare un singolo intervento completo e giudicabile per volta, con la relativa anteprima, senza accorpare le modifiche successive.
-- Non eseguire merge senza approvazione esplicita.
+- Non eseguire merge senza approvazione esplicita, anche quando contenuta in un piano di lavoro già approvato; verificare CI applicabile e SHA della head prima di ogni merge.
 
 Applicare la preferenza «GIF per la dinamica, screenshot per gli stati statici, nessun HTML embedded» anche agli altri siti e alle altre interfacce sviluppati per l'utente.
 
 ## Modalità di distribuzione — requisito corrente (30/10/2026)
 
 - **Hellscape deve funzionare dal sito pubblicato via HTTP(S), attualmente GitHub Pages. L'esecuzione senza connessione Internet o da un file HTML autonomo non è richiesta.**
-- La build offline e i relativi test preesistenti sono strumenti opzionali/legacy, non condizioni di accettazione né obblighi per le nuove funzionalità. Non richiedere la generazione o la consegna di un HTML offline nelle PR, nelle anteprime o nel refactoring.
+- L'esportazione offline e i relativi test sono stati rimossi con la PR #78. L'ambiente HTML interno di revisione grafica non costituisce una distribuzione offline del gioco; non richiedere HTML offline nelle PR o nelle anteprime.
 - I test possono usare un pacchetto HTML autonomo come **ambiente interno di revisione grafica**, ma ciò non introduce un requisito di funzionamento offline per il prodotto; la verifica delle funzionalità del sito online resta prioritaria.
-- Mantenere i salvataggi locali e la ripresa della partita nello stesso browser: non sono dipendenti dalla distribuzione offline. Non eliminare il codice legacy dell'export senza una PR dedicata e senza verificare le dipendenze dei test.
+- Mantenere i salvataggi locali e la ripresa della partita nello stesso browser: non sono dipendenti dalla distribuzione offline. Non reintrodurre l'export offline senza una nuova richiesta esplicita. Qualsiasi modifica agli harness di revisione deve preservare test, screenshot reali e isolamento dei salvataggi.
 
 ## Orientamento del gioco
 
@@ -89,3 +89,10 @@ Queste istruzioni si applicano a **qualsiasi agente o strumento** che modifichi 
 - Se il refactoring è significativo, preferire una PR dedicata, distinta da nuove funzionalità, con sintesi delle modifiche e dei controlli effettuati.
 - Per le modifiche visive o funzionali restano obbligatorie GIF reali o screenshot secondo la sezione precedente, senza HTML di anteprima.
 - Prima di modificare AGENTS.md, verificare che la regola non esista già ed evitare duplicazioni o istruzioni contraddittorie.
+
+## Versioning e archiviazione delle evidenze (30/10/2026)
+
+- Per i nuovi documenti di lavoro usare nomi versionati `TITOLO_vMAJOR.MINOR.PATCH_YYYYMMDD.md` e annotare fonte, revisione e modifiche; per i documenti vivi conservare normalmente solo ultima e penultima versione. Non eliminare specifiche vincolanti o riferimenti necessari.
+- Gli screenshot/GIF storici non rappresentano necessariamente la UI corrente: mantenere provenienza e commit sorgente. Non riutilizzarli come prova di un test nuovo.
+- L'archivio `docs/review-archive/20261030/` conserva byte per byte le evidenze uniche dei sette branch `review/*` precedenti; il manifesto `docs/REVIEW_EVIDENCE_ARCHIVE_v1.0.0_20261030.md` ne registra SHA e provenienza. Non eliminare i branch prima che il merge dell'archivio sia verificato e il workflow abbia ricontrollato tutti i blob, le modifiche e gli SHA delle head.
+- La verifica finale end-to-end deve produrre screenshot reali dalla revisione verificata e registrare gli esiti dei test. Conservare le prove canoniche indispensabili; non versionare tutti gli output temporanei di CI.
