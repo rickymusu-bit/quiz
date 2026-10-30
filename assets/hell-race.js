@@ -552,6 +552,19 @@
     canvas.width = RACE_WIDTH;
     canvas.setAttribute('aria-hidden', 'true');
     fig.appendChild(canvas);
+    // Keep the first visible frame consistent with the final environment.
+    // This neutral loading layer can later host the flying-devil animation.
+    fig.style.position = 'relative';
+    canvas.style.visibility = 'hidden';
+    const loading = document.createElement('div');
+    loading.className = 'hell-scene-loading';
+    loading.setAttribute('role', 'status');
+    loading.setAttribute('aria-live', 'polite');
+    loading.textContent = 'Caricamento scenario…';
+    Object.assign(loading.style, {position:'absolute',inset:'0',display:'grid',
+      placeItems:'center',background:'#100b0d',color:'#e5cba8',
+      font:'24px FoolTerminal, monospace',zIndex:'2',textAlign:'center'});
+    fig.appendChild(loading);
     const caption = document.createElement('figcaption');
     caption.className = 'hell-race-caption';
     caption.textContent = final
@@ -595,6 +608,21 @@
       // Bound fill rate on DPR displays; all motion still uses elapsed time.
       if(lastPaint!==null&&now-lastPaint<1000/30-.5){record.frame=root.requestAnimationFrame(draw);return;}
       lastPaint=now;
+      const bridge = root.FoolBridge;
+      const bridgeReady = !!bridge?.ready?.();
+      if (!bridgeReady) {
+        if (bridge?.failed?.()) {
+          loading.textContent = 'Impossibile caricare lo scenario. Ricarica la pagina.';
+          return;
+        }
+        record.frame = root.requestAnimationFrame(draw);
+        return;
+      }
+      // Unhide only after both definitive environment images have loaded.
+      if (loading.isConnected) {
+        canvas.style.visibility = '';
+        loading.remove();
+      }
       const width = RACE_WIDTH;
       // Match CSS size and effective DPR, bounded to 1536×1152 (7 MiB RGBA).
       const rasterScale=Math.max(1,Math.min(1536/width,canvas.getBoundingClientRect().width/width*Math.min(2,root.devicePixelRatio||1)));
