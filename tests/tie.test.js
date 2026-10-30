@@ -61,6 +61,12 @@ test('Completed victories clear a pending or active tie notice so navigation unl
  assert.equal(t2.sample().kind,'elimination');
  assert(t2.sample().blocking);
  t2.sync({...eliminated,phase:'conclusa'});
+ // The last player still gets the "ELIMINATO" card, before final capture.
+ assert(t2.sample().blocking);
+ assert.equal(t2.sample().phase,'eliminated');
+ t2.advance(DURATION.elimination,{captures:true});
+ assert.equal(t2.sample().phase,'capture');
+ t2.completeCapture();
  assert(!t2.sample().blocking);
  assert.equal(t2.sample().phase,'idle');
 });
