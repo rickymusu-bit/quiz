@@ -126,3 +126,14 @@ Lo specchio gotico dell’atlante nativo ora si innalza sul giocatore che attiva
 Contrappasso, con indicazioni di punti ×2 e rischio −2×. Non proietta più un
 attacco verso l’aggressore. Nessuna modifica ai pixel dell’atlante; l’effetto
 continua a rispettare pausa, movimento ridotto e orologio della scena.
+
+## Diavoli volanti approvati — 30/10/2026
+
+- `diavolo-flight-aba-v1.gif`: GIF A→B→A approvata dall'utente in conversazione («Perfetto. Salvalo negli asset sul repo»), conservata senza modifiche.
+- `diavolo-flight-v1.webp`: atlas lossless di otto celle 420×560, estratte dai primi otto frame della GIF; nessun ridisegno, morphing o deformazione locale.
+- `diavolo-flight-v1.json`: dimensioni, pivot, pose originali 1–5 e 8–10 (6 e 7 escluse su richiesta), ordine circolare di 14 frame e durate identiche alla GIF. Periodo 1,36 s.
+- Fonte: spritesheet `15230.png`, Library `libfile_bca5adfd22488191ab7bbde1ed59d37b`; GIF approvata `Hellscape_diavolo_8_pose_ABA_v1.0.0_20261030.gif`, Library `libfile_073e370172788191b062b8d2746245d8`. I prompt della generazione precedente non sono ricostruiti né inventati in questa integrazione.
+- Ruolo: otto creature sul piano del cielo, dietro il ponte; larghezze logiche 25/37/49/61 px, quattro distanze, direzioni speculari e fasi alari sfalsate. Scala uniforme sull'intero sprite, senza deformare anatomia o materiali.
+- Cinematica: velocità orizzontali nel mondo ±10/15/20 unità/s, inferiori alle 48 unità/s della corsa. Posizione proiettata = posizione iniziale + (velocità × tempo − distanza effettiva telecamera) × profondità. La telecamera segue Cerbero: in corsa entrambi i versi scorrono verso sinistra, con velocità apparente attenuata per i più lontani. Durante rallentamenti/arresti della camera si usa il suo spostamento effettivo; pausa e movimento ridotto seguono l'orologio condiviso.
+- Sostituito il disegno procedurale delle vecchie sagome nere, rimosso dal renderer. Il caricamento della scena attende anche il nuovo atlas. Cerbero, veicoli e regole di gioco conservano gli asset e la logica esistenti.
+- Verifiche: test di ordine/timing/loop, dimensioni atlas, velocità relative e parallasse; suite automatica e registrazione reale del browser documentate nella PR. Nessun nuovo prompt di generazione: l'intervento assembla e riproduce materiale già approvato.

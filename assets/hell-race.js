@@ -10,7 +10,8 @@
   // Widths in logical race pixels; preserve each complete silhouette's aspect ratio.
   const vehicleWidths = [44, 58, 62, 54, 56, 40];
   const sheets = { vehicles: null };
-  const files = { vehicles: 'vehicles-drive-v1.webp' };
+  sheets.flyers = null;
+  const files = { vehicles: 'vehicles-drive-v1.webp', flyers: 'diavolo-flight-v1.webp' };
   // Shared atlases are decoded once; every state uses the same images.
   if (typeof root.Image === 'function') {
     for (const key of Object.keys(sheets)) {
@@ -296,64 +297,47 @@
     }
     return { x: left, y: top - 4 * unit, width: 50 * unit, height: 24 * unit };
   }
-  const devilFrames=new Map();
-  function devilFrame(frame) {
-    if(devilFrames.has(frame))return devilFrames.get(frame);
-    const canvas=document.createElement('canvas');canvas.width=192;canvas.height=180;
-    const c=canvas.getContext('2d'),flap=Math.sin(frame/16*Math.PI*2)*7;
-    c.translate(96,72);c.scale(3,3);
-    const shade=c.createLinearGradient(0,-18,0,25);
-    shade.addColorStop(0,'#301815');shade.addColorStop(.55,'#160c0c');shade.addColorStop(1,'#281411');
-    c.fillStyle=shade;
-    for(const side of [-1,1]){
-      c.save();c.scale(side,1);
-      c.beginPath();c.moveTo(2,-1);
-      c.bezierCurveTo(8,-7,17,-13+flap,29,-10+flap);
-      c.quadraticCurveTo(24,-4+flap,26,3+flap*.35);
-      c.quadraticCurveTo(19,-1,17,7+flap*.2);
-      c.quadraticCurveTo(12,2,10,10);
-      c.quadraticCurveTo(7,4,3,6);c.closePath();c.fill();
-      c.strokeStyle='#603326';c.lineWidth=.45;c.globalAlpha=.65;
-      for(const [tx,ty] of [[28,-10+flap],[25,3+flap*.35],[17,7+flap*.2]]){
-        c.beginPath();c.moveTo(3,0);c.quadraticCurveTo(10,-5,tx,ty);c.stroke();
-      }
-      c.globalAlpha=1;
-      c.beginPath();c.moveTo(2,-6);c.quadraticCurveTo(10,-11,7,-18);
-      c.quadraticCurveTo(6,-11,1,-10);c.closePath();c.fill();
-      c.beginPath();c.moveTo(2,5);c.lineTo(5,13);c.lineTo(3,18);
-      c.lineTo(8,17);c.lineTo(7,14);c.lineTo(7,10);c.lineTo(4,3);c.closePath();c.fill();
+  // Approved eight-pose A→B→A cycle, exactly matching the review GIF.
+  const flightOrder = [0,1,2,3,4,5,6,7,6,5,4,3,2,1];
+  const flightDurations = [140,90,90,90,90,90,90,140,90,90,90,90,90,90];
+  const flightPeriod = flightDurations.reduce((sum, duration) => sum + duration, 0);
+  function devilFrame(time) {
+    let phase = ((time * 1000 % flightPeriod) + flightPeriod) % flightPeriod;
+    for (let i = 0; i < flightOrder.length; i++) {
+      if (phase < flightDurations[i]) return flightOrder[i];
+      phase -= flightDurations[i];
+    }
+    return flightOrder[0];
+  }
+  function devilPosition(index, width, time, cameraDistance) {
+    // World flight is slower than the pack (ROAD_SPEED). The camera follows
+    // Cerbero: forward-facing flyers are overtaken too. Depth attenuates both
+    // world motion and camera displacement, rather than reversing their facing.
+    const depth = .16 + (index % 4) * .095;
+    const direction = index % 2 ? -1 : 1;
+    const velocity = direction * (10 + (index % 3) * 5);
+    const span = width + 140, slot = (index + .5) * span / 8;
+    const displacement = (velocity * time - cameraDistance) * depth;
+    return {
+      x: ((slot + displacement) % span + span) % span - 70,
+      y: 40 + ((index * 3) % 8) * 19 + Math.sin(time * .55 + index * 2) * 3,
+      width: 25 + (index % 4) * 12,
+      depth, direction, velocity,
+    };
+  }
+  function flyingDevils(c, W, time, cameraDistance) {
+    if (!imageReady(sheets.flyers)) return;
+    c.save();c.globalAlpha=1;c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';
+    // Smaller, distant creatures first; near creatures may occlude them.
+    const flock = Array.from({length:8}, (_, i) => ({
+      ...devilPosition(i, W, time, cameraDistance), frame: devilFrame(time + i * .173),
+    })).sort((a, b) => a.depth - b.depth);
+    for (const p of flock) {
+      const height = p.width * 560 / 420;
+      c.save();c.translate(p.x,p.y);c.scale(p.direction,1);
+      c.drawImage(sheets.flyers, p.frame * 420, 0, 420, 560,
+        -p.width / 2, -height / 2, p.width, height);
       c.restore();
-    }
-    c.beginPath();c.ellipse(0,-6,3.4,4.6,0,0,Math.PI*2);c.fill();
-    c.beginPath();c.moveTo(-3,-3);c.quadraticCurveTo(-5,3,-2,9);
-    c.lineTo(2,9);c.quadraticCurveTo(5,3,3,-3);c.closePath();c.fill();
-    c.strokeStyle='#291412';c.lineWidth=1.8;c.lineCap='round';
-    c.beginPath();c.moveTo(0,7);c.bezierCurveTo(-1,15,17,13,13,23);c.stroke();
-    c.beginPath();c.moveTo(13,26);c.lineTo(9,20);c.lineTo(16,21);c.closePath();c.fill();
-    // Rasterize once at the same source density as the illustrated scene assets.
-    // Subtle grain and wing ribs keep the distant silhouettes from looking like flat icons.
-    c.globalCompositeOperation='source-atop';
-    for(let n=0;n<160;n++){
-      const x=((n*37)%173)/3-28,y=((n*71)%137)/3-17;
-      c.fillStyle=n%3?'#77402c55':'#09070888';c.fillRect(x,y,.3,.4);
-    }
-    devilFrames.set(frame,canvas);return canvas;
-  }
-  function devilPosition(index,width,time) {
-    const span=width+90,slot=(index+.5)*span/8;
-    return {x:((slot+time*2)%span+span)%span-45,
-      y:25+((index*3)%8)*17+Math.sin(time*.65+index*2)*1.4,
-      size:.48+(index%3)*.065};
-  }
-  function flyingDevils(c,W,time) {
-    c.save();c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';
-    for(let i=0;i<8;i++){
-      const p=devilPosition(i,W,time),direction=i%2?-1:1;
-      const frame=((Math.floor(time*5.5+i*2.3)%16)+16)%16;
-      const image=devilFrame(frame);
-      c.save();c.translate(p.x,p.y);c.scale(direction*p.size,p.size);
-      c.globalAlpha=1;
-      c.drawImage(image,-32,-24,64,60);c.restore();
     }
     c.restore();
   }
@@ -362,7 +346,7 @@
     const layers=ending?.bridge?{damage:ending.bridge,
       behind:()=>root.FoolPortal.back(c,ending.portal)}:null;
     if(root.FoolBridge?.environment(c,W,H,tick,effectTime)){
-      flyingDevils(c,W,effectTime);
+      flyingDevils(c,W,effectTime,tick*motion.ROAD_SPEED);
       root.FoolBridge.draw(c,W,tick,progress,null,effectTime,layers);
       return;
     }
@@ -562,16 +546,16 @@
       if(lastPaint!==null&&now-lastPaint<1000/30-.5){record.frame=root.requestAnimationFrame(draw);return;}
       lastPaint=now;
       const bridge = root.FoolBridge;
-      const bridgeReady = !!bridge?.ready?.();
+      const bridgeReady = !!bridge?.ready?.() && imageReady(sheets.flyers);
       if (!bridgeReady) {
-        if (bridge?.failed?.()) {
+        if (bridge?.failed?.() || (sheets.flyers?.complete && !sheets.flyers.naturalWidth)) {
           loading.textContent = 'Impossibile caricare lo scenario. Ricarica la pagina.';
           return;
         }
         record.frame = root.requestAnimationFrame(draw);
         return;
       }
-      // Unhide only after both definitive environment images have loaded.
+      // Unhide after the definitive environment and approved flight atlas have loaded.
       if (loading.isConnected) {
         canvas.style.visibility = '';
         loading.remove();

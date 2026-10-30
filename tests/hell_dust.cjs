@@ -1,7 +1,8 @@
 'use strict';
-const {createCanvas}=require('@napi-rs/canvas'),vm=require('node:vm'),fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
-const root={FoolMotion:require('../assets/hell-motion.js'),FoolLayout:require('../assets/hell-layout.js'),matchMedia:()=>({matches:false})};
-const source=fs.readFileSync(path.join(__dirname,'../assets/hell-race.js'),'utf8').replace('root.FoolHellRace = { createStage, vehiclePreview };','root.FoolHellRace = { vehicleDust, dustPuff, dirtChip, flyingDevils };');
+const {createCanvas,loadImage}=require('@napi-rs/canvas'),vm=require('node:vm'),fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+(async()=>{
+const root={__flyer:await loadImage('assets/hell-race/diavolo-flight-v1.webp'),FoolMotion:require('../assets/hell-motion.js'),FoolLayout:require('../assets/hell-layout.js'),matchMedia:()=>({matches:false})};
+const source=fs.readFileSync(path.join(__dirname,'../assets/hell-race.js'),'utf8').replace('sheets.flyers = null;', 'sheets.flyers = root.__flyer;').replace('root.FoolHellRace = { createStage, vehiclePreview };','root.FoolHellRace = { vehicleDust, dustPuff, dirtChip, flyingDevils };');
 const math=Object.create(Math);math.random=()=>{throw Error('Dust must not consume game RNG')};
 vm.runInNewContext(source,{window:root,Math:math,document:{createElement:()=>createCanvas(1,1)}});const dust=root.FoolHellRace;
 const K=require('../assets/hell-cerbero.js');
@@ -9,7 +10,7 @@ const cerberoDust=(c,t)=>K.dust(c,{left:10,ground:150,width:221,runWeight:1},{ti
 function render(fn){const canvas=createCanvas(360,180),c=canvas.getContext('2d');c.globalAlpha=.7;const alpha=c.globalAlpha;fn(c);assert.equal(c.globalAlpha,alpha,'Effect must restore canvas opacity');return canvas;}
 function pixels(canvas){return canvas.getContext('2d').getImageData(0,0,canvas.width,canvas.height).data;}
 for(const type of ['vehicle','demon','sky']){
- const paint=(c,t)=>type==='vehicle'?dust.vehicleDust(c,260,145,t,2):type==='demon'?cerberoDust(c,t):dust.flyingDevils(c,360,t);
+ const paint=(c,t)=>type==='vehicle'?dust.vehicleDust(c,260,145,t,2):type==='demon'?cerberoDust(c,t):dust.flyingDevils(c,360,t,t*48);
  const a=render(c=>paint(c,2)),b=render(c=>paint(c,2)),later=render(c=>paint(c,2.16));
  assert.deepEqual(pixels(a),pixels(b),'Same clock must reproduce frozen dust');assert.notDeepEqual(pixels(a),pixels(later),'Dust must evolve with motion');
  let calls=0;render(c=>{const fill=c.fillRect.bind(c);c.fillRect=(...args)=>{calls++;assert(args.every(Number.isFinite));fill(...args)};paint(c,1e8)});
@@ -27,8 +28,11 @@ for(let frame=0;frame<4;frame++){
 fs.mkdirSync(path.join(__dirname,'../artifacts'),{recursive:true});fs.writeFileSync(path.join(__dirname,'../artifacts/dust-sequence.png'),board.toBuffer('image/png'));
 console.log('PASS: evolving dust, deterministic freeze, bounded particles, lifetime and isolated canvas state; no game RNG');
 
-const sky=render(c=>dust.flyingDevils(c,360,4)),sd=pixels(sky);for(let y=174;y<180;y++)assert(!sd.slice(y*360*4,(y+1)*360*4).some(v=>v),'Flying devils stay in the distant sky');
+const sky=createCanvas(360,576);dust.flyingDevils(sky.getContext('2d'),360,4,4*48);
+const sd=pixels(sky);for(let y=228;y<576;y++)assert(!sd.slice(y*360*4,(y+1)*360*4).some(v=>v),'Flying devils stay above the bridge deck');
 
-const alpha=pixels(render(c=>dust.flyingDevils(c,360,4))).filter((v,i)=>i%4===3);
+const alpha=pixels(render(c=>dust.flyingDevils(c,360,4,4*48))).filter((v,i)=>i%4===3);
 assert(alpha.some(v=>v===255),'Flying devil bodies must be opaque, even if the parent context was translucent');
-render(c=>{const draw=c.drawImage.bind(c);c.drawImage=(...args)=>{assert.equal(c.globalAlpha,1,'Each background devil is painted without an opacity reduction');draw(...args)};dust.flyingDevils(c,360,4)});
+render(c=>{const draw=c.drawImage.bind(c);c.drawImage=(...args)=>{assert.equal(c.globalAlpha,1,'Each background devil is painted without an opacity reduction');draw(...args)};dust.flyingDevils(c,360,4,4*48)});
+
+})().catch(error=>{console.error(error);process.exitCode=1});
