@@ -1269,13 +1269,17 @@
     return ui === "game" && !!game && (main.classList.contains("showing-movement") ||
       main.querySelector('.hell-race[data-animation-busy="true"]') !== null);
   }
+  function setTieScreenInert(blocked) {
+    for (const child of main.querySelectorAll(':scope > :not(.hell-race):not(.ending), .ending > :not(.hell-race)'))
+      child.inert = blocked;
+  }
   function syncCinematic() {
     const malocchioAnswer = game?.s.screen === "answer" && !!game.s.malocchio;
     // The full response timer starts at confirmation, including a passed question.
     const active = cinematicActive() && !malocchioAnswer;
     // A finished game cannot be locked by a stale Ultimo Miglio notice.
     const tieActive = game?.s.phase === "pareggio" && FoolHellRace.tieStatus().blocking;
-    for(const child of main.querySelectorAll(':scope > :not(.hell-race):not(.ending), .ending > :not(.hell-race)'))child.inert=tieActive;
+    setTieScreenInert(tieActive);
     document.body.classList.toggle("showing-cinematic", active);
     if (active && game.running) {
       cinematicPause = {game, question:game.s.current?.id};
