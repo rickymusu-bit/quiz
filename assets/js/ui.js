@@ -3,10 +3,10 @@
   const store = HellscapePersistence.create({
     storage: () => localStorage,
     engine: Fool,
-    namespace: window.HellscapeOffline ? "hellscape-offline-v1" : null,
+    namespace: window.HellscapePreviewResources ? "hellscape-offline-v1" : null,
   });
   const launchParams = new URLSearchParams(
-    window.HellscapeOffline?.search ?? location.search,
+    window.HellscapePreviewResources?.search ?? location.search,
   );
   const F = Fool,
     $ = (id) => document.getElementById(id),
@@ -1390,7 +1390,7 @@
     art.className = "end-wordmark";
     const titleAsset =
       s.winner === null ? "assets/game-over.png" : "assets/hell-race/victory-title-v1.webp";
-    art.src = window.HellscapeOffline?.assets?.[titleAsset] || titleAsset;
+    art.src = window.HellscapePreviewResources?.assets?.[titleAsset] || titleAsset;
     art.alt = s.winner === null ? "GAME OVER" : "VITTORIA";
     if (s.winner !== null) b.classList.add("victory");
     art.setAttribute("fetchpriority", "high");
@@ -2756,7 +2756,7 @@
   }, 100);
   setInterval(persist, 3000);
   if (
-    !window.HellscapeOffline &&
+    !window.HellscapePreviewResources &&
     (launchParams.get("start") === "1" || launchParams.get("resume") === "1")
   )
     history.replaceState(null, "", location.pathname);
