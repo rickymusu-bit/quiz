@@ -25,3 +25,6 @@ I prompt espliciti sono conservati prima di ogni chiamata; le istruzioni interne
 
 ## Decisione utente — 30/10/2026
 Design statico A approvato: «Va bene». Proseguire con B ali abbassate mantenendo l'identità. A completamento del nuovo ciclo, rimuovere e sostituire i vecchi diavoli neri. La rimozione è pianificata per l'integrazione del nuovo asset, senza doppie popolazioni. Approvazione artistica non equivale ad approvazione del merge o del runtime.
+
+## Correzione utente — 30/10/2026
+B v1 respinta: ali allungate e membrane prive di fori. La sola registrazione del corpo non risolve il difetto anatomico. Revisione mirata A per membrane forate, poi nuova B dal riferimento accettato. Ogni nuovo PNG deve essere accompagnato da GIF diagnostica reale dei PNG allineati (§7.6 protocollo v9). Nessun nuovo PNG considerato approvato automaticamente.

@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "source_revision": "ec4eb85057da38b821e3c2ae00ee0dcc017f418f",
-  "status": "pose_B_candidate_pending_review",
+  "status": "retake_design_A_membrane_holes",
   "reference": {
     "path": "references/scena-reale-20261030.jpg",
     "git_blob": "ab349ca62d2285964ad805a785f3db2dc99c882e",
@@ -26,7 +26,7 @@
         0,
         254
       ],
-      "status": "approved_static_design",
+      "status": "approved_previous_design_revision_requested",
       "approval": {
         "date": "2026-10-30",
         "user_quote": "Va bene. Quando sarà completato il design rimuovi i vecchi diavoli, i vecchi diavoli neri che c'erano prima",
@@ -42,7 +42,7 @@
       "prompt": "prompts/002_posa_B_v1.md",
       "source": "approved/pose_A.png",
       "output": "candidates/002_posa_B_v1.png",
-      "status": "candidate_needs_registration",
+      "status": "rejected_by_user",
       "approval": null,
       "git_blob": "5eb68e12be472208a607e31a1078f6b3968e1a9f",
       "sha256": "7e1f2df1789440f24fdaaeca42755015b8ba6b05ec24ba32e82633ae37c66255",
@@ -56,12 +56,23 @@
         254
       ],
       "report": "reports/verifica_002_v1.0.0_20261030.md",
-      "registration_note": "B body approximately 60 pixels above A; visual estimate. Measure/align rigid whole frame during packing; ensure lower wing padding before any loop approval."
+      "registration_note": "B body approximately 60 pixels above A; visual estimate. Measure/align rigid whole frame during packing; ensure lower wing padding before any loop approval.",
+      "rejection": "Ali allungate e membrane prive dei fori richiesti; non basta allineare il busto. Non usare per intermedi."
+    },
+    {
+      "id": "003",
+      "phase": "design_A_membrane_revision",
+      "prompt": "prompts/003_design_A_v2.md",
+      "source": "approved/pose_A.png",
+      "output": "candidates/003_design_A_v2.png",
+      "status": "not_generated",
+      "approval": null
     }
   ],
   "replacement_instruction": {
     "date": "2026-10-30",
     "status": "pending_complete_approved_cycle",
     "instruction": "Quando il nuovo design/ciclo è completo, sostituire e rimuovere i vecchi diavoli neri procedurali; non mantenere due popolazioni sovrapposte. Verificare riferimenti prima di eliminare codice o asset."
-  }
+  },
+  "incremental_gif_required": true
 }
