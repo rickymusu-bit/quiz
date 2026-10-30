@@ -108,6 +108,7 @@ Al 29/10/2026, dal codice e dalla documentazione del repository si ricavano ques
 | Fiamme, fumo, liquidi, fratture o trasformazioni | Disegni/animazione specifica degli effetti | Causalità e ancoraggi; non forzare una sagoma rigida |
 
 **Prova prima della produzione.** Dopo l'audit e il piano di movimento, preparare i due estremi e almeno un breakdown rappresentativo, inizialmente anche schematici. Per il rig provare anche la traiettoria continua fra le pose: estremi corretti non dimostrano che il passaggio sia corretto. Mostrare il ciclo alla velocità prevista e alla scala finale, controllando:
+
 - articolazioni, lunghezze e volumi plausibili; ossa, artigli, crani e metallo conservano la forma;
 - membrane flessibili senza stiramenti gratuiti; fori e segni restano sullo stesso lembo;
 - prospettiva, occlusioni, superfici visibili e illuminazione coerenti;
@@ -664,7 +665,7 @@ Questa sezione riguarda **il documento di lavoro**; per refactoring del codice d
 2. **Numerazione progressiva:** le revisioni sostanziali producono un **nuovo file** con versione successiva. Non sovrascrivere la versione precedente per un cambiamento sostanziale; i ripristini generano una versione successiva, senza decrementare N.
 3. **Piccole correzioni:** refusi, punteggiatura o collegamenti senza variazioni di significato possono essere corretti nella stessa versione, tracciando il commit.
 4. **Data e stato:** aggiornare data locale, versione, stato e registro modifiche quando nasce una nuova edizione. Distinguere proposta, approvazione e implementazione.
-5. **Conservazione:** mantenere direttamente nella cartella di lavoro **ultima e penultima versione** del documento; le versioni più vecchie rimangono rintracciabili nella cronologia Git. Non cancellare documenti storici di altra famiglia.
+5. **Conservazione:** mantenere direttamente nella cartella di lavoro **ultima e penultima versione** del documento; le versioni più vecchie rimangono rintracciabili nella cronologia Git. Per v8/v9 del protocollo, i rimandi di provenienza nel fascicolo del diavolo si riferiscono alla revisione storica `bc96436cebbd6979c871cae36f66475bfbbdf3a1`, dove tali file restano recuperabili; i prompt storici non vanno riscritti. Non cancellare documenti storici di altra famiglia.
 6. **Refactoring editoriale continuo:** dopo aggiornamenti significativi eliminare duplicazioni, sezioni obsolete, contraddizioni, rimandi rotti e istruzioni ormai superate; preservare tutte le regole ancora valide.
 7. **Refactoring strutturale:** programmare una revisione di struttura **al più tardi a ogni decima versione sostanziale** (v10, v20, …), anticipandola se il documento diventa complesso. Una correzione ortografica non fa avanzare il contatore.
 8. **No regressioni normative:** la riorganizzazione editoriale non può cancellare vincoli approvati né cambiarne significato. Prima di sostituire un criterio segnalare esplicitamente il conflitto con le istruzioni precedenti.
@@ -685,7 +686,6 @@ Questa sezione riguarda **il documento di lavoro**; per refactoring del codice d
 | v8 | 2026-10-29 | Integra pose-to-pose professionale, key/breakdown/inbetween, archi, volumi, timing/X-sheet, onion skin e controllo silhouette; rettifica generazione multiposa predefinita: una posa per volta con limiti IA espliciti e retake mirati. |
 | v9 | 2026-10-30 | GIF diagnostica dopo ogni PNG, allineamento su pivot e controllo di lunghezze e topologia delle membrane. |
 | v10 | 2026-10-30 | Normalizzazione obbligatoria dopo ogni generazione: landmark corporei, trasformazioni globali, tolleranze alla scala reale, controlli anatomici separati e tracciabilità. Revisione strutturale: regole di allineamento centralizzate in §4.1 e rinvii coerenti nelle fasi operative, senza cambiare i gate. Corretto ordine del registro revisioni e separatore storico. |
-
 | v11.0.0 | 2026-10-30 | Scelta motivata rig/disegno/tecnica mista con prova agli estremi e nel percorso; materiali e file sorgenti; rig in produzione distinto da runtime; coppia A/B congiunta ammessa con verifica individuale, senza garanzie di coerenza; conservati allineamento, GIF, vincoli Cerbero e approvazioni. Aggiornati pipeline, prompt e controlli per eliminare i divieti generali superati. |
 
 ### 12.2 Fonti professionali usate nella revisione v8
