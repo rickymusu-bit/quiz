@@ -17,7 +17,7 @@
       const img = new root.Image();
       img.decoding = 'async';
       const assetPath = 'assets/hell-race/' + files[key];
-      img.src = root.HellscapeOffline?.assets?.[assetPath] || assetPath;
+      img.src = root.HellscapePreviewResources?.assets?.[assetPath] || assetPath;
       img.addEventListener('load', () => live?.redraw?.(), { once: true });
       sheets[key] = img;
     }

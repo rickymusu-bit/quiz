@@ -62,17 +62,17 @@
   const cells = [[0,0],[1,0],[2,0],[0,1],[1,1],[2,1],[0,2],[1,2],[2,2]];
   function load(redraw=()=>{}) {
     if(!poisonArt&&typeof root.Image==='function'){
-      poisonArt=new root.Image();poisonArt.src=root.HellscapeOffline?.assets?.[POISON_ASSET]||POISON_ASSET;
+      poisonArt=new root.Image();poisonArt.src=root.HellscapePreviewResources?.assets?.[POISON_ASSET]||POISON_ASSET;
       poisonArt.addEventListener('load',redraw,{once:true});
     }
     if(!sacrificeArt&&typeof root.Image==="function"){
-      sacrificeArt=new root.Image();sacrificeArt.src=root.HellscapeOffline?.assets?.[SACRIFICE_ASSET]||SACRIFICE_ASSET;
+      sacrificeArt=new root.Image();sacrificeArt.src=root.HellscapePreviewResources?.assets?.[SACRIFICE_ASSET]||SACRIFICE_ASSET;
       sacrificeArt.addEventListener("load",redraw,{once:true});
     }
     if (!art && typeof root.Image === "function") {
       art = new root.Image();
       const path="assets/hell-race/ammo-relics-v1.webp";
-      art.src=root.HellscapeOffline?.assets?.[path]||path;
+      art.src=root.HellscapePreviewResources?.assets?.[path]||path;
       art.addEventListener("load",redraw,{once:true});
     }
     return art;

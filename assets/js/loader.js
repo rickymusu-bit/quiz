@@ -1,13 +1,13 @@
-/* Hellscape: loader. Shared by the static site, Node tests and offline export. */
+/* Hellscape: loader. Shared by the static site, Node tests and browser review harness. */
 (function (root) {
   "use strict";
   const datasets = root.HellscapeDatasets;
   async function fetchSiteText(path) {
     if (
-      root.HellscapeOffline?.texts &&
-      Object.hasOwn(root.HellscapeOffline.texts, path)
+      root.HellscapePreviewResources?.texts &&
+      Object.hasOwn(root.HellscapePreviewResources.texts, path)
     )
-      return root.HellscapeOffline.texts[path];
+      return root.HellscapePreviewResources.texts[path];
     const url = new URL(path, location.href);
     if (
       !["http:", "https:"].includes(url.protocol) ||
@@ -45,10 +45,10 @@
       ids.add(entry.id);
       const url = new URL(
         entry.url,
-        root.HellscapeOffline ? "https://offline.invalid/" : location.href,
+        root.HellscapePreviewResources ? "https://offline.invalid/" : location.href,
       );
       if (
-        !root.HellscapeOffline?.texts?.[entry.url] &&
+        !root.HellscapePreviewResources?.texts?.[entry.url] &&
         (url.origin !== location.origin ||
           !["http:", "https:"].includes(url.protocol))
       )

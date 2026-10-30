@@ -14,12 +14,12 @@
   function load(redraw=()=>{}){
     if(!art&&typeof root.Image==='function'){
       art=new root.Image();const path=ASSETS.bridge;
-      art.src=root.HellscapeOffline?.assets?.[path]||path;
+      art.src=root.HellscapePreviewResources?.assets?.[path]||path;
       art.addEventListener('load',redraw,{once:true});
     }
     if(!lake&&typeof root.Image==='function'){
       lake=new root.Image();const path=ASSETS.sea;
-      lake.src=root.HellscapeOffline?.assets?.[path]||path;lake.addEventListener('load',redraw,{once:true});
+      lake.src=root.HellscapePreviewResources?.assets?.[path]||path;lake.addEventListener('load',redraw,{once:true});
     }
     return art;
   }
