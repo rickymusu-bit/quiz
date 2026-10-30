@@ -2,3 +2,10 @@ node_modules/
 dist/
 artifacts/
 __pycache__/
+
+# Anteprime storiche superate: le nuove catture temporanee vanno in artifacts/
+docs/previews/portal-azure/
+docs/previews/portal-side/
+docs/previews/antisigillo/
+docs/previews/black-bridge/
+docs/screenshots/timer-width/
