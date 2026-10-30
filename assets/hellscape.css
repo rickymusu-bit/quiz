@@ -120,3 +120,8 @@ body[data-layout="compact"] #viewport-stage .ending .victory-wordmark .end-wordm
   max-width:100%;white-space:normal;min-height:48px;
   background:#311e18;border:2px solid #cba176;color:#fff0dc;
 }
+
+/* UI assets at the actual 1024x768 game stage: 16px lives, 32px pointer. */
+.turn-order .life-skull{display:inline-block;width:16px;height:16px;flex:0 0 16px;background:url('./ui/skull-active.png') center/contain no-repeat}
+.turn-order .life-skull.lost{background-image:url('./ui/skull-lost.png')}
+@media (pointer:fine){html,body,#viewport-stage{cursor:url('./ui/claw-cursor.png') 2 2,auto}button,a,summary,select,[role=button]{cursor:url('./ui/claw-cursor.png') 2 2,pointer}input,textarea,[contenteditable=true]{cursor:text}}

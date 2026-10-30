@@ -189,3 +189,5 @@ body[data-layout="compact"] #viewport-stage main.operational>.operation-body{pad
 @media(min-height:601px){
  #viewport-stage main.operational>.operation-body {left:180px;right:180px;}
 }
+
+body[data-layout="compact"] .turn-order .life-skull{width:14px;height:14px;flex-basis:14px}

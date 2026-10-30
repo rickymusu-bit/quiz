@@ -21,7 +21,7 @@ VIEWPORTS = [(1920, 1080), (1366, 768), (1024, 768), (844, 390), (667,375)]
 if '--quick' in sys.argv:
     VIEWPORTS = [(1366, 768), (667,375), (844, 390)]
 
-METRICS = """() => [...document.querySelectorAll('img,canvas,button,a,h1,h2,.ammo-round,.heart,.time-vial,.question,.subtitle')].filter(el => {
+METRICS = """() => [...document.querySelectorAll('img,canvas,button,a,h1,h2,.ammo-round,.life-skull,.time-vial,.question,.subtitle')].filter(el => {
   const r=el.getBoundingClientRect(),s=getComputedStyle(el);
   return r.width && r.height && s.display!=='none' && s.visibility!=='hidden';
 }).map(el => {
@@ -86,7 +86,7 @@ with sync_playwright() as p:
                     assert f.evaluate('HellscapeUI.game.s.phase') == 'pareggio'
                     assert f.evaluate('HellscapeUI.game.s.screen') == 'hidden'
                     assert not f.evaluate('HellscapeUI.game.running')
-                    assert f.locator('.turn-order .heart:not(.lost)').count() == 9
+                    assert f.locator('.turn-order .life-skull:not(.lost)').count() == 9
                 if scenario == 'portale':
                     assert f.locator('.hell-race-final').get_attribute('data-ending-phase') == 'escape'
                 if scenario in ['vittoria','gameover']:
