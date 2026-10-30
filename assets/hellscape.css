@@ -110,11 +110,11 @@ body.showing-cinematic dialog:not(#orientation-note)::backdrop{background:transp
 #viewport-stage .ending .winner-escape{font:clamp(24px,3.4vw,36px)/1.15 FoolTerminal,monospace;color:#f1e5bc;max-width:90%;text-shadow:2px 2px #100b09}
 body[data-layout="compact"] #viewport-stage .ending .victory-wordmark .end-wordmark{max-height:none}
 
-/* Keep the final return action inside the viewport, even when the long
-   victory artwork and answer summary fill the remaining height. */
+/* Reserve a dedicated toolbar row for Home. An overlaid fixed button
+   could cover the VITTORIA / GAME OVER artwork on the results screen. */
 #viewport-stage main.final-screen .ending>.ending-home{
-  position:fixed;top:16px;left:16px;z-index:6;margin:0;
-  max-width:calc(100% - 32px);
+  position:relative;inset:auto;order:-1;align-self:flex-start;flex:0 0 auto;
+  z-index:6;margin:16px 0 0 16px;max-width:calc(100% - 32px);
 }
 #viewport-stage main.final-screen .ending>.ending-home button{
   max-width:100%;white-space:normal;min-height:48px;
