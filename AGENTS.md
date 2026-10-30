@@ -65,7 +65,7 @@ Applicare la preferenza «GIF per la dinamica, screenshot per gli stati statici,
 
 ## Protocollo per sprite animati
 
-- Per creare o modificare sequenze di sprite, utilizzare il documento versionato [Protocollo operativo per sprite animati coerenti — v10](docs/PROTOCOLLO_SPRITE_ANIMATI_v10_20261030.md) come riferimento vincolante per produzione di fotogrammi disegnati, anatomia, proprietà meccaniche dei materiali, punti di ancoraggio, continuità, effetti, limiti ai fallback e controlli. Applicare sempre le regole di consegna di questo AGENTS.md; aggiornare il link quando viene pubblicata una versione successiva del protocollo, senza duplicarne qui il contenuto.
+- Per creare o modificare sequenze di sprite, utilizzare il documento versionato [Protocollo operativo per sprite animati coerenti — v11.0.0](docs/PROTOCOLLO_SPRITE_ANIMATI_v11.0.0_20261030.md) come riferimento vincolante per scelta della tecnica (rig, disegno o tecnica mista), produzione e verifica delle pose, anatomia, proprietà meccaniche dei materiali, punti di ancoraggio, continuità, effetti, limiti ai fallback e controlli. Applicare sempre le regole di consegna di questo AGENTS.md; aggiornare il link quando viene pubblicata una versione successiva del protocollo, senza duplicarne qui il contenuto.
 
 ## Controlli CI e copertura (30/10/2026)
 
