@@ -89,7 +89,7 @@ header .brand .hellscape-logo{display:block;width:170px;height:39px;object-fit:c
 
 /* Only the Canvas remains visible for important race actions and endings. */
 body.showing-cinematic main.operational>:not(.hell-race):not(.movement-cue),
-body.showing-cinematic main.final-screen .ending>:not(.hell-race),
+body.showing-cinematic main.final-screen .ending>:not(.hell-race):not(.ending-home),
 body.showing-cinematic dialog:not(#orientation-note),
 body.showing-cinematic #message,
 body.showing-cinematic #fit-warning{visibility:hidden!important;pointer-events:none!important}
