@@ -24,6 +24,15 @@
     shuffle,
   } = core;
   const { parseDataset } = datasets;
+  function isSupportedVehicle(vehicle) {
+    return ["chopper", "pickup", "truck", "coupe", "offroad", "ape"].includes(vehicle);
+  }
+  function isSupportedIcon(icon) {
+    return ["skull", "bolt", "star", "swords", "shield", "crown"].includes(icon);
+  }
+  function validBonusWeight(value) {
+    return typeof value === "number" && Number.isFinite(value) && value >= 0 && value <= 100;
+  }
   function config(c) {
     need(
       Array.isArray(c.names) && c.names.length === 3,
@@ -40,20 +49,14 @@
       need(
         Array.isArray(c.icons) &&
           c.icons.length === 3 &&
-          c.icons.every((x) =>
-            ["skull", "bolt", "star", "swords", "shield", "crown"].includes(x),
-          ),
+          c.icons.every(isSupportedIcon),
         "Icone dei giocatori non valide",
       );
     if (c.vehicles !== undefined)
       need(
         Array.isArray(c.vehicles) &&
           c.vehicles.length === 3 &&
-          c.vehicles.every((x) =>
-            ["chopper", "pickup", "truck", "coupe", "offroad", "ape"].includes(
-              x,
-            ),
-          ) &&
+          c.vehicles.every(isSupportedVehicle) &&
           new Set(c.vehicles).size === 3,
         "Scegli tre veicoli diversi tra i sei disponibili",
       );
@@ -68,13 +71,7 @@
     need(
       bonusWeights &&
         typeof bonusWeights === "object" &&
-        TYPES.every(
-          (type) =>
-            typeof bonusWeights[type] === "number" &&
-            Number.isFinite(bonusWeights[type]) &&
-            bonusWeights[type] >= 0 &&
-            bonusWeights[type] <= 100,
-        ),
+        TYPES.every((type) => validBonusWeight(bonusWeights[type])),
       "Probabilità delle Omen non valide",
     );
     for (const d of ["facile", "media", "difficile"])
@@ -130,8 +127,9 @@
       names,
     };
   }
-  const totalTurnLimit = c => c.roundCount === undefined
-    ? c.turnCount : c.roundCount * c.names.length;
+  function totalTurnLimit(c) {
+    return c.roundCount === undefined ? c.turnCount : c.roundCount * c.names.length;
+  }
   function prepare(bank, c, random = Math.random) {
     c = config(c);
     const eligible = bank.filter(
@@ -282,11 +280,9 @@
       return this.s.order.filter((i) => !this.s.groups[i].out);
     }
     timeLimit() {
-      return (
-        (this.s.screen === "choice"
-          ? core.MALOCCHIO_CHOICE_SECONDS
-          : this.s.config.seconds) * 1000
-      );
+      return (this.s.screen === "choice"
+        ? core.MALOCCHIO_CHOICE_SECONDS
+        : this.s.config.seconds) * 1000;
     }
     left() {
       return this.running
