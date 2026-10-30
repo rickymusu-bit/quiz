@@ -151,7 +151,7 @@ npm run test:motion     # locomozione, pausa e clock a 30/60/144 FPS
 npm run test:layout     # testo e controlli nativi, 4:3, orientamento e fullscreen
 ```
 
-I test riutilizzano Chromium in `/usr/bin/chromium`; per un altro eseguibile impostare `CHROMIUM_PATH`. Se non è presente un browser, installarlo con `npx playwright install --with-deps chromium` e impostare `CHROMIUM_PATH` al percorso restituito da `node -p "require('playwright').chromium.executablePath()"`. La generazione dell’export usa soltanto librerie standard di Node.
+I test riutilizzano Chromium in `/usr/bin/chromium`; per un altro eseguibile impostare `CHROMIUM_PATH`. Se non è presente un browser, installarlo con `npx playwright install --with-deps chromium` e impostare `CHROMIUM_PATH` al percorso restituito da `node -p "require('playwright').chromium.executablePath()"`. La generazione delle anteprime di revisione usa soltanto librerie standard di Node.
 
 GitHub Pages può continuare a pubblicare la radice del ramo `main`, con gli stessi URL `index.html`, `Fool.html`, `Fool_regole.html`, catalogo, dataset e asset. `npm run build` produce anche `dist/site` per altri hosting statici; non pubblica nulla e non modifica la configurazione Pages.
 
@@ -159,9 +159,9 @@ L'[audit grafico della specifica 1.2.0](docs/HELLSCAPE_AUDIT_VISIVO.md) document
 la correzione del ricampionamento del logo e i successivi interventi di layout
 e cinematiche. Il logo illustrato viene visualizzato alla risoluzione originale,
 senza la precedente conversione a 256/68 pixel. `npm run test:quality` genera
-anche `dist/Hellscape-review.html`: un export autonomo con un pannello per
+anche `dist/Hellscape-review.html`: un ambiente di test con un pannello per
 aprire direttamente gli scenari di revisione, compresi Ultimo Miglio e finali.
-Gli scenari sostituiscono la partita dell'anteprima, nelle sole chiavi offline.
+Gli scenari sono isolati dai salvataggi del sito pubblicato.
 La UI del sito e il regolamento non includono quel pannello.
 
 Il [contratto di layout condiviso](docs/HELLSCAPE_LAYOUT.md) conserva il palco
@@ -183,16 +183,14 @@ a due/tre giocatori, il nuovo giro e un’eliminazione in pausa.
 La [PR C di inseguimento e catture](docs/HELLSCAPE_CHASE.md) parte dalle posizioni
 realmente mostrate, dispone i mezzi in fila e cattura prima il perdente arretrato.
 Il veicolo segue mano e bocca senza cambiare scala; strada e passi derivano dalle
-coordinate del mondo. Dopo le catture il demone recupera sul vincitore. L'export
+coordinate del mondo. Dopo le catture il demone recupera sul vincitore. L'anteprima di revisione
 include filmati con zero, uno o due perdenti e fotogrammi di fila, presa e bocca.
 La [PR D del portale](docs/HELLSCAPE_PORTAL.md) completa l'uscita: architettura
 trasversale in marmo e oro, frattura causata dall'emersione, passaggio dietro
 la soglia, sprofondamento e nuovo epilogo. Solo dopo pugni, fiammata e affanno
 compaiono VITTORIA e il nome reale del fuggitivo.
 
-L’anteprima include home, gioco, regole, entrambi i dataset, script, CSS, immagini e font in **un solo HTML**. Le pagine sono incorporate in un iframe che viene ricreato alla navigazione, così timer ed eventi della pagina precedente vengono chiusi. La chiave delle partite esportate è `hellscape-offline-v1:fool-v1`; quella dei profili è `hellscape-offline-v1:fool-settings-v1`. Non legge o sovrascrive i salvataggi del sito. Il meta `hellscape-revision` e `dist/revision.json` identificano il commit generatore; gli output sono ignorati da Git e vanno rigenerati dopo ogni modifica, senza correggerli a mano.
-
-`tests/offline.py` carica gli esatti byte dell’HTML in un contesto Chromium senza rete, controlla entrambe le banche, risposte, regole, ripresa, isolamento dei salvataggi, assenza di richieste esterne ed errori JavaScript a 1440×900, 390×844 e 844×390. Il browser gestito di questa sessione blocca gli URL `file://`: il test usa una sola risposta locale intercettata per fornire il documento e non certifica l’apertura diretta da file in quel browser. Gli screenshot vengono scritti in `artifacts/`.
+L’ambiente `Hellscape-review.html` incorpora le risorse necessarie agli scenari grafici e viene generato soltanto per i test; non è una distribuzione offline supportata. Il meta `hellscape-revision` e `dist/revision.json` identificano il commit. Gli output generati sono ignorati da Git e vanno rigenerati dopo ogni modifica. Le anteprime usano uno spazio di salvataggio separato dal sito pubblicato.
 
 Per confrontare la grafica con la base della PR #17, preparare un checkout e indicarlo a `HELLSCAPE_BASELINE=/percorso/base python3 tests/visual_parity.py` (richiede Pillow). Il test confronta pixel per pixel tre screenshot con movimento ridotto e riprende una partita salvata dal codice della base. È una verifica del solo refactoring: la successiva correzione approvata delle proporzioni dei mezzi e della posizione dei nomi produce differenze visive intenzionali rispetto alla PR #17. La base non viene usata dal sito o dalla build.
 
