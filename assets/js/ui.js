@@ -94,7 +94,13 @@
       b.setAttribute("aria-keyshortcuts", key);
       b.title = text + " (" + key + ")";
     }
-    b.onclick = () => { if(ui === "game" && FoolHellRace.tieStatus().blocking)return; act(fn); };
+    // Never trap the player on the result screen: tie cinematics may retain
+    // a blocking notice, but a completed match must always allow navigation.
+    b.onclick = () => {
+      if (ui === "game" && game?.s.phase !== "conclusa" &&
+          FoolHellRace.tieStatus().blocking) return;
+      act(fn);
+    };
     return b;
   }
   function act(fn) {
@@ -1264,7 +1270,8 @@
     const malocchioAnswer = game?.s.screen === "answer" && !!game.s.malocchio;
     // The full response timer starts at confirmation, including a passed question.
     const active = cinematicActive() && !malocchioAnswer;
-    const tieActive = FoolHellRace.tieStatus().blocking;
+    // A finished game cannot be locked by a stale Ultimo Miglio notice.
+    const tieActive = game?.s.phase === "pareggio" && FoolHellRace.tieStatus().blocking;
     for(const child of main.querySelectorAll(':scope > :not(.hell-race):not(.ending), .ending > :not(.hell-race)'))child.inert=tieActive;
     document.body.classList.toggle("showing-cinematic", active);
     if (active && game.running) {
