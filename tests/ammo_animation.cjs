@@ -7,6 +7,11 @@ const types = ['salta','ruba','svela','aura','marx','ira','sacrificio','karma','
 const selected = process.argv.find(arg=>arg.startsWith('--case='))?.split('=')[1];
 const modes = ['shield','lethal','timer','reduced'];
 assert(!selected||[...types,...modes,'reload'].includes(selected),'Unknown Ammo test case');
+const part=process.env.HELLSCAPE_CI_PART||'all';
+assert(['all','primary','secondary','modes'].includes(part),'Unknown Ammo CI part');
+const allowedTypes=part==='primary'?types.slice(0,5):part==='secondary'?types.slice(5):part==='modes'?[]:types;
+const allowedModes=(part==='all'||part==='modes')?modes:[];
+const testedTypes=allowedTypes.filter(type=>!selected||selected===type);
 (async () => {
   fs.mkdirSync(path.join(root,'artifacts'), {recursive:true});
   const server = http.createServer((req,res)=>{
@@ -59,7 +64,7 @@ assert(!selected||[...types,...modes,'reload'].includes(selected),'Unknown Ammo 
   }
   try {
     for(const [width,height] of [[1440,900],[667,375],[844,390]]) {
-      for(const type of types.filter(type=>!selected||selected===type)){
+      for(const type of testedTypes){
         const {page,view}=await start(width,height);await use(view,type);
         await page.clock.runFor(650);
         assert.equal(await view.locator('.hell-race').getAttribute('data-ammo'),type);
@@ -75,9 +80,9 @@ assert(!selected||[...types,...modes,'reload'].includes(selected),'Unknown Ammo 
         assert.equal(await view.locator('.hell-race').getAttribute('data-ammo'),'');
         await page.close();
       }
-      if(!selected||types.includes(selected))checks.push({viewport:[width,height],activations:types.filter(type=>!selected||selected===type),result:'PASS'});
+      if(testedTypes.length)checks.push({viewport:[width,height],activations:testedTypes,result:'PASS'});
     }
-    for(const mode of modes.filter(mode=>!selected||selected===mode)){
+    for(const mode of allowedModes.filter(mode=>!selected||selected===mode)){
       const {page,view}=await start(1440,900,mode==='reduced');
       await use(view,mode==='lethal'?'ira':mode==='timer'||mode==='reduced'?'aura':'salta',
         {shield:mode==='shield',lethal:mode==='lethal',answer:mode==='timer'});
@@ -109,7 +114,7 @@ assert(!selected||[...types,...modes,'reload'].includes(selected),'Unknown Ammo 
       await page.close();checks.push({mode,result:'PASS'});
     }
     // A reload during an attack must not consume the Ammo or its effects again.
-    if(!offline&&(!selected||selected==='reload')){
+    if(!offline&&(part==='all'||part==='modes')&&(!selected||selected==='reload')){
       const {page,view}=await start();await use(view,'salta');await page.clock.runFor(400);
       const saved=await view.evaluate('JSON.stringify(HellscapeUI.game.s.effects)');
       await page.goto(`http://127.0.0.1:${server.address().port}/Fool.html?resume=1`);await page.clock.runFor(100);

@@ -67,13 +67,17 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      max-parallel: 10
+      max-parallel: 12
       matrix:
         include:
           - suite: core
             command: npm test && npm run test:frames && npm run build
-          - suite: portal
-            command: npm run test:portal
+          - suite: portal-cinematic
+            command: node --test tests/portal.test.js && node scripts/build.cjs --quality-preview && HELLSCAPE_CI_PART=cinematic python3 tests/portal_browser.py
+          - suite: portal-matrix-even
+            command: node scripts/build.cjs --quality-preview && HELLSCAPE_CI_PART=matrix-even python3 tests/portal_browser.py
+          - suite: portal-matrix-odd
+            command: node scripts/build.cjs --quality-preview && HELLSCAPE_CI_PART=matrix-odd python3 tests/portal_browser.py
           - suite: chase-cinematic
             command: node --test tests/chase.test.js && node scripts/build.cjs --quality-preview && HELLSCAPE_CI_PART=cinematic python3 tests/chase_browser.py
           - suite: chase-matrix-even
@@ -94,8 +98,14 @@ jobs:
             command: npm run test:browser:main
           - suite: browser-secondary
             command: npm run test:browser:secondary
-          - suite: ammo
-            command: npm run test:ammo
+          - suite: ammo-primary
+            command: HELLSCAPE_CI_PART=primary node tests/ammo_animation.cjs
+          - suite: ammo-secondary
+            command: HELLSCAPE_CI_PART=secondary node tests/ammo_animation.cjs
+          - suite: ammo-modes
+            command: HELLSCAPE_CI_PART=modes node tests/ammo_animation.cjs && node tests/bridge_layout.cjs
+          - suite: ammo-materials
+            command: npm run preview:ammo && node tests/gothic_preview.cjs
           - suite: endings
             command: npm run test:endings
           - suite: terrain
