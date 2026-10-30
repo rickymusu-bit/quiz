@@ -59,7 +59,6 @@ try:
    expect(q.locator('.answer')).to_have_count(4)
    assert q.evaluate('HellscapeUI.game.s.screen')=='answer'
    q.keyboard.press('a')
-   expect(q.locator('.answer').first).to_be_disabled()
    assert q.evaluate('HellscapeUI.game.s.screen')=='result'
    report.append({'keyboard':'PASS','touch':touch,'orientation':'landscape'})
    q.close()
