@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "source_revision": "ec4eb85057da38b821e3c2ae00ee0dcc017f418f",
-  "status": "B_color_and_wing_claw_retake_pending",
+  "status": "B_claw_attachment_targeted_retake_pending",
   "reference": {
     "path": "references/scena-reale-20261030.jpg",
     "git_blob": "ab349ca62d2285964ad805a785f3db2dc99c882e",
@@ -168,6 +168,22 @@
       ],
       "prompt": "prompts/005_posa_B_v3_colore_artiglio.md",
       "output": "candidates/005_posa_B_v3.png",
+      "status": "rejected_claw_attachment_unchanged",
+      "approval": null,
+      "sha256": "c6eb1f2775ebe18de79f3c6c2beb58885cca4653af65acb422c1ab81d63b05d2",
+      "git_blob": "b5fc5d45ff835b258827512d1b2099de4f9c85b0",
+      "comparison_gif": "reports/gifs/confronto_A_B_v3_respinta.gif",
+      "report": "reports/verifica_005_v1.0.0_20261030.md"
+    },
+    {
+      "id": "006",
+      "phase": "key_B_claw_attachment_targeted_retake",
+      "prompt": "prompts/006_posa_B_v4_attacco_artiglio.md",
+      "source": [
+        "candidates/005_posa_B_v3.png",
+        "approved/pose_A.png"
+      ],
+      "output": "candidates/006_posa_B_v4.png",
       "status": "not_generated",
       "approval": null
     }
