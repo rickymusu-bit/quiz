@@ -209,17 +209,7 @@
           " domande. Le nuove partite durano 13 turni per giocatore.", "help"));
     } catch (e) {}
   }
-  function leaveForHome() {
-    cancelFeedback();
-    if (game) game.stop();
-    game = null;
-    ui = "home";
-    configurationLoad++;
-    closeDialog();
-    if (window.hellscapePreviewHome) {
-      window.hellscapePreviewHome();
-      return;
-    }
+  function navigateToHome() {
     // When the game runs inside the fullscreen home iframe, restore the
     // parent menu directly rather than navigating inside the iframe.
     try {
@@ -231,6 +221,19 @@
       }
     } catch (error) {}
     location.assign(new URL("./", location.href).href);
+  }
+  function leaveForHome() {
+    cancelFeedback();
+    if (game) game.stop();
+    game = null;
+    ui = "home";
+    configurationLoad++;
+    closeDialog();
+    if (window.hellscapePreviewHome) {
+      window.hellscapePreviewHome();
+      return;
+    }
+    navigateToHome();
   }
   function goHome() {
     if (!game || game.s.phase === "conclusa") {
