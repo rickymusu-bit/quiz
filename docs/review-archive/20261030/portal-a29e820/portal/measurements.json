@@ -1,0 +1,907 @@
+{
+  "revision": "a29e820d43da18b26b3fe7c5d87b3511c9cb31a2",
+  "movies": [
+    {
+      "winner": 0,
+      "phases": [
+        "lineup",
+        "winner-chase",
+        "rise",
+        "open",
+        "escape",
+        "close",
+        "sink",
+        "rage",
+        "fire",
+        "exhausted",
+        "done"
+      ],
+      "state_unchanged": true,
+      "completion_events": 1
+    }
+  ],
+  "renders": [
+    {
+      "sample": "open",
+      "viewport": [
+        1366,
+        768
+      ],
+      "dpr": 1,
+      "vehicle": "chopper",
+      "camera": {
+        "distance": 189.46727243211717,
+        "speed": 0
+      },
+      "portal": {
+        "visible": true,
+        "offset": 0,
+        "opening": 1,
+        "passed": false,
+        "rise": 1,
+        "sink": 0,
+        "anchorX": 583.9815124321171,
+        "camera": {
+          "distance": 189.46727243211717,
+          "speed": 0
+        },
+        "time": 5.2,
+        "geometry": {
+          "far": -20,
+          "near": 130,
+          "height": 220,
+          "water": 16,
+          "thickness": 16,
+          "openingFar": 25,
+          "openingNear": 85,
+          "openingHeight": 138,
+          "bury": 248
+        }
+      },
+      "demon": {
+        "left": 138.2,
+        "ground": 303,
+        "width": 221,
+        "scale": 1.3,
+        "runWeight": 1,
+        "pose": [
+          {
+            "frame": 8,
+            "weight": 1
+          },
+          {
+            "frame": 7,
+            "weight": 0
+          }
+        ],
+        "worldDistance": 319.66727243211716
+      }
+    },
+    {
+      "sample": "cross",
+      "viewport": [
+        1366,
+        768
+      ],
+      "dpr": 1,
+      "vehicle": "chopper",
+      "camera": {
+        "distance": 189.46727243211717,
+        "speed": 0
+      },
+      "portal": {
+        "visible": true,
+        "offset": 0,
+        "opening": 1,
+        "passed": false,
+        "rise": 1,
+        "sink": 0,
+        "anchorX": 583.9815124321171,
+        "camera": {
+          "distance": 189.46727243211717,
+          "speed": 0
+        },
+        "time": 5.800000000000001,
+        "geometry": {
+          "far": -20,
+          "near": 130,
+          "height": 220,
+          "water": 16,
+          "thickness": 16,
+          "openingFar": 25,
+          "openingNear": 85,
+          "openingHeight": 138,
+          "bury": 248
+        }
+      },
+      "demon": {
+        "left": 140.2886297376093,
+        "ground": 303,
+        "width": 221,
+        "scale": 1.3,
+        "runWeight": 0.05539358600583022,
+        "pose": [
+          {
+            "frame": 8,
+            "weight": 0.05539358600583022
+          },
+          {
+            "frame": 7,
+            "weight": 0.9446064139941698
+          }
+        ],
+        "worldDistance": 321.7559021697265
+      }
+    },
+    {
+      "sample": "sink",
+      "viewport": [
+        1366,
+        768
+      ],
+      "dpr": 1,
+      "vehicle": "chopper",
+      "camera": {
+        "distance": 189.46727243211717,
+        "speed": 0
+      },
+      "portal": {
+        "visible": true,
+        "offset": 112.39013671875,
+        "opening": 0,
+        "passed": true,
+        "rise": 1,
+        "sink": 0.45318603515625,
+        "anchorX": 583.9815124321171,
+        "camera": {
+          "distance": 189.46727243211717,
+          "speed": 0
+        },
+        "time": 7.45,
+        "geometry": {
+          "far": -20,
+          "near": 130,
+          "height": 220,
+          "water": 16,
+          "thickness": 16,
+          "openingFar": 25,
+          "openingNear": 85,
+          "openingHeight": 138,
+          "bury": 248
+        }
+      },
+      "demon": {
+        "left": 140.3,
+        "ground": 303,
+        "width": 221,
+        "scale": 1.3,
+        "runWeight": 0,
+        "pose": [
+          {
+            "frame": 8,
+            "weight": 0
+          },
+          {
+            "frame": 7,
+            "weight": 1
+          }
+        ],
+        "worldDistance": 321.7672724321172
+      }
+    },
+    {
+      "sample": "done",
+      "viewport": [
+        1366,
+        768
+      ],
+      "dpr": 1,
+      "vehicle": "chopper",
+      "camera": {
+        "distance": 189.46727243211717,
+        "speed": 0
+      },
+      "portal": {
+        "visible": false,
+        "offset": 248,
+        "opening": 0,
+        "passed": true,
+        "rise": 1,
+        "sink": 1,
+        "anchorX": 583.9815124321171,
+        "camera": {
+          "distance": 189.46727243211717,
+          "speed": 0
+        },
+        "time": 14.000000000000002,
+        "geometry": {
+          "far": -20,
+          "near": 130,
+          "height": 220,
+          "water": 16,
+          "thickness": 16,
+          "openingFar": 25,
+          "openingNear": 85,
+          "openingHeight": 138,
+          "bury": 248
+        }
+      },
+      "demon": {
+        "left": 140.3,
+        "ground": 303,
+        "width": 221,
+        "scale": 1.3,
+        "runWeight": 0,
+        "pose": [
+          {
+            "frame": 7,
+            "weight": 1
+          }
+        ],
+        "worldDistance": 321.7672724321172
+      }
+    },
+    {
+      "sample": "open",
+      "viewport": [
+        1366,
+        768
+      ],
+      "dpr": 2,
+      "vehicle": "coupe",
+      "camera": {
+        "distance": 190.06750765480956,
+        "speed": 0
+      },
+      "portal": {
+        "visible": true,
+        "offset": 0,
+        "opening": 1,
+        "passed": false,
+        "rise": 1,
+        "sink": 0,
+        "anchorX": 588.7120975989436,
+        "camera": {
+          "distance": 190.06750765480956,
+          "speed": 0
+        },
+        "time": 5.2,
+        "geometry": {
+          "far": -20,
+          "near": 130,
+          "height": 220,
+          "water": 16,
+          "thickness": 16,
+          "openingFar": 25,
+          "openingNear": 85,
+          "openingHeight": 138,
+          "bury": 248
+        }
+      },
+      "demon": {
+        "left": 135.09999999999997,
+        "ground": 303,
+        "width": 221,
+        "scale": 1.3,
+        "runWeight": 1,
+        "pose": [
+          {
+            "frame": 8,
+            "weight": 1
+          },
+          {
+            "frame": 7,
+            "weight": 0
+          }
+        ],
+        "worldDistance": 317.1675076548095
+      }
+    },
+    {
+      "sample": "cross",
+      "viewport": [
+        1366,
+        768
+      ],
+      "dpr": 2,
+      "vehicle": "coupe",
+      "camera": {
+        "distance": 190.06750765480956,
+        "speed": 0
+      },
+      "portal": {
+        "visible": true,
+        "offset": 0,
+        "opening": 1,
+        "passed": false,
+        "rise": 1,
+        "sink": 0,
+        "anchorX": 588.7120975989436,
+        "camera": {
+          "distance": 190.06750765480956,
+          "speed": 0
+        },
+        "time": 5.800000000000001,
+        "geometry": {
+          "far": -20,
+          "near": 130,
+          "height": 220,
+          "water": 16,
+          "thickness": 16,
+          "openingFar": 25,
+          "openingNear": 85,
+          "openingHeight": 138,
+          "bury": 248
+        }
+      },
+      "demon": {
+        "left": 137.1886297376093,
+        "ground": 303,
+        "width": 221,
+        "scale": 1.3,
+        "runWeight": 0.05539358600583022,
+        "pose": [
+          {
+            "frame": 8,
+            "weight": 0.05539358600583022
+          },
+          {
+            "frame": 7,
+            "weight": 0.9446064139941698
+          }
+        ],
+        "worldDistance": 319.25613739241885
+      }
+    },
+    {
+      "sample": "sink",
+      "viewport": [
+        1366,
+        768
+      ],
+      "dpr": 2,
+      "vehicle": "coupe",
+      "camera": {
+        "distance": 190.06750765480956,
+        "speed": 0
+      },
+      "portal": {
+        "visible": true,
+        "offset": 112.39013671875,
+        "opening": 0,
+        "passed": true,
+        "rise": 1,
+        "sink": 0.45318603515625,
+        "anchorX": 588.7120975989436,
+        "camera": {
+          "distance": 190.06750765480956,
+          "speed": 0
+        },
+        "time": 7.45,
+        "geometry": {
+          "far": -20,
+          "near": 130,
+          "height": 220,
+          "water": 16,
+          "thickness": 16,
+          "openingFar": 25,
+          "openingNear": 85,
+          "openingHeight": 138,
+          "bury": 248
+        }
+      },
+      "demon": {
+        "left": 137.2,
+        "ground": 303,
+        "width": 221,
+        "scale": 1.3,
+        "runWeight": 0,
+        "pose": [
+          {
+            "frame": 8,
+            "weight": 0
+          },
+          {
+            "frame": 7,
+            "weight": 1
+          }
+        ],
+        "worldDistance": 319.26750765480955
+      }
+    },
+    {
+      "sample": "done",
+      "viewport": [
+        1366,
+        768
+      ],
+      "dpr": 2,
+      "vehicle": "coupe",
+      "camera": {
+        "distance": 190.06750765480956,
+        "speed": 0
+      },
+      "portal": {
+        "visible": false,
+        "offset": 248,
+        "opening": 0,
+        "passed": true,
+        "rise": 1,
+        "sink": 1,
+        "anchorX": 588.7120975989436,
+        "camera": {
+          "distance": 190.06750765480956,
+          "speed": 0
+        },
+        "time": 14.000000000000002,
+        "geometry": {
+          "far": -20,
+          "near": 130,
+          "height": 220,
+          "water": 16,
+          "thickness": 16,
+          "openingFar": 25,
+          "openingNear": 85,
+          "openingHeight": 138,
+          "bury": 248
+        }
+      },
+      "demon": {
+        "left": 137.2,
+        "ground": 303,
+        "width": 221,
+        "scale": 1.3,
+        "runWeight": 0,
+        "pose": [
+          {
+            "frame": 7,
+            "weight": 1
+          }
+        ],
+        "worldDistance": 319.26750765480955
+      }
+    },
+    {
+      "sample": "open",
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 1,
+      "vehicle": "pickup",
+      "camera": {
+        "distance": 189.66752318406378,
+        "speed": 0
+      },
+      "portal": {
+        "visible": true,
+        "offset": 0,
+        "opening": 1,
+        "passed": false,
+        "rise": 1,
+        "sink": 0,
+        "anchorX": 583.9204494998532,
+        "camera": {
+          "distance": 189.66752318406378,
+          "speed": 0
+        },
+        "time": 5.2,
+        "geometry": {
+          "far": -20,
+          "near": 130,
+          "height": 220,
+          "water": 16,
+          "thickness": 16,
+          "openingFar": 25,
+          "openingNear": 85,
+          "openingHeight": 138,
+          "bury": 248
+        }
+      },
+      "demon": {
+        "left": 133.85999999999996,
+        "ground": 303,
+        "width": 221,
+        "scale": 1.3,
+        "runWeight": 1,
+        "pose": [
+          {
+            "frame": 8,
+            "weight": 1
+          },
+          {
+            "frame": 7,
+            "weight": 0
+          }
+        ],
+        "worldDistance": 315.52752318406374
+      }
+    },
+    {
+      "sample": "cross",
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 1,
+      "vehicle": "pickup",
+      "camera": {
+        "distance": 189.66752318406378,
+        "speed": 0
+      },
+      "portal": {
+        "visible": true,
+        "offset": 0,
+        "opening": 1,
+        "passed": false,
+        "rise": 1,
+        "sink": 0,
+        "anchorX": 583.9204494998532,
+        "camera": {
+          "distance": 189.66752318406378,
+          "speed": 0
+        },
+        "time": 5.800000000000001,
+        "geometry": {
+          "far": -20,
+          "near": 130,
+          "height": 220,
+          "water": 16,
+          "thickness": 16,
+          "openingFar": 25,
+          "openingNear": 85,
+          "openingHeight": 138,
+          "bury": 248
+        }
+      },
+      "demon": {
+        "left": 135.94862973760928,
+        "ground": 303,
+        "width": 221,
+        "scale": 1.3,
+        "runWeight": 0.05539358600583022,
+        "pose": [
+          {
+            "frame": 8,
+            "weight": 0.05539358600583022
+          },
+          {
+            "frame": 7,
+            "weight": 0.9446064139941698
+          }
+        ],
+        "worldDistance": 317.61615292167306
+      }
+    },
+    {
+      "sample": "sink",
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 1,
+      "vehicle": "pickup",
+      "camera": {
+        "distance": 189.66752318406378,
+        "speed": 0
+      },
+      "portal": {
+        "visible": true,
+        "offset": 112.39013671875,
+        "opening": 0,
+        "passed": true,
+        "rise": 1,
+        "sink": 0.45318603515625,
+        "anchorX": 583.9204494998532,
+        "camera": {
+          "distance": 189.66752318406378,
+          "speed": 0
+        },
+        "time": 7.45,
+        "geometry": {
+          "far": -20,
+          "near": 130,
+          "height": 220,
+          "water": 16,
+          "thickness": 16,
+          "openingFar": 25,
+          "openingNear": 85,
+          "openingHeight": 138,
+          "bury": 248
+        }
+      },
+      "demon": {
+        "left": 135.95999999999998,
+        "ground": 303,
+        "width": 221,
+        "scale": 1.3,
+        "runWeight": 0,
+        "pose": [
+          {
+            "frame": 8,
+            "weight": 0
+          },
+          {
+            "frame": 7,
+            "weight": 1
+          }
+        ],
+        "worldDistance": 317.62752318406376
+      }
+    },
+    {
+      "sample": "done",
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 1,
+      "vehicle": "pickup",
+      "camera": {
+        "distance": 189.66752318406378,
+        "speed": 0
+      },
+      "portal": {
+        "visible": false,
+        "offset": 248,
+        "opening": 0,
+        "passed": true,
+        "rise": 1,
+        "sink": 1,
+        "anchorX": 583.9204494998532,
+        "camera": {
+          "distance": 189.66752318406378,
+          "speed": 0
+        },
+        "time": 14.000000000000002,
+        "geometry": {
+          "far": -20,
+          "near": 130,
+          "height": 220,
+          "water": 16,
+          "thickness": 16,
+          "openingFar": 25,
+          "openingNear": 85,
+          "openingHeight": 138,
+          "bury": 248
+        }
+      },
+      "demon": {
+        "left": 135.95999999999998,
+        "ground": 303,
+        "width": 221,
+        "scale": 1.3,
+        "runWeight": 0,
+        "pose": [
+          {
+            "frame": 7,
+            "weight": 1
+          }
+        ],
+        "worldDistance": 317.62752318406376
+      }
+    },
+    {
+      "sample": "open",
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 2,
+      "vehicle": "offroad",
+      "camera": {
+        "distance": 190.00089108608333,
+        "speed": 0
+      },
+      "portal": {
+        "visible": true,
+        "offset": 0,
+        "opening": 1,
+        "passed": false,
+        "rise": 1,
+        "sink": 0,
+        "anchorX": 586.4956299096128,
+        "camera": {
+          "distance": 190.00089108608333,
+          "speed": 0
+        },
+        "time": 5.2,
+        "geometry": {
+          "far": -20,
+          "near": 130,
+          "height": 220,
+          "water": 16,
+          "thickness": 16,
+          "openingFar": 25,
+          "openingNear": 85,
+          "openingHeight": 138,
+          "bury": 248
+        }
+      },
+      "demon": {
+        "left": 134.48,
+        "ground": 303,
+        "width": 221,
+        "scale": 1.3,
+        "runWeight": 1,
+        "pose": [
+          {
+            "frame": 8,
+            "weight": 1
+          },
+          {
+            "frame": 7,
+            "weight": 0
+          }
+        ],
+        "worldDistance": 316.4808910860833
+      }
+    },
+    {
+      "sample": "cross",
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 2,
+      "vehicle": "offroad",
+      "camera": {
+        "distance": 190.00089108608333,
+        "speed": 0
+      },
+      "portal": {
+        "visible": true,
+        "offset": 0,
+        "opening": 1,
+        "passed": false,
+        "rise": 1,
+        "sink": 0,
+        "anchorX": 586.4956299096128,
+        "camera": {
+          "distance": 190.00089108608333,
+          "speed": 0
+        },
+        "time": 5.800000000000001,
+        "geometry": {
+          "far": -20,
+          "near": 130,
+          "height": 220,
+          "water": 16,
+          "thickness": 16,
+          "openingFar": 25,
+          "openingNear": 85,
+          "openingHeight": 138,
+          "bury": 248
+        }
+      },
+      "demon": {
+        "left": 136.5686297376093,
+        "ground": 303,
+        "width": 221,
+        "scale": 1.3,
+        "runWeight": 0.05539358600583022,
+        "pose": [
+          {
+            "frame": 8,
+            "weight": 0.05539358600583022
+          },
+          {
+            "frame": 7,
+            "weight": 0.9446064139941698
+          }
+        ],
+        "worldDistance": 318.56952082369264
+      }
+    },
+    {
+      "sample": "sink",
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 2,
+      "vehicle": "offroad",
+      "camera": {
+        "distance": 190.00089108608333,
+        "speed": 0
+      },
+      "portal": {
+        "visible": true,
+        "offset": 112.39013671875,
+        "opening": 0,
+        "passed": true,
+        "rise": 1,
+        "sink": 0.45318603515625,
+        "anchorX": 586.4956299096128,
+        "camera": {
+          "distance": 190.00089108608333,
+          "speed": 0
+        },
+        "time": 7.45,
+        "geometry": {
+          "far": -20,
+          "near": 130,
+          "height": 220,
+          "water": 16,
+          "thickness": 16,
+          "openingFar": 25,
+          "openingNear": 85,
+          "openingHeight": 138,
+          "bury": 248
+        }
+      },
+      "demon": {
+        "left": 136.58,
+        "ground": 303,
+        "width": 221,
+        "scale": 1.3,
+        "runWeight": 0,
+        "pose": [
+          {
+            "frame": 8,
+            "weight": 0
+          },
+          {
+            "frame": 7,
+            "weight": 1
+          }
+        ],
+        "worldDistance": 318.58089108608334
+      }
+    },
+    {
+      "sample": "done",
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 2,
+      "vehicle": "offroad",
+      "camera": {
+        "distance": 190.00089108608333,
+        "speed": 0
+      },
+      "portal": {
+        "visible": false,
+        "offset": 248,
+        "opening": 0,
+        "passed": true,
+        "rise": 1,
+        "sink": 1,
+        "anchorX": 586.4956299096128,
+        "camera": {
+          "distance": 190.00089108608333,
+          "speed": 0
+        },
+        "time": 14.000000000000002,
+        "geometry": {
+          "far": -20,
+          "near": 130,
+          "height": 220,
+          "water": 16,
+          "thickness": 16,
+          "openingFar": 25,
+          "openingNear": 85,
+          "openingHeight": 138,
+          "bury": 248
+        }
+      },
+      "demon": {
+        "left": 136.58,
+        "ground": 303,
+        "width": 221,
+        "scale": 1.3,
+        "runWeight": 0,
+        "pose": [
+          {
+            "frame": 7,
+            "weight": 1
+          }
+        ],
+        "worldDistance": 318.58089108608334
+      }
+    }
+  ],
+  "errors": [],
+  "external_requests": []
+}

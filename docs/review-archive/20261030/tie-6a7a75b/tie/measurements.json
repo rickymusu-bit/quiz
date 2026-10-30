@@ -1,0 +1,87 @@
+{
+  "revision": "6a7a75b236b1432e069759fcde7e4062803c7280",
+  "cases": [
+    {
+      "viewport": [
+        1920,
+        1080
+      ],
+      "dpr": 1,
+      "intro_pause_orientation_focus": "PASS"
+    },
+    {
+      "viewport": [
+        1920,
+        1080
+      ],
+      "dpr": 2,
+      "intro_pause_orientation_focus": "PASS"
+    },
+    {
+      "viewport": [
+        1366,
+        768
+      ],
+      "dpr": 1,
+      "intro_pause_orientation_focus": "PASS"
+    },
+    {
+      "viewport": [
+        1366,
+        768
+      ],
+      "dpr": 2,
+      "intro_pause_orientation_focus": "PASS"
+    },
+    {
+      "viewport": [
+        1024,
+        768
+      ],
+      "dpr": 1,
+      "intro_pause_orientation_focus": "PASS"
+    },
+    {
+      "viewport": [
+        1024,
+        768
+      ],
+      "dpr": 2,
+      "intro_pause_orientation_focus": "PASS"
+    },
+    {
+      "viewport": [
+        844,
+        390
+      ],
+      "dpr": 1,
+      "intro_pause_orientation_focus": "PASS"
+    },
+    {
+      "viewport": [
+        844,
+        390
+      ],
+      "dpr": 2,
+      "intro_pause_orientation_focus": "PASS"
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 1,
+      "intro_pause_orientation_focus": "PASS"
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 2,
+      "intro_pause_orientation_focus": "PASS"
+    }
+  ],
+  "errors": [],
+  "external_requests": []
+}
