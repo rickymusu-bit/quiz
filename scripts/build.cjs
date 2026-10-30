@@ -87,7 +87,7 @@ function qualityPreview() {
     '<!doctype html><html lang="it"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Hellscape — anteprima di revisione</title><meta name="hellscape-revision" content="' +
       revision +
       '"><style>html,body,iframe{width:100%;height:100%;margin:0;border:0;display:block;background:#090909}</style><iframe title="Hellscape" allow="fullscreen"></iframe><script>' +
-      fixed + (review ? "\n" + read("scripts/quality-preview.js") : "") +
+      fixed + "\n" + read("scripts/quality-preview.js") +
       "</script></html>",
   );
 }
