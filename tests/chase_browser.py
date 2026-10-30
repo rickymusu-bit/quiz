@@ -7,6 +7,8 @@ from io import BytesIO
 import os,json,subprocess,base64,math,sys
 ROOT=Path(__file__).resolve().parent.parent;ART=ROOT/'artifacts/chase';ART.mkdir(parents=True,exist_ok=True)
 HTML=(ROOT/'dist/Hellscape-review.html').read_text()
+PART=os.environ.get('HELLSCAPE_CI_PART','all')
+assert PART in ('all','cinematic','matrix-even','matrix-odd'),f'Unknown CI part: {PART}'
 report={'revision':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),'movies':[],'renders':[],'errors':[],'external_requests':[]}
 VIEWPORTS=[(1920,1080),(1366,768),(1024,768),(844,390),(667,375)];DPRS=[1,2]
 if '--quick' in sys.argv:VIEWPORTS=[(1366,768),(667,375)];DPRS=[1]
@@ -26,7 +28,7 @@ with sync_playwright() as p:
  def snap(f):return f.evaluate('FoolHellRace.presentationSnapshot()')
  def raw(f):return f.locator('.hell-race canvas').evaluate('c=>c.toDataURL()')
  # Play real RAF timelines. The renderer observes, but never changes the final model.
- for remaining in ([] if '--matrix' in sys.argv else [2,1,0]):
+ for remaining in ([] if '--matrix' in sys.argv or PART in ('matrix-even','matrix-odd') else [2,1,0]):
   context,page,f=start();page.clock.install();page.clock.pause_at(page.evaluate('Date.now()+1000'));setup(f,remaining);page.clock.run_for(100)
   entry=snap(f)['frame'];f.evaluate("window.__complete=0;document.addEventListener('foolendingcomplete',()=>__complete++);HellscapeUI.game.complete(0);HellscapeUI.changed()")
   before=state(f);page.clock.run_for(100);plan=snap(f)['plan'];assert plan['victims']==[2,1][:remaining] if remaining==2 else plan['victims']==([1] if remaining==1 else [])
@@ -62,8 +64,11 @@ with sync_playwright() as p:
   if frames:frames[0].save(ART/'chase.gif',save_all=True,append_images=frames[1:],duration=[200]*(len(frames)-1)+[1200],loop=0,optimize=True)
   report['movies'].append({'remaining_losers':remaining,'victims':plan['victims'],'duration':plan['duration'],'phases':sorted(phases),'state_unchanged':True});context.close()
  # Deterministic rendered samples, same logical geometry at every viewport/DPR.
- for width,height in VIEWPORTS:
+ for width,height in (VIEWPORTS if PART!='cinematic' else []):
   for dpr in DPRS:
+   case_index=VIEWPORTS.index((width,height))*len(DPRS)+DPRS.index(dpr)
+   if PART=='matrix-even' and case_index%2:continue
+   if PART=='matrix-odd' and case_index%2==0:continue
    context,page,f=start(width,height,dpr);setup(f);f.wait_for_timeout(50)
    f.evaluate('''()=>{const E=FoolEnding,render=E.render,frame=E.frame;window.__sample='line';const at=p=>__sample==='line'?p.lineupEnd:__sample==='grip'?p.lineupEnd+1.1:__sample==='flight'?p.lineupEnd+2.75:__sample==='sink'?p.lineupEnd+3.9:p.captureEnd+1.4;E.frame=(...a)=>{a[2]=at(a[0]);return frame(...a)};E.render=(...a)=>{a[4]=at(a[3]);return render(...a)};HellscapeUI.game.complete(0);HellscapeUI.changed()}''')
    f.wait_for_function("FoolHellRace.presentationSnapshot().frame?.phase==='capture'")
@@ -77,10 +82,10 @@ with sync_playwright() as p:
     report['renders'].append({'sample':key,'viewport':[width,height],'dpr':dpr,'demon':d,'camera':fr['camera']})
    context.close()
  # Static reduced-motion ending keeps complete information and never blocks the result.
- for winner in [0,None]:
+ for winner in ([0,None] if PART in ('all','cinematic') else []):
   context,page,f=start(667,375,2,True);setup(f)
   f.evaluate('''winner=>{const g=HellscapeUI.game;if(winner===null){g.eliminate(0,'test');g.eliminate(1,'test');g.eliminate(2,'test');}g.complete(winner);HellscapeUI.changed()}''',winner)
   f.wait_for_function("document.querySelector('.hell-race').dataset.endingPhase==='done'");before=state(f);image=raw(f);page.wait_for_timeout(300);assert image==raw(f) and state(f)==before
   expect(f.locator('.final-title')).to_be_visible();context.close()
  assert not report['errors'],report['errors'];assert not report['external_requests'],report['external_requests'];browser.close()
-(ART/'measurements.json').write_text(json.dumps(report,indent=2));print('PASS: 0/1/2 losers, state invariance, anchors/occlusion, pause/resume/orientation, no resurrection; ',len(report['renders']),'offline viewport/DPR samples')
+(ART/'measurements.json').write_text(json.dumps(report,indent=2));print('PASS:',PART,'0/1/2 losers and/or viewport/DPR cases; ',len(report['renders']),'render samples')

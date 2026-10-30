@@ -5,32 +5,95 @@ on:
     branches: [main]
 permissions:
   contents: read
+  pull-requests: read
 concurrency:
   group: hellscape-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 jobs:
+  impact:
+    name: Determina i controlli necessari
+    runs-on: ubuntu-latest
+    outputs:
+      full: ${{ steps.scope.outputs.full }}
+    steps:
+      - name: Classifica i file cambiati (in caso di incertezza, test completi)
+        id: scope
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            let paths = [];
+            try {
+              if (context.eventName === 'pull_request') {
+                const files = await github.paginate(github.rest.pulls.listFiles, {
+                  owner, repo, pull_number: context.issue.number, per_page: 100
+                });
+                paths = files.map(file => file.filename);
+              } else if (context.eventName === 'push') {
+                const before = context.payload.before;
+                if (!before || /^0+$/.test(before)) {
+                  core.setOutput('full', 'true');
+                  return;
+                }
+                const result = await github.rest.repos.compareCommitsWithBasehead({
+                  owner, repo, basehead: `${before}...${context.sha}`
+                });
+                paths = (result.data.files ?? []).map(file => file.filename);
+                if (paths.length >= 300 || result.data.total_commits >= 250) {
+                  core.setOutput('full', 'true');
+                  return;
+                }
+              } else {
+                core.setOutput('full', 'true');
+                return;
+              }
+            } catch (error) {
+              core.warning(`Impact check unavailable: ${error.message}; running full CI`);
+              core.setOutput('full', 'true');
+              return;
+            }
+            const docsOnly = paths.length > 0 && paths.every(path =>
+              path.startsWith('docs/') ||
+              path === 'README.md' ||
+              path === 'AGENTS.md' ||
+              path === '.gitignore'
+            );
+            core.setOutput('full', String(!docsOnly));
+            core.info(`${paths.length} changed files; full CI: ${!docsOnly}`);
   checks:
     name: ${{ matrix.suite }}
+    needs: impact
+    if: needs.impact.outputs.full == 'true'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      max-parallel: 6
+      max-parallel: 10
       matrix:
         include:
           - suite: core
             command: npm test && npm run test:frames && npm run build
           - suite: portal
             command: npm run test:portal
-          - suite: chase
-            command: npm run test:chase
-          - suite: ties
-            command: npm run test:ties
+          - suite: chase-cinematic
+            command: node --test tests/chase.test.js && node scripts/build.cjs --quality-preview && HELLSCAPE_CI_PART=cinematic python3 tests/chase_browser.py
+          - suite: chase-matrix-even
+            command: node scripts/build.cjs --quality-preview && HELLSCAPE_CI_PART=matrix-even python3 tests/chase_browser.py
+          - suite: chase-matrix-odd
+            command: node scripts/build.cjs --quality-preview && HELLSCAPE_CI_PART=matrix-odd python3 tests/chase_browser.py
+          - suite: ties-matrix-even
+            command: node scripts/build.cjs --quality-preview && HELLSCAPE_CI_PART=matrix-even python3 tests/tie_browser.py
+          - suite: ties-matrix-odd
+            command: node scripts/build.cjs --quality-preview && HELLSCAPE_CI_PART=matrix-odd python3 tests/tie_browser.py
+          - suite: ties-scenarios
+            command: node --test tests/tie.test.js && node scripts/build.cjs --quality-preview && HELLSCAPE_CI_PART=scenarios python3 tests/tie_browser.py && python3 tests/turn_limit_browser.py
           - suite: motion
             command: npm run test:motion
           - suite: layout
             command: npm run test:layout
-          - suite: browser
-            command: npm run test:browser
+          - suite: browser-main
+            command: npm run test:browser:main
+          - suite: browser-secondary
+            command: npm run test:browser:secondary
           - suite: ammo
             command: npm run test:ammo
           - suite: endings
@@ -50,11 +113,14 @@ jobs:
           node-version: 24
           cache: npm
       - uses: actions/setup-python@v6
+        if: matrix.suite != 'core'
         with:
           python-version: '3.12'
       - run: npm ci
-      - run: python3 -m pip install -r requirements-test.txt
+      - if: matrix.suite != 'core'
+        run: python3 -m pip install -r requirements-test.txt
       - name: Riutilizza Chromium disponibile, altrimenti installa il browser di test
+        if: matrix.suite != 'core'
         shell: bash
         run: |
           browser_path=$(command -v chromium || command -v chromium-browser || true)
@@ -70,9 +136,9 @@ jobs:
         with:
           name: hellscape-${{ github.sha }}-${{ matrix.suite }}
           if-no-files-found: ignore
+          retention-days: 7
+          compression-level: 0
           path: |
-            dist/Hellscape-Ammo.html
-            dist/Hellscape-review.html
             dist/revision.json
             artifacts/*.png
             artifacts/quality/
@@ -83,9 +149,21 @@ jobs:
             artifacts/portal/
             artifacts/orientation/
   verify:
+    name: Tutte le verifiche richieste
     if: always()
-    needs: checks
+    needs: [impact, checks]
     runs-on: ubuntu-latest
     steps:
-      - name: Tutte le suite devono riuscire
-        run: test "${{ needs.checks.result }}" = "success"
+      - name: Verifica risultato della CI applicabile
+        env:
+          IMPACT_RESULT: ${{ needs.impact.result }}
+          FULL: ${{ needs.impact.outputs.full }}
+          CHECKS_RESULT: ${{ needs.checks.result }}
+        run: |
+          test "$IMPACT_RESULT" = success
+          if [ "$FULL" = true ]; then
+            test "$CHECKS_RESULT" = success
+          else
+            test "$FULL" = false
+            test "$CHECKS_RESULT" = skipped
+          fi
