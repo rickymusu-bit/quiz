@@ -120,9 +120,8 @@ body[data-layout="compact"] .turn-order ol {grid-template-columns:1fr;gap:4px;}
 .player-window summary {cursor:pointer;list-style-position:inside;color:#d9b87e;}
 #viewport-stage .player-window summary>button {display:inline-block;width:calc(100% - 22px);vertical-align:middle;min-height:44px;font-size:20px;padding:4px;}
 #viewport-stage .player-window .turn-name {white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-#viewport-stage .player-window .turn-stats {margin-top:2px;}
-#viewport-stage .player-window .lives {display:none;position:absolute;top:100%;left:0;z-index:6;padding:5px;background:#20140f;width:100%;}
-#viewport-stage .player-window[open] .lives {display:flex;}
+#viewport-stage .player-window .turn-stats {margin-top:2px;display:flex;align-items:center;flex-wrap:wrap;gap:3px 6px;}
+#viewport-stage .player-window .lives {display:inline-flex;align-items:center;position:static;gap:2px;padding:0;background:none;width:auto;flex:0 0 auto;}
 .hud-inventory {position:absolute;top:calc(100% + 24px);left:0;width:100%;z-index:6;display:flex;flex-wrap:wrap;gap:4px;padding:6px;background:#20140ffa;border:1px solid #ac8055;font-size:14px;box-shadow:3px 5px 8px #000b;}
 #viewport-stage .hud-inventory .ammo-round {width:32px;height:32px;min-height:32px;}
 #viewport-stage .player-window[open] {z-index:7;}

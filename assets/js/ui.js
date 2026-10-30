@@ -1462,23 +1462,18 @@
       return b;
     }
     if (s.screen === "hidden") {
-      if (!s.config.turnCount || s.phase === "pareggio") b.append(
-        node(
+      if (s.phase === "pareggio") {
+        b.append(node(
           "div",
-          s.phase === "pareggio"
-            ? "Ultimo Miglio · Giro " +
-                s.tieRound +
-                " · " +
-                (s.tieIndex < 0 ? 1 : s.tieIndex + 1) +
-                "/" +
-                s.tieOrder.length
-            : "Domanda " +
-                (s.valid + 1) +
-                " di " +
-                (s.config.questionCount ?? 33),
+          "Ultimo Miglio · Giro " +
+            s.tieRound +
+            " · " +
+            (s.tieIndex < 0 ? 1 : s.tieIndex + 1) +
+            "/" +
+            s.tieOrder.length,
           "eyebrow",
-        ),
-      );
+        ));
+      }
       b.append(questionActions());
       return b;
     }

@@ -55,6 +55,38 @@ const assert = require("node:assert/strict");
     await page.screenshot({path:"artifacts/customization-truck.png"});
     await page.getByRole("button",{name:/Inizia partita/}).click();
     await page.getByRole("button",{name:"Svela e avvia il tempo"}).waitFor();
+    // Player lives must be visible even when all three HUD windows are collapsed.
+    const players = page.locator(".turn-order .player-window");
+    assert.equal(await players.count(), 3);
+    assert.equal(await page.locator(".turn-order .player-window[open]").count(), 0);
+    for (const card of await players.all()) {
+      assert.equal(await card.locator(".lives .heart").count(), 3);
+      assert(await card.locator(".lives").isVisible());
+      assert.equal(
+        await card.locator(".heart").first().evaluate(el => getComputedStyle(el, "::before").content),
+        '"♥"',
+      );
+    }
+    await page.evaluate(() => {
+      const state = HellscapeUI.game.s;
+      // Legacy roundCount saves previously displayed an extra "Domanda N di M".
+      state.config.questionCount = 39;
+      state.groups[0].damage = 1;
+      HellscapeUI.renderGame();
+    });
+    assert.match(await page.locator(".operation-body .turn-progress").innerText(), /turno 1 di 13/i);
+    assert(!/domanda\s+\d+\s+di\s+\d+/i.test(await page.locator(".operation-body").innerText()));
+    const damaged = page.locator('.turn-order button[data-team="0"] .lives');
+    assert.match(await damaged.getAttribute("aria-label"), /2 vite su 3/);
+    assert.equal(await damaged.locator(".heart.lost").count(), 1);
+    assert(await damaged.isVisible());
+    const liquid = await page.locator(".vial-liquid").evaluate(el => getComputedStyle(el).backgroundImage);
+    assert(liquid.includes("rgb(101, 13, 25)"), "The timer must use the dark blood-red palette");
+    await page.screenshot({path:"artifacts/hud-lives-blood-vial-desktop.png"});
+    await page.setViewportSize({width:667,height:375});
+    for (const life of await page.locator(".turn-order .lives").all()) assert(await life.isVisible());
+    await page.screenshot({path:"artifacts/hud-lives-blood-vial-landscape.png"});
+    await page.setViewportSize({width:1366,height:900});
     await page.evaluate(() => {
       const g=HellscapeUI.game.s;
       const owner=g.owner;
