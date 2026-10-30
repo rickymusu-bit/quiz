@@ -1,3 +1,7 @@
+## Correzione 3.11.2 — ritorno alla schermata iniziale dopo la vittoria
+
+Al termine di una partita, anche dopo l'Ultimo Miglio, il pulsante **Torna alla schermata iniziale** deve essere sempre operativo. I blocchi della transizione di spareggio vengono rimossi al completamento della partita; il ritorno deve funzionare anche quando il gioco è ospitato nell'iframe della home in modalità schermo intero. Aggiunti test per il ritorno dalla vittoria nel frame e per la pulizia dello stato terminale.
+
 ## Aggiornamento · 13 turni per giocatore e Cerbero in partita
 
 Le nuove partite durano **13 turni per giocatore** (39 occasioni complessive in una gara con tre giocatori), configurabili da 1 fino alla somma delle domande disponibili negli argomenti selezionati e nelle tre difficoltà, divisa per il numero dei giocatori e arrotondata per difetto. Ogni giocatore ha un turno per giro, mentre Catene e le cessioni per Tributo/Arsenico consumano l'occasione senza necessariamente porre una domanda. Malocchio non aggiunge un turno. Alla fine si confrontano i punti; la parità al primo posto apre l’Ultimo Miglio. Le partite già salvate conservano la precedente durata totale; i profili di configurazione migrano a turni per giocatore, mantenendo punti, tempo, probabilità e proporzioni degli argomenti. La difficoltà non è selezionabile: ogni partita nuova mescola i tre livelli, mentre il livello di ogni domanda ne determina il punteggio.
@@ -6,7 +10,7 @@ Malocchio concede **45 secondi attivi** per tenere la domanda o assegnarla. Alla
 
 Cerbero sputa dalle tre bocche ogni 60 secondi attivi della scena, con prima fiammata dopo 60 secondi e azione di 1,8 secondi. Continua a camminare; è un effetto visivo, senza modifiche a punti, vite o timer. È sospeso durante catture, Omen e finali e disattivato con movimento ridotto. La home usa `assets/hellscape-cerbero-home.webp`, conversione senza perdita dell’illustrazione con Cerbero al posto del demone.
 
-Motore **3.0.0**, regolamento **27.0.0**, applicazione **3.11.1**. Le sezioni versionate sotto documentano anche il comportamento storico, superato dall’aggiornamento corrente.
+Motore **3.0.0**, regolamento **27.0.0**, applicazione **3.11.2**. Le sezioni versionate sotto documentano anche il comportamento storico, superato dall’aggiornamento corrente.
 
 ## Omen, Arsenico e HUD — 3.10.0
 
