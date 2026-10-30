@@ -30,7 +30,7 @@ const assert = require('node:assert/strict');
       assert.equal(await turns.count(), 3);
       assert.equal(await page.locator('.player-sidebar,.player-card,.game-options').count(), 0);
       assert.equal(await page.locator('.current-player').count(), 0);
-      assert.equal(await page.locator('.turn-order .heart').count(), 9);
+      assert.equal(await page.locator('.turn-order .life-skull').count(), 9);
       assert.equal(await page.locator('.turn-order .player-points').count(), 3);
       const current = await page.evaluate(() => HellscapeUI.game.s.respondent);
       assert.equal(await turns.first().getAttribute('data-team'), String(current));
