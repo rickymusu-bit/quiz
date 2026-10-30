@@ -17,7 +17,9 @@
           notice={kind:'elimination',key:id+':out:'+s.result.id,index:s.result.respondent,elapsed:0};
         }
       }
-      if(s.phase!=='pareggio'){pending=null;active=null;}
+      // The final cinematic owns the post-match capture. No tie notice may
+      // remain active and block the final navigation controls.
+      if(s.phase!=='pareggio'){pending=null;active=null;notice=null;completion=null;paused=false;}
       previous={phase:s.phase,round:s.tieRound,result:s.result?.id};
     }
     function begin(s) {
