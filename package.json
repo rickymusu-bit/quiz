@@ -15,6 +15,7 @@
     "test:endings": "python3 tests/endings.py",
     "test:terrain": "python3 tests/terrain_browser.py",
     "test:quality": "node scripts/build.cjs --quality-preview && python3 tests/visual_quality.py",
+    "test:final-audit": "npm test && npm run test:frames && npm run build && npm run test:browser && npm run test:ammo && npm run test:endings && npm run test:terrain && npm run test:quality && npm run test:layout && npm run test:omen && npm run test:orientation && npm run test:motion && npm run test:ties && npm run test:chase && npm run test:portal",
     "test:layout": "python3 tests/responsive.py",
     "test:omen": "python3 tests/omen_browser.py",
     "test:orientation": "python3 tests/orientation.py",
