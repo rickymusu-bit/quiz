@@ -23,6 +23,19 @@ with sync_playwright() as p:
  def finish(page,winner):
   page.evaluate('''winner=>{const g=HellscapeUI.game;g.s.id+='-final-'+winner;if(winner===null){g.eliminate(0,'test');g.eliminate(1,'test');g.eliminate(2,'test');g.s.respondent=2;}else{g.eliminate(1,'test');g.eliminate(2,'test');}g.complete(winner);HellscapeUI.changed()}''',winner)
  def raw(page):return page.locator('.hell-race-final canvas').evaluate('c=>c.toDataURL()')
+ def assert_home_clear_of_title(page):
+  overlaps=page.evaluate("""() => {
+    const button=document.querySelector('.ending-home button').getBoundingClientRect();
+    return [...document.querySelectorAll('.final-title .victory-wordmark, .final-title .winner-name, .final-title > .end-wordmark')]
+      .filter(el=>{
+        const r=el.getBoundingClientRect();
+        return r.width>0 && r.height>0 &&
+          button.left<r.right+4 && button.right+4>r.left &&
+          button.top<r.bottom+4 && button.bottom+4>r.top;
+      }).map(el=>el.className||el.tagName);
+  }""")
+  assert not overlaps,f'Home overlaps the final wording: {overlaps}'
+
  for winner,name in [(0,'portal-escape'),(None,'eat-fire-dance')]:
   page=start();finish(page,winner);before=page.evaluate('JSON.stringify(HellscapeUI.game.snapshot())');frames=[];phase_set=set()
   page.clock.run_for(100);duration=page.evaluate('FoolHellRace.presentationSnapshot().plan.duration')+.3
@@ -52,6 +65,7 @@ with sync_playwright() as p:
   page.evaluate("document.body.classList.remove('showing-cinematic')")
   box=home.bounding_box()
   assert box and box['x']>=0 and box['y']>=0 and box['x']+box['width']<=page.viewport_size['width'] and box['y']+box['height']<=page.viewport_size['height'],box
+  assert_home_clear_of_title(page)
   if winner==0:
    page.screenshot(path=str(ART/'victory-home-visible.png'))
   if frames:frames[0].save(ART/f'{name}.gif',save_all=True,append_images=frames[1:],duration=[100]*(len(frames)-1)+[1500],loop=0,optimize=True)
@@ -75,6 +89,7 @@ with sync_playwright() as p:
    page=start(viewport={'width':width,'height':height});finish(page,winner);page.clock.run_for(100);page.clock.run_for(math.ceil(page.evaluate('FoolHellRace.presentationSnapshot().plan.duration')*1000)+200)
    assert page.locator('.hell-race-final').get_attribute('data-ending-phase')=='done'
    assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+1 && document.documentElement.scrollHeight<=innerHeight+1')
+   assert_home_clear_of_title(page)
    page.screenshot(path=str(ART/f'ending-{width}x{height}-{"win" if winner==0 else "over"}.png'));page.close()
  # Previously untested path: a fullscreen game is hosted in the homepage
  # iframe. A terminal tie status must never swallow the click or strand the
