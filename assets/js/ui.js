@@ -1653,30 +1653,21 @@
   function focusReveal() {
     requestAnimationFrame(()=>main.querySelector('[data-game-action="reveal"]')?.focus({preventScroll:true}));
   }
-  function renderGame() {
-    cancelFeedback();
-    if (!game) return;
-    if(FoolLayout.portrait && game.running){game.pause("orientamento schermo");persist();}
-    ui = "game";
-    const s = game.s,
-      revision = s.revision;
-    document.body.classList.add("playing");
-    document.body.classList.toggle("finished", s.phase === "conclusa");
-    if (s.phase === "conclusa") {
-      closeDialog();
-      fitBlocked = false;
-      $("fit-warning").hidden = true;
-      main.className = "final-screen";
-      main.replaceChildren(endScreen());
-      syncCinematic();
-      if (lastFinalGame !== s.id) {
-        lastFinalGame = s.id;
-        requestAnimationFrame(() => {
-          main.querySelector(".final-title")?.focus({ preventScroll: true });
-        });
-      }
-      return;
+  function renderFinishedScreen(s) {
+    closeDialog();
+    fitBlocked = false;
+    $("fit-warning").hidden = true;
+    main.className = "final-screen";
+    main.replaceChildren(endScreen());
+    syncCinematic();
+    if (lastFinalGame !== s.id) {
+      lastFinalGame = s.id;
+      requestAnimationFrame(() => {
+        main.querySelector(".final-title")?.focus({ preventScroll: true });
+      });
     }
+  }
+  function renderOperationalScreen(s) {
     const previousBody = main.querySelector(".operation-body");
     const unfold = previousBody?.dataset.screen === "hidden" && s.screen === "answer" && previousBody.dataset.question === s.current?.id;
     main.className = "operational";
@@ -1710,6 +1701,21 @@
     if (s.panel?.type === "sanctions" && !$("dialog").open) showSanctions();
     requestAnimationFrame(checkFit);
   }
+  function renderGame() {
+    cancelFeedback();
+    if (!game) return;
+    if(FoolLayout.portrait && game.running){game.pause("orientamento schermo");persist();}
+    ui = "game";
+    const s = game.s;
+    document.body.classList.add("playing");
+    document.body.classList.toggle("finished", s.phase === "conclusa");
+    if (s.phase === "conclusa") {
+      renderFinishedScreen(s);
+      return;
+    }
+    renderOperationalScreen(s);
+  }
+
   let rulesPages = null;
   async function showRules() {
     if (game?.running) game.pause("regole");
