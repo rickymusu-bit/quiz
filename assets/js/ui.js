@@ -2016,6 +2016,9 @@
     );
   }
 
+  function focusFirstDialogControl(dialogElement) {
+    dialogElement.querySelector("button,input,select")?.focus();
+  }
   function dialog(title, build) {
     const d = $("dialog");
     passiveReturn = null;
@@ -2023,7 +2026,7 @@
     d.replaceChildren(node("h2", title));
     build(d);
     if (!d.open) d.showModal();
-    d.querySelector("button,input,select")?.focus();
+    focusFirstDialogControl(d);
     return d;
   }
   function restoreFocusAfterDialog() {
