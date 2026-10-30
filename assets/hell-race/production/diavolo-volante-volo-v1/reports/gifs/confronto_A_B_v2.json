@@ -1,0 +1,48 @@
+{
+  "source_B": "/workspace/scratch/aa645753c8fe/generated_images/exec-574b1887-1284-440c-acb6-f11849faa392.png",
+  "sha256_B": "b2272812ade507323c9aaa862bfb4bc39895bdc2b6eda7c54b0dff6de6329374",
+  "bytes_B": 1479178,
+  "size_B": [
+    1536,
+    1024
+  ],
+  "alpha_B": [
+    0,
+    254
+  ],
+  "bbox_alpha24": [
+    143,
+    188,
+    1393,
+    868
+  ],
+  "registration": {
+    "method": "normalized luminance correlation on central body only; no anatomy guarantee",
+    "template_A_halfres": [
+      335,
+      200,
+      440,
+      390
+    ],
+    "uniform_source_scale_B": 0.8850000000000001,
+    "whole_image_offset_B": [
+      86,
+      164
+    ],
+    "correlation": 0.8332940936088562,
+    "no_warp": true
+  },
+  "gif": {
+    "file": "confronto_A_B_v2.gif",
+    "size": [
+      768,
+      576
+    ],
+    "durations_ms": [
+      650,
+      650
+    ],
+    "type": "diagnostic alternation of actual PNGs; no intermediate poses or browser/game recording",
+    "display_scale": 0.5
+  }
+}

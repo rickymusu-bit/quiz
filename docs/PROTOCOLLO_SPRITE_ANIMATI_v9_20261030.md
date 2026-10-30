@@ -1,7 +1,7 @@
 # Protocollo operativo per sprite animati coerenti
 
-**Versione documento:** v8  
-**Ultimo aggiornamento:** 29 ottobre 2026 — Europe/Rome  
+**Versione documento:** v9  
+**Ultimo aggiornamento:** 30 ottobre 2026 — Europe/Rome  
 **Progetto di riferimento:** Hellscape – Fuga dall'inferno  
 **Ambito:** riutilizzabile per qualsiasi personaggio, creatura, veicolo, oggetto animato o effetto collegato  
 **Stato:** specifica operativa proposta; non attesta che gli asset del gioco siano già stati sostituiti o validati  
@@ -406,6 +406,17 @@ Le istruzioni sono formulate in base a ciò che un generatore di immagini **può
 
 **Tracciabilità reale:** salvare il **testo di istruzione esplicito** e i riferimenti realmente forniti; se il servizio non espone il prompt interno o altri parametri, dichiarare il limite nel log, senza inventare un prompt retrospettivo. L'output del generatore è un **candidato da validare**; Codex controlla bitmap/tempi/packing e l'utente approva i risultati artistici. Queste condizioni valgono anche quando il modello produce immagini visivamente persuasive.
 
+### 7.6 GIF incrementale obbligatoria a ogni fotogramma (30/10/2026)
+
+Disposizione utente: «per ogni fotogramma che crei produci una GIF che mostra la transizione da uno all'altro».
+
+- Dopo ogni PNG candidato nuovo o corretto, prima di chiedere approvazione o generare il successivo, produrre e mostrare una GIF ricavata dai PNG effettivi: alternanza della nuova posa e del riferimento/adiacente pertinente e, quando disponibile, sequenza progressiva aggiornata. Per gli inbetween mostrare entrambi i vicini.
+- Allineare il pivot corporeo con traslazione rigida e padding comuni; conservare scala e proporzioni. Non ridimensionare ciascuna sagoma indipendentemente per riempire il riquadro. Registrare offset e metodo; eventuali landmark stimati restano dichiarati tali.
+- Nessuna dissolvenza, morphing, mesh o deformazione per simulare fotogrammi mancanti. Distinguere una GIF diagnostica a due estremi, che può mostrare salti, dal loop finale con timing approvato.
+- Documentare PNG sorgenti, versione, stato candidato/respinto/approvato, ordine, durate, scala e correzioni. Mostrare anche i tentativi respinti quando servono a capire il difetto. La GIF locale non sostituisce la GIF browser dopo l'integrazione.
+- Confrontare esplicitamente lunghezza e numero dei segmenti delle ali e degli arti, dimensioni del corpo e topologia delle membrane. Fori, strappi e segni distintivi seguono lo stesso lembo di membrana tra pose; non spariscono o si rigenerano casualmente.
+- Dopo un difetto tecnico o anatomico, segnare la posa respinta e non usarla come base approvata per gli intermedi. Correggere il riferimento se la richiesta modifica anche il design; poi ottenere l'approvazione della revisione.
+
 ## 8. Asset, struttura tecnica e metadati
 
 La consegna può comprendere, secondo le necessità:
@@ -588,7 +599,7 @@ I parametri mancanti si derivano dall'asset approvato e dal codice corrente quan
 
 Questa sezione riguarda **il documento di lavoro**; per refactoring del codice di gioco restano autoritative le regole di AGENTS.md.
 
-1. **Nome versionato:** PROTOCOLLO_SPRITE_ANIMATI_vN_YYYYMMDD.md, data locale Europe/Rome. Questa edizione è **v8_20261029**.
+1. **Nome versionato:** PROTOCOLLO_SPRITE_ANIMATI_vN_YYYYMMDD.md, data locale Europe/Rome. Questa edizione è **v9_20261030**.
 2. **Numerazione progressiva:** le revisioni sostanziali producono un **nuovo file** (v2, v3, …). Non sovrascrivere la versione precedente per un cambiamento sostanziale; i ripristini generano una versione successiva, senza decrementare N.
 3. **Piccole correzioni:** refusi, punteggiatura o collegamenti senza variazioni di significato possono essere corretti nella stessa versione, tracciando il commit.
 4. **Data e stato:** aggiornare data locale, versione, stato e registro modifiche quando nasce una nuova edizione. Distinguere proposta, approvazione e implementazione.
@@ -609,6 +620,7 @@ Questa sezione riguarda **il documento di lavoro**; per refactoring del codice d
 | v5 | 2026-10-29 | Generazione diretta di spritesheet PNG RGBA trasparenti come procedura predefinita; ritaglio dei frame, loop GIF di controllo, verifica alpha e criteri per correggere atlanti illustrativi imperfetti. |
 | v6 | 2026-10-29 | Inbetweening ricorsivo adattivo, doppio estremo A/B, inversione del tratto quando giustificata, timing non uniforme, controlli oggettivi e gate tecnico/artistico, test col diavolo volante. |
 | v7 | 2026-10-29 | Branch temporaneo dedicato a ogni asset/azione; struttura standard cartelle; logging rigoroso prompt e riferimenti; manifest PNG, versioning, verifiche, approvazioni, PR e pulizia dopo merge. |
+| v9 | 2026-10-30 | GIF diagnostica dopo ogni PNG, allineamento su pivot e controllo di lunghezze e topologia delle membrane. |
 | v8 | 2026-10-29 | Integra pose-to-pose professionale, key/breakdown/inbetween, archi, volumi, timing/X-sheet, onion skin e controllo silhouette; rettifica generazione multiposa predefinita: una posa per volta con limiti IA espliciti e retake mirati. |
 
 ### 12.2 Fonti professionali usate nella revisione v8
@@ -625,4 +637,4 @@ Letture di riferimento consultate il 29/10/2026; **fonti sul metodo di animazion
 
 ---
 
-**Versione:** v8 · **Ultimo aggiornamento:** 29 ottobre 2026 (Europe/Rome)
+**Versione:** v9 · **Ultimo aggiornamento:** 30 ottobre 2026 (Europe/Rome)
