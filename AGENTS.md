@@ -17,9 +17,16 @@ Per ogni modifica visiva o funzionale a Hellscape/Fool:
 
 Applicare la preferenza «GIF per la dinamica, screenshot per gli stati statici, nessun HTML embedded» anche agli altri siti e alle altre interfacce sviluppati per l'utente.
 
+## Modalità di distribuzione — requisito corrente (30/10/2026)
+
+- **Hellscape deve funzionare dal sito pubblicato via HTTP(S), attualmente GitHub Pages. L'esecuzione senza connessione Internet o da un file HTML autonomo non è richiesta.**
+- La build offline e i relativi test preesistenti sono strumenti opzionali/legacy, non condizioni di accettazione né obblighi per le nuove funzionalità. Non richiedere la generazione o la consegna di un HTML offline nelle PR, nelle anteprime o nel refactoring.
+- I test possono usare un pacchetto HTML autonomo come **ambiente interno di revisione grafica**, ma ciò non introduce un requisito di funzionamento offline per il prodotto; la verifica delle funzionalità del sito online resta prioritaria.
+- Mantenere i salvataggi locali e la ripresa della partita nello stesso browser: non sono dipendenti dalla distribuzione offline. Non eliminare il codice legacy dell'export senza una PR dedicata e senza verificare le dipendenze dei test.
+
 ## Orientamento del gioco
 
-- Il gioco si usa esclusivamente con schermo orizzontale (larghezza maggiore dell’altezza), su sito, schermo intero ed export offline. In verticale o su finestra quadrata mostrare l’invito a ruotare, impedire comandi e fermare timer e animazioni. Conservare domanda, stato e pannelli aperti; tornare in orizzontale permette la ripresa esplicita della domanda. Le vecchie prove in verticale sono documentazione storica.
+- Il gioco si usa esclusivamente con schermo orizzontale (larghezza maggiore dell’altezza), sul sito e in schermo intero. In verticale o su finestra quadrata mostrare l’invito a ruotare, impedire comandi e fermare timer e animazioni. Conservare domanda, stato e pannelli aperti; tornare in orizzontale permette la ripresa esplicita della domanda. Le vecchie prove in verticale sono documentazione storica.
 
 ## Direzione grafica e fase di approvazione del ponte
 

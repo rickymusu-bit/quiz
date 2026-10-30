@@ -17,15 +17,10 @@ base=f'http://127.0.0.1:{server.server_port}/'
 report={'revision':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),'errors':[],'checks':[]}
 with sync_playwright() as p:
     browser=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox','--disable-dev-shm-usage'])
-    def page(width=844,height=390,offline=False,reduced=False):
-        c=browser.new_context(viewport={'width':width,'height':height},offline=offline,reduced_motion='reduce' if reduced else 'no-preference');q=c.new_page();q.set_default_navigation_timeout(120000);q.clock.install();q.on('pageerror',lambda e:report['errors'].append(str(e)))
-        if offline:
-            def route(r):
-                assert r.request.url=='http://orientation.test/'
-                r.fulfill(content_type='text/html',body=(ROOT/'dist/Hellscape-offline.html').read_text())
-            c.route('**/*',route);q.goto('http://orientation.test/');v=q.frames[1]
-        else:q.goto(base+'Fool.html?start=1');v=q
-        return c,q,v
+    def page(width=844,height=390,reduced=False):
+        c=browser.new_context(viewport={'width':width,'height':height},reduced_motion='reduce' if reduced else 'no-preference');q=c.new_page();q.set_default_navigation_timeout(120000);q.clock.install();q.on('pageerror',lambda e:report['errors'].append(str(e)))
+        q.goto(base+'Fool.html?start=1')
+        return c,q,q
     def rotate(q,v,w,h):
         set_viewport(q,v,w,h);q.clock.run_for(50)
         assert v.evaluate('FoolLayout.portrait')==(w<=h)
@@ -42,9 +37,9 @@ with sync_playwright() as p:
         for key in ['n','g','Enter','Escape','p']:q.keyboard.press(key)
         assert q.url==url;gate(q);c.close()
     report['checks'].append('home/setup/rules: portrait gate, blocked shortcuts')
-    for offline,reduced in [(False,False),(True,True)]:
-        print(f'Checking orientation: offline={offline}, reduced={reduced}',flush=True)
-        c,q,v=page(offline=offline,reduced=reduced);start(v,q)
+    for reduced in (False,True):
+        print(f'Checking web orientation: reduced={reduced}',flush=True)
+        c,q,v=page(reduced=reduced);start(v,q)
         v.get_by_role('button',name='Svela e avvia il tempo').click();q.clock.run_for(1000)
         rotate(q,v,390,844);gate(v);left=v.evaluate('HellscapeUI.game.left()');s=snap(v);raw=pixels(v);motion=v.evaluate('JSON.stringify(FoolHellRace.motionSnapshot())')
         for key in ['p','a','1','i','Enter','Escape']:q.keyboard.press(key)
@@ -60,7 +55,7 @@ with sync_playwright() as p:
         v.evaluate('HellscapeUI.game.resume();HellscapeUI.changed()');v.locator('.answer').nth(v.evaluate('HellscapeUI.game.s.current.correct')).click();q.clock.run_for(100)
         rotate(q,v,390,844);gate(v);s=snap(v);raw=pixels(v);presentation=v.evaluate('JSON.stringify(FoolHellRace.presentationSnapshot())');q.clock.run_for(2500);assert snap(v)==s and pixels(v)==raw and v.evaluate('JSON.stringify(FoolHellRace.presentationSnapshot())')==presentation
         rotate(q,v,844,390);q.clock.run_for(2000);assert not v.evaluate('document.body.classList.contains("showing-cinematic")')
-        rotate(q,v,500,500);gate(v);c.close();report['checks'].append({'offline':offline,'reduced':reduced,'timer_state_pixels_cinematic_modal_square':'PASS'})
+        rotate(q,v,500,500);gate(v);c.close();report['checks'].append({'deployment':'web','reduced':reduced,'timer_state_pixels_cinematic_modal_square':'PASS'})
     # Persistence reloads into the gate, retaining the same remaining time.
     c,q,v=page();start(v,q);v.get_by_role('button',name='Svela e avvia il tempo').click();q.clock.run_for(700);rotate(q,v,390,844);left=v.evaluate('HellscapeUI.game.left()');question=v.evaluate('HellscapeUI.game.s.current.id');q.goto(base+'Fool.html?resume=1');gate(q);assert q.evaluate('HellscapeUI.game.left()')==left and q.evaluate('HellscapeUI.game.s.current.id')==question
     rotate(q,q,844,390);q.get_by_role('button',name='Riprendi partita',exact=True).click();assert q.evaluate('HellscapeUI.game.running');c.close();report['checks'].append('saved match reload: remaining time and question retained')

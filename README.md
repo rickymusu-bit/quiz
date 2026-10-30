@@ -1,3 +1,9 @@
+## Modalità di esecuzione richiesta — sito online (30/10/2026)
+
+La distribuzione supportata di Hellscape è il **sito web pubblicato**: https://rickymusu-bit.github.io/quiz/. Non è più richiesto che il gioco funzioni senza connessione Internet o che sia esportabile come HTML autonomo. La capacità offline già presente può rimanere temporaneamente nel codice come funzionalità legacy, ma **non è un criterio di accettazione, di test obbligatorio o di consegna**. Le partite e le impostazioni salvate nello stesso browser devono continuare a funzionare. Le suite che usano un documento HTML incorporato per controllare le animazioni restano strumenti interni di test e non rappresentano una promessa di utilizzo offline.
+
+Le istruzioni storiche in fondo a questo documento relative alla consegna di HTML offline sono superate da questa decisione e da `AGENTS.md`.
+
 ## Correzione 3.11.2 — ritorno alla schermata iniziale dopo la vittoria
 
 Al termine di una partita, anche dopo l'Ultimo Miglio, il pulsante **Torna alla schermata iniziale** deve essere sempre operativo. I blocchi della transizione di spareggio vengono rimossi al completamento della partita; il ritorno deve funzionare anche quando il gioco è ospitato nell'iframe della home in modalità schermo intero. Aggiunti test per il ritorno dalla vittoria nel frame e per la pulizia dello stato terminale.
@@ -122,7 +128,7 @@ Il sito funziona direttamente come archivio statico, senza compilazione obbligat
 - `assets/hell-ammo.js`: timeline degli eventi Ammo ed effetti Canvas sui veicoli; conserva la coda visiva fra i ridisegni e ignora gli eventi storici alla ripresa di un salvataggio.
 - `assets/hell-race.js`: componente Canvas separato; legge lo stato senza applicare transizioni al motore.
 - `assets/vendor/katex.js` e `katex.css`: KaTeX 0.16.22 e font incorporati estratti senza riscrittura; licenza in `assets/vendor/README.md` e nell’HTML.
-- `scripts/build.cjs`: copia statica e generazione dell’unico HTML offline dagli stessi sorgenti.
+- `scripts/build.cjs`: compilazione della copia statica per il sito. Le varianti HTML autonome sono strumenti facoltativi di revisione/test e non una modalità di distribuzione richiesta.
 
 Servono Node 22 o successivo e Python 3.12 per i comandi di sviluppo. Il sito pubblicato non richiede Node o Python.
 
@@ -137,12 +143,11 @@ npm run test:ammo       # sette effetti Ammo, blocchi, timer, pausa e movimento 
 npm run test:endings    # presa, morso, fiammata e i due finali
 npm run test:terrain    # progressione del terreno su desktop e Android
 npm run build           # dist/site, pubblicabile su hosting statico
-npm run test:offline    # genera e verifica dist/Hellscape-offline.html
-npm run test:quality    # audit offline di dieci schermate, cinque viewport, DPR 1/2
+npm run test:quality    # audit visivo tramite ambiente interno di revisione, cinque viewport e DPR 1/2
 npm run test:ties       # intro, eliminazioni, nuovi giri e ripresa dell’Ultimo Miglio
-npm run test:portal     # portale nel mondo, ponte, attraversamento ed epilogo offline
-npm run test:chase      # fila, ancoraggi, catture e inseguimento offline, cinque viewport a DPR 1/2
-npm run test:motion     # locomozione offline, pausa e clock a 30/60/144 FPS
+npm run test:portal     # portale nel mondo, ponte, attraversamento ed epilogo
+npm run test:chase      # fila, ancoraggi, catture e inseguimento, cinque viewport a DPR 1/2
+npm run test:motion     # locomozione, pausa e clock a 30/60/144 FPS
 npm run test:layout     # testo e controlli nativi, 4:3, orientamento e fullscreen
 ```
 
@@ -203,7 +208,7 @@ Alla fine delle domande previste **vince il giocatore attivo con più punti**. S
 
 Ogni uso confermato mostra materiali illustrati horror, gotici e junkpunk, ricavati da un atlante raster: Catene serra maglie di ferro corroso con lucchetto a teschio; Tributo muove sacche di monete maledette; Malocchio apre un occhio di carne fra palpebre d'osso; Sigillo chiude una gabbia di ossa e ferraglia; Contrappasso usa uno specchio gotico infranto; Livella raccoglie e ripartisce il tributo con una bilancia d'ossa; Flagello rompe il basalto e fa eruttare fuoco. Gli attacchi bloccati producono schegge sul Sigillo. Le eliminazioni da Flagello vengono animate dopo il colpo collettivo.
 
-Durante gli effetti i pannelli lasciano visibile la corsa e il timer resta fermo; `P` permette la pausa manuale durante una domanda aperta. Con movimento ridotto viene mostrata una posa statica per 450 ms. Le animazioni leggono gli eventi già risolti dal motore: non consumano altre munizioni e non vengono ripetute ricaricando un salvataggio. `npm run test:ammo` controlla desktop e schermi Android orizzontali; `node tests/ammo_animation.cjs --offline` verifica gli stessi effetti nell'HTML esportato senza rete.
+Durante gli effetti i pannelli lasciano visibile la corsa e il timer resta fermo; `P` permette la pausa manuale durante una domanda aperta. Con movimento ridotto viene mostrata una posa statica per 450 ms. Le animazioni leggono gli eventi già risolti dal motore: non consumano altre munizioni e non vengono ripetute ricaricando un salvataggio. `npm run test:ammo` controlla desktop e schermi Android orizzontali. Il controllo legacy `node tests/ammo_animation.cjs --offline` è facoltativo e non definisce un requisito del prodotto.
 
 ## Ultimo Miglio
 
@@ -289,7 +294,7 @@ Il tempo è rappresentato da una fiala orizzontale di liquido rosso: si svuota s
 
 Percorsi pubblici, API del motore e chiavi dei salvataggi sono conservati. Nessuna modifica a regole, dataset o formato dei salvataggi. I veicoli già scelti sono disabilitati negli altri selettori e tornano disponibili quando vengono liberati. All’uscita si sceglie Salva ed esci, Esci senza salvare oppure Annulla.
 
-Per ogni modifica all’interfaccia consegnare un’anteprima HTML offline e allegare in chat screenshot aggiornati prima dell’approvazione.
+**Nota: istruzione storica superata.** Per ogni modifica all’interfaccia fornire screenshot reali; per animazioni e transizioni GIF reali, senza consegnare HTML offline come anteprima.
 
 La schermata iniziale usa `assets/hellscape-chase.webp`: i sei veicoli selezionabili sono visti frontalmente mentre fuggono verso chi guarda, con il demone alle loro spalle e proporzioni e sagome distinte. `assets/hellscape-logo.webp` è il titolo HELLSCAPE in metallo scolpito e incandescente, nello stile Doom del precedente logo FOOL, con sfondo trasparente. Lo stesso titolo compare nelle intestazioni di preparazione e regolamento. Illustrazione e logo sono generati dai riferimenti del gioco e convertiti in WebP senza perdita; gli originali sono conservati nell’ambiente di lavoro. Il sottotitolo «fuggi dall'inferno» è centrato sopra HELLSCAPE. I comandi della home rimangono sotto la scena, compreso Riprendi quando è disponibile un salvataggio. Tutte le immagini e il font del menu sono incorporati nell’HTML offline dagli stessi sorgenti.
 

@@ -37,14 +37,12 @@ jobs:
             command: npm run test:endings
           - suite: terrain
             command: npm run test:terrain
-          - suite: offline
-            command: npm run test:offline
           - suite: quality
             command: npm run test:quality
           - suite: omen
             command: npm run test:omen
           - suite: orientation
-            command: npm run preview:offline && npm run test:orientation
+            command: npm run test:orientation
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
@@ -73,7 +71,6 @@ jobs:
           name: hellscape-${{ github.sha }}-${{ matrix.suite }}
           if-no-files-found: ignore
           path: |
-            dist/Hellscape-offline.html
             dist/Hellscape-Ammo.html
             dist/Hellscape-review.html
             dist/revision.json
