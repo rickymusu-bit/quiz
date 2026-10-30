@@ -1,4 +1,4 @@
-"""Real settings controls: selected-topic capacity / players, persistence and offline."""
+"""Real settings controls: selected-topic capacity / players, persistence and review preview."""
 from pathlib import Path
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 from functools import partial
@@ -6,7 +6,7 @@ from playwright.sync_api import sync_playwright, expect
 import threading, os, sys, json, subprocess, hashlib
 
 ROOT = Path(__file__).resolve().parent.parent
-subprocess.run(['node', 'scripts/build.cjs', '--offline'], cwd=ROOT, check=True, stdout=subprocess.DEVNULL)
+subprocess.run(['node', 'scripts/build.cjs', '--quality-preview'], cwd=ROOT, check=True, stdout=subprocess.DEVNULL)
 OUT = ROOT / 'docs/turni-cerbero/evidence'
 record = '--record' in sys.argv
 frames = []
@@ -120,7 +120,7 @@ try:
             q.close()
         # Embedded settings use the same cap with external requests disabled.
         context = browser.new_context(viewport={'width': 844, 'height': 390}, offline=True)
-        html = (ROOT / 'dist/Hellscape-offline.html').read_text()
+        html = (ROOT / 'dist/Hellscape-review.html').read_text()
         requests = []
         def route(r):
             if r.request.url == 'http://capacity.test/preview': r.fulfill(content_type='text/html', body=html)
@@ -141,6 +141,6 @@ try:
         images[0].save(gif, save_all=True, append_images=images[1:], duration=250, loop=0, optimize=True)
         report['clip'] = {'file': gif.name, 'viewport': [1366, 768], 'pixels': [960, 540], 'duration_ms': len(frames) * 250, 'fps': 4, 'sha256': hashlib.sha256(gif.read_bytes()).hexdigest()}
         (OUT / 'capacity-report.json').write_text(json.dumps(report, indent=2) + '\n')
-    print('PASS: all difficulty levels counted, selected questions / players, clamping, legacy preference migration, persistence, desktop/mobile and offline')
+    print('PASS: all difficulty levels counted, selected questions / players, clamping, legacy preference migration, persistence, desktop/mobile and review preview')
 finally:
     server.shutdown()

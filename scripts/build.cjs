@@ -55,7 +55,7 @@ function addCerberoAssets(assets) {
   const paths=new Set([...frames.walk.map(f=>f.asset),frames.parts.asset,frames.jaw?.asset,frames.flames?.asset].filter(Boolean));
   for(const file of paths)assets[file]=data(file);
 }
-function offline(review = false) {
+function qualityPreview() {
   const catalog = JSON.parse(read("datasets.json")),
     texts = {
       "datasets.json": read("datasets.json"),
@@ -76,8 +76,6 @@ function offline(review = false) {
   const pages = {};
   for (const file of ["index.html", "Fool.html", "Fool_regole.html"]) {
     let html = inline(file);
-    if (file === "index.html")
-      html = html.replaceAll("'fool-v1'", "'hellscape-offline-v1:fool-v1'");
     const runtime = `window.HellscapeOffline={...parent.HellscapePreview.resources,search:parent.HellscapePreview.search};window.hellscapePreviewHome=()=>parent.HellscapePreview.navigate('index.html');document.addEventListener('click',e=>{const a=e.target.closest('a[href]');if(!a)return;const url=new URL(a.getAttribute('href'),'https://offline.invalid/');const file=url.pathname.split('/').pop()||'index.html';if(['index.html','Fool.html','Fool_regole.html'].includes(file)){e.preventDefault();e.stopImmediatePropagation();parent.HellscapePreview.navigate(file+url.search);}},true);`;
     // The iframe receives launch parameters without relying on file:// query handling.
     html = html.replace("<head>", "<head><script>" + runtime + "</script>");
@@ -85,11 +83,11 @@ function offline(review = false) {
   }
   const fixed = `const resources=${safe(config)},pages=${safe(pages)};const frame=document.querySelector('iframe');window.HellscapePreview={resources,navigate(route){const url=new URL(route,'https://offline.invalid/');let html=pages[url.pathname.slice(1)];if(!html)throw Error('Unknown preview page');this.search=url.search;frame.srcdoc=html;}};HellscapePreview.navigate('index.html');`;
   fs.writeFileSync(
-    path.join(out, review ? "Hellscape-review.html" : "Hellscape-offline.html"),
-    '<!doctype html><html lang="it"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Hellscape — anteprima offline</title><meta name="hellscape-revision" content="' +
+    path.join(out, "Hellscape-review.html"),
+    '<!doctype html><html lang="it"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Hellscape — anteprima di revisione</title><meta name="hellscape-revision" content="' +
       revision +
       '"><style>html,body,iframe{width:100%;height:100%;margin:0;border:0;display:block;background:#090909}</style><iframe title="Hellscape" allow="fullscreen"></iframe><script>' +
-      fixed + (review ? "\n" + read("scripts/quality-preview.js") : "") +
+      fixed + "\n" + read("scripts/quality-preview.js") +
       "</script></html>",
   );
 }
@@ -108,9 +106,8 @@ fs.writeFileSync(
   path.join(out, "revision.json"),
   JSON.stringify({ revision }, null, 2) + "\n",
 );
-if (process.argv.includes("--quality-preview")) offline(true);
+if (process.argv.includes("--quality-preview")) qualityPreview();
 else if (process.argv.includes("--ammo-preview")) ammoPreview();
-else if (process.argv.includes("--offline")) {offline();ammoPreview();}
 else {
   const site = path.join(out, "site");
   fs.mkdirSync(site, { recursive: true });
