@@ -1,0 +1,167 @@
+{
+  "source": "exec-9e3911cf-863d-45bc-ada4-61687be75dfa.png",
+  "source_size": [
+    1280,
+    1229
+  ],
+  "scale": 0.7723976120071456,
+  "translation": [
+    0.25005216736315106,
+    15.713949807362496
+  ],
+  "canvas": [
+    1000,
+    960
+  ],
+  "landmarks_reference": [
+    [
+      907.0,
+      440.0
+    ],
+    [
+      790.0,
+      459.0
+    ],
+    [
+      836.0,
+      606.0
+    ],
+    [
+      770.0,
+      563.0
+    ]
+  ],
+  "landmarks_P": [
+    [
+      1172.0,
+      557.0
+    ],
+    [
+      994.0,
+      584.0
+    ],
+    [
+      1109.0,
+      755.0
+    ],
+    [
+      1000.0,
+      700.0
+    ]
+  ],
+  "landmark_status": "manually estimated positions, no exact correspondence guarantee",
+  "residual_asset_pixels": [
+    6.125891445419692,
+    23.327339706797673,
+    22.023666035397245,
+    7.1184347158466785
+  ],
+  "rms_residual": 16.713806435398602,
+  "color_curves": [
+    {
+      "source": [
+        0.0,
+        5.0,
+        21.0,
+        42.0,
+        74.0,
+        118.0,
+        166.0,
+        239.0,
+        255.0
+      ],
+      "target": [
+        0.0,
+        8.0,
+        24.0,
+        42.0,
+        71.0,
+        109.0,
+        148.0,
+        209.0,
+        255.0
+      ]
+    },
+    {
+      "source": [
+        0.0,
+        5.0,
+        18.0,
+        39.0,
+        69.0,
+        113.0,
+        204.57999999999993,
+        255.0
+      ],
+      "target": [
+        0.0,
+        9.0,
+        21.0,
+        41.0,
+        68.0,
+        106.0,
+        171.57999999999993,
+        255.0
+      ]
+    },
+    {
+      "source": [
+        0.0,
+        1.0,
+        10.0,
+        29.0,
+        55.0,
+        91.0,
+        173.57999999999993,
+        255.0
+      ],
+      "target": [
+        0.0,
+        5.0,
+        14.0,
+        32.0,
+        56.0,
+        90.0,
+        146.0,
+        255.0
+      ]
+    }
+  ],
+  "median_before": [
+    74.0,
+    39.0,
+    29.0
+  ],
+  "median_after": [
+    71.0,
+    41.0,
+    32.0
+  ],
+  "reference_median": [
+    71.0,
+    41.0,
+    32.0
+  ],
+  "alpha_preserved": true,
+  "sequence": [
+    "A",
+    "M",
+    "N",
+    "P",
+    "B",
+    "P",
+    "N",
+    "M"
+  ],
+  "duration_ms": [
+    450,
+    450,
+    450,
+    450,
+    450,
+    450,
+    450,
+    450
+  ],
+  "limitations": "P is candidate. Global registration and palette normalization do not certify anatomy or wing geometry. Reverse playback only diagnostic."
+}
