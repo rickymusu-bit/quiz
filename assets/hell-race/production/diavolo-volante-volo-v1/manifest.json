@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "source_revision": "ec4eb85057da38b821e3c2ae00ee0dcc017f418f",
-  "status": "B_v2_globally_aligned_pending_artistic_review",
+  "status": "B_color_and_wing_claw_retake_pending",
   "reference": {
     "path": "references/scena-reale-20261030.jpg",
     "git_blob": "ab349ca62d2285964ad805a785f3db2dc99c882e",
@@ -91,7 +91,7 @@
         "approved/pose_A.png"
       ],
       "output": "candidates/004_posa_B_v2.png",
-      "status": "globally_aligned_candidate_pending_approval",
+      "status": "globally_aligned_but_artistic_rejected",
       "approval": null,
       "git_blob": "18b3096767d9168815d0441d36da438ea123b6c7",
       "sha256": "b2272812ade507323c9aaa862bfb4bc39895bdc2b6eda7c54b0dff6de6329374",
@@ -156,7 +156,20 @@
         "median_after": 1.0012369885876782,
         "units": "source image pixels",
         "interpretation": "residual comparable to manual annotation uncertainty; does not certify limb or wing equivalence"
-      }
+      },
+      "rejection": "L'utente rileva differenza cromatica e artiglio alare su un'articolazione diversa; registrazione globale valida solo come allineamento."
+    },
+    {
+      "id": "005",
+      "phase": "key_B_color_claw_retake",
+      "source": [
+        "aligned/004_posa_B_v2_allineata_v1.png",
+        "approved/pose_A.png"
+      ],
+      "prompt": "prompts/005_posa_B_v3_colore_artiglio.md",
+      "output": "candidates/005_posa_B_v3.png",
+      "status": "not_generated",
+      "approval": null
     }
   ],
   "replacement_instruction": {
