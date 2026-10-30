@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "source_revision": "ec4eb85057da38b821e3c2ae00ee0dcc017f418f",
-  "status": "awaiting_static_design_approval",
+  "status": "design_approved_pose_B_pending",
   "reference": {
     "path": "references/scena-reale-20261030.jpg",
     "git_blob": "ab349ca62d2285964ad805a785f3db2dc99c882e",
@@ -26,11 +26,29 @@
         0,
         254
       ],
-      "status": "candidate",
-      "approval": null,
+      "status": "approved_static_design",
+      "approval": {
+        "date": "2026-10-30",
+        "user_quote": "Va bene. Quando sarà completato il design rimuovi i vecchi diavoli, i vecchi diavoli neri che c'erano prima",
+        "scope": "design statico e prosecuzione con ali abbassate; non integrazione o merge"
+      },
       "source": "references/scena-reale-20261030.jpg",
       "duration_ms": null,
       "pivot": null
+    },
+    {
+      "id": "002",
+      "phase": "key_B",
+      "prompt": "prompts/002_posa_B_v1.md",
+      "source": "approved/pose_A.png",
+      "output": "candidates/002_posa_B_v1.png",
+      "status": "not_generated",
+      "approval": null
     }
-  ]
+  ],
+  "replacement_instruction": {
+    "date": "2026-10-30",
+    "status": "pending_complete_approved_cycle",
+    "instruction": "Quando il nuovo design/ciclo è completo, sostituire e rimuovere i vecchi diavoli neri procedurali; non mantenere due popolazioni sovrapposte. Verificare riferimenti prima di eliminare codice o asset."
+  }
 }

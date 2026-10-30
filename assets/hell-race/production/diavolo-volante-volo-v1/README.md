@@ -22,3 +22,6 @@ Dimensioni di esportazione e alpha da verificare sull'output effettivo. Nessuna 
 Design statico/A candidato → approvazione design → piano di movimento e tempi → B → breakdown → intermedi selettivi e loop locale → approvazione → integrazione separata e GIF reale dal browser.
 Non fissato un numero di PNG o una durata prima del blocking. Nessun file in approved/ finché l'utente non approva.
 I prompt espliciti sono conservati prima di ogni chiamata; le istruzioni interne del servizio non sono accessibili.
+
+## Decisione utente — 30/10/2026
+Design statico A approvato: «Va bene». Proseguire con B ali abbassate mantenendo l'identità. A completamento del nuovo ciclo, rimuovere e sostituire i vecchi diavoli neri. La rimozione è pianificata per l'integrazione del nuovo asset, senza doppie popolazioni. Approvazione artistica non equivale ad approvazione del merge o del runtime.
