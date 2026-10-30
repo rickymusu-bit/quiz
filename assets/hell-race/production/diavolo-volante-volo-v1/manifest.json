@@ -1,14 +1,36 @@
 {
   "version": "1.0.0",
   "source_revision": "ec4eb85057da38b821e3c2ae00ee0dcc017f418f",
-  "status": "design_pending",
+  "status": "awaiting_static_design_approval",
+  "reference": {
+    "path": "references/scena-reale-20261030.jpg",
+    "git_blob": "ab349ca62d2285964ad805a785f3db2dc99c882e",
+    "kind": "actual_browser_screenshot",
+    "deployment_sha": "not_exposed"
+  },
   "frames": [
     {
       "id": "001",
+      "phase": "design_A_candidate",
       "prompt": "prompts/001_design_A_v1.md",
       "output": "candidates/001_design_A_v1.png",
-      "status": "not_generated",
-      "approval": null
+      "report": "reports/verifica_001_v1.0.0_20261030.md",
+      "sha256": "10439ee3ad19783e4e14d88bec330776809e1ea7a08a6d0fe4ad8228b3da59b3",
+      "git_blob": "5285a77df551e846d990ec78bd1847f28db58af1",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        254
+      ],
+      "status": "candidate",
+      "approval": null,
+      "source": "references/scena-reale-20261030.jpg",
+      "duration_ms": null,
+      "pivot": null
     }
   ]
 }

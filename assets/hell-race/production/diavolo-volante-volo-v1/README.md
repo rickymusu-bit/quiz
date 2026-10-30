@@ -1,7 +1,7 @@
 # Diavolo volante — volo v1
 Data: 30 ottobre 2026. Fonte: main ec4eb85057da38b821e3c2ae00ee0dcc017f418f.
 Protocollo: docs/PROTOCOLLO_SPRITE_ANIMATI_v8_20261029.md (§2.1, §7.2–7.5, §8.1).
-Stato: produzione artistica; design candidato da generare, nessuna approvazione o integrazione.
+Stato: produzione artistica; design candidato generato, in attesa di approvazione, nessuna approvazione o integrazione.
 
 ## Audit verificato
 - Ispezionati assets/hell-race.js (blob 02459dce3bd0c5cc97132cf2535ff908eb1c47b3), docs/HELLSCAPE_LAYOUT.md e asset infernal-world-v1.webp (blob 20952a8b76a320295337cd03ec48f146bcc3fb08, aperto visivamente).
