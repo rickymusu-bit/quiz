@@ -1,0 +1,118 @@
+name: Pulizia sicura dei branch Hellscape
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/branch-prune.yml'
+      - 'docs/BRANCH_AUDIT_v1.0.0_20261030.md'
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: read
+
+concurrency:
+  group: hellscape-branch-pruning
+  cancel-in-progress: false
+
+jobs:
+  audit-and-prune:
+    name: Verifica PR e rimuovi solo i branch integrati
+    runs-on: ubuntu-latest
+    steps:
+      - name: Audit completo dei riferimenti e pulizia protetta
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const repository = `${owner}/${repo}`;
+            const dryRun = context.eventName === 'pull_request';
+            const branches = await github.paginate(github.rest.repos.listBranches, {
+              owner, repo, per_page: 100
+            });
+            const closed = await github.paginate(github.rest.pulls.list, {
+              owner, repo, state: 'closed', per_page: 100
+            });
+            const open = await github.paginate(github.rest.pulls.list, {
+              owner, repo, state: 'open', per_page: 100
+            });
+            const main = await github.rest.repos.getBranch({ owner, repo, branch: 'main' });
+            const mergedHeads = new Map();
+            for (const pr of closed) {
+              if (!pr.merged_at || pr.head.repo?.full_name !== repository) continue;
+              const entries = mergedHeads.get(pr.head.ref) || [];
+              entries.push({ number: pr.number, sha: pr.head.sha });
+              mergedHeads.set(pr.head.ref, entries);
+            }
+            const activeHeads = new Set(open
+              .filter(pr => pr.head.repo?.full_name === repository)
+              .map(pr => pr.head.ref));
+            const candidates = [];
+            const retained = [];
+            for (const branch of branches) {
+              const name = branch.name;
+              if (name === 'main' || branch.protected || activeHeads.has(name)) {
+                retained.push({ name, reason: 'main, protected or open PR' });
+                continue;
+              }
+              const found = (mergedHeads.get(name) || [])
+                .find(pr => pr.sha === branch.commit.sha);
+              if (found) {
+                candidates.push({ name, sha: branch.commit.sha,
+                  reason: `merged PR #${found.number} with exact head SHA` });
+                continue;
+              }
+              // Only this previously audited historical branch is eligible
+              // without a merged PR. Never delete unknown unmerged work.
+              if (name === 'design/black-stone-bridge'
+                  && branch.commit.sha === '7c831bfa71f031e8be951e775ea1f9d43ca9ca46') {
+                const comparison = await github.rest.repos.compareCommits({
+                  owner, repo, base: main.data.commit.sha, head: name
+                });
+                if (comparison.data.ahead_by === 0) {
+                  candidates.push({ name, sha: branch.commit.sha,
+                    reason: 'previously audited fully-contained historical commit' });
+                  continue;
+                }
+              }
+              retained.push({ name, reason: 'nonmerged or independent evidence' });
+            }
+            core.info(`Found ${branches.length} branches; eligible ${candidates.length}; retained ${retained.length}; dry-run=${dryRun}`);
+            core.summary.addHeading('Hellscape: verifica e pulizia branch');
+            core.summary.addRaw(`Modalità: ${dryRun ? 'simulazione PR' : 'eliminazione su main'}\n\n`);
+            core.summary.addRaw(`Branch trovati: ${branches.length}; idonei: ${candidates.length}; preservati: ${retained.length}\n\n`);
+            core.summary.addTable([
+              [{data:'Branch',header:true},{data:'Decisione',header:true},{data:'Motivo',header:true}],
+              ...retained.map(x => [x.name, 'preservato', x.reason])
+            ]);
+            if (!dryRun) {
+              let deleted = 0;
+              for (const item of candidates) {
+                // Recheck SHA immediately before mutation, preserving moving
+                // branches and work started after the audit.
+                const ref = `heads/${item.name}`;
+                let current;
+                try {
+                  current = await github.rest.git.getRef({ owner, repo, ref });
+                } catch (error) {
+                  if (error.status === 404) {
+                    core.info(`Already deleted: ${item.name}`);
+                    continue;
+                  }
+                  throw error;
+                }
+                if (current.data.object.sha !== item.sha) {
+                  core.warning(`Branch changed; skipping: ${item.name}`);
+                  continue;
+                }
+                await github.rest.git.deleteRef({ owner, repo, ref });
+                deleted++;
+                core.info(`Deleted ${item.name}: ${item.reason}`);
+              }
+              core.summary.addRaw(`\nEliminati effettivamente: ${deleted}\n`);
+            } else {
+              core.info('Dry-run: no branch references were deleted.');
+            }
+            await core.summary.write();
