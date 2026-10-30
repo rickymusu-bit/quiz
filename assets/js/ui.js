@@ -1672,6 +1672,10 @@
     syncCinematic();
     if (lastFinalGame !== s.id) {
       lastFinalGame = s.id;
+      // Carrying the previous game's scroll offset into the ending can place
+      // the return-home control above the viewport, even with a fixed anchor.
+      main.scrollTop = 0;
+      $("viewport-stage").scrollTop = 0;
       requestAnimationFrame(() => {
         main.querySelector(".final-title")?.focus({ preventScroll: true });
       });
