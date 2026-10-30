@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "source_revision": "ec4eb85057da38b821e3c2ae00ee0dcc017f418f",
-  "status": "B_physical_consistency_retake_pending",
+  "status": "B_v2_candidate_pending_approval",
   "reference": {
     "path": "references/scena-reale-20261030.jpg",
     "git_blob": "ab349ca62d2285964ad805a785f3db2dc99c882e",
@@ -91,8 +91,36 @@
         "approved/pose_A.png"
       ],
       "output": "candidates/004_posa_B_v2.png",
-      "status": "not_generated",
-      "approval": null
+      "status": "candidate_pending_approval",
+      "approval": null,
+      "git_blob": "18b3096767d9168815d0441d36da438ea123b6c7",
+      "sha256": "b2272812ade507323c9aaa862bfb4bc39895bdc2b6eda7c54b0dff6de6329374",
+      "size": [
+        1536,
+        1024
+      ],
+      "alpha_extrema": [
+        0,
+        254
+      ],
+      "registration": {
+        "method": "normalized luminance correlation on central body only; no anatomy guarantee",
+        "template_A_halfres": [
+          335,
+          200,
+          440,
+          390
+        ],
+        "uniform_source_scale_B": 0.8850000000000001,
+        "whole_image_offset_B": [
+          86,
+          164
+        ],
+        "correlation": 0.8332940936088562,
+        "no_warp": true
+      },
+      "comparison_gif": "reports/gifs/confronto_A_B_v2.gif",
+      "report": "reports/verifica_004_v1.0.0_20261030.md"
     }
   ],
   "replacement_instruction": {
