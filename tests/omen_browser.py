@@ -44,7 +44,18 @@ try:
    assert abs((dock['y']+dock['height'])-(opened['y']+opened['height']))<2
    assert opened['y']<dock['y'],(dock,opened)
    if w<1000:
-    owner=v.evaluate('HellscapeUI.game.s.owner');q.keyboard.press('a');assert v.evaluate('HellscapeUI.game.s.screen')=='answer'
+    # Rotation pauses gameplay. Resume explicitly before testing the hardware
+    # keyboard: a paused game must correctly ignore answer shortcuts.
+    state=v.evaluate('''()=>{const s=HellscapeUI.game.s;return {screen:s.screen,paused:s.paused,suspended:s.suspended,fitBlocked:!!document.querySelector('#fit-warning:not([hidden])'),dialog:document.querySelector('#dialog').open}}''')
+    if state['suspended']:
+     q.keyboard.press('l')
+    if v.evaluate('HellscapeUI.game.s.paused'):
+     q.keyboard.press('p')
+    state=v.evaluate('''()=>{const s=HellscapeUI.game.s;return {screen:s.screen,paused:s.paused,suspended:s.suspended,phase:s.phase,panel:s.panel,draftBonus:s.draftBonus,dialog:document.querySelector('#dialog').open}}''')
+    assert state['screen']=='answer' and not state['paused'] and not state['suspended'],state
+    owner=v.evaluate('HellscapeUI.game.s.owner')
+    q.keyboard.press('a')
+    assert v.evaluate('HellscapeUI.game.s.screen')=='result',state
    v.locator('.answer').nth(v.evaluate('(HellscapeUI.game.s.current.correct+1)%4')).click();q.wait_for_timeout(2300);layout(v,w,h)
    if h<600:
     v.get_by_role('button',name='Dettagli esito',exact=True).click();expect(v.locator('#dialog')).to_contain_text('Risposta errata');v.get_by_role('button',name='Chiudi',exact=True).click()
