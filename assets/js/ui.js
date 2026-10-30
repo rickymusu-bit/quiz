@@ -1289,10 +1289,13 @@
       changed();
     }
   }
-  function syncCinematic() {
+  function shouldPauseForCinematic() {
     const malocchioAnswer = game?.s.screen === "answer" && !!game.s.malocchio;
     // The full response timer starts at confirmation, including a passed question.
-    const active = cinematicActive() && !malocchioAnswer;
+    return cinematicActive() && !malocchioAnswer;
+  }
+  function syncCinematic() {
+    const active = shouldPauseForCinematic();
     // A finished game cannot be locked by a stale Ultimo Miglio notice.
     const tieActive = game?.s.phase === "pareggio" && FoolHellRace.tieStatus().blocking;
     setTieScreenInert(tieActive);
