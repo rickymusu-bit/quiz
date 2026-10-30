@@ -4,7 +4,7 @@ const bridge=require('../assets/hell-bridge.js');
 (async()=>{
  const image=await loadImage('assets/hell-race/vehicles-drive-v1.webp');
  const root={FoolMotion:require('../assets/hell-motion.js'),FoolLayout:require('../assets/hell-layout.js'),__sheets:{vehicles:image},FoolBridge:bridge,matchMedia:()=>({matches:false})};
- const source=fs.readFileSync('assets/hell-race.js','utf8').replace('const sheets = { vehicles: null, world: null };','const sheets=root.__sheets;').replace('root.FoolHellRace = { createStage, vehiclePreview };','root.FoolHellRace={packPosition};');
+ const source=fs.readFileSync('assets/hell-race.js','utf8').replace('const sheets = { vehicles: null };','const sheets=root.__sheets;').replace('root.FoolHellRace = { createStage, vehiclePreview };','root.FoolHellRace={packPosition};');
  vm.runInNewContext(source,{window:root,document:{createElement:()=>createCanvas(1,1)}});
  const names=['chopper','pickup','truck','coupe','offroad','ape'];let count=0;
  for(const a of names)for(const b of names.filter(n=>n!==a))for(const d of names.filter(n=>n!==a&&n!==b)){
