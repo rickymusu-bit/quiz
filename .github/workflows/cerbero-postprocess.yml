@@ -1,0 +1,75 @@
+name: Cerbero — sprites-post pinned verification
+
+on:
+  pull_request:
+    paths:
+      - 'assets/hell-race/production/cerbero/**'
+      - 'assets/hell-cerbero-gallop.js'
+      - 'tests/cerbero-gallop.test.js'
+      - '.github/workflows/cerbero-postprocess.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+
+jobs:
+  postprocess:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch immutable Hellscape artwork
+        uses: actions/checkout@v5
+        with:
+          path: quiz
+      - name: Check out standalone sprites-post tool at a fixed commit
+        uses: actions/checkout@v5
+        with:
+          repository: rickymusu-bit/sprites-post
+          ref: 870e1274aee5fd42ede786cff7eec944087c7771
+          path: sprites-post
+          persist-credentials: false
+      - name: Python runtime
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Install ONLY independent tool dependencies
+        run: python3 -m pip install -r sprites-post/requirements.txt
+      - name: Reprocess approved source with its original thorax landmarks
+        run: |
+          python3 sprites-post/scripts/sprite_postprocess.py \
+            quiz/assets/hell-race/production/cerbero/run-stabilized-v1/source-sheet.png \
+            --columns 4 --rows 2 \
+            --landmarks quiz/assets/hell-race/production/cerbero/run-stabilized-v1/landmarks.json \
+            --duration 100 \
+            --out artifacts/cerbero-sprites-post
+      - name: Compare reproduced frames pixel-for-pixel to the approved atlas
+        run: |
+          python3 - <<'PY'
+          import json, hashlib
+          from pathlib import Path
+          from PIL import Image, ImageChops
+
+          source = Path('quiz/assets/hell-race/production/cerbero/run-stabilized-v1')
+          manifest = json.loads((source / 'manifest.json').read_text())
+          original = source / manifest['source']['path']
+          actual_sha = hashlib.sha256(original.read_bytes()).hexdigest()
+          assert actual_sha == manifest['source']['sha256'], 'Original source changed'
+          output = Path('artifacts/cerbero-sprites-post')
+          for item in manifest['frames']:
+              idx = item['index']
+              generated = Image.open(output / 'aligned' / f'{idx:03}.png').convert('RGBA')
+              approved = Image.open(source / item['png']).convert('RGBA')
+              assert generated.size == approved.size, f'Frame {idx} size drift'
+              assert ImageChops.difference(generated, approved).getbbox() is None, f'Frame {idx} pixel drift'
+          new_atlas = Image.open(output / 'atlas.png').convert('RGBA')
+          old_atlas = Image.open(source / manifest['sheet']['path']).convert('RGBA')
+          assert new_atlas.size == old_atlas.size
+          assert ImageChops.difference(new_atlas, old_atlas).getbbox() is None, 'Atlas drift'
+          print('Reproduced 8 RGBA frames and atlas without pixel changes')
+          PY
+      - name: Preserve diagnostic evidence only (NOT runtime/browser proof)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cerbero-sprites-post-diagnostic
+          path: artifacts/cerbero-sprites-post/
+          if-no-files-found: ignore
+          retention-days: 7
