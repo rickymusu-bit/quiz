@@ -2,13 +2,13 @@
 
 **Versione documento:** v14.0.0\
 **Ultimo aggiornamento:** 31 ottobre 2026 — Europe/Rome\
-**Progetto di riferimento:** Hellscape – Fuga dall'inferno\
+**Progetto campione:** Hellscape – Fuga dall'inferno (esempi e prescrizioni specifiche esternalizzati)\
 **Ambito:** riutilizzabile per qualsiasi personaggio, creatura, veicolo, oggetto animato o effetto collegato\
-**Stato:** proposta v14 versionata con il tool della PR #94; main mantiene v12 come riferimento vincolante. Include la v13 della PR #92 ancora aperta: la sua approvazione non è presunta. Nessun asset/runtime modificato.
-**Destinatari:** Codex, ChatGPT Work, artisti, altri agenti e sviluppatori\
+**Stato:** protocollo aggiornato con vincoli fisici e biomeccanici; la presente revisione non convalida automaticamente asset o animazioni prodotti
+**Destinatari:** artisti, agenti grafici, sviluppatori e operatori autorizzati\
 **Repository:** rickymusu-bit/quiz\
-**Fonte di questa revisione:** v13 proposta nella PR #92, head 96312a3bb56ebdcf9cb070327dd049f4c0c2a25d; richiesta utente del 31/10/2026 sul protocollo di correzione locale; integrazione tecnica sulla pipeline PR #94 e coordinamento con il piano PR #96.
-**Convenzioni prevalenti:** [AGENTS.md](../AGENTS.md); in caso di conflitto prevalgono le istruzioni più recenti esplicitamente approvate dall'utente.
+**Fonte di questa revisione:** v13.0.0 del 30/10/2026 (PR #92); richiesta utente del 31/10/2026 di separare le prescrizioni di progetto dalle regole di metodo.
+**Convenzioni prevalenti:** [AGENTS.md](../AGENTS.md) e [specifiche Hellscape](HELLSCAPE_PROJECT_RULES_v1.0.0_20261031.md) per i soli casi pertinenti; in caso di conflitto prevalgono le istruzioni più recenti esplicitamente approvate dall'utente.
 
 > **Principio guida:** uno sprite animato rappresenta **un unico soggetto articolato che evolve nel tempo**, non una serie di illustrazioni indipendenti. Le parti anatomiche, i punti di ancoraggio e la causalità degli effetti sono vincoli di produzione e di accettazione, non semplici suggerimenti stilistici.
 
@@ -68,17 +68,9 @@ Prima del primo concept, produrre e conservare una scheda sintetica, compilata *
 
 **Gate di ingresso:** se camera, ruolo, collocazione e riferimenti non sono stati controllati o le ipotesi non sono dichiarate, **non è consentito presentare il concept come pronto per il gioco**. La generazione esplorativa è possibile soltanto se esplicitamente marcata come tale, non come asset approvato.
 
-#### 2.1.2 Caso di applicazione: diavolo volante di Hellscape
+#### 2.1.2 Applicazione dell'audit a un progetto
 
-Al 29/10/2026, dal codice e dalla documentazione del repository si ricavano questi dati operativi da **riconfermare quando cambia il renderer**:
-
-- `docs/HELLSCAPE_LAYOUT.md`: Canvas di scena **512 × 384 pixel logici**, palco di riferimento **1024 × 768**.
-- `assets/hell-race.js`: funzione `flyingDevils()` con piccoli soggetti decorativi nel cielo, otto istanze; `devilPosition()` determina quota e movimento.
-- Lo sprite procedurale esistente viene disegnato in un riquadro nominale **64 × 60** con scala circa **0,48–0,61**, quindi ingombro di riferimento nell'ordine di **31–39 × 29–37 pixel logici** (prima di eventuali trasparenze della sagoma).
-- `assets/hell-race/infernal-world-v1.webp`, `assets/hell-race/lava-bridge-v1.webp`, `assets/hell-race/demon-actions-v1.webp`, screenshot delle scene approvate: riferimenti da ispezionare visivamente prima di dichiarare il nuovo sprite stilisticamente conforme. Il codice da solo non sostituisce la verifica delle immagini.
-- **Ruolo:** sagoma atmosferica di secondo piano, non nuovo boss. Il design di riferimento deve funzionare soprattutto come silhouette con battito d'ali; ingombro e definizione devono essere calibrati sul Canvas, non sulla dimensione di una illustrazione da copertina.
-- **Camera:** l'inquadratura laterale della corsa è la cornice compositiva. L'esatto angolo del personaggio va confrontato con la scena e confermato visivamente prima degli sprite definitivi. Una posa drammatica frontale a tre quarti non è automaticamente adatta.
-- Durante la fase di test del concept non modificare il codice per riattivare i diavoli volanti eventualmente rimossi dalla versione di gioco in uso. L'integrazione richiede una richiesta e approvazione separate.
+Per ogni asset compilare la scheda precedente usando codice, fotogrammi, screenshot, dimensioni, palette, orientamento e ruoli **effettivamente verificati**. Conservare i valori e le scelte vincolanti nel fascicolo dell'asset o nella specifica del progetto; non promuovere i dati di un singolo personaggio a regola generale. Un caso documentato è archiviato nelle [specifiche Hellscape](HELLSCAPE_PROJECT_RULES_v1.0.0_20261031.md).
 
 ## 2.2 Modello fisico e biomeccanico — requisito obbligatorio (v13)
 
@@ -109,26 +101,11 @@ Annotare in un file versionato:
 - **Periodi e loop:** le pose coprono un ciclo completo e si collegano con continuità **di posizione e, quanto ragionevolmente visibile, di velocità**; la prima e l'ultima non vanno duplicate per riempire caselle.
 - **Rig/disegno:** scegliere per ciascun intervallo secondo §3.1. Se il rig invalida silhouette e occlusione, disegnare pose correttive. La trasformazione geometrica non deve sostituire la flessione del dorso né far ruotare arti intorno a pivot sbagliati.
 
-### 2.2.3 Galoppo rotatorio a doppia sospensione — esempio operativo Cerbero
+### 2.2.3 Andature e azioni: modelli specifici separati
 
-**Modello di riferimento:** quadrupede canide veloce, con adattamento esplicito al torace e ai tre colli del Cerbero. Il galoppo è un'andatura asimmetrica. Il doppio volo non è obbligatorio per tutte le specie e tutte le velocità; è associato soprattutto alle andature più rapide e a sufficiente flessione/estensione del dorso. L'ordine concreto dei contatti, il lato guida e la distribuzione delle durate possono variare: confermare con reference invece di affermare un'inesistente sequenza universalmente fissa.
+La scheda fisica identifica l'andatura o l'azione concreta (cammino, galoppo, salto, volo, presa) e ne descrive **eventi**, carichi, contatti e traiettorie prima della scelta del numero dei disegni. Nessun ordine di appoggio o numero di sospensioni è universale: variano con specie, morfologia, velocità e stilizzazione approvata. I keyframe A/B/M indicano riferimenti e passaggi, non garantiscono corrispondenza con stati fisici specifici. Registrare le sequenze anatomiche del singolo soggetto nel fascicolo dedicato.
 
-Per un **ciclo di esempio** visto da destra, scegliere un lato guida e mantenerlo per il loop; la sequenza di contatti, iniziando dalla fase di volo estesa, è: **anteriore 1 → anteriore 2 → sospensione raccolta → posteriore 1 → posteriore 2 → sospensione estesa**. L'inizio è convenzionale: il ciclo è chiuso.
-
-| Evento progettuale | Anatomia, carico e contatto | Controllo visivo |
-| --- | --- | --- |
-| E0: sospensione estesa | Dorso in estensione, anteriori protesi, posteriori allungati; quattro appoggi assenti | Nessuna zampa deve simulare un ancoraggio a terra |
-| E1: primo contatto anteriore | Una zampa anteriore raggiunge il suolo e assorbe il carico; l'altra è sfalsata | Punto di contatto stabile nel mondo |
-| E2: secondo contatto e carico anteriore | Secondo anteriore in successione; tronco e bacino procedono, arti posteriori recuperano sotto il corpo | Non confondere ginocchi e gomiti; nessun piede duplicato |
-| E3: sospensione raccolta | Nessun appoggio; colonna flessa e arti raccolti; massa non sospesa magicamente a quota fissa | Distinguere raccolta dal fermo in piedi |
-| E4: primo contatto posteriore | Una zampa posteriore atterra; bacino e torace iniziano a risollevarsi | Piede al suolo e reazione visibile del corpo |
-| E5: secondo contatto posteriore | Seconda zampa posteriore appoggia in successione, aumenta la spinta | Non invertire i lati guida |
-| E6: estensione di spinta | Posteriori si estendono con effetto su velocità e centro di massa | Collegare giunti e artigli al rispettivo arto |
-| E7: distensione e rilascio | Si perde il contatto e si entra nel successivo volo esteso; le zampe si preparano a E0 | Nessun salto nel passaggio E7→E0 |
-
-**Le otto righe sono eventi, non il numero obbligatorio di sprite.** Possibili breakdown aggiuntivi nei contatti brevi; il loop può richiedere più frame o timing diseguale.
-
-**Riferimenti A/B già approvati:** A corrisponde alla sospensione distesa; B esprime raccolta/compressione, ma **non va automaticamente identificato con la sospensione raccolta** se la silhouette mostra zampe che toccano terra. Verificare i contatti e, se incompatibili con E3, usare B come riferimento morfologico o porlo in E4/E5 soltanto dopo la verifica. Le teste mantengono tre identità, tre colli attaccati al tronco e un'oscillazione limitata in ritardo; la coda segue il bacino. Per la fiammata e il morso usare gli ancoraggi delle bocche nella posizione trasformata di ciascun frame.
+**Esempio non vincolante:** un quadrupede in corsa richiede di identificare appoggi, fasi di volo e lato guida; le pose e l'ordine effettivo devono essere fondati sulle reference dell'azione. Un caso sul galoppo è conservato nelle [specifiche di progetto](HELLSCAPE_PROJECT_RULES_v1.0.0_20261031.md).
 
 ### 2.2.4 Gate di qualità, artefatti e controlli
 
@@ -195,7 +172,7 @@ Un foglio generato da AI **non è automaticamente un modello fisico certificato*
 
 **Produzione ed esecuzione sono scelte distinte.** Un rig può servire soltanto nell'editor ed essere esportato in PNG/atlante, senza introdurre un rig nel motore. Usare preferibilmente il formato già supportato dal gioco; un rig a runtime richiede una scelta tecnica documentata e verifiche di caricamento, prestazioni, pause, frame rate, movimento ridotto e ancoraggi. L'approvazione del protocollo non equivale all'approvazione di un nuovo asset o della sua integrazione.
 
-**Vincoli specifici conservati.** Per Cerbero resta respinta la deformazione elastica della sola posa statica; le sequenze complesse già prescritte in AGENTS.md rimangono disegnate. Questa revisione introduce la valutazione del rig per nuovi movimenti e parti idonee, senza sostituire automaticamente quel lavoro. Per nuove sequenze del diavolo volante applicare il percorso generativo §7.3; rig e tecnica mista restano alternative motivate, senza sostituire automaticamente le pose già approvate.
+**Vincoli approvati per singoli asset.** Un cambio generale di metodologia non annulla rig, disegni o altri requisiti già approvati per un asset. Rispettare il relativo fascicolo, senza imporre quelle eccezioni agli altri soggetti.
 
 ### 3.2 Coerenza meccanica dei materiali
 
@@ -211,9 +188,9 @@ La deformazione ammissibile dipende dall'oggetto e dal materiale, non da un gene
 | Tessuti organici | Contrazioni muscolari, piegamenti articolari, deformazioni locali congruenti con anatomia e forze | Stretch indiscriminato di arti, colli o crani |
 | Liquidi, fiamme e gas | Forma variabile, flusso, dispersione e dinamica degli effetti | Vincolarli alla silhouette rigida di un veicolo o a coordinate indipendenti dalla sorgente |
 
-**Regola specifica per Hellscape — veicoli:** durante accelerazione, decelerazione e corsa, **lunghezza, larghezza e proporzioni della carrozzeria restano costanti**. Mostrare velocità e terreno irregolare mediante traslazione, rotazione coerente del veicolo, movimento e compressione delle sospensioni, rotazione delle ruote, polvere/scintille ed eventuale camera tracking. La carrozzeria non deve espandersi o restringersi orizzontalmente. Una collisione può produrre danni locali coerenti con sollecitazione e materiale, non una deformazione elastica globale e reversibile.
+**Principio generale per corpi rigidi:** durante il moto ordinario un oggetto rigido conserva proporzioni e volume; rotazione, traslazione e sospensioni articolate descrivono il movimento. Sotto urto sono possibili danni locali permanenti motivati dal materiale. I vincoli esatti dei singoli mezzi sono nelle specifiche di progetto.
 
-Le regole valgono per **tutti gli oggetti animati**: non solo Cerbero e veicoli ma anche ponte, portale, rottami, armi, effetti e nuovi asset. Non applicare il medesimo effetto grafico a materiali con comportamenti diversi.
+Le regole valgono per **tutti gli oggetti animati**: soggetti organici, mezzi, architetture, rottami, strumenti ed effetti. Non applicare il medesimo effetto grafico a materiali con comportamenti diversi.
 
 ## 4. Scheletro logico, coordinate e ancoraggi
 
@@ -227,16 +204,16 @@ Prima dei frame definire uno **schema articolare logico**, utilizzabile come rif
 - eventuali parti condivise, sovrapposizioni e ordine dei livelli (davanti/dietro);
 - limiti di rotazione, traslazione e deformazione.
 
-**Ogni bocca mantiene un identificatore stabile per tutta la sequenza** (per esempio bocca_sx, bocca_centrale, bocca_dx rispetto al corpo del personaggio, non alla posizione sullo schermo). L'ordine non cambia quando una testa si sovrappone a un'altra.
+**Ogni ancoraggio funzionale mantiene un identificatore stabile per tutta la sequenza**, nel sistema di coordinate della parte che lo possiede e non nella posizione sullo schermo. Non rinominare un anchor quando cambia l'occlusione.
 
 Formalmente, un punto di emissione in coordinate del mondo deriva dalla trasformazione della parte anatomica che lo possiede:
 
 ~~~text
-p_emissione(t) = T_corpo(t) · T_collo_i(t) · T_testa_i(t) · p_bocca_locale_i
-direzione(t)   = orientamento della bocca trasformato nello stesso sistema
+p_emissione(t) = T_soggetto(t) · T_catena_articolare_i(t) · p_anchor_locale_i
+direzione(t)   = orientamento locale dell'ancoraggio trasformato nello stesso sistema
 ~~~
 
-Non inserire coordinate arbitrarie della fiammata indipendenti dalla testa. La formula è un **contratto geometrico**: non impone una specifica libreria o l'uso obbligatorio di matrici nel codice.
+Non inserire coordinate arbitrarie di un effetto indipendenti dall'elemento emittente. La formula è un **contratto geometrico**: non impone una specifica libreria o l'uso obbligatorio di matrici nel codice.
 
 ### 4.1 Allineamento obbligatorio degli output generativi
 
@@ -285,18 +262,16 @@ Nel manifest/rapporto registrare: PNG grezzo e derivato allineato (oppure trasfo
 
 Per ogni fase indicare **che cosa si muove**, **che cosa rimane ancorato**, **quali eventi iniziano/terminano**, eventuali occlusioni e durata. Un esempio numerico non è un vincolo universale: numero di frame e velocità dipendono dall'azione e dal motore.
 
-### 5.1 Esempio illustrativo di 12 frame: Cerbero sputa fuoco
+### 5.1 Esempio illustrativo generico: emissione di un effetto
 
-| Frame | Fase | Corpo e teste | Effetti |
-| --- | --- | --- | --- |
-| 1–2 | Preparazione | Baricentro stabile; colli iniziano a tendersi verso i bersagli | Nessuna fiamma |
-| 3–4 | Caricamento | Teste si orientano; mandibole si aprono | Nessuna fiamma prematura |
-| 5–6 | Emissione | Bocche aperte; colli ancora connessi e proporzionati | Ogni getto nasce dalla propria bocca |
-| 7–9 | Massima intensità | Reazione controllata e movimento continuo | Getti si estendono lungo la direzione delle rispettive bocche |
-| 10 | Arresto | Inizio della chiusura delle mandibole | Le emissioni cessano alla fonte; residui possono proseguire |
-| 11–12 | Recupero | Collo e testa tornano progressivamente verso la postura di partenza | Solo eventuali particelle residue separate |
+| Fase | Evento del soggetto | Evento dell'effetto |
+| --- | --- | --- |
+| Preparazione | Il soggetto si orienta e si carica | Assente |
+| Attivazione | L'emettitore raggiunge l'orientamento previsto | Inizia nell'ancoraggio corretto |
+| Sviluppo | Il movimento prosegue con continuità | Si propaga nella direzione trasformata |
+| Recupero | Postura e articolazioni tornano alla condizione successiva | Si estingue o si separa secondo le leggi fisiche scelte |
 
-La tabella descrive una **proposta di regia**, non frame già prodotti. Se i getti non sono simultanei, dichiarare esplicitamente l'ordine delle tre bocche. Non assumere che tutte le teste debbano sempre fare esattamente lo stesso movimento.
+Questo è **solo un esempio didattico**, non una richiesta di quattro pose, una durata prefissata o un effetto particolare. Quantità, tempi e ordine di eventi sono definiti dall'azione specifica e dal suo fascicolo.
 
 ### 5.2 Fluidità
 
@@ -311,7 +286,7 @@ La tabella descrive una **proposta di regia**, non frame già prodotti. Se i get
 
 **Distinguere tre tipi di disegno.** Non confondere «fotogramma centrale» con «posa che spiega il movimento»:
 
-1. **Key / extreme pose:** le posizioni e gli eventi fondamentali che definiscono azione, silhouette, peso e intenzione (per il diavolo: ali massimamente alzate e abbassate). Sono disegni approvati, non automaticamente il primo e l'ultimo frame di un loop.
+1. **Key / extreme pose:** le posizioni e gli eventi fondamentali che definiscono azione, silhouette, peso e intenzione (per una creatura alata: ali massimamente alzate e abbassate). Sono disegni approvati, non automaticamente il primo e l'ultimo frame di un loop.
 2. **Breakdown:** disegno strutturale che indica **come** si attraversa l'intervallo: arco di movimento, articolazioni, orientamento delle superfici, cambio di volume apparente, occlusioni, ritardo di coda/membrane. Può trovarsi a qualsiasi posizione temporale, **non necessariamente al 50%**. Nel percorso generativo §7.3, M è facoltativo e si approva prima dello spritesheet solo quando serve a chiarire il passaggio; non è un requisito universale.
 3. **Inbetween:** disegno aggiuntivo fra key e breakdown o fra due pose già valide, per ottenere lo spacing desiderato. Lo spritesheet può produrre più intermedi insieme dopo l’approvazione dei riferimenti (§7.3). La generazione di un singolo inbetween è disponibile per riparazioni mirate (§7.4), non è la procedura predefinita.
 
@@ -319,9 +294,9 @@ La tabella descrive una **proposta di regia**, non frame già prodotti. Se i get
 
 **Principi professionali applicati con giudizio fisico:**
 
-| Principio | Regola operativa per Hellscape |
+| Principio | Regola generale |
 | --- | --- |
-| **Staging** | Leggibilità e gerarchia delle sagome nel campo visivo effettivo; diavoli di sfondo non possono competere con Cerbero o coprire i pannelli |
+| **Staging** | Leggibilità e gerarchia delle sagome nel campo visivo effettivo; elementi secondari non devono oscurare il soggetto principale o i controlli senza intenzione |
 | **Solid drawing e coerenza dei volumi** | Testa, torace, ali, veicoli e giunti conservano volume prospettico e materiali lungo la sequenza; girare in prospettiva non significa cambiare taglia |
 | **Arcs** | Ancorare punti guida (spalla, gomito alare, polso, punta, testa, coda) e controllare traiettorie curve o dinamiche plausibili; evitare saltelli e cambi di asse arbitrari |
 | **Anticipation** | Aggiungere preparazione **quando l'azione la richiede** (salto, morso, accelerazione), non come gesto obbligatorio a ogni ciclo di volo |
@@ -384,17 +359,9 @@ Se una fiamma nasce in un punto sbagliato:
 
 **Non spostare la testa verso una fiamma disegnata male.** Non spostare colli, zampe o altri elementi già corretti solo per nascondere l'errore. Correggere il minimo elemento responsabile, preservando la continuità dell'intera sequenza.
 
-### 6.2 Cerbero: tre bocche, tre origini
+### 6.2 Emissioni multiple: identità degli ancoraggi
 
-Per ciascuna testa definire un ancoraggio distinto. In ogni frame con emissione, controllare che:
-
-- il getto sinistro nasca dalla **bocca della testa sinistra**, anche quando è più bassa rispetto alle altre;
-- il getto centrale nasca dalla bocca centrale;
-- il getto destro nasca dalla bocca destra;
-- le tre sorgenti rimangano allineate alle tre bocche durante qualsiasi rotazione o traslazione;
-- nessuna terza fiamma appaia in un punto vuoto soltanto perché lì era stata disegnata in un precedente tentativo.
-
-La distinzione sinistra/centro/destra è **anatomica**, riferita alla creatura; annotare la corrispondenza con la vista sullo schermo per evitare inversioni.
+Quando un soggetto possiede più emettitori, assegnare a ciascuno un identificatore immutabile e calcolare indipendentemente origine e orientamento mediante la propria catena di trasformazioni. Se un emettitore è coperto da un altro, l'anchor non cambia identità. Il numero di emettitori e il tipo d'effetto sono requisiti dell'asset, non di questo protocollo.
 
 ## 7. Pipeline di produzione
 
@@ -422,21 +389,21 @@ Non dichiarare «animazione completata» perché il codice gira o supera test un
 
 Per correzioni minori a un effetto già approvato, evitare burocrazia inutile: aggiornare solo i frame interessati e le evidenze proporzionate al cambiamento, senza bypassare i vincoli anatomici e materiali.
 
-### 7.2 Workflow operativo ChatGPT → Codex: dalla creazione del personaggio all'animazione
+### 7.2 Workflow operativo tra ruoli grafici e tecnici: dalla creazione del soggetto all'animazione
 
-**Divisione dei ruoli:** gli strumenti grafici producono e correggono i disegni; Codex può preparare e animare un rig secondo §3.1, automatizzare controlli, esportazione e integrazione. La tecnica scelta e i limiti degli strumenti devono essere dichiarati. Le immagini generate richiedono verifica: condividere il prompt non garantisce coerenza.
+**Divisione dei ruoli:** chi cura le immagini produce e corregge disegni; chi cura la parte tecnica prepara rig quando appropriato, controlla export e integra; chi coordina verifica vincoli, prompt e approvazioni. I ruoli sono indipendenti dallo strumento.
 
 | Fase | Responsabile principale | Output obbligatorio | Gate prima della fase successiva |
 | --- | --- | --- | --- |
-| 0. Audit del gioco | ChatGPT + Codex | Analisi reale di camera, viewport, profondità, ruolo, asset canonici, rendering, screenshot e scala finale (sezione 2.1) | Scheda contestuale verificata, ipotesi segnalate |
-| 1. Brief e vincoli | ChatGPT + utente | Scheda del soggetto: identità, anatomia/parti, silhouette, materiali, palette, prospettiva, risoluzione effettiva, azioni richieste | Requisiti fissati |
-| 2. Design canonico | ChatGPT + strumento immagini | Immagine di riferimento approvata e, se necessario, viste ortogonali/tre quarti e dettagli; percorso/versione asset | **Approvazione del design statico**, senza redesign nelle fasi successive |
-| 3. Blocking, tecnica e timing | ChatGPT + Codex | Scelta §3.1, prova A/B e M eventuale (breakdown/percorso obbligatori se si sceglie un rig), traiettorie, X-sheet e confronto alla scala reale | Piano verificato e problemi espliciti |
-| 4. Riferimenti A/B ed eventuale M | Strumenti grafici + Codex | A e B coerenti; M solo se utile; originali, allineamento §4.1 e GIF diagnostica | Approvazione esplicita di tutti i riferimenti usati prima dello spritesheet |
-| 5. Spritesheet completo e correzioni | Strumenti grafici + Codex | Tavola generata da A/B ed eventuale M; celle estratte e allineate; retake mirati e GIF completa | Verifica di tutte le pose e approvazione del loop corretto; nessuna approvazione separata obbligatoria per ogni cella iniziale |
-| 6. Preparazione tecnica | Codex | Asset finali impacchettati in spritesheet/atlante, metadata per frame (durata, canvas, pivot, ancoraggi, evento), nomi e versioni stabili | Controlli di dimensioni, trasparenza, margini, tagli, allineamento e riferimenti |
-| 7. Implementazione runtime | Codex | Riproduzione dell'atlante, oppure rig runtime motivato §3.1; stati, eventi, ancoraggi e camera separata | Timing, input, pause, persistenza, collisioni e prestazioni |
-| 8. Validazione reale e consegna | Codex + ChatGPT + utente | GIF **acquisita dal gioco nel browser**, screenshot dei punti chiave, test desktop/mobile, PR con diff ed evidenze | Approvazione esplicita **prima** del merge |
+| 0. Audit del prodotto | Coordinamento + sviluppo | Analisi reale di camera, viewport, profondità, ruolo, asset canonici, rendering, screenshot e scala finale (sezione 2.1) | Scheda contestuale verificata, ipotesi segnalate |
+| 1. Brief e vincoli | Coordinamento + utente | Scheda del soggetto: identità, anatomia/parti, silhouette, materiali, palette, prospettiva, risoluzione effettiva, azioni richieste | Requisiti fissati |
+| 2. Design canonico | Coordinamento + grafica | Immagine di riferimento approvata e, se necessario, viste ortogonali/tre quarti e dettagli; percorso/versione asset | **Approvazione del design statico**, senza redesign nelle fasi successive |
+| 3. Blocking, tecnica e timing | Coordinamento + sviluppo | Scelta §3.1, prova A/B e M eventuale (breakdown/percorso obbligatori se si sceglie un rig), traiettorie, X-sheet e confronto alla scala reale | Piano verificato e problemi espliciti |
+| 4. Riferimenti A/B ed eventuale M | Grafica + sviluppo | A e B coerenti; M solo se utile; originali, allineamento §4.1 e GIF diagnostica | Approvazione esplicita di tutti i riferimenti usati prima dello spritesheet |
+| 5. Spritesheet completo e correzioni | Grafica + sviluppo | Tavola generata da A/B ed eventuale M; celle estratte e allineate; retake mirati e GIF completa | Verifica di tutte le pose e approvazione del loop corretto; nessuna approvazione separata obbligatoria per ogni cella iniziale |
+| 6. Preparazione tecnica | Sviluppo | Asset finali impacchettati in spritesheet/atlante, metadata per frame (durata, canvas, pivot, ancoraggi, evento), nomi e versioni stabili | Controlli di dimensioni, trasparenza, margini, tagli, allineamento e riferimenti |
+| 7. Implementazione runtime | Sviluppo | Riproduzione dell'atlante, oppure rig runtime motivato §3.1; stati, eventi, ancoraggi e camera separata | Timing, input, pause, persistenza, collisioni e prestazioni |
+| 8. Validazione reale e consegna | Sviluppo + coordinamento + utente | GIF **acquisita dal gioco nel browser**, screenshot dei punti chiave, test desktop/mobile, PR con diff ed evidenze | Approvazione esplicita **prima** del merge |
 
 #### Regole di handoff e responsabilità
 
@@ -448,14 +415,10 @@ Per correzioni minori a un effetto già approvato, evitare burocrazia inutile: a
 - **Ancoraggi e allineamento.** Piedi, ruote e contatti utilizzano coordinate e pivot per-frame coerenti; lo spostamento nel mondo non viene disegnato duplicando coordinate nello spritesheet. Il renderer posiziona ogni frame sul medesimo riferimento.
 - **Materiali prima del movimento.** Una testa/arto si articola anatomicamente; un telaio metallico si muove rigidamente, mentre le sospensioni e gli pneumatici lavorano in modo differenziato. Non trasferire squash/stretch da un soggetto organico a un veicolo.
 - **Effetti su livelli separati** quando la causalità lo richiede (fiamme, polvere, scintille), ancorati a bocche, pneumatici o contatti nei singoli frame e sincronizzati con gli eventi.
-- **No asset, no falso completamento.** Se ChatGPT o gli strumenti a disposizione non riescono a generare frame soddisfacenti, segnalare quali mancano; non passare automaticamente a transform CSS, mesh o rigging procedurale. Proporre un artista o un editor di sprite come soluzione produttiva, non dichiarare realizzata la sequenza.
+- **No asset, no falso completamento.** Se gli strumenti a disposizione non riescono a generare frame soddisfacenti, segnalare quali mancano; non passare automaticamente a transform CSS, mesh o rigging procedurale. Proporre un artista o un editor di sprite come soluzione produttiva, non dichiarare realizzata la sequenza.
 - **Test visivi obbligatori.** I controlli automatici integrano ma non sostituiscono la revisione umana. Nessun merge finché l'utente non approva gli asset e la GIF reale di gioco.
 
-#### Esempio concreto: Cerbero e veicoli di Hellscape
-
-Per **Cerbero** creare distinte sequenze disegnate di locomozione, slancio, emissione di fiamme, morso/sbranamento, recupero e sprint. Ogni frame mostra teste, colli, busto e zampe connessi. La fiamma nasce da una bocca con ancoraggio identificato; l'attacco modifica corpo e postura, non solo la rotazione della testa. La telecamera segue il movimento nel mondo e deve poter risultare ferma mentre Cerbero sbrana il bersaglio: non muovere il ponte solo per fingere avanzamento.
-
-Per **i veicoli** mantenere stabile la sagoma rigida della carrozzeria; animare ruote, sospensioni, inclinazioni del telaio e spostamento rispetto al mondo. Vietata la contrazione/dilatazione orizzontale del mezzo per simulare velocità.
+Le regole particolari di ogni soggetto e dei suoi interlocutori animati sono registrate nella [specifica di progetto](HELLSCAPE_PROJECT_RULES_v1.0.0_20261031.md). Qui rimane soltanto il workflow generale.
 
 ### 7.3 Procedura predefinita: A/B, M facoltativo, spritesheet completo e correzioni
 
@@ -496,20 +459,16 @@ Per **i veicoli** mantenere stabile la sagoma rigida della carrozzeria; animare 
 | Velocità/accelerazione | Differenze prime e seconde di posizione/angolo divise per il tempo effettivo per-frame | Calibrare con la dinamica desiderata; salti bruschi possono essere intenzionali |
 | Loop | Continuità fra ultimi/primi frame e assenza di duplicazioni o pause inattese agli estremi | Verificare anche la continuità dei movimenti, non solo la posizione |
 | Materiali | Stabilità delle parti rigide, deformazione consentita delle membrane, articolazioni e contatti | Controllo semiautomatico + supervisione visiva |
-| Scala e ruolo | Test nell'inquadratura reale alle dimensioni d'uso e su fondo contrastante | Essenziale per un diavolo di sfondo; misure su file grande non bastano |
+| Scala e ruolo | Test nell'inquadratura reale alle dimensioni d'uso e su fondo contrastante | Essenziale per qualunque soggetto piccolo o secondario; misure su file grande non bastano |
 | Evidenza dinamica | GIF ricavata esattamente dai PNG e, dopo integrazione, **GIF acquisita dal browser** | Distinguere la prova locale dal test nel motore di gioco |
 
 **7. Criterio di raffinamento.** Aggiungere un frame soltanto per colmare una lacuna identificata (intervallo con spostamento eccessivo, anatomia implausibile, accelerazione discontinua, sfarfallio, salto di scala, loop sbagliato). Documentare il difetto, la modifica e l'esito. Se un intervallo appare già fluido alla scala reale e passa i controlli, **non** aggiungere fotogrammi senza necessità. Le soglie non devono essere numeri universali arbitrari; stabilirle da un ciclo modello approvato o con prove alla scala del gioco.
 
 **8. Gate tecnico e artistico distinti.** I controlli automatici possono respingere file corrotti o incoerenti e segnalare sospette discontinuità; non possono certificare da soli anatomia, peso, aerodinamica o qualità stilistica. La revisione umana approva la resa delle azioni, non dovrebbe essere usata per compensare errori tecnici evidenti.
 
-#### Applicazione di prova al diavolo volante
+#### Verifica mediante un caso pilota
 
-- Analizzare la sequenza preesistente e registrare il risultato come **baseline**, distinguendo dati calcolati da valutazioni artistiche.
-- Selezionare due estremi anatomicamente corretti (ali alte/ali basse); se la sequenza preesistente non ne contiene uno, **non spacciarla per completa** e creare il nuovo estremo.
-- Valutare M facoltativo; approvare A/B e M se creato, poi generare lo spritesheet completo usando questi riferimenti. Verificare spalle, ossa alari, membrane, corpo, coda, testa e prospettiva in ogni cella.
-- Correggere le celle difettose e rimuovere duplicati involontari solo senza lasciare salti; montare A→B→A quando reversibile, con tempi documentati e senza estremi duplicati. Il risultato del diavolo di questa sessione è un esempio pratico, non una garanzia generale del generatore.
-- Produrre estrazione PNG, GIF e report di misure/limiti; **nessuna integrazione nel gioco e nessun merge prima dell'approvazione**.
+Applicare il procedimento su un solo ciclo rappresentativo; registrare baseline, riferimenti approvati, eventuale midpoint, intervalli difettosi, report di allineamento e GIF diagnostiche. Se non sono disponibili estremi appropriati, produrli senza descrivere il loop come già completo. Le configurazioni di esempio e i risultati storici appartengono alle specifiche dei rispettivi asset.
 
 ### 7.5 Capacità e limiti operativi del generatore di immagini
 
@@ -530,7 +489,7 @@ Le istruzioni sono formulate in base a ciò che un generatore di immagini **può
 
 **Regola del retake:** dopo un esito non conforme non avanzare all’approvazione o all’integrazione; applicare prima le correzioni dello spritesheet §7.3 senza scartare le celle valide. Identificare **il difetto principale**, mantenere il riferimento corretto, riscrivere il prompt per il solo frame fallito e chiedere nuovamente la medesima posa. Limitare tentativi ripetitivi con lo stesso prompt senza nuove informazioni; se non si raggiunge la posa, segnare il blocco e usare un editor di sprite o un artista per il ridisegno prima di proseguire. Non trasformare una prova fallita in un attestato di «metodo ricorsivo non riuscito» se la procedura non è stata eseguita.
 
-**Tracciabilità reale:** salvare il **testo di istruzione esplicito** e i riferimenti realmente forniti; se il servizio non espone il prompt interno o altri parametri, dichiarare il limite nel log, senza inventare un prompt retrospettivo. L'output del generatore è un **candidato da validare**; Codex controlla bitmap/tempi/packing e l'utente approva i risultati artistici. Queste condizioni valgono anche quando il modello produce immagini visivamente persuasive.
+**Tracciabilità reale:** salvare il **testo di istruzione esplicito** e i riferimenti realmente forniti; se il servizio non espone il prompt interno o altri parametri, dichiarare il limite nel log, senza inventare un prompt retrospettivo. L'output del generatore è un **candidato da validare**; Il responsabile tecnico controlla bitmap/tempi/packing; la persona autorizzata approva i risultati artistici. Queste condizioni valgono anche quando il modello produce immagini visivamente persuasive.
 
 ### 7.6 GIF dei riferimenti, dello spritesheet e dei retake (30/10/2026)
 
@@ -544,54 +503,6 @@ Per il rig, mostrare la prova dopo ogni revisione significativa del movimento e 
 - Documentare PNG sorgenti, versione, stato candidato/respinto/approvato, ordine, durate, scala e correzioni. Mostrare anche i tentativi respinti quando servono a capire il difetto. La GIF locale non sostituisce la GIF browser dopo l'integrazione.
 - Confrontare esplicitamente lunghezza e numero dei segmenti delle ali e degli arti, dimensioni del corpo e topologia delle membrane. Fori, strappi e segni distintivi seguono lo stesso lembo di membrana tra pose; non spariscono o si rigenerano casualmente.
 - Dopo un difetto tecnico o anatomico, segnare la posa respinta e non usarla come base approvata per gli intermedi. Correggere il riferimento se la richiesta modifica anche il design; poi ottenere l'approvazione della revisione.
-
-### 7.7 Correzioni locali con ImageGen e reinserimento deterministico — v14
-
-**Principio:** correggere la minima regione necessaria, preservando il massimo dell'immagine approvata. Questa procedura integra §§4.1, 7.3–7.6, 8.1 e 10; non sostituisce i gate fisici/biomeccanici della v13 o le regole di AGENTS.md. È riutilizzabile per Cerbero, veicoli, demoni volanti e altri asset.
-
-**Diagnosi prima dell'intervento**
-
-| Errore | Procedura preferita |
-| --- | --- |
-| Posizione, allineamento, scala | Postprocessing deterministico |
-| Colori o trasparenza | Postprocessing deterministico |
-| Parte rigida isolata da ruotare | Postprocessing con pivot annotato e verificato |
-| Dettaglio mancante o anatomia locale errata | ImageGen locale |
-| Superficie nascosta da ricostruire | ImageGen locale con riferimenti approvati |
-| Posa complessiva anatomicamente impossibile | Nuovo keyframe |
-| Prospettiva generale incompatibile | Rigenerazione del frame |
-
-Non usare ImageGen quando una trasformazione deterministica risolve il problema senza perdita di qualità. La classificazione è una diagnosi annotata, non una certificazione automatica dell'anatomia.
-
-**Preparazione e generazione**
-
-1. Conservare il PNG originale immutato e registrarne SHA-256, revisione, frame e coordinate della cella. Congelare anche la ricetta deterministica precedente all'intervento: un input cambiato richiede una nuova richiesta.
-2. Definire una maschera esplicita dell'area modificabile e un ritaglio più esteso per il contesto anatomico/visivo. **La maschera autorizza i pixel; il ritaglio fornisce contesto.** Registrarli separatamente, con coordinate e convenzioni.
-3. Allegare l'originale e i riferimenti canonici approvati; quando necessario aggiungere i due vicini. Conservare percorso, revisione, hash, ruolo e gli input effettivamente forniti al servizio.
-4. Richiedere una sola modifica semantica per intervento quando possibile. Il prompt esatto deve specificare identità, parte da correggere, geometria/movimento, articolazioni e connessioni obbligatorie, palette, illuminazione, materiali, stile e parti intoccabili. Non sostituire retroattivamente il prompt effettivo con uno ricostruito.
-5. Esportare i materiali per un passaggio ImageGen esterno/manuale; non presumere API disponibili a Codex. Se il servizio non accetta una maschera, modificare il ritaglio e applicare comunque la maschera deterministica al ritorno. Non fidarsi della conservazione delle altre zone da parte del generatore.
-
-Esempio: «Correggi esclusivamente la testa centrale di Cerbero. Mantieni invariati torso, zampe, coda e altre teste. Ricostruisci la mandibola con articolazione plausibile, preservando attacco del collo, orientamento e proporzioni del riferimento approvato, stile pittorico, palette e illuminazione».
-
-**Reinserimento e verifica**
-
-1. Conservare il PNG generato separatamente. Non sostituire automaticamente il frame completo.
-2. Riportare il ritaglio nelle coordinate sorgenti; allineare landmark anatomici/meccanici annotati con trasformazioni esplicite. Non ridimensionare implicitamente un output di dimensioni diverse. Registrare matrici, ricampionamento, residui e limiti. Un'identità senza landmark resta non verificata geometricamente.
-3. Sostituire RGBA esclusivamente entro la maschera. L'alpha del candidato può cancellare pixel autorizzati; non usare un semplice alpha-over che impedisca tale cancellazione. Eventuale sfumatura resta **interna** al supporto della maschera. Non alterare RGB nascosti sotto alpha zero fuori regione.
-4. Verificare con confronto di tutti e quattro i canali che i pixel esterni siano esattamente identici allo snapshot precedente. Questa prova va effettuata sul frame nativo, prima della registrazione globale comune per l'atlante: la trasformazione globale è una fase distinta e deve mantenere i propri metadati.
-5. Produrre un nuovo PNG derivato senza sovrascrivere la sorgente, un prima/dopo, onion skin e GIF diagnostica della sequenza con i vicini e il passaggio ultimo→primo. La GIF dei PNG non sostituisce la registrazione reale del gioco richiesta da AGENTS.md.
-6. Confrontare originale, derivato e vicini: anatomia, proporzioni, articolazioni, dettagli persistenti, colori, illuminazione, materiali e ancoraggi funzionali (bocche, artigli, ruote, contatti). Verificare al tempo e alla scala effettivi del gioco. Misure automatiche non certificano assenza di aloni, discontinuità o difetti anatomici: richiedere revisione visiva esplicita.
-7. Se occorrono modifiche oltre maschera o contesto, ampliare esplicitamente la regione e creare un nuovo intervento. Se il derivato fallisce, respingerlo, disattivarlo o ricaricare la ricetta precedente, ripartendo dall'originale conservato; non usare il fallimento come nuovo originale approvato.
-
-**Tracciabilità, accettazione e integrazione**
-
-Ogni ID immutabile conserva PNG sorgente/hash, snapshot e ricetta, maschera, coordinate crop, riferimenti forniti/hash/revisione, prompt effettivo, metadati disponibili del servizio, PNG generato, PNG finale, trasformazioni, report tecnico e visivo, prima/dopo, GIF diagnostica e stato di approvazione. Archiviare nei fascicoli di produzione §8.1; durante lo sviluppo usare `artifacts/`, senza riversare output temporanei nel repository. I tentativi respinti restano distinguibili; solo approvazioni esplicite consentono la promozione in `approved/`.
-
-Una correzione è accettabile solo se risolve il difetto, conserva identità e coerenza anatomica/meccanica, lascia invariati i pixel fuori maschera, non introduce difetti nei vicini, è riproducibile dagli input/metadati conservati e supera la revisione visiva alla scala finale. Tracciare revisore, decisione, note ed evidenze; la verifica tecnica non approva automaticamente un asset né la sua integrazione o il merge.
-
-Estendere la pipeline `scripts/sprite_postprocess.py` della PR #94 e il suo editor, mantenendo moduli distinti per diagnosi, preparazione/esportazione, importazione, registrazione/reinserimento e verifica. I candidati importati diventano operazioni della **stessa ricetta**: l'editor può confrontarli, disattivarli ed esportarli. Non introdurre una pipeline concorrente o dipendenze da servizi di generazione per il replay deterministico. Guida operativa: [correzioni locali v1.1](SPRITE_LOCAL_PATCHES_v1.1.0_20261031.md).
-
-**Ambito della revisione:** nessuna modifica ad asset approvati o runtime durante l'aggiornamento del protocollo. Verificare main e PR aperte prima di pubblicare; nessun merge automatico senza approvazione esplicita.
 
 ## 8. Asset, struttura tecnica e metadati
 
@@ -609,19 +520,18 @@ Il formato dei metadati è scelto secondo lo stack effettivamente presente; un p
 
 ~~~json
 {
-  "character": "cerbero",
-  "action": "fire_breath",
+  "subject": "SOGGETTO_ESEMPIO",
+  "action": "AZIONE_ESEMPIO",
   "source_reference": "PERCORSO_E_REVISIONE_DA_COMPILARE",
   "frame_size": [0, 0],
-  "origin": "pivot_corpo",
+  "origin": "PIVOT_DA_DEFINIRE",
   "frames": [
     {
       "index": 1,
       "duration_ms": 0,
       "anchors": {
-        "mouth_left": [0, 0],
-        "mouth_center": [0, 0],
-        "mouth_right": [0, 0]
+        "emitter_1": [0, 0],
+        "contact_1": [0, 0]
       },
       "events": []
     }
@@ -629,16 +539,16 @@ Il formato dei metadati è scelto secondo lo stack effettivamente presente; un p
 }
 ~~~
 
-**I valori a zero sono placeholder, non coordinate valide per il gioco.** Codex deve derivare valori reali dagli asset accettati. Non imporre questo schema se il renderer attuale dispone già di un sistema equivalente.
+**I valori a zero sono placeholder, non coordinate valide per un prodotto.** L'agente responsabile deve derivare valori reali dagli asset accettati. Non imporre questo schema se il renderer attuale dispone già di un sistema equivalente.
 
 Rispettare trasparenza, padding di sicurezza, ordinamento dei livelli, qualità percepita uniforme e risoluzione coerente con il progetto. Non alterare manualmente build/artefatti generati se la pipeline li ricrea.
 
 ### 8.1 Repository per ogni asset animato: branch temporaneo e fascicolo di produzione
 
-Questa procedura è **vincolante** quando si crea, si modifica o si rigenera un asset animato (diavolo volante, Cerbero, veicolo, effetto o altro). Si applica a ChatGPT, Codex, Work e operatori manuali.
+Questa procedura è **vincolante** quando si crea, si modifica o si rigenera un asset animato. Si applica a qualsiasi agente o operatore autorizzato, a prescindere dal nome dello strumento.
 
 **Branch e PR**
-1. Prima di generare il primo candidato dell'asset, creare un **branch temporaneo** dal `main` aggiornato, nominato `asset/<soggetto>-<azione>-vN` (per esempio `asset/diavolo-volante-volo-v1`). Un branch per asset/azione coerente, **non** uno per ogni fotogramma; le altre lavorazioni rimangono isolate.
+1. Prima di generare il primo candidato dell'asset, creare un **branch temporaneo** dal `main` aggiornato, nominato `asset/<soggetto>-<azione>-vN`. Un branch per asset/azione coerente, **non** uno per ogni fotogramma; le altre lavorazioni rimangono isolate.
 2. Creare una PR **in bozza** per consentire il monitoraggio della cronologia dei commit. Il branch non è permanente e la PR rimane non mergiata fino all'approvazione esplicita dell'utente.
 3. Prima di qualunque nuova generazione, salvare nel branch **il prompt che verrà effettivamente inviato**, associato alla sua versione e ai file di riferimento. Dopo l'esito, salvare il risultato, i dati disponibili del generatore e la valutazione. Non aggiornare retroattivamente il testo per farlo sembrare conforme al risultato.
 4. Procedere per checkpoint secondo §§3.1 e 7.3–7.4: A/B, M eventuale, approvazione dei riferimenti, spritesheet completo, correzioni mirate e approvazione del ciclo. Tracciare ogni tentativo e la corrispondenza fra tavola, celle estratte e retake. Rig e tecnica mista seguono la decisione registrata.
@@ -647,7 +557,7 @@ Questa procedura è **vincolante** quando si crea, si modifica o si rigenera un 
 **Struttura standard da creare nel branch** (adattare solo quando il repository usa già una struttura equivalente; non duplicare asset canonicali):
 
 ~~~text
-assets/hell-race/production/<slug-asset>/
+assets/production/<slug-asset>/
 ├── README.md
 ├── manifest.json
 ├── references/
@@ -731,11 +641,9 @@ Se il generatore combina automaticamente contesto visivo o istruzioni non espost
 
 I test di componenti connessi e sagome isolate sono **ausiliari**: non dimostrano da soli che l'anatomia sia corretta. Occorre una verifica visiva della sequenza. Soglie numeriche non arbitrarie devono essere determinate sui riferimenti reali.
 
-### 9.3 Evidenze da consegnare per Hellscape
+### 9.3 Evidenze in funzione del prodotto
 
-Seguire **AGENTS.md**: per animazioni, movimento e transizioni, **GIF animata reale acquisita dal browser** sulla stessa revisione; screenshot reali per stati statici. Nessun HTML incorporato o file HTML allegato come anteprima. Indicare viewport, durata, revisione e se la prova è desktop o mobile. Non dichiarare controlli che non sono stati eseguiti. Se è stato prodotto solo il documento e nessun asset è stato modificato, dichiararlo: **non fabbricare una falsa GIF**.
-
-Nessun merge senza esplicita approvazione dell'utente.
+Seguire **AGENTS.md** e le specifiche di progetto per tipo di anteprima e verifiche. Separare GIF/schede diagnostiche ottenute dai PNG da **registrazioni effettive dell'applicazione**. Annotare revisioni, dimensioni, durata, ambiente e limiti. Documentare l'assenza di modifiche runtime quando si consegna soltanto documentazione. Non fare merge senza l'approvazione esplicita prescritta.
 
 ## 10. Riparazione di errori senza redesign
 
@@ -753,9 +661,9 @@ Classificare il difetto in modo causale:
 | Testa o corna tagliate | Adeguare padding o inquadratura senza rimpicciolire arbitrariamente il personaggio. |
 | Qualità disomogenea | Uniformare risoluzione e stile degli asset, verificando la resa alle dimensioni effettive. |
 
-Dopo ogni correzione ricontrollare **il frame interessato e i due adiacenti**, oltre all'animazione intera. Non cambiare spontaneamente il design, la posizione delle teste già approvata o le altre parti corrette.
+Dopo ogni correzione ricontrollare **il frame interessato e i due adiacenti**, oltre all'animazione intera. Non cambiare spontaneamente il design, le posizioni delle parti già approvate o altri elementi corretti.
 
-## 11. Istruzione standard per agenti di generazione e Codex
+## 11. Istruzione standard per agenti di generazione e integrazione
 
 > Genera una nuova sequenza animata di **[PERSONAGGIO]** che esegue **[AZIONE]**, usando **[PERCORSO/RIFERIMENTO APPROVATO]** come modello canonico e **[AZIONE PRECEDENTE, SE PRESENTE]** come riferimento di continuità.\
 > Mantieni identità, anatomia, numero di parti, proporzioni, silhouette, palette, prospettiva, pivot e stile. Non ridisegnare il personaggio per ogni fotogramma.\
@@ -773,17 +681,17 @@ I parametri mancanti si derivano dall'asset approvato e dal codice corrente quan
 
 ## 12. Versioning, manutenzione e refactoring del documento
 
-Questa sezione riguarda **il documento di lavoro**; per refactoring del codice di gioco restano autoritative le regole di AGENTS.md.
+Questa sezione riguarda **il documento di lavoro**; per refactoring del codice e requisiti del prodotto restano autoritative AGENTS.md e le specifiche applicabili.
 
-1. **Nome versionato:** PROTOCOLLO_SPRITE_ANIMATI_vMAJOR.MINOR.PATCH_YYYYMMDD.md secondo AGENTS.md. Questa proposta è **v14.0.0_20261031**, successiva alla proposta v13.0.0 della PR #92; main resta alla v12.0.0; non rinominare retroattivamente le edizioni precedenti.
+1. **Nome versionato:** PROTOCOLLO_SPRITE_ANIMATI_vMAJOR.MINOR.PATCH_YYYYMMDD.md secondo AGENTS.md. Questa edizione è **v12.0.0_20261030**, successiva alla v11.0.0; non rinominare retroattivamente le edizioni precedenti.
 2. **Numerazione progressiva:** le revisioni sostanziali producono un **nuovo file** con versione successiva. Non sovrascrivere la versione precedente per un cambiamento sostanziale; i ripristini generano una versione successiva, senza decrementare N.
 3. **Piccole correzioni:** refusi, punteggiatura o collegamenti senza variazioni di significato possono essere corretti nella stessa versione, tracciando il commit.
 4. **Data e stato:** aggiornare data locale, versione, stato e registro modifiche quando nasce una nuova edizione. Distinguere proposta, approvazione e implementazione.
-5. **Conservazione:** mantenere direttamente nella cartella di lavoro **ultima e penultima versione** del documento; le versioni più vecchie rimangono rintracciabili nella cronologia Git. Per v10 usare la revisione `afae26867311d25b8c608f7693c4b9f809c66142`, nella quale il file è ancora presente. Per v8/v9 del protocollo, i rimandi di provenienza nel fascicolo del diavolo si riferiscono alla revisione storica `bc96436cebbd6979c871cae36f66475bfbbdf3a1`, dove tali file restano recuperabili; i prompt storici non vanno riscritti. Non cancellare documenti storici di altra famiglia.
+5. **Conservazione:** mantenere direttamente nella cartella di lavoro **ultima e penultima versione** del documento; le versioni più vecchie rimangono rintracciabili nella cronologia Git. Per le versioni più vecchie usare la revisione `afae26867311d25b8c608f7693c4b9f809c66142`, nella quale il file è ancora presente. Per v8/v9 del protocollo, i rimandi di provenienza nel fascicolo del diavolo si riferiscono alla revisione storica `bc96436cebbd6979c871cae36f66475bfbbdf3a1`, dove tali file restano recuperabili; i prompt storici non vanno riscritti. Non cancellare documenti storici di altra famiglia.
 6. **Refactoring editoriale continuo:** dopo aggiornamenti significativi eliminare duplicazioni, sezioni obsolete, contraddizioni, rimandi rotti e istruzioni ormai superate; preservare tutte le regole ancora valide.
 7. **Refactoring strutturale:** programmare una revisione di struttura **al più tardi a ogni decima versione sostanziale** (v10, v20, …), anticipandola se il documento diventa complesso. Una correzione ortografica non fa avanzare il contatore.
 8. **No regressioni normative:** la riorganizzazione editoriale non può cancellare vincoli approvati né cambiarne significato. Prima di sostituire un criterio segnalare esplicitamente il conflitto con le istruzioni precedenti.
-9. **AGENTS.md:** conservarlo come fonte delle regole trasversali, con un semplice rimando a questo protocollo; evitare di copiarvi tutte le prescrizioni. Se cambia il nome della versione corrente, aggiornare il rimando.
+9. **AGENTS.md:** conservarlo come fonte delle regole trasversali, con un semplice rimando a questo protocollo; evitare di copiarvi tutte le prescrizioni. Se cambia il nome della versione corrente, aggiornare il rimando; non inserire istruzioni su asset particolari nel protocollo.
 10. **Workflow:** preferire branch e PR con riepilogo, differenze e verifiche; approvazione esplicita prima del merge. Le specifiche non equivalgono alla loro implementazione.
 
 ### 12.1 Registro delle revisioni
@@ -802,8 +710,9 @@ Questa sezione riguarda **il documento di lavoro**; per refactoring del codice d
 | v10 | 2026-10-30 | Normalizzazione obbligatoria dopo ogni generazione: landmark corporei, trasformazioni globali, tolleranze alla scala reale, controlli anatomici separati e tracciabilità. Revisione strutturale: regole di allineamento centralizzate in §4.1 e rinvii coerenti nelle fasi operative, senza cambiare i gate. Corretto ordine del registro revisioni e separatore storico. |
 | v11.0.0 | 2026-10-30 | Scelta motivata rig/disegno/tecnica mista con prova agli estremi e nel percorso; materiali e file sorgenti; rig in produzione distinto da runtime; coppia A/B congiunta ammessa con verifica individuale, senza garanzie di coerenza; conservati allineamento, GIF, vincoli Cerbero e approvazioni. Aggiornati pipeline, prompt e controlli per eliminare i divieti generali superati. |
 | v12.0.0 | 2026-10-30 | Nuovo flusso predefinito richiesto dall’utente: A/B, M facoltativo, approvazione dei riferimenti, generazione dello spritesheet completo, estrazione/allineamento e correzioni mirate, quindi approvazione della GIF del ciclo e prova runtime. Inbetweening ricorsivo opzionale per riparazioni; rimossi obblighi contraddittori di singolo intermedio e M universale. Conservati rig alternativi, anatomia, materiali, prompt, versioning e gate di integrazione/merge. |
-| v13.0.0 (proposta PR #92) | 2026-10-30 | Modello fisico e biomeccanico, galoppo rotatorio, gate e fonti del §2.2; conservati integralmente in questa proposta, senza presumere approvazione. |
-| v14.0.0 (proposta locale) | 2026-10-31 | §7.7: diagnosi, maschera distinta dal crop, handoff manuale ImageGen, reinserimento RGBA esatto, tracciabilità e verifica umana. Coordinamento PR #92/#94/#96; nessuna modifica runtime o asset approvato. |
+
+| v13.0.0 | 2026-10-30 | Introduzione della verifica fisica e biomeccanica preliminare alle pose, con studio pilota del galoppo; invarianti di contatto, movimento e controllo dei riferimenti. |
+| v14.0.0 | 2026-10-31 | Separazione tra principi universali e specifiche di Hellscape: esempi e prescrizioni degli asset spostati in documento dedicato; vincoli del processo e biomeccanica v13 preservati. |
 
 ### 12.2 Fonti professionali usate nella revisione v8
 
@@ -819,5 +728,4 @@ Letture di riferimento consultate il 29/10/2026; **fonti sul metodo di animazion
 
 ---
 
-**Versione:** v14.0.0 (proposta) · **Ultimo aggiornamento:** 31 ottobre 2026 (Europe/Rome)
-
+**Versione:** v14.0.0 · **Ultimo aggiornamento:** 31 ottobre 2026 (Europe/Rome)
