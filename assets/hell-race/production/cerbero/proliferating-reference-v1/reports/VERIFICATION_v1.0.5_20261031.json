@@ -1,0 +1,30 @@
+{
+  "version": "1.0.5",
+  "updated_at": "2026-10-31T15:15:37.794342+01:00",
+  "scope": "Production reference saving only, no new runtime code or animation.",
+  "source_sha256": "f5f5216a2b20c3b07354b3e91a00b68608c92751434abec1d303b9e1be0bab1f",
+  "source_copy_exact": true,
+  "png_format": "RGBA",
+  "source_size": [
+    1536,
+    1024
+  ],
+  "approved_uniform_scale": 0.174,
+  "scale_ratio_from_large_preview": 0.6,
+  "approved_preview_rgba_replay": "pixel_identical_all_channels",
+  "approved_preview_sha256": "49d5e29d6f9f0fdf492ca37dd317c2e304ffa991e01914bd406f2fe9d21db2ba",
+  "viewport": [
+    1024,
+    768
+  ],
+  "logical_raster": [
+    768,
+    576
+  ],
+  "exact_biomechanical_anchors": "not_certified; layout y=1000 is manual static estimate",
+  "evidence_kind": "Static composition using native bridge, not gameplay or animation proof",
+  "local_tests": {
+    "command": "node --test tests/cerbero-gallop.test.js tests/cerbero.test.js",
+    "result": "passed, 2 test files, 0 failures"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "version": "1.0.5",
+  "updated_at": "2026-10-31T15:14:35.468013+01:00",
+  "reviewer": "user",
+  "status": "approved",
+  "instruction": "Perfetto. Salva il riferimento e fai il merge della PR",
+  "scope": "Original first proliferating concept unchanged, and exact latest bridge layout after 40% reduction. Save production reference and merge PR after applicable checks. No request to implement an animation or swap runtime assets.",
+  "reference": {
+    "path": "reference.png",
+    "sha256": "f5f5216a2b20c3b07354b3e91a00b68608c92751434abec1d303b9e1be0bab1f",
+    "image_version": "1.0.0"
+  },
+  "layout": {
+    "path": "layout/layout_v1.0.5_20261031.json",
+    "sha256": "b25f940e87ef7b01d8e1c017df2feca965e8d05adea541fb5be57198a6e5babf",
+    "uniform_scale": 0.174,
+    "reduction_from_previous": 0.4,
+    "preview": "evidence/approved-layout_v1.0.5_20261031.png",
+    "preview_sha256": "49d5e29d6f9f0fdf492ca37dd317c2e304ffa991e01914bd406f2fe9d21db2ba"
+  },
+  "superseded_drafts": [
+    "PR #104 neck correction on old three-headed design",
+    "Later unapproved mutant/wolf concepts; not the chosen reference"
+  ]
+}

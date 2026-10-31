@@ -1,0 +1,22 @@
+{
+  "version": "1.0.0",
+  "prompt_id": "001_proliferating_reference",
+  "source": "Exact explicit argument from the original image_gen.imagegen call recorded in this conversation; saved during approved-reference packaging, not claimed as a pre-generation Git checkpoint.",
+  "tool": "image_gen.imagegen",
+  "arguments": {
+    "prompt": "Crea un nuovo riferimento statico per un Cerbero gigantesco in stile horror demoniaco junkpunk: un predatore quadrupede pesante e muscoloso, con un unico corpo coerente.\n\nQuesta creatura possiede più di tre teste, di dimensioni e aspetti differenti. Le teste sembrano proliferazioni tumorali demoniache: crescono irregolarmente da spalle, dorso, costati e altri punti improbabili del corpo. Alcune sono grandi e feroci, altre piccole, atrofizzate o ancora parzialmente formate. Variano per cranio, muso, mandibola, occhi, denti e corna, pur appartenendo alla stessa creatura.\n\nOgni testa emerge da una massa organica continua e credibile: pelle, muscoli, pieghe, tessuti nodulari e strutture ossee ne spiegano l’attacco al corpo. Distribuzione asimmetrica e disordinata, con zone di crescita più dense di altre.\n\nRispetta rigorosamente profondità e occlusioni. Le teste vicine possono coprire quelle lontane; alcune possono essere visibili solo parzialmente. Non disporle a ventaglio, non distanziarle per mostrarle tutte e non spostare parti anatomiche per dare risalto a una testa.\n\nIntegra elementi junkpunk consumati: metallo annerito e arrugginito, piastre recuperate, bulloni e catene incorporati nella massa organica. Palette di carne rosso scuro, osso sporco e metallo bruciato, con occhi incandescenti. Aspetto minaccioso, pesante e brutale, coerente con un gioco ambientato su un ponte infernale sopra la lava.\n\nMostra una sola creatura completa, ferma in una posa naturale sulle quattro zampe, vista laterale rivolta a destra. Sfondo trasparente reale RGBA, margini sufficienti per tutte le estremità. Nessun ambiente, veicolo, effetto, testo, tavola multipla o sequenza animata.",
+    "transparent_background": true
+  },
+  "reference_inputs": "None: first exploration of a genuinely new design.",
+  "result": {
+    "artifact_identifier": "exec-18154a5c-bcf8-430c-8b29-906d99bd5f81",
+    "original_output_path": "/workspace/generated_images/exec-18154a5c-bcf8-430c-8b29-906d99bd5f81.png",
+    "saved_png": "../reference.png",
+    "sha256": "f5f5216a2b20c3b07354b3e91a00b68608c92751434abec1d303b9e1be0bab1f"
+  },
+  "unavailable": [
+    "seed",
+    "model revision",
+    "internal rewritten prompt"
+  ]
+}

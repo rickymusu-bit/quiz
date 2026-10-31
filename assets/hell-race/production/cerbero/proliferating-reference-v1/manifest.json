@@ -1,0 +1,118 @@
+{
+  "version": "1.0.5",
+  "updated_at": "2026-10-31T15:14:35.468013+01:00",
+  "timezone": "Europe/Rome",
+  "subject": "Cerbero proliferante",
+  "status": "approved_reference_and_static_scale",
+  "reference": {
+    "path": "reference.png",
+    "image_version": "1.0.0",
+    "sha256": "f5f5216a2b20c3b07354b3e91a00b68608c92751434abec1d303b9e1be0bab1f",
+    "size": [
+      1536,
+      1024
+    ],
+    "mode": "RGBA",
+    "alpha_extrema": [
+      0,
+      254
+    ],
+    "original_output": "exec-18154a5c-bcf8-430c-8b29-906d99bd5f81",
+    "preservation": "byte-for-byte original, no fur or redesign"
+  },
+  "generation": {
+    "prompt_id": "001_proliferating_reference",
+    "request": "prompts/001_reference_request_v1.0.0_20261031.json",
+    "explicit_prompt_record": "from actual original tool call, not internal prompt reconstruction"
+  },
+  "layout": "layout/layout_v1.0.5_20261031.json",
+  "approval": "reports/APPROVAL_v1.0.5_20261031.json",
+  "evidence": {
+    "path": "evidence/approved-layout_v1.0.5_20261031.png",
+    "kind": "static technical composition with native bridge renderer; not an integrated gameplay screenshot",
+    "viewport": [
+      1024,
+      768
+    ],
+    "logical_raster": [
+      768,
+      576
+    ]
+  },
+  "vehicle_reference": {
+    "path": "references/coupe_V0_intact.png",
+    "sha256": "1d5a827903ea6d86b2e5ffca452079a9bfe41469679c3a3ecebe9909a90f93f3",
+    "source_atlas": "assets/hell-race/vehicles-drive-v1.webp",
+    "source_atlas_sha256": "36cc3bfb362771a8826e9b13d6825b471b18dd90f0488f6beea4fa3fafabc877",
+    "method": "Native first coupe frame instrumented from FoolHellRace.vehiclePreview via drawImage; not arbitrary crop."
+  },
+  "renderer_sources": [
+    {
+      "path": "assets/hell-layout.js",
+      "sha256": "8321bd97e5a01be99174b55d98e8630cad9c68caf3a9aac35a48f3b6683f2bfc"
+    },
+    {
+      "path": "assets/hell-motion.js",
+      "sha256": "4e4602097963106cad21ea7416ffaab17da5369cd5e7e8ef1b9803ee86d536f8"
+    },
+    {
+      "path": "assets/hell-bridge.js",
+      "sha256": "9ce2c84338248ee4887b9c3d4528412fe2158bdb3979d6acb322d2aa0fd8a753"
+    }
+  ],
+  "replay": "reports/replay_approved_layout.py",
+  "versioning": "1.0.0 original image, 1.0.5 package/layout revision after user-requested 40% reduction; earlier source image is not relabeled as a new generation.",
+  "pending": [
+    "Stable anatomical head/part inventory and per-head anchors before animation generation",
+    "Biomechanical motion and real runtime integration remain separate later stages"
+  ],
+  "runtime": "unchanged",
+  "files": [
+    {
+      "path": "README.md",
+      "sha256": "2646eb1fcf7f90687d44fe81b82ffd7b6ac804b2c6c3af08dbe14c4505eb3643",
+      "bytes": 4021
+    },
+    {
+      "path": "evidence/approved-layout_v1.0.5_20261031.png",
+      "sha256": "49d5e29d6f9f0fdf492ca37dd317c2e304ffa991e01914bd406f2fe9d21db2ba",
+      "bytes": 1478402
+    },
+    {
+      "path": "layout/layout_v1.0.5_20261031.json",
+      "sha256": "b25f940e87ef7b01d8e1c017df2feca965e8d05adea541fb5be57198a6e5babf",
+      "bytes": 1550
+    },
+    {
+      "path": "prompts/001_reference_request_v1.0.0_20261031.json",
+      "sha256": "98802714a780ffcd69bb9f6f830f875864c7b70dcffc90324c24261937d85377",
+      "bytes": 2567
+    },
+    {
+      "path": "reference.png",
+      "sha256": "f5f5216a2b20c3b07354b3e91a00b68608c92751434abec1d303b9e1be0bab1f",
+      "bytes": 2914307
+    },
+    {
+      "path": "references/coupe_V0_intact.png",
+      "sha256": "1d5a827903ea6d86b2e5ffca452079a9bfe41469679c3a3ecebe9909a90f93f3",
+      "bytes": 37222
+    },
+    {
+      "path": "reports/APPROVAL_v1.0.5_20261031.json",
+      "sha256": "cee796b8508e89452c0ba01ad8b07a98283aefd0578f012c152a42c91b57c8b2",
+      "bytes": 1124
+    },
+    {
+      "path": "reports/VERIFICATION_v1.0.5_20261031.json",
+      "sha256": "71227c27fa7eaf2e78ef0d7df9bcf9c0596b61a6bc170450ed3ba8cb6908375c",
+      "bytes": 1003
+    },
+    {
+      "path": "reports/replay_approved_layout.py",
+      "sha256": "f769f67ae920a8cf0d4b1444cd7d5d0c5e72d984efea770193a48dde5d3cee64",
+      "bytes": 3102
+    }
+  ],
+  "verification": "reports/VERIFICATION_v1.0.5_20261031.json"
+}
