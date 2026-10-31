@@ -1,0 +1,104 @@
+{
+  "outside_mask_changed_pixels": 0,
+  "inside_mask_changed_pixels": 4082,
+  "alpha_changed_pixels": 3029,
+  "technical_pass": true,
+  "status": "pending_visual_review",
+  "visual_checks": {
+    "defect_fixed": "not_reviewed",
+    "identity": "not_reviewed",
+    "anatomy_mechanics": "not_reviewed",
+    "neighbor_continuity": "not_reviewed",
+    "anchors": "not_reviewed",
+    "materials_lighting": "not_reviewed",
+    "no_halos_seams": "not_reviewed",
+    "final_scale": "not_reviewed"
+  },
+  "runtime_capture": "not_performed; diagnostic GIF is not game evidence",
+  "version": "2.0.0",
+  "updated_at": "2026-10-31T14:13:27.311731+01:00",
+  "assessment": "Partial only: nearer/right neck tissue becomes distinct. Far/left neck not sufficiently shortened after registration, so full first output is not an approvable reference. Retain only right-neck patch; original remains identity authority.",
+  "right_polygon": [
+    [
+      372,
+      278
+    ],
+    [
+      416,
+      275
+    ],
+    [
+      441,
+      260
+    ],
+    [
+      510,
+      260
+    ],
+    [
+      537,
+      283
+    ],
+    [
+      533,
+      320
+    ],
+    [
+      468,
+      325
+    ],
+    [
+      428,
+      307
+    ],
+    [
+      397,
+      301
+    ],
+    [
+      376,
+      292
+    ]
+  ],
+  "mask_refinement": "Intersection with originally authorized mask, no expansion.",
+  "registration": {
+    "matrix": [
+      0.396,
+      -0.0,
+      12.0,
+      0.0,
+      0.396,
+      18.0
+    ],
+    "landmark_count": 0,
+    "max_residual_px": 0,
+    "residuals_px": [],
+    "candidate_size": [
+      1400,
+      1300
+    ],
+    "target_size": [
+      552,
+      522
+    ],
+    "mapping_mode": "uniform",
+    "input_mapping_matrix": [
+      0.396,
+      0,
+      12.0,
+      0,
+      0.396,
+      18.0
+    ],
+    "registration": "explicit_mapping_unverified",
+    "resampling": "bicubic"
+  },
+  "raw_padding": [
+    1400,
+    1300
+  ],
+  "source": "../run-stabilized-v1/frames/008.png",
+  "source_sha256": "3081b2c69468b6ed30871d7fa48a77de39f59c4acd5050d08a4a22a8c0575b44",
+  "output_sha256": "7d7d92921a0c81a95cf9962192166b883075b893135204b8acf40c0345e863ba",
+  "next": "Local cropped repair of far/left neck against original, then deterministic combination."
+}

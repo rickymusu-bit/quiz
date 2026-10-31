@@ -1,0 +1,63 @@
+{
+  "version": "2.0.1",
+  "updated_at": "2026-10-31T14:14:55.014577+01:00",
+  "prompt_id": "002_FAR",
+  "status": "passed_before_generation",
+  "parent": "001_NECKS 2.0.0 partial; full first output not approved",
+  "new_information": "Registered first output reconstructs near/right neck but does not adequately shorten far/left neck. Use tightly cropped original context and explicit rigid skull retraction, rather than equivalent full-body prompting.",
+  "references": [
+    {
+      "path": "assets/hell-race/production/cerbero/reference-anatomy-v2/references/002_FAR_context_v2.0.1_20261031.png",
+      "sha256": "82068c119335bdced3573b2f630fcca0dc54e284a36031906a19e1d787dba9ef",
+      "size": [
+        176,
+        176
+      ],
+      "role": "exact context crop to edit"
+    },
+    {
+      "path": "assets/hell-race/production/cerbero/run-stabilized-v1/frames/008.png",
+      "sha256": "3081b2c69468b6ed30871d7fa48a77de39f59c4acd5050d08a4a22a8c0575b44",
+      "size": [
+        552,
+        522
+      ],
+      "role": "unchanged canonical authority"
+    }
+  ],
+  "input_link": {
+    "tool": "image_gen.imagegen",
+    "field": "referenced_image_paths",
+    "paths": [
+      "/workspace/quiz-reference/assets/hell-race/production/cerbero/reference-anatomy-v2/references/002_FAR_context_v2.0.1_20261031.png",
+      "/workspace/quiz-reference/assets/hell-race/production/cerbero/run-stabilized-v1/frames/008.png"
+    ],
+    "verification": "Both files viewed directly, hashes/decoding verified; crop is exact from canonical, tool accepts actual local paths. First generated failure is NOT used as canonical reference.",
+    "service_ingestion_receipt": "Not exposed."
+  },
+  "crop_box": [
+    320,
+    120,
+    496,
+    296
+  ],
+  "context_size": [
+    176,
+    176
+  ],
+  "mask": {
+    "path": "references/002_FAR_mask_v2.0.1_20261031.png",
+    "sha256": "e159dcee36da545b00a597704c56846f98981a54a6e9b01be5797e2e87e1b9d1",
+    "role": "Far-head correction only; foreground middle head is protected by subtracting its occlusion region. Applied deterministically after generation, not transmitted as nonexistent mask API."
+  },
+  "geometry_target": "Far head retracts about 25 native px left, same rigid skull size; muzzle target crop x118/y90 rather than x143/y90. Occlusion behind middle and near head retained.",
+  "preserved_right_patch": "candidates/001_RIGHT_partial_v2.0.0_20261031.png (candidate only; no approval claimed)",
+  "source_unchanged_sha256": "3081b2c69468b6ed30871d7fa48a77de39f59c4acd5050d08a4a22a8c0575b44",
+  "prompt": {
+    "path": "prompts/002_FAR_v2.0.1_20261031.txt",
+    "sha256": "7f4ac7be9724ffb4a336bdf910672987b84fec4110659cfc60be94fa72f22aaa",
+    "serialization": "terminal LF; exact submitted arguments logged after call"
+  },
+  "versioning": "2.0.0 -> 2.0.1, retake/correction of same proposed reference, no new animation.",
+  "stop_rule": "No generation if crop or original cannot be forwarded."
+}
