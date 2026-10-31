@@ -122,6 +122,11 @@
     return canvas;
   }
   const reduce = root.matchMedia('(prefers-reduced-motion: reduce)');
+  // Deliberate visual-review gate. Original Cerbero remains canonical outside
+  // ?cerberoGallop=stabilized, and during actions needing native mouth anchors.
+  const reviewGallop = typeof root.URLSearchParams === 'function' &&
+    new root.URLSearchParams(root.location?.search || '')
+      .get('cerberoGallop') === 'stabilized';
   const ammo = root.FoolAmmo?.createTracker();
   const tie = root.FoolTie?.createTracker();
   let live = null, last = null, clock = new motion.Clock(), clockId = null;
@@ -357,7 +362,11 @@
     root.FoolCerbero.load(()=>live?.redraw?.());
     const body={...geometry,runWeight:1,pose:[{frame:8,weight:1}],worldDistance:travel.distance,time:travel.time,
       animation:breath?.active?'fire':'walk',movingFire:true,actionTime:breath?.age??0};
-    const rig=root.FoolCerbero.render(c,body,travel);
+    const proposed = reviewGallop && !breath?.active && !reduce.matches
+      ? root.FoolCerberoGallop : null;
+    if(proposed)proposed.load(()=>live?.redraw?.());
+    const preview = proposed?.ready() ? proposed.render(c,body,travel) : null;
+    const rig = preview ? null : root.FoolCerbero.render(c,body,travel);
     if(rig&&breath?.active)for(const id of root.FoolCerbero.heads)
       root.FoolCerbero.flame(c,id,breath.emissionAge,rig.heads[id],1.3);
     if(dust)root.FoolCerbero.dust(c,body,travel);
