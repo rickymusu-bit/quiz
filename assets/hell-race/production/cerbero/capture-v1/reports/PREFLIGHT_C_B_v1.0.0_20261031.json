@@ -1,0 +1,46 @@
+{
+  "version": "1.0.0",
+  "updated_at": "2026-10-31T12:48:13.990297+01:00",
+  "protocol": "docs/PROTOCOLLO_SPRITE_ANIMATI_v16.0.0_20261031.md",
+  "pose": "C-B",
+  "status": "passed_before_generation",
+  "source_revision": "3e73adec8457458441f5c4eae121d05c03312c17",
+  "canonical": {
+    "path": "assets/hell-race/production/cerbero/run-stabilized-v1/frames/008.png",
+    "asset_version": "1.0.0",
+    "sha256": "3081b2c69468b6ed30871d7fa48a77de39f59c4acd5050d08a4a22a8c0575b44",
+    "git_blob_sha": "7539414886c8aee0746370477bb7f0a5a7120a28",
+    "format": "PNG",
+    "mode": "RGBA",
+    "size": [
+      552,
+      522
+    ]
+  },
+  "input_link": {
+    "tool": "image_gen.imagegen",
+    "field": "referenced_image_paths",
+    "value": [
+      "/workspace/quiz/assets/hell-race/production/cerbero/run-stabilized-v1/frames/008.png"
+    ],
+    "verified": "File exists, decodes as PNG RGBA, was visually inspected via view_image; tool schema explicitly accepts absolute local image paths and host forwards them as editing references. This exact absolute path will be passed, not merely mentioned in the prompt.",
+    "service_ingestion_receipt": "Not exposed by this tool; do not claim a separate server-side hash receipt."
+  },
+  "prompt": {
+    "id": "001_C_B",
+    "version": "1.0.0",
+    "path": "assets/hell-race/production/cerbero/capture-v1/prompts/001_C_B_v1.0.0_20261031.txt",
+    "sha256": "dd61a6c77f630a345ac1206a4cbac27b84ca774fbcbc2dc69719b1619de3e6d2"
+  },
+  "scope": "Latest user instruction selects only 008.png for one isolated C-B. Earlier multi-reference C-B/C-C proposals are not executed. Screenshot/code audited for context, not generative identity inputs.",
+  "stop_rule": "If the reference path cannot be forwarded or the generation rejects the image input, stop without text-only retry.",
+  "other_parameters": {
+    "transparent_background": true,
+    "num_last_images_to_include": "omitted"
+  },
+  "unavailable": [
+    "seed",
+    "model revision",
+    "internal rewritten prompt"
+  ]
+}
