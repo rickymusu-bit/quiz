@@ -1,3 +1,5 @@
+> **NOTA DI PRECEDENZA (31/10/2026):** la [nuova direzione Hellscape con Bafometto e città biomeccanica dai sei quartieri industriali in successione (pietra caotica, elettrico, chimico-putrefattivo, fabbrica biomeccanica, fornaci e siderurgia, discarica radioattiva), ispirati nell'aspetto a settori infernali](HELLSCAPE_BAFOMETTO_DIREZIONE_CINEMATICA_v1.2.0_20261031.md) sostituisce **solo per il redesign futuro** le istruzioni artistiche seguenti su Cerbero, fiammate, eliminazione per caduta nella lava, fondale fisso e portale discendente. Conservare il testo sottostante come storico e riferimento allo **stato del runtime precedente**, non come incarico di implementazione corrente. Le altre regole di gioco restano valide. Non sono stati sostituiti asset o codice.
+
 # Hellscape — specifiche di progetto e casistiche degli asset
 
 **Versione:** v1.0.1 · **Data:** 31 ottobre 2026 (Europe/Rome)  

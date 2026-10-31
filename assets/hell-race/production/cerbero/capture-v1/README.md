@@ -1,24 +1,17 @@
-# Cerbero — produzione della cattura
+# Cerbero — archivio storico della vecchia cattura
 
-**Versione fascicolo:** 3.0.0 · **Data:** 31 ottobre 2026, Europe/Rome. Timestamp in `manifest.json`.
-**Stato:** piano corrente, nessuna nuova posa o modifica runtime. [PR #103 in bozza](https://github.com/rickymusu-bit/quiz/pull/103).
+**Stato al 31 ottobre 2026:** **fascicolo archiviato, NON usare come piano di produzione corrente**. Il codice del gioco può ancora impiegare Cerbero e i vecchi asset: questo README descrive provenienza e stato implementato precedente, **non** l'antagonista scelto per il prossimo redesign.
 
-La sequenza richiesta è **fiammata a distanza → incendio del veicolo perdente → rallentamento → Cerbero lo raggiunge → spinta laterale → caduta dal ponte nella lava → ripresa della corsa**. Applicare il [piano v3.0.0](PIANO_CATTURA_SPINTA_LAVA_v3.0.0_20261031.md) e il [documento d’integrazione corrente](../../../../../docs/CERBERO_INTEGRAZIONE_MOVIMENTI_v3.0.0_20261031.md).
+La **nuova direzione narrativa** di Hellscape è [Bafometto biomeccanico — v1.2.0](../../../../../docs/HELLSCAPE_BAFOMETTO_DIREZIONE_CINEMATICA_v1.2.0_20261031.md): levitazione a gambe incrociate, dispositivi metallici distinti associati alle mani (potenzialmente fusi nelle mani; forme non definitive), sollevamento del perdente e **incenerimento con fuoco verde sulfureo fino a cenere visibile**, ambiente progressivo e porta finale già nel mondo. Niente morso, fiammata di Cerbero, spinta, sbandata o caduta del perdente nella lava; niente portale che precipita dall'alto.
 
-Il modello canonico per le nuove animazioni è il [Cerbero proliferante approvato](../proliferating-reference-v1/README.md), pacchetto 1.0.5: primo PNG originale invariato, scala 0,174 dopo la riduzione del 40%. Il ciclo storico a tre teste resta conservato e non è stato aggiornato al nuovo design. Prima di ogni generazione fornire realmente i riferimenti allo strumento, verificandone percorso e hash secondo il protocollo v16.0.0. Il piano è ancora da tradurre in nuove pose, effetti e prove del gioco.
+## Materiali storici preservati
 
-## File attuali
+- [Piano della spinta v3.0.0](PIANO_CATTURA_SPINTA_LAVA_v3.0.0_20261031.md) e [versione precedente v2.0.0](PIANO_CATTURA_SPINTA_LAVA_v2.0.0_20261031.md): **non eseguire**, solo traccia delle decisioni storiche e riferimenti dei manifest.
+- [Manifest storico](manifest.json): snapshot **immutato** dei riferimenti, hash, dati di provenienza e approvazioni di quel pacchetto. La sua etichetta di `plan` riguarda la vecchia fase, non la direzione attuale.
+- [Riferimento Cerbero approvato storicamente](../proliferating-reference-v1/README.md) e materiali di corsa: **non usare come reference del Bafometto**.
+- [Rapporto decisione](reports/DECISIONE_CATTURA_v2.0.0_20261031.json), [rapporto pulizia](reports/PULIZIA_CATTURA_v2.0.1_20261031.json), [archivio morso](archive/bite-v1/README.md): evidenze da conservare.
+- La [vecchia integrazione v3](../../../../../docs/CERBERO_INTEGRAZIONE_MOVIMENTI_v3.0.0_20261031.md) descrive lo stato/proposta Cerbero al momento della sua redazione, **non** il nuovo obiettivo.
 
-- `PIANO_CATTURA_SPINTA_LAVA_v3.0.0_20261031.md`: piano corrente; 2.0.0 rimane la penultima revisione storica.
-- `manifest.json`: percorsi correnti, versioni, hash, stato e collegamento all’archivio.
-- `reports/DECISIONE_CATTURA_v2.0.0_20261031.json`: richiesta che ha sostituito il morso.
-- `reports/PULIZIA_CATTURA_v2.0.1_20261031.json`: inventario della pulizia e verifiche.
-- [Archivio essenziale del morso](archive/bite-v1/README.md): posa approvata, due fallimenti diagnostici, prompt effettivi, decisioni e replay della sola C-B approvata.
+La proposta Cerbero v4.0–v4.2, ancora non integrata e poi superata, è stata rimossa dalla PR documentale attiva per non mantenere diversi piani operativi concorrenti; resta recuperabile nella cronologia Git. Conservare gli asset e i manifest storici originali senza dichiarare la nuova cinematica già implementata.
 
-Piani, prompt proposti, GIF/onion skin duplicate, manifest intermedi e ricette delle pose accantonate sono stati rimossi dalla cartella attiva. L’archivio conserva i file necessari per capire gli errori e riprodurre l’asset approvato: non è un piano alternativo da eseguire. Non dipende dalla sopravvivenza del branch per preservare queste evidenze.
-
-## Versioni e controlli
-
-Uso `MAJOR.MINOR.PATCH` per il pacchetto: MAJOR per un cambio incompatibile dell’azione, MINOR per una posa/capacità compatibile, PATCH per correzioni e manutenzione. **3.0.0** adotta la nuova identità proliferante approvata; **2.0.1** documenta la pulizia precedente. Il nuovo riferimento ha pacchetto **1.0.5**, la C-B storica **1.0.1**, il protocollo **16.0.0**. ID dei tentativi, date e timestamp restano distinti dalle versioni.
-
-La pulizia verifica collegamenti, hash degli asset conservati, invarianza degli asset esterni al fascicolo e replay della C-B approvata. Nessun codice runtime è modificato, nessuna nuova animazione è dichiarata completata. Il workflow storico di audit degli input e i controlli della corsa restano utili e sono mantenuti. Nessun merge senza approvazione esplicita.
+**Nessuna modifica a runtime, punteggi, turni, vite o salvataggi è implicita in questa archiviazione.**
