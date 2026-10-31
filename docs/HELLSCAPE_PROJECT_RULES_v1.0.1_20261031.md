@@ -171,7 +171,7 @@ Nessun merge senza esplicita approvazione dell'utente.
 
 ## 5. Correzioni locali di sprite: applicazione specifica Hellscape
 
-Il protocollo generale v15, §7.7, contiene le regole universali per maschere e ritagli. Per il postprocessing usare l'applicazione indipendente [sprites-post](https://github.com/rickymusu-bit/sprites-post), una volta integrata e verificata. I manuali operativi di estrazione, editor e correzione mascherata appartengono al repository del tool; i requisiti specifici di Cerbero, veicoli e altre scene restano in Hellscape. Non duplicare qui la pipeline.
+Il protocollo generale v15, §7.7, contiene le regole universali per maschere e ritagli. Per il postprocessing usare l'applicazione indipendente [sprites-post](https://github.com/rickymusu-bit/sprites-post), integrata e verificata al commit `870e1274`. I manuali operativi di estrazione, editor e correzione mascherata appartengono al repository del tool; i requisiti specifici di Cerbero, veicoli e altre scene restano in Hellscape. Non duplicare qui la pipeline.
 
 ## 6. Fonti e mantenimento
 
@@ -179,5 +179,5 @@ Il protocollo generale v15, §7.7, contiene le regole universali per maschere e 
 - **Norme trasversali:** [AGENTS.md](../AGENTS.md).
 - **Specifiche esistenti:** [Omen/Cerbero/layout](HELLSCAPE_SPEC_OMEN_CERBERO_LAYOUT_v1.md), [cinematiche](HELLSCAPE_SPEC_CINEMATICHE_v1.2.0.md) e successive revisioni; non sostituire tali documenti senza un audit delle precedenze.
 - **Produzione cattura veicoli:** la PR #96 contiene un piano dedicato, non mergiato al momento dell'estrazione; non interpretare questo fascicolo come implementazione di quel piano.
-- **Postprocessing:** tool separato nel [repository sprites-post](https://github.com/rickymusu-bit/sprites-post); utilizzare la revisione verificata e versionata come dipendenza di sviluppo, non di esecuzione del gioco.
+- **Postprocessing:** tool separato nel [repository sprites-post](https://github.com/rickymusu-bit/sprites-post) alla revisione [870e1274](https://github.com/rickymusu-bit/sprites-post/commit/870e1274aee5fd42ede786cff7eec944087c7771); utilizzarlo come dipendenza di sviluppo, non di esecuzione del gioco.
 - Non riportare nuove prescrizioni specifiche in AGENTS.md o nel protocollo generale: aggiornarle nella specifica dell'asset/gioco interessato. La cronologia delle versioni conserva i riferimenti storici.
