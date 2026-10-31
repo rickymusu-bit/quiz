@@ -1,0 +1,256 @@
+{
+  "version": "1.0.0",
+  "updated_at": "2026-10-31T12:54:37.729820+01:00",
+  "timezone": "Europe/Rome",
+  "subject": "Cerbero",
+  "pose": "C-B",
+  "state": "candidate_awaiting_user_approval",
+  "scope": "One isolated C-B. C-C not generated; complete capture gate not passed. No runtime integration or merge.",
+  "protocol": {
+    "path": "docs/PROTOCOLLO_SPRITE_ANIMATI_v16.0.0_20261031.md",
+    "version": "16.0.0",
+    "sha256": "5fcc40b5bc81690fbc348746294e60cdbe13c76d6744279ffbd354ab2b407585"
+  },
+  "canonical": {
+    "path": "assets/hell-race/production/cerbero/run-stabilized-v1/frames/008.png",
+    "asset_version": "1.0.0",
+    "revision": "3e73adec8457458441f5c4eae121d05c03312c17",
+    "sha256": "3081b2c69468b6ed30871d7fa48a77de39f59c4acd5050d08a4a22a8c0575b44",
+    "preservation": "Existing tracked original retained byte for byte, no duplicate required (protocol 8.1).",
+    "approval": "Run asset approved; definitive C-A raccord approval not implied."
+  },
+  "pre_generation_commit": "37fd05ef4ef649c35d74e933071054ab8e42ef95",
+  "pull_request": "https://github.com/rickymusu-bit/quiz/pull/103",
+  "generation": {
+    "count": 1,
+    "prompt_id": "001_C_B",
+    "exact_arguments": "prompts/001_C_B_request_v1.0.0_20261031.json",
+    "explicit_prompt_sha256_utf8": "39dc6413f144d2512db99a38d9ee60ae52df5abdaa1ece013fd1be44f9b0ad7c",
+    "tool": "image_gen.imagegen",
+    "editing_reference_paths": [
+      "/workspace/quiz/assets/hell-race/production/cerbero/run-stabilized-v1/frames/008.png"
+    ],
+    "transparent_background": true,
+    "generation_artifact": "exec-05d600bb-b069-4e3f-9366-8f43fedea9c7",
+    "unavailable": [
+      "seed",
+      "model revision",
+      "internal prompt",
+      "server-side input hash receipt"
+    ]
+  },
+  "files": [
+    {
+      "path": "candidates/001_C_B_raw_v1.0.0_20261031.png",
+      "role": "immutable_generated_original",
+      "version": "1.0.0",
+      "sha256": "4317f2a478d9b28ebe20078c9bfc265a0aaefa3bebd90f420490a460227ad543",
+      "size": [
+        1290,
+        1219
+      ],
+      "mode": "RGBA",
+      "status": "candidate",
+      "prompt_id": "001_C_B",
+      "alpha_bounds": [
+        0,
+        21,
+        1289,
+        1195
+      ],
+      "visible_bounds_alpha_gt_8": [
+        107,
+        352,
+        1199,
+        910
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_zero_corners": true
+    },
+    {
+      "path": "candidates/001_C_B_aligned_v1.0.0_20261031.png",
+      "role": "candidate_aligned",
+      "version": "1.0.0",
+      "sha256": "8a722da9b921eb6c9ba57a28ff9a5b25171d2af915691416a110ae28ffba2da5",
+      "size": [
+        600,
+        554
+      ],
+      "mode": "RGBA",
+      "status": "candidate",
+      "prompt_id": null,
+      "alpha_bounds": [
+        40,
+        52,
+        551,
+        519
+      ],
+      "visible_bounds_alpha_gt_8": [
+        69,
+        167,
+        538,
+        407
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_zero_corners": true
+    },
+    {
+      "path": "reports/008_C_B_flip_v1.0.0_20261031.gif",
+      "role": "diagnostic_flip_not_runtime",
+      "version": "1.0.0",
+      "sha256": "c346af95601f48553d3a5bcd0e9ce4388e3b0ceecd0b67902957fc9b4d90f7e4",
+      "size": [
+        600,
+        554
+      ],
+      "mode": "P",
+      "status": "candidate",
+      "prompt_id": null,
+      "frames": 2,
+      "durations_ms": [
+        500,
+        500
+      ]
+    },
+    {
+      "path": "reports/008_C_B_onion_v1.0.0_20261031.png",
+      "role": "diagnostic_onion_not_generated_art",
+      "version": "1.0.0",
+      "sha256": "b12cd4229930df5980e65f16ee45a15ca918aa21f41d36d28349607d9c61fbf6",
+      "size": [
+        600,
+        554
+      ],
+      "mode": "RGBA",
+      "status": "candidate",
+      "prompt_id": null,
+      "alpha_bounds": [
+        40,
+        52,
+        551,
+        519
+      ],
+      "visible_bounds_alpha_gt_8": [
+        69,
+        167,
+        538,
+        407
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_zero_corners": true
+    },
+    {
+      "path": "reports/008_C_B_adapter_scale_v1.0.0_20261031.gif",
+      "role": "diagnostic_at_adapter_scale",
+      "version": "1.0.0",
+      "sha256": "0e5abc0c50a6d1a255af3bef0d8c5948b9ac1b4e83b5c043368feb8b638a0746",
+      "size": [
+        265,
+        245
+      ],
+      "mode": "P",
+      "status": "candidate",
+      "prompt_id": null,
+      "frames": 2,
+      "durations_ms": [
+        500,
+        500
+      ]
+    }
+  ],
+  "supporting_files": [
+    {
+      "path": "README.md",
+      "sha256": "fffcbcb5430bacdc1aca978f5371edac98b1d16a84e76807330ce5963ad0d414"
+    },
+    {
+      "path": "prompts/001_C_B_v1.0.0_20261031.txt",
+      "sha256": "dd61a6c77f630a345ac1206a4cbac27b84ca774fbcbc2dc69719b1619de3e6d2"
+    },
+    {
+      "path": "prompts/001_C_B_request_v1.0.0_20261031.json",
+      "sha256": "e36bf8bd92a178cb1eb434fbb1951918ce3cdfc293b8d426bc9dbdf657efa3e3"
+    },
+    {
+      "path": "reports/PREFLIGHT_C_B_v1.0.0_20261031.json",
+      "sha256": "11e80caecfb38552e6ddf801d9280b479c8f8cdee006810ec6cda2fc2f6b082a"
+    },
+    {
+      "path": "reports/ALIGNMENT_C_B_v1.0.0_20261031.json",
+      "sha256": "47c7366a6726cdf7d1f75ca94759798d25322ee6fca087db2c4284e4b885a52d"
+    },
+    {
+      "path": "reports/REPLAY_C_B_v1.0.0_20261031.py",
+      "sha256": "9a35d1d7811fdc9991db98b69e0984f5f36b6c9be25c9fa5ac19475aa31c6ad0"
+    }
+  ],
+  "alignment_report": "reports/ALIGNMENT_C_B_v1.0.0_20261031.json",
+  "anchors": {
+    "status": "manual_provisional_not_runtime_validated",
+    "uncertainty_raw_px": 19,
+    "convention": "PNG top-left origin, x right, y down; central denotes intermediate visible head. No vehicle/contact anchor certified.",
+    "raw": {
+      "neck_base_central": [
+        883,
+        568
+      ],
+      "jaw_hinge_central": [
+        1110,
+        612
+      ],
+      "mouth_contact_central": [
+        1182,
+        630
+      ]
+    },
+    "aligned": {
+      "neck_base_central": [
+        402.4397904116465,
+        259.4442457329318
+      ],
+      "jaw_hinge_central": [
+        500.1070532128513,
+        278.37534513052213
+      ],
+      "mouth_contact_central": [
+        531.0852158634538,
+        286.1198857931727
+      ]
+    }
+  },
+  "timing": {
+    "production_duration_ms": null,
+    "diagnostic_order": [
+      "008",
+      "C-B"
+    ],
+    "diagnostic_exposure_ms": [
+      500,
+      500
+    ],
+    "interpolation": false,
+    "loop_claim": false
+  },
+  "approval": {
+    "C-B": "pending",
+    "C-C": "blocked_pending_C-B",
+    "integration": "not_requested",
+    "merge": "not_authorized"
+  },
+  "known_limits": [
+    "Manual landmark uncertainty; low fit residual does not certify anatomy.",
+    "Four limbs have overlapping near/far silhouettes inherited from reference.",
+    "Generated fine texture and contours vary slightly.",
+    "Canonical screenshot is historical context; no current runtime evidence or coupe contact test.",
+    "Candidate canvas has common padding 600x554; generated raw resolution differed from requested 552x522."
+  ]
+}

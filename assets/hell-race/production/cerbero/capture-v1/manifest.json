@@ -1,10 +1,10 @@
 {
   "version": "1.0.0",
-  "updated_at": "2026-10-31T12:54:37.729820+01:00",
+  "updated_at": "2026-10-31T13:08:55.374471+01:00",
   "timezone": "Europe/Rome",
   "subject": "Cerbero",
   "pose": "C-B",
-  "state": "candidate_awaiting_user_approval",
+  "state": "rejected_by_user",
   "scope": "One isolated C-B. C-C not generated; complete capture gate not passed. No runtime integration or merge.",
   "protocol": {
     "path": "docs/PROTOCOLLO_SPRITE_ANIMATI_v16.0.0_20261031.md",
@@ -50,7 +50,7 @@
         1219
       ],
       "mode": "RGBA",
-      "status": "candidate",
+      "status": "rejected",
       "prompt_id": "001_C_B",
       "alpha_bounds": [
         0,
@@ -80,7 +80,7 @@
         554
       ],
       "mode": "RGBA",
-      "status": "candidate",
+      "status": "rejected",
       "prompt_id": null,
       "alpha_bounds": [
         40,
@@ -110,7 +110,7 @@
         554
       ],
       "mode": "P",
-      "status": "candidate",
+      "status": "rejected",
       "prompt_id": null,
       "frames": 2,
       "durations_ms": [
@@ -128,7 +128,7 @@
         554
       ],
       "mode": "RGBA",
-      "status": "candidate",
+      "status": "rejected",
       "prompt_id": null,
       "alpha_bounds": [
         40,
@@ -158,7 +158,7 @@
         245
       ],
       "mode": "P",
-      "status": "candidate",
+      "status": "rejected",
       "prompt_id": null,
       "frames": 2,
       "durations_ms": [
@@ -241,7 +241,7 @@
     "loop_claim": false
   },
   "approval": {
-    "C-B": "pending",
+    "C-B": "rejected",
     "C-C": "blocked_pending_C-B",
     "integration": "not_requested",
     "merge": "not_authorized"
@@ -252,5 +252,6 @@
     "Generated fine texture and contours vary slightly.",
     "Canonical screenshot is historical context; no current runtime evidence or coupe contact test.",
     "Candidate canvas has common padding 600x554; generated raw resolution differed from requested 552x522."
-  ]
+  ],
+  "decision": "reports/REJECTION_C_B_v1.0.1_20261031.json"
 }

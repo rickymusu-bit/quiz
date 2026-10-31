@@ -1,11 +1,17 @@
 # Cerbero — cattura, checkpoint C-B
 
-**Versione:** 1.0.0 · **Data:** 31 ottobre 2026, Europe/Rome. Timestamp preciso in `manifest.json`.
-**Stato:** singola C-B candidata, approvazione utente pendente. C-C non prodotta; cattura completa e integrazione non completate. PR in bozza: https://github.com/rickymusu-bit/quiz/pull/103.
+**Versione:** 1.0.1 · **Data:** 31 ottobre 2026, Europe/Rome. Timestamp preciso in `manifest.json`.
+**Stato corrente:** C-B 1.0.0 respinta dall’utente per riordino delle teste; retake 1.0.1 in preparazione, con tutte le teste protese e ordine anatomico preservato. C-C non prodotta; cattura completa e integrazione non completate. PR in bozza: https://github.com/rickymusu-bit/quiz/pull/103.
 
 Applicati `AGENTS.md` e `docs/PROTOCOLLO_SPRITE_ANIMATI_v16.0.0_20261031.md`. La richiesta corrente seleziona esclusivamente `../run-stabilized-v1/frames/008.png` come riferimento indispensabile, superando per questo checkpoint le precedenti proposte multiposa/multiriferimento. I documenti precedenti restano storici, non prompt eseguiti. La corsa è approvata come asset; 008 non viene automaticamente approvato come raccordo definitivo C-A.
 
 Il PNG canonico resta al suo percorso originale, byte per byte, collegato da revisione Git e SHA-256 nel manifest. Il preflight e il testo del prompt sono stati committati e pubblicati nella PR prima della generazione. La chiamata ha usato realmente `referenced_image_paths` con quel file, senza riferimenti impliciti alla chat. Il tool non espone una ricevuta separata di ingestione server. `prompts/001_C_B_request_v1.0.0_20261031.json` conserva gli argomenti effettivi completi; seed, modello interno e riscritture interne non sono disponibili.
+
+## Convenzione di versionamento
+
+Per il pacchetto dell’asset uso `MAJOR.MINOR.PATCH`: MAJOR per una nuova famiglia di azione o un contratto incompatibile di identità/anatomia/coordinate (non autorizza redesign); MINOR per aggiungere una posa o capacità compatibile; PATCH per correggere la stessa posa. Questo retake di C-B passa da **1.0.0 a 1.0.1**. L’ID progressivo del tentativo passa separatamente da `001_C_B` a `002_C_B`; non è la versione. La data `YYYYMMDD` nel nome è distinta dal timestamp ISO-8601 `updated_at`, con fuso Europe/Rome. Il protocollo resta 16.0.0 e il tool mantiene la propria versione. La semantica editoriale delle revisioni del protocollo è una convenzione distinta (§12), non viene applicata automaticamente ai retake PNG.
+
+La 1.0.0 resta conservata come respinta, collegata alla decisione `reports/REJECTION_C_B_v1.0.1_20261031.json`. Il nuovo tentativo usa soltanto il canonico 008 e la regione teste/colli; una maschera deterministica protegge tutti i canali fuori regione. Le sezioni seguenti descrivono la lavorazione storica 1.0.0 finché non aggiornate con l’esito del retake.
 
 ## Contesto e modello fisico
 
