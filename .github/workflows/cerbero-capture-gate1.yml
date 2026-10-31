@@ -1,0 +1,43 @@
+name: Cerbero — capture gate 1 canonical-input audit
+on:
+  pull_request:
+    paths:
+      - 'scripts/prepare_cerbero_capture_gate1.py'
+      - 'assets/hell-race/production/cerbero/capture-v1/**'
+      - '.github/workflows/cerbero-capture-gate1.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  canonical-inputs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - run: npm ci
+      - run: python3 -m pip install -r requirements-test.txt
+      - name: Locate Chromium
+        shell: bash
+        run: |
+          browser_path=$(command -v chromium || command -v chromium-browser || true)
+          if [ -z "$browser_path" ]; then
+            npx playwright install --with-deps chromium
+            browser_path=$(node -p "require('playwright').chromium.executablePath()")
+          fi
+          echo "CHROMIUM_PATH=$browser_path" >> "$GITHUB_ENV"
+      - name: Export immutable Cerbero candidates and original coupe V0
+        run: python3 scripts/prepare_cerbero_capture_gate1.py
+      - name: Share original images for visual review (not a gameplay GIF)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cerbero-capture-gate1-canonical-inputs
+          path: artifacts/capture-gate1/
+          retention-days: 7
+          if-no-files-found: warn
