@@ -9,7 +9,7 @@
 
 ## 1. Regia generale
 
-- **Due cinematica riutilizzabili:** (A) una eliminazione per ciascun giocatore perdente; (B) il finale del vincitore.
+- **Due cinematiche riutilizzabili:** (A) una eliminazione per ciascun giocatore perdente; (B) il finale del vincitore.
 - **Un'unica ripresa continua per ogni sequenza:** telecamera virtuale in movimento fluido; niente tagli, teletrasporti, variazioni brusche di scala o cambi improvvisi di posa.
 - **Coordinate del mondo distinte dalle coordinate dello schermo:** spostare i soggetti realmente nella scena; la telecamera li inquadra, non ne sostituisce la fisica con traslazioni di sprite.
 - **Movimento sempre credibile:** ciclo di galoppo e tempi di appoggio del Cerbero coerenti con velocità e distanza percorsa; ponte e lava mantengono prospettiva/occlusioni; le sagome dei veicoli restano rigide.
