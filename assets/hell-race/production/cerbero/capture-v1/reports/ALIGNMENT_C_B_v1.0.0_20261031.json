@@ -1,0 +1,102 @@
+{
+  "version": "1.0.0",
+  "updated_at": "2026-10-31T12:52:29.533843+01:00",
+  "tool": {
+    "repository": "rickymusu-bit/sprites-post",
+    "revision": "870e1274aee5fd42ede786cff7eec944087c7771",
+    "module_sha256": "9ed1607ca09da16ff5580f5aac6bd069633f51065a4f4027bc50f751ca1d77c4",
+    "api": [
+      "fit_landmarks",
+      "render",
+      "save_gif",
+      "onion_frames"
+    ]
+  },
+  "input_sha256": {
+    "canonical": "3081b2c69468b6ed30871d7fa48a77de39f59c4acd5050d08a4a22a8c0575b44",
+    "raw": "4317f2a478d9b28ebe20078c9bfc265a0aaefa3bebd90f420490a460227ad543"
+  },
+  "source_landmarks_raw": {
+    "shoulder_mass_center": [
+      795,
+      640
+    ],
+    "upper_thorax": [
+      747,
+      573
+    ],
+    "lower_thorax": [
+      832,
+      718
+    ]
+  },
+  "canonical_landmarks": {
+    "shoulder_mass_center": [
+      340,
+      275.3333333333333
+    ],
+    "upper_thorax": [
+      319,
+      247.33333333333334
+    ],
+    "lower_thorax": [
+      358,
+      308.3333333333333
+    ]
+  },
+  "canonical_landmark_source": "run-stabilized-v1/landmarks.json frame 8, transformed by reports/alignment-original.json frame 8",
+  "annotation": "Candidate points manually estimated from viewed PNG, medium confidence; uncertainty about 19 raw px (8 canonical px). Historical points have about 8 px uncertainty. Not precision anatomy measurements.",
+  "fit": {
+    "landmark_count": 3,
+    "provisional": false,
+    "weighted_rms_px": 1.2141616121209144,
+    "maximum_residual_px": 1.6371047745549465,
+    "residuals_px": [
+      0.5844197463980008,
+      1.1835990783173445,
+      1.6371047745549465
+    ]
+  },
+  "raw_to_canonical_before_padding": [
+    0.4302522590361444,
+    -1.4729543172689432,
+    0.06096260040175139
+  ],
+  "final_transforms": [
+    [
+      1,
+      24,
+      15
+    ],
+    [
+      0.4302522590361444,
+      22.527045682731057,
+      15.060962600401751
+    ]
+  ],
+  "canvas": [
+    600,
+    554
+  ],
+  "padding_reason": "Common canvas preserves even faint alpha pixels without clipping. Original canonical file remains immutable. Initial 584x554 proposal was rejected by tool clipping guard (required width 588); no image was produced by that failed export.",
+  "rotation_degrees": 0,
+  "resampling": "One whole-frame uniform scale and translation, bicubic from raw; no regional transform or warp.",
+  "intentional_motion": "Central neck reach and jaw opening preserved; same airborne stride. No temporal interpolation.",
+  "gif": {
+    "encoded_frames": 2,
+    "durations_ms": [
+      500,
+      500
+    ],
+    "total_duration_ms": 1000
+  },
+  "diagnostic_scale": {
+    "adapter_scale": 0.442,
+    "logical_size": [
+      265,
+      245
+    ],
+    "not_runtime": true
+  },
+  "status": "candidate; registration uses estimated landmarks, artistic approval pending"
+}
