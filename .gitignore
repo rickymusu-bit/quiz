@@ -1,11 +1,9 @@
-node_modules/
-dist/
-artifacts/
+.venv/
 __pycache__/
-
-# Anteprime storiche superate: le nuove catture temporanee vanno in artifacts/
-docs/previews/portal-azure/
-docs/previews/portal-side/
-docs/previews/antisigillo/
-docs/previews/black-bridge/
-docs/screenshots/timer-width/
+*.py[cod]
+.pytest_cache/
+artifacts/
+dist/
+build/
+*.egg-info/
+.DS_Store

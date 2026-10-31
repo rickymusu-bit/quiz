@@ -1,4 +1,0 @@
-
-> hellscape@3.9.0 build
-> node scripts/build.cjs
-

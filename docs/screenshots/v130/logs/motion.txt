@@ -1,1 +1,0 @@
-PASS: distance, gait, acceleration and exact footfalls agree at 30/60/144 FPS; pause/long gaps freeze; reduced motion freezes travel while notices expire

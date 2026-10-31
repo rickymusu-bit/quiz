@@ -19,7 +19,7 @@ from sprite_editor_server import EditorSession, make_server
 from sprite_patches.materials import prepare, dump
 from sprite_patches.workflow import import_candidate
 
-BASE = ROOT / "assets/hell-race/production/cerbero/run-stabilized-v1"
+BASE = ROOT / "tests/fixtures/example-creature"
 OUT = ROOT / "artifacts/sprite-editor/patch-review"
 OUT.mkdir(parents=True, exist_ok=True)
 work = OUT / "work"

@@ -1,1 +1,0 @@
-PASS: 0/1/2 losers, state invariance, anchors/occlusion, pause/resume/orientation, no resurrection;  8 offline viewport/DPR samples

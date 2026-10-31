@@ -1,1 +1,0 @@
-PASS: real integrated race/capture/portal GIF, unchanged engine, two victims, permanent rocks and preserved gold

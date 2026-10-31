@@ -15,7 +15,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 import sprite_postprocess as core
 from sprite_editor_server import EditorSession, make_server
 
-BASE = ROOT / "assets/hell-race/production/cerbero/run-stabilized-v1"
+BASE = ROOT / "tests/fixtures/example-creature"
 OUT = ROOT / "artifacts/sprite-editor/review"
 OUT.mkdir(parents=True, exist_ok=True)
 args = core.parser().parse_args([str(BASE / "source-sheet.png"), "--columns", "4", "--rows", "2",
