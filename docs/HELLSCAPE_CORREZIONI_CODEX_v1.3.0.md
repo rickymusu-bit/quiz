@@ -1,4 +1,6 @@
-> **Per la futura direzione artistica e la cinematica prevale la [specifica Bafometto v1.0.0](HELLSCAPE_BAFOMETTO_DIREZIONE_CINEMATICA_v1.0.0_20261031.md).** Le istruzioni seguenti su Cerbero, sfondo a ponte e portale dall'alto rappresentano il progetto precedente/runtime ancora non sostituito. Questa nota **non** modifica le regole di gameplay descritte sotto.\n\n# Hellscape — Correzioni gameplay e regia (prompt operativo per Codex)
+> **Per la futura direzione artistica e la cinematica prevale la [specifica Bafometto v1.0.0](HELLSCAPE_BAFOMETTO_DIREZIONE_CINEMATICA_v1.0.0_20261031.md).** Le istruzioni seguenti su Cerbero, sfondo a ponte e portale dall'alto rappresentano il progetto precedente/runtime ancora non sostituito. Questa nota **non** modifica le regole di gameplay descritte sotto.
+
+# Hellscape — Correzioni gameplay e regia (prompt operativo per Codex)
 
 > Aggiornamento dell’utente del 28/10/2026: per le modifiche dinamiche allegare **GIF reali del browser**, non soltanto screenshot. Per gli stati statici restano validi gli screenshot; niente HTML di anteprima. Questa richiesta prevale sui riferimenti «solo screenshot» presenti nel testo storico seguente. Procedere con [un intervento per volta](HELLSCAPE_LAVORO_SEQUENZIALE.md).
 
