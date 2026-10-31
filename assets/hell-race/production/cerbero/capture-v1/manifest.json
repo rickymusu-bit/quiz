@@ -1,10 +1,10 @@
 {
   "version": "1.0.1",
-  "updated_at": "2026-10-31T13:15:31.332500+01:00",
+  "updated_at": "2026-10-31T13:23:50.757998+01:00",
   "timezone": "Europe/Rome",
   "subject": "Cerbero",
   "pose": "C-B",
-  "state": "candidate_awaiting_user_approval",
+  "state": "C-B_approved_C-C_preparing",
   "scope": "All three heads reach toward vehicle at right, preserve anatomical order and canonical body. Only C-B.",
   "canonical": {
     "path": "assets/hell-race/production/cerbero/run-stabilized-v1/frames/008.png",
@@ -230,9 +230,10 @@
     "No runtime contact/vehicle test; all animation durations are diagnostic."
   ],
   "approval": {
-    "C-B": "pending",
-    "C-C": "blocked_pending_C-B",
+    "C-B": "approved",
+    "C-C": "preparing",
     "merge": "not_authorized",
-    "runtime": "not_integrated"
+    "runtime": "not_integrated",
+    "decision": "reports/APPROVAL_C_B_v1.1.0_20261031.json"
   }
 }

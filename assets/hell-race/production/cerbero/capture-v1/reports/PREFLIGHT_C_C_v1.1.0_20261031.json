@@ -1,0 +1,167 @@
+{
+  "version": "1.1.0",
+  "updated_at": "2026-10-31T13:23:50.757998+01:00",
+  "pose": "C-C",
+  "prompt_id": "003_C_C",
+  "state": "passed_before_generation",
+  "source_revision": "41e8088a38cc658ba8a26b3dcf380520078820e1",
+  "references": [
+    {
+      "path": "assets/hell-race/production/cerbero/capture-v1/candidates/002_C_B_masked_v1.0.1_20261031.png",
+      "sha256": "0ce883a438ba3a693a0013247bf9f4405a7d0d7325eb7365efd233aacf42fd59",
+      "role": "approved C-B, exact edit source",
+      "size": [
+        552,
+        522
+      ]
+    },
+    {
+      "path": "assets/hell-race/production/cerbero/run-stabilized-v1/frames/008.png",
+      "sha256": "3081b2c69468b6ed30871d7fa48a77de39f59c4acd5050d08a4a22a8c0575b44",
+      "role": "canonical identity",
+      "size": [
+        552,
+        522
+      ]
+    }
+  ],
+  "input_link": {
+    "tool": "image_gen.imagegen",
+    "field": "referenced_image_paths",
+    "values": [
+      "/workspace/quiz/assets/hell-race/production/cerbero/capture-v1/candidates/002_C_B_masked_v1.0.1_20261031.png",
+      "/workspace/quiz/assets/hell-race/production/cerbero/run-stabilized-v1/frames/008.png"
+    ],
+    "verification": "Both actual files exist, decode as RGBA PNG, hashes verified and both viewed directly. Tool schema forwards these absolute local file paths as image editing references; no separate server ingestion receipt exposed."
+  },
+  "mask": {
+    "path": "references/003_C_C_mask_v1.1.0_20261031.png",
+    "sha256": "94001b72fc51a1aaad1fa0693f208452caa78ce14b31da13f169fd78da9fe0c2",
+    "polygons": [
+      [
+        [
+          402,
+          217
+        ],
+        [
+          443,
+          217
+        ],
+        [
+          456,
+          228
+        ],
+        [
+          456,
+          241
+        ],
+        [
+          445,
+          247
+        ],
+        [
+          444,
+          266
+        ],
+        [
+          427,
+          274
+        ],
+        [
+          407,
+          258
+        ],
+        [
+          398,
+          238
+        ]
+      ],
+      [
+        [
+          334,
+          293
+        ],
+        [
+          370,
+          289
+        ],
+        [
+          405,
+          314
+        ],
+        [
+          455,
+          330
+        ],
+        [
+          510,
+          349
+        ],
+        [
+          516,
+          421
+        ],
+        [
+          436,
+          420
+        ],
+        [
+          409,
+          369
+        ],
+        [
+          365,
+          346
+        ],
+        [
+          334,
+          322
+        ]
+      ]
+    ],
+    "context_box": [
+      0,
+      0,
+      552,
+      522
+    ],
+    "transmitted": false,
+    "application": "Union of central-bite and forelimb regions, applied deterministically through pinned sprites-post after generation. Preserve all RGBA bytes outside mask. No mask API claimed."
+  },
+  "anchors": {
+    "coordinate_system": "native approved C-B PNG, top-left origin",
+    "jaw_hinge_central": {
+      "xy": [
+        414,
+        237
+      ],
+      "uncertainty_px": 4,
+      "method": "manual visual estimate"
+    },
+    "mouth_contact_central": {
+      "xy": [
+        439,
+        240
+      ],
+      "uncertainty_px": 4,
+      "method": "manual visual estimate of intended grip gap; virtual anchor, vehicle not yet calibrated"
+    },
+    "central_neck_base": {
+      "xy": [
+        385,
+        250
+      ],
+      "uncertainty_px": 6,
+      "method": "manual visual estimate"
+    }
+  },
+  "biomechanics": "Initial bite follows reach. Central jaw closes around its hinge; forelimbs begin lowering toward support, without planted feet/full brake. Torso and pelvis retain forward inertia; no completed collision dynamics certified. Side heads keep approved order/occlusion.",
+  "timing": "Production duration remains uncalibrated; diagnostics use 500ms exposures, no inbetweens.",
+  "versioning": "1.0.1 -> 1.1.0: compatible addition of new pose C-C. C-B remains approved version 1.0.1; protocol stays 16.0.0.",
+  "stop_rule": "Stop if either necessary visual reference cannot be forwarded; no descriptive substitute.",
+  "prompt": {
+    "path": "prompts/003_C_C_v1.1.0_20261031.txt",
+    "sha256": "18d61f55bfd40c3e6ddb613c25a792fa02156cdfcb1327e4b5bd18c6593e4463",
+    "note": "Text file terminal LF; exact tool argument logged separately after call."
+  }
+}
