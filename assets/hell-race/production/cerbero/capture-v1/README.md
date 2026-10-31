@@ -1,7 +1,13 @@
 # Cerbero — cattura, checkpoint C-B
 
-**Versione:** 1.1.0 · **Data:** 31 ottobre 2026, Europe/Rome. Timestamp preciso in `manifest.json`.
-**Stato corrente:** C-B 1.0.1 approvata dall’utente («Va bene. Procediamo.»); C-C 1.1.0 candidata da approvare. Cattura completa e integrazione non completate. PR in bozza: https://github.com/rickymusu-bit/quiz/pull/103.
+**Versione:** 2.0.0 · **Data:** 31 ottobre 2026, Europe/Rome. Timestamp preciso in `manifest.json`.
+**Stato corrente:** nuova direzione richiesta: fiammata a distanza, incendio e rallentamento del veicolo perdente, raggiungimento, spinta laterale oltre il bordo del ponte e caduta nella lava, poi Cerbero prosegue la corsa. Solo piano, nessuna nuova posa generata o integrata. PR in bozza: https://github.com/rickymusu-bit/quiz/pull/103.
+
+## Direzione attuale — 2.0.0
+
+Vedere [piano spinta e caduta nella lava](PIANO_CATTURA_SPINTA_LAVA_v2.0.0_20261031.md). La fiammata iniziale incendia il mezzo e ne causa il rallentamento; solo allora Cerbero lo raggiunge e lo spinge lateralmente nella lava. Questa sequenza sostituisce morso/presa e la proposta di salto/schiacciamento. Il contatto proposto è con spalla e torace sulla fiancata, da calibrare per ciascun mezzo e per il bordo del ponte. Nessuna testa viene spostata per mostrarla: valgono le occlusioni anatomiche naturali.
+
+Il pacchetto passa a 2.0.0 perché cambia la struttura dell’azione; il personaggio canonico resta invariato. C-B conserva la propria approvazione storica, C-C 1.1.0 resta non approvata e accantonata. Il retake 1.1.1 e le nuove sequenze discusse non sono stati generati. Il piano intermedio con salto non è stato pubblicato; la fiammata è invece confermata prima dell’avvicinamento. Tutte le sezioni successive documentano la lavorazione storica e non prescrivono la nuova azione.
 
 Applicati `AGENTS.md` e `docs/PROTOCOLLO_SPRITE_ANIMATI_v16.0.0_20261031.md`. La richiesta corrente seleziona esclusivamente `../run-stabilized-v1/frames/008.png` come riferimento indispensabile, superando per questo checkpoint le precedenti proposte multiposa/multiriferimento. I documenti precedenti restano storici, non prompt eseguiti. La corsa è approvata come asset; 008 non viene automaticamente approvato come raccordo definitivo C-A.
 

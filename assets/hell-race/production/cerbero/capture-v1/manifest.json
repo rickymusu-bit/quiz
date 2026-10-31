@@ -1,11 +1,12 @@
 {
-  "version": "1.1.0",
-  "updated_at": "2026-10-31T13:28:11.636551+01:00",
+  "version": "2.0.0",
+  "updated_at": "2026-10-31T13:42:46.444232+01:00",
   "timezone": "Europe/Rome",
   "subject": "Cerbero",
-  "pose": "C-C",
-  "state": "C-B_approved_C-C_candidate",
-  "scope": "One C-C pose after approved C-B; no composite, inbetweens, atlas, runtime or merge.",
+  "action": "capture_fire_slowdown_shove_lava",
+  "state": "plan_only_no_new_art",
+  "plan": "PIANO_CATTURA_SPINTA_LAVA_v2.0.0_20261031.md",
+  "scope": "Fire before approach ignites losing vehicle; it slows and is reached, body-shoved off bridge into lava. Plan only, no new generated artwork/runtime/merge.",
   "canonical": {
     "path": "assets/hell-race/production/cerbero/run-stabilized-v1/frames/008.png",
     "asset_version": "1.0.0",
@@ -21,204 +22,41 @@
   },
   "pull_request": "https://github.com/rickymusu-bit/quiz/pull/103",
   "versioning": {
-    "scheme": "MAJOR.MINOR.PATCH for the capture asset work package",
-    "MAJOR": "New action family or incompatible identity/anatomical/coordinate contract. Does not authorize redesign.",
-    "MINOR": "Compatible addition of a new pose/capability to the package.",
-    "PATCH": "Correction/retake of the same existing pose without changing the canonical identity or action.",
-    "this_change": "1.0.1 -> 1.1.0: compatible addition of new C-C pose, C-B remains 1.0.1.",
-    "separate_namespaces": "Prompt ID 002 is immutable attempt sequence; protocol 16.0.0 and external tool versions remain unchanged. Date YYYYMMDD in filename and ISO-8601 updated_at with Europe/Rome offset in metadata."
+    "scheme": "MAJOR.MINOR.PATCH for capture package",
+    "this_change": "1.1.0 -> 2.0.0: incompatible choreography, fire/slowdown/body shove/fall replace bite/grip; no redesign."
   },
-  "approved_poses": {
+  "previous_work": {
+    "snapshot_manifest": "reports/MANIFEST_CATTURA_v1.1.0_20261031.json",
+    "snapshot_revision": "7ab019ec39fe4e076cf56ef86145b61996dfc7de",
     "C-B": {
       "version": "1.0.1",
       "path": "candidates/002_C_B_masked_v1.0.1_20261031.png",
       "sha256": "0ce883a438ba3a693a0013247bf9f4405a7d0d7325eb7365efd233aacf42fd59",
       "decision": "reports/APPROVAL_C_B_v1.1.0_20261031.json",
       "source_revision": "41e8088a38cc658ba8a26b3dcf380520078820e1"
-    }
-  },
-  "pre_generation_commit": "d3e9ef5545372520f1f08bcf6efde0d43947e0d9",
-  "generation": {
-    "prompt_id": "003_C_C",
-    "new_generations": 1,
-    "exact_arguments": "prompts/003_C_C_request_v1.1.0_20261031.json",
-    "explicit_prompt_sha256_utf8": "79882837b4616d2c3bcc5b678b52a18ba290d8ead193f9313dfcf1aa15c7c6b4",
-    "reference_paths": [
-      "/workspace/quiz/assets/hell-race/production/cerbero/capture-v1/candidates/002_C_B_masked_v1.0.1_20261031.png",
-      "/workspace/quiz/assets/hell-race/production/cerbero/run-stabilized-v1/frames/008.png"
-    ],
-    "reference_hashes": [
-      "0ce883a438ba3a693a0013247bf9f4405a7d0d7325eb7365efd233aacf42fd59",
-      "3081b2c69468b6ed30871d7fa48a77de39f59c4acd5050d08a4a22a8c0575b44"
-    ],
-    "result_artifact": "exec-581372de-6528-406e-8e49-9bdb28a44cf5",
-    "unavailable": [
-      "seed",
-      "model revision",
-      "internal prompt",
-      "separate server-side input hash receipt"
-    ]
+    },
+    "C-C_1.1.0": "superseded_unapproved",
+    "C-C_1.1.1": "not_generated"
   },
   "files": [
     {
       "path": "README.md",
-      "version": "1.1.0",
-      "sha256": "ee7b7ea8f7c7527a09272e4baa944b49e8d4360530ce83972c365440ba5a640e"
+      "sha256": "6080c1217a0f4aa2d71c5f883fc3aa71e09589b306fd5f1db7475fa5c0b64e9f"
     },
     {
-      "path": "candidates/003_C_C_masked_v1.1.0_20261031.png",
-      "version": "1.1.0",
-      "sha256": "6e0925db5d7d6af51a749dc9a011a897fdc63d93c7a85af98dd997a6c76609c5",
-      "size": [
-        552,
-        522
-      ],
-      "mode": "RGBA",
-      "alpha_extrema": [
-        0,
-        255
-      ]
+      "path": "PIANO_CATTURA_SPINTA_LAVA_v2.0.0_20261031.md",
+      "sha256": "0af70986e99fffdee5c4e08d8b4772a12f3da06a6537edccf136c0be55d77bc8"
     },
     {
-      "path": "candidates/003_C_C_raw_v1.1.0_20261031.png",
-      "version": "1.1.0",
-      "sha256": "cf95307620aaae5c48f68bd555cd99c18df9589cc2aaf06a2d289098cc1b8f96",
-      "size": [
-        1290,
-        1219
-      ],
-      "mode": "RGBA",
-      "alpha_extrema": [
-        0,
-        255
-      ]
-    },
-    {
-      "path": "prompts/003_C_C_request_v1.1.0_20261031.json",
-      "version": "1.1.0",
-      "sha256": "d2a075d5cf7780ab735b027d88ed8df1ca1b3f6e2b24ca19e1c6ff425ccad355"
-    },
-    {
-      "path": "prompts/003_C_C_v1.1.0_20261031.txt",
-      "version": "1.1.0",
-      "sha256": "18d61f55bfd40c3e6ddb613c25a792fa02156cdfcb1327e4b5bd18c6593e4463"
-    },
-    {
-      "path": "references/003_C_C_mask_v1.1.0_20261031.png",
-      "version": "1.1.0",
-      "sha256": "94001b72fc51a1aaad1fa0693f208452caa78ce14b31da13f169fd78da9fe0c2",
-      "size": [
-        552,
-        522
-      ],
-      "mode": "L"
-    },
-    {
-      "path": "reports/APPROVAL_C_B_v1.1.0_20261031.json",
-      "version": "1.1.0",
-      "sha256": "a5a4d414e453ff7b145328f95490cbb827be688cbb659c63d8dab7164353c91c"
-    },
-    {
-      "path": "reports/C_B_C_C_adapter_scale_v1.1.0_20261031.gif",
-      "version": "1.1.0",
-      "sha256": "1480dd0826f1792dc744b2148ac5289cf44091829f462776a3dee188d53b68ff",
-      "size": [
-        244,
-        231
-      ],
-      "mode": "P",
-      "durations_ms": [
-        500,
-        500
-      ]
-    },
-    {
-      "path": "reports/C_B_C_C_flip_v1.1.0_20261031.gif",
-      "version": "1.1.0",
-      "sha256": "df0425cd25a9057606e5117efec4e4a4613fcba96e91284c896934d3ef121ed6",
-      "size": [
-        552,
-        522
-      ],
-      "mode": "P",
-      "durations_ms": [
-        500,
-        500
-      ]
-    },
-    {
-      "path": "reports/C_B_C_C_onion_v1.1.0_20261031.png",
-      "version": "1.1.0",
-      "sha256": "e242a482934c2c062a5ca987726ee9ef1d6b78dd7c6b63bd2f17366f7d6d592a",
-      "size": [
-        552,
-        522
-      ],
-      "mode": "RGBA",
-      "alpha_extrema": [
-        0,
-        255
-      ]
-    },
-    {
-      "path": "reports/PREFLIGHT_C_C_v1.1.0_20261031.json",
-      "version": "1.1.0",
-      "sha256": "69f81594f4f01d59594fed224e0f4f5c7bb8a8ba5fd27af085b8fbdbe7cc60da"
-    },
-    {
-      "path": "reports/RECIPE_C_C_v1.1.0_20261031.json",
-      "version": "1.1.0",
-      "sha256": "f2f9b0ebd4697d22748f50baa657f94350cb7f152e2f4f8a6866c28c56597947"
-    },
-    {
-      "path": "reports/REPLAY_C_C_v1.1.0_20261031.py",
-      "version": "1.1.0",
-      "sha256": "0dd284caebbef4ba12cef8b7991ed20f604ae64117828c110e0c390402f11d44"
-    },
-    {
-      "path": "reports/VERIFICATION_C_C_v1.1.0_20261031.json",
-      "version": "1.1.0",
-      "sha256": "f9174f0595759469058c2f935b0e63309c090d2056d710f3bb06dde4a913d441"
+      "path": "reports/DECISIONE_CATTURA_v2.0.0_20261031.json",
+      "sha256": "36606e557d9d7e840b7aa43f5a8b84d41e7a37e2b62be54197c86e85c0718147"
     }
   ],
-  "final": "candidates/003_C_C_masked_v1.1.0_20261031.png",
-  "raw": "candidates/003_C_C_raw_v1.1.0_20261031.png",
-  "verification": "reports/VERIFICATION_C_C_v1.1.0_20261031.json",
-  "recipe": "reports/RECIPE_C_C_v1.1.0_20261031.json",
-  "outside_mask_changed_pixels": 0,
-  "inside_mask_changed_pixels": 11797,
-  "anchors": {
-    "status": "manual_estimates_pending_vehicle_calibration",
-    "source_CB_mouth_contact": [
-      439,
-      240
-    ],
-    "candidate_CC_mouth_contact": [
-      439,
-      235
-    ],
-    "candidate_CC_jaw_hinge": [
-      418,
-      235
-    ],
-    "estimated_delta_px": [
-      0,
-      -5
-    ],
-    "uncertainty_per_annotation_px": 4,
-    "note": "Two manual source/result annotations have combined uncertainty up to 8 px. Approximate gap position is retained; exact vehicle locking is unverified and is not approved by the isolated pose."
-  },
-  "known_limits": [
-    "Isolated pose only; exact mouth/vehicle contact not calibrated.",
-    "Gap anchor estimates differ by 5 px and have 4 px uncertainty each; no exact locking claim.",
-    "Photometric registration does not certify limb length or biomechanics.",
-    "B/C flip is two held extremes, not the complete timed capture or runtime evidence."
-  ],
   "approval": {
-    "C-B": "approved",
-    "C-C": "pending",
-    "whole_capture": "not_approved",
-    "merge": "not_authorized",
-    "runtime": "not_integrated"
+    "new_direction": "requested_by_user",
+    "new_pose_assets": "not_created",
+    "full_animation": "not_approved",
+    "runtime": "unchanged",
+    "merge": "not_authorized"
   }
 }
