@@ -1,7 +1,7 @@
 # Cerbero — cattura, checkpoint C-B
 
 **Versione:** 1.0.1 · **Data:** 31 ottobre 2026, Europe/Rome. Timestamp preciso in `manifest.json`.
-**Stato corrente:** C-B 1.0.0 respinta dall’utente per riordino delle teste; retake 1.0.1 in preparazione, con tutte le teste protese e ordine anatomico preservato. C-C non prodotta; cattura completa e integrazione non completate. PR in bozza: https://github.com/rickymusu-bit/quiz/pull/103.
+**Stato corrente:** C-B 1.0.0 respinta dall’utente; retake 1.0.1 candidato in attesa di approvazione, con tutte le teste protese e testa inferiore/destra ancora più avanzata. C-C non prodotta; cattura completa e integrazione non completate. PR in bozza: https://github.com/rickymusu-bit/quiz/pull/103.
 
 Applicati `AGENTS.md` e `docs/PROTOCOLLO_SPRITE_ANIMATI_v16.0.0_20261031.md`. La richiesta corrente seleziona esclusivamente `../run-stabilized-v1/frames/008.png` come riferimento indispensabile, superando per questo checkpoint le precedenti proposte multiposa/multiriferimento. I documenti precedenti restano storici, non prompt eseguiti. La corsa è approvata come asset; 008 non viene automaticamente approvato come raccordo definitivo C-A.
 
@@ -11,7 +11,26 @@ Il PNG canonico resta al suo percorso originale, byte per byte, collegato da rev
 
 Per il pacchetto dell’asset uso `MAJOR.MINOR.PATCH`: MAJOR per una nuova famiglia di azione o un contratto incompatibile di identità/anatomia/coordinate (non autorizza redesign); MINOR per aggiungere una posa o capacità compatibile; PATCH per correggere la stessa posa. Questo retake di C-B passa da **1.0.0 a 1.0.1**. L’ID progressivo del tentativo passa separatamente da `001_C_B` a `002_C_B`; non è la versione. La data `YYYYMMDD` nel nome è distinta dal timestamp ISO-8601 `updated_at`, con fuso Europe/Rome. Il protocollo resta 16.0.0 e il tool mantiene la propria versione. La semantica editoriale delle revisioni del protocollo è una convenzione distinta (§12), non viene applicata automaticamente ai retake PNG.
 
-La 1.0.0 resta conservata come respinta, collegata alla decisione `reports/REJECTION_C_B_v1.0.1_20261031.json`. Il nuovo tentativo usa soltanto il canonico 008 e la regione teste/colli; una maschera deterministica protegge tutti i canali fuori regione. Le sezioni seguenti descrivono la lavorazione storica 1.0.0 finché non aggiornate con l’esito del retake.
+La 1.0.0 resta conservata come respinta, collegata alla decisione `reports/REJECTION_C_B_v1.0.1_20261031.json`. Il nuovo tentativo usa soltanto il canonico 008 e la regione teste/colli; una maschera deterministica protegge tutti i canali fuori regione. Le sezioni dopo il resoconto 1.0.1 conservano la lavorazione storica 1.0.0; i suoi giudizi di conformità sono superati dalla bocciatura dell’utente.
+
+## Retake 1.0.1 — esito attuale
+
+Riferimento effettivo unico: PNG canonico 008, verificato e ispezionato nuovamente. La candidata respinta non è allegata al generatore. Prompt `002_C_B` e preflight sono stati pubblicati nel commit `c38248cf4d4d694b57e5b6be1bb8cf01fcae41bf` prima della chiamata. Un solo nuovo output, 1290×1219 RGBA; nessuna C-C o altra posa generata. Il prompt vieta esplicitamente riordino, cambio di profondità e spostamenti per enfasi visiva.
+
+Il derivato `candidates/002_C_B_masked_v1.0.1_20261031.png` conserva il canvas nativo **552×522**. Tutte e tre le teste sono rivolte/protese a destra e la testa inferiore/destra rimane la più avanzata; quella centrale non la scavalca. Le fauci sono aperte. L’estensione resta da approvare artisticamente: i tre colli non hanno spostamenti numericamente identici, la testa intermedia presenta anche una componente verso l’alto, e non si dichiara una biomeccanica certificata. Verificare questo dettaglio prima di approvare.
+
+Applicata solo la maschera teste/colli con il tool esterno sprites-post al commit bloccato. **19127 pixel RGBA modificati dentro, zero fuori**, inclusi RGB nascosti sotto alpha zero. Corpo, zampe, coda e spine dorsali conservano esattamente i pixel canonici. La maschera iniziale è stata ristretta dopo l’output per proteggere il raccordo delle spine dorsali: `MASK_REFINEMENT` registra la diagnosi e prova che il supporto effettivo è un sottoinsieme di quello inizialmente autorizzato. Nessuna nuova generazione e nessuna espansione implicita dell’area.
+
+Registrazione del grezzo: scala uniforme **0,4**, offset **(+4,+10)**, rotazione zero, bicubico, sfumatura di 1,5 px solo interna alla maschera. Inizializzata mediante confronto fotometrico di una ROI toracica stabile e selezione manuale: la registrazione grezzo→contesto resta provvisoria, non precisione anatomica da landmark. Un’estensione trasparente esplicita a destra/in basso del canvas grezzo copre tutto il contesto della maschera, senza alterare i suoi pixel. Tutti i dettagli sono in `VERIFICATION`. L’allineamento globale del derivato è identità: i tre landmark corporei del canonico sono fuori maschera e restano esattamente invariati. Le GIF alternano solo 008/C-B per 500 ms ciascuno, senza interpolazione; non sono prove runtime.
+
+Replay deterministico nella stessa ricetta `sprite_edits.apply_all`, con operazione `patch` del tool esterno. `RECIPE` conserva l’operazione riattivabile/disattivabile; `REPLAY` ricostruisce PNG finale, onion skin e GIF da canonico/grezzo/maschera. Nessuna copia del motore del tool né atlas generato.
+
+```bash
+python assets/hell-race/production/cerbero/capture-v1/reports/REPLAY_C_B_v1.0.1_20261031.py \
+  --repo /percorso/quiz --tool-root /percorso/sprites-post --out /tmp/cb-1.0.1-nuova
+```
+
+Controllati hash, RGBA/alpha, invarianza fuori maschera, subset della maschera, tre landmark corporei, replay deterministico e GIF a due frame. Nessun codice/asset runtime modificato. C-C, integrazione e merge restano bloccati dall’approvazione esplicita.
 
 ## Contesto e modello fisico
 
