@@ -67,6 +67,8 @@ Applicare la preferenza «GIF per la dinamica, screenshot per gli stati statici,
 
 - Per creare o modificare sequenze di sprite, utilizzare il documento versionato [Protocollo operativo per sprite animati coerenti — v12.0.0](docs/PROTOCOLLO_SPRITE_ANIMATI_v12.0.0_20261030.md) come riferimento vincolante per flusso A/B ed eventuale M approvati → spritesheet completo → correzioni mirate e approvazione del ciclo, scelta della tecnica, produzione e verifica delle pose, anatomia, proprietà meccaniche dei materiali, punti di ancoraggio, continuità, effetti, limiti ai fallback e controlli. Applicare sempre le regole di consegna di questo AGENTS.md; aggiornare il link quando viene pubblicata una versione successiva del protocollo, senza duplicarne qui il contenuto.
 
+La [proposta v14.0.0](docs/PROTOCOLLO_SPRITE_ANIMATI_v14.0.0_20261031.md) integra la v13 ancora aperta nella PR #92 e il flusso di correzione locale della PR #94. È una proposta da revisionare: il riferimento vincolante rimane v12 fino alla pubblicazione della nuova edizione; nessuna approvazione o integrazione di asset è implicita.
+
 ## Controlli CI e copertura (30/10/2026)
 
 - La CI deve mantenere la verifica completa del gioco sulle modifiche funzionali, inclusi motore, finale, spareggio, layout, Omen, persistenza, animazioni e asset. I test di scenario possono essere suddivisi in shard, mai omessi: l'unione deve coincidere con la suite integrale.

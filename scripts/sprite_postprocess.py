@@ -2,6 +2,8 @@
 """Extract, register and onion-skin spritesheets. Requires only Pillow.
 
 See docs/SPRITE_POSTPROCESS_v1.0.0_20261030.md for the CLI and landmark schema.
+See docs/SPRITE_EDITOR_v1.2.0_20261031.md for the local visual editor and edits.
+See docs/SPRITE_LOCAL_PATCHES_v1.1.0_20261031.md for external masked corrections.
 """
 
 import argparse
@@ -14,7 +16,7 @@ from pathlib import Path
 
 from PIL import Image, ImageChops, ImageDraw, ImageStat
 
-VERSION = "1.0.0"
+VERSION = "1.4.0"
 
 
 @dataclass
@@ -381,9 +383,14 @@ def run(args):
         config = json.loads(args.landmarks.read_text())
         if config.get("source_sha256", digest(args.sheet)) != digest(args.sheet):
             raise ValueError("Landmark source hash differs from the input sheet")
-        transforms, reports = landmark_transforms(sprites, staged, config, reference, args.allow_scale)
-        method = "weighted stable-body landmarks; rotation locked at zero"
-    elif args.body_roi:
+        if len(config["frames"]) != len(sprites):
+            raise ValueError("Recipe frame count differs from the input sheet")
+        if config.get("align_body", True) and not args.no_align:
+            transforms, reports = landmark_transforms(sprites, staged, config, reference, args.allow_scale)
+            method = "weighted stable-body landmarks; rotation locked at zero"
+        else:
+            method = "layout only; body alignment disabled"
+    elif args.body_roi and not args.no_align:
         method = "body-ROI template matching; translation only; provisional"
         transforms = []
         for i, frame in enumerate(raw):
@@ -392,7 +399,18 @@ def run(args):
             transforms.append((1.0, sx + dx, sy + dy))
             reports[i] = {"provisional": True, "photometric_mean_absolute_error": score,
                           "search_boundary_reached": args.search > 0 and max(abs(dx), abs(dy)) == args.search}
-    frames, transforms = render(sprites, transforms, args.padding, args.canvas, args.nearest)
+    working = sprites
+    edit_reports = [[] for _ in sprites]
+    if config and any(frame.get("edits") for frame in config["frames"]):
+        import sprite_edits
+        if config.get("local_edits_version", sprite_edits.VERSION) not in sprite_edits.SUPPORTED_VERSIONS:
+            raise ValueError("Unsupported local edit recipe version")
+        working, edit_reports = sprite_edits.apply_all(sprites,
+            [frame.get("edits", []) for frame in config["frames"]], args.nearest,
+            [frame["points"] if config.get("align_body", True) and not args.no_align else {} for frame in config["frames"]])
+        transforms = sprite_edits.adjust_transforms(sprites, working, transforms)
+        method += "; deterministic local edits"
+    frames, transforms = render(working, transforms, args.padding, args.canvas, args.nearest)
     onions = onion_frames(frames, args.onion_opacity)
     args.out.mkdir(parents=True, exist_ok=True)
     for name in ("extracted", "aligned", "onion"):
@@ -422,14 +440,19 @@ def run(args):
     (args.out / "landmarks-template.json").write_text(json.dumps(template, indent=2) + "\n")
     frame_records = []
     for i, (sprite, (scale, dx, dy), report) in enumerate(zip(sprites, transforms, reports), 1):
-        origin_x, origin_y = sprite.box[:2]
+        origin_x, origin_y = working[i - 1].box[:2]
         matrix = [[scale, 0, dx - scale * origin_x], [0, scale, dy - scale * origin_y], [0, 0, 1]]
         anchors = {}
         if config:
-            for name, value in config["frames"][i - 1].get("anchors", {}).items():
+            input_anchors = config["frames"][i - 1].get("anchors", {})
+            if config["frames"][i - 1].get("edits"):
+                local_anchor_map = sprite_edits.map_anchors(sprite, working[i - 1], config["frames"][i - 1]["edits"], input_anchors)
+                input_anchors = {name: anchor["xy"] for name, anchor in local_anchor_map.items()}
+            for name, value in input_anchors.items():
                 xy, _ = point(value)
                 anchors[name] = [scale * xy[0] + matrix[0][2], scale * xy[1] + matrix[1][2]]
         frame_records.append({"index": i, "source_box": sprite.box, "source_to_output_matrix": matrix,
+            "edited_source_box": working[i - 1].box, "edit_operations": edit_reports[i - 1],
             "uniform_scale": scale, "rotation_degrees": 0, "transformed_anchors": anchors,
             "alignment_check": report, "png": f"aligned/{i:03d}.png",
             "sha256": digest(args.out / "aligned" / f"{i:03d}.png"),
@@ -465,11 +488,24 @@ def parser():
     p.add_argument("--search", type=int, default=48, help="Translation search radius in pixels")
     p.add_argument("--landmarks", type=Path, help="JSON body points in source-sheet coordinates")
     p.add_argument("--allow-scale", action="store_true", help="Fit a whole-frame uniform scale from body landmarks")
+    p.add_argument("--no-align", action="store_true", help="Apply a recipe without fitting body landmarks")
     p.add_argument("--padding", type=int, default=16)
     p.add_argument("--canvas", type=int, nargs=2, metavar=("W", "H"), help="Optional fixed canvas; undersized values fail")
     p.add_argument("--nearest", action="store_true", help="Nearest-neighbor sampling for pixel art")
     p.add_argument("--duration", type=int, default=100, help="Milliseconds per frame, multiple of 10")
     p.add_argument("--onion-opacity", type=float, default=0.3)
+    p.add_argument("--editor", action="store_true", help="Open the local landmark editor server instead of a batch export")
+    p.add_argument("--port", type=int, default=0, help="Local editor port (0 chooses an available port)")
+    patch = p.add_mutually_exclusive_group()
+    patch.add_argument("--patch-diagnose", type=Path, help="Classify an annotated defect without generating anything")
+    patch.add_argument("--patch-prepare", type=Path, help="Export a masked local-correction request from JSON")
+    patch.add_argument("--patch-import", type=Path, help="Import an external candidate into a request folder")
+    patch.add_argument("--patch-replay", type=Path, help="Reproduce and compare a preserved patch attempt")
+    patch.add_argument("--patch-review", type=Path, help="Append an explicit visual review to an attempt")
+    p.add_argument("--patch-candidate", type=Path)
+    p.add_argument("--patch-registration", type=Path)
+    p.add_argument("--patch-generation", type=Path)
+    p.add_argument("--patch-review-file", type=Path)
     return p
 
 
@@ -477,6 +513,18 @@ def main():
     p = parser()
     args = p.parse_args()
     try:
+        if args.patch_diagnose:
+            from sprite_patches.diagnosis import classify
+            print(json.dumps(classify(json.loads(args.patch_diagnose.read_text())), ensure_ascii=False))
+            return
+        if any((args.patch_prepare, args.patch_import, args.patch_replay, args.patch_review)):
+            from sprite_patches.workflow import run as patch_run
+            print(patch_run(args))
+            return
+        if args.editor:
+            from sprite_editor_server import serve
+            serve(args)
+            return
         manifest = run(args)
     except (ValueError, OSError, KeyError, TypeError) as error:
         p.exit(2, f"sprite_postprocess: {error}\n")

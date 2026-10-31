@@ -3,15 +3,42 @@ on:
   pull_request:
     paths:
       - scripts/sprite_postprocess.py
+      - scripts/sprite_editor_server.py
+      - scripts/sprite_edits.py
+      - scripts/sprite_patches/**
+      - scripts/sprite_editor/**
       - tests/test_sprite_postprocess.py
+      - tests/test_sprite_editor.py
+      - tests/test_sprite_edits.py
+      - tests/test_sprite_patches.py
+      - tests/test_sprite_patch_browser.py
+      - tests/sprite_patch_workflow_browser.py
+      - tests/sprite_patches_browser.py
+      - tests/sprite_editor_browser.py
+      - tests/sprite_local_edits_browser.py
       - docs/SPRITE_POSTPROCESS_*.md
+      - docs/SPRITE_EDITOR_*.md
+      - docs/SPRITE_LOCAL_PATCHES_*.md
+      - docs/PROTOCOLLO_SPRITE_ANIMATI_*.md
       - requirements-test.txt
       - .github/workflows/sprite-postprocess.yml
   push:
     branches: [main]
     paths:
       - scripts/sprite_postprocess.py
+      - scripts/sprite_editor_server.py
+      - scripts/sprite_edits.py
+      - scripts/sprite_patches/**
+      - scripts/sprite_editor/**
       - tests/test_sprite_postprocess.py
+      - tests/test_sprite_editor.py
+      - tests/test_sprite_edits.py
+      - tests/test_sprite_patches.py
+      - tests/test_sprite_patch_browser.py
+      - tests/sprite_patch_workflow_browser.py
+      - tests/sprite_patches_browser.py
+      - tests/sprite_editor_browser.py
+      - tests/sprite_local_edits_browser.py
       - requirements-test.txt
       - .github/workflows/sprite-postprocess.yml
 permissions:
@@ -28,4 +55,35 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - run: python3 -m pip install -r requirements-test.txt
-      - run: python3 -m unittest discover -s tests -p 'test_sprite_postprocess.py' -v
+      - run: python3 -m unittest discover -s tests -p 'test_sprite*.py' -v
+  editor-browser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - run: python3 -m pip install -r requirements-test.txt
+      - run: python3 -m playwright install --with-deps chromium
+      - run: python3 tests/sprite_editor_browser.py
+      - run: python3 tests/sprite_local_edits_browser.py
+      - run: python3 tests/sprite_patches_browser.py
+      - run: python3 tests/sprite_patch_workflow_browser.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sprite-editor-browser
+          if-no-files-found: ignore
+          path: |
+            artifacts/sprite-editor/review/editor.png
+            artifacts/sprite-editor/review/editor-demo.gif
+            artifacts/sprite-editor/review/browser-report.json
+            artifacts/sprite-editor/local-edits-review/local-editor.png
+            artifacts/sprite-editor/local-edits-review/local-edits-demo.gif
+            artifacts/sprite-editor/local-edits-review/browser-report.json
+            artifacts/sprite-editor/patch-review/browser.png
+            artifacts/sprite-editor/patch-review/browser-demo.gif
+            artifacts/sprite-editor/patch-review/browser-report.json
+            artifacts/sprite-editor/patch-browser-v1.1/synthetic-ui/browser-demo.gif
+            artifacts/sprite-editor/patch-browser-v1.1/synthetic-ui/mapping.png
+            artifacts/sprite-editor/patch-browser-v1.1/synthetic-ui/browser-report.json
