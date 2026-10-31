@@ -2,7 +2,7 @@
 
 **Stato al 31 ottobre 2026:** **fascicolo archiviato, NON usare come piano di produzione corrente**. Il codice del gioco può ancora impiegare Cerbero e i vecchi asset: questo README descrive provenienza e stato implementato precedente, **non** l'antagonista scelto per il prossimo redesign.
 
-La **nuova direzione narrativa** di Hellscape è [Bafometto biomeccanico — v1.0.0](../../../../../docs/HELLSCAPE_BAFOMETTO_DIREZIONE_CINEMATICA_v1.0.0_20261031.md): levitazione a gambe incrociate, dispositivi metallici distinti associati alle mani (potenzialmente fusi nelle mani; forme non definitive), sollevamento del perdente e **incenerimento con fuoco verde sulfureo fino a cenere visibile**, ambiente progressivo e porta finale già nel mondo. Niente morso, fiammata di Cerbero, spinta, sbandata o caduta del perdente nella lava; niente portale che precipita dall'alto.
+La **nuova direzione narrativa** di Hellscape è [Bafometto biomeccanico — v1.1.0](../../../../../docs/HELLSCAPE_BAFOMETTO_DIREZIONE_CINEMATICA_v1.1.0_20261031.md): levitazione a gambe incrociate, dispositivi metallici distinti associati alle mani (potenzialmente fusi nelle mani; forme non definitive), sollevamento del perdente e **incenerimento con fuoco verde sulfureo fino a cenere visibile**, ambiente progressivo e porta finale già nel mondo. Niente morso, fiammata di Cerbero, spinta, sbandata o caduta del perdente nella lava; niente portale che precipita dall'alto.
 
 ## Materiali storici preservati
 
