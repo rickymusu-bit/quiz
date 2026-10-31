@@ -124,8 +124,9 @@
   const reduce = root.matchMedia('(prefers-reduced-motion: reduce)');
   // Deliberate visual-review gate. Original Cerbero remains canonical outside
   // ?cerberoGallop=stabilized, and during actions needing native mouth anchors.
-  const reviewGallop = new URLSearchParams(root.location?.search || '')
-    .get('cerberoGallop') === 'stabilized';
+  const reviewGallop = typeof root.URLSearchParams === 'function' &&
+    new root.URLSearchParams(root.location?.search || '')
+      .get('cerberoGallop') === 'stabilized';
   const ammo = root.FoolAmmo?.createTracker();
   const tie = root.FoolTie?.createTracker();
   let live = null, last = null, clock = new motion.Clock(), clockId = null;
