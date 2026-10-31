@@ -1,6 +1,6 @@
 # Cerbero running with three flame jets
 
-Version 1.1.0 · 2026-10-31 (Europe/Rome). Candidate for user visual review.
+Version 1.2.0 · 2026-10-31 (Europe/Rome). Candidate for user visual review.
 
 This action reuses the approved stabilized running loop from main commit `4876d1a066f31453e844a8932cb12d94529db2ae`, at `../run-stabilized-v1/`. All eight original RGBA running files remain unchanged. They render at scale 1, offset (0,0), with the same 100 ms pose timing and 800 ms loop. Fixed side camera, facing right; the stabilized torso and all three heads remain those of the accepted run.
 
@@ -41,4 +41,8 @@ python3 assets/hell-race/production/cerbero/run-fire-v1/reports/render_fire_v1.p
 
 ## Direction correction requested by the user
 
-The first assembly used fixed upper/middle/lower spread angles. The user required each flame to emerge from its mouth in the direction of that head. Version 1.1.0 re-inspects all 24 mouth centers and records a separate muzzle-axis point pair for every head and every running pose. The renderer derives its angle from that pair instead of a fixed fan. Both the emission root and the +X direction of the flame are checked against the respective mouth and forward muzzle axis in all 48 rendered emissions. `reports/rejected-fixed-spread.json` preserves the cause, previous settings and diagnostic hash; the rejected preview remains a local artifact and is not the delivered loop.
+The first assembly used fixed upper/middle/lower spread angles. The user required each flame to emerge from its mouth in the direction of that head. Version 1.2.0 re-inspects all 24 mouth centers and records a separate muzzle-axis point pair for every head and every running pose. The renderer derives its angle from that pair instead of a fixed fan. Both the emission root and the +X direction of the flame are checked against the respective mouth and forward muzzle axis in all 48 rendered emissions. `reports/rejected-fixed-spread.json` preserves the cause, previous settings and diagnostic hash; the rejected preview remains a local artifact and is not the delivered loop.
+
+## Leading-head mouth correction
+
+The user identified the foremost (lower/rightmost) jet as originating at its nose. Version 1.2.0 lowers only that head’s mouth Y coordinate in each of the eight source poses, after inspection of enlarged mouth crops. Its horizontal anchor and muzzle direction remain the same; upper/middle head annotations and the original running sequence are unchanged. `reports/leading-mouth-correction.json` records the old and new coordinates. The browser capture, atlas, mathematical attachment checks and no-clipping checks were rerun.

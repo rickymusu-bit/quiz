@@ -1,0 +1,99 @@
+{
+  "reason": "User observed fire at the nose of the leading head and requested a lower anchor.",
+  "head_id": "lower",
+  "source_frame_size": [
+    552,
+    522
+  ],
+  "validation": "Inspected enlarged source-mouth crops in all eight poses; only leading-head Y emission coordinates changed. Upper/middle annotations, all muzzle axes and running frames unchanged.",
+  "changes": [
+    {
+      "body_frame": 1,
+      "previous_mouth": [
+        478,
+        279
+      ],
+      "corrected_mouth": [
+        478,
+        288
+      ]
+    },
+    {
+      "body_frame": 2,
+      "previous_mouth": [
+        489,
+        280
+      ],
+      "corrected_mouth": [
+        489,
+        291
+      ]
+    },
+    {
+      "body_frame": 3,
+      "previous_mouth": [
+        489,
+        287
+      ],
+      "corrected_mouth": [
+        489,
+        302
+      ]
+    },
+    {
+      "body_frame": 4,
+      "previous_mouth": [
+        471,
+        281
+      ],
+      "corrected_mouth": [
+        471,
+        300
+      ]
+    },
+    {
+      "body_frame": 5,
+      "previous_mouth": [
+        469,
+        277
+      ],
+      "corrected_mouth": [
+        469,
+        285
+      ]
+    },
+    {
+      "body_frame": 6,
+      "previous_mouth": [
+        469,
+        277
+      ],
+      "corrected_mouth": [
+        469,
+        283
+      ]
+    },
+    {
+      "body_frame": 7,
+      "previous_mouth": [
+        481,
+        279
+      ],
+      "corrected_mouth": [
+        481,
+        300
+      ]
+    },
+    {
+      "body_frame": 8,
+      "previous_mouth": [
+        474,
+        273
+      ],
+      "corrected_mouth": [
+        474,
+        287
+      ]
+    }
+  ]
+}

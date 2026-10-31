@@ -1,5 +1,5 @@
 {
-  "version": "1.1.0",
+  "version": "1.2.0",
   "date": "2026-10-31",
   "timezone": "Europe/Rome",
   "status": "candidate action for user visual review; not integrated",
@@ -135,7 +135,7 @@
           "effect_index": 4,
           "mouth": [
             478,
-            279
+            288
           ],
           "muzzle_axis": [
             [
@@ -159,7 +159,7 @@
             -0.3286364640234732,
             0.639976272045711,
             548.2763133330195,
-            116.94762992442529
+            125.94762992442529
           ]
         }
       ]
@@ -247,7 +247,7 @@
           "effect_index": 5,
           "mouth": [
             478,
-            279
+            288
           ],
           "muzzle_axis": [
             [
@@ -271,7 +271,7 @@
             -0.3286364640234732,
             0.639976272045711,
             547.6363370609738,
-            116.61899346040181
+            125.61899346040181
           ]
         }
       ]
@@ -359,7 +359,7 @@
           "effect_index": 6,
           "mouth": [
             489,
-            280
+            291
           ],
           "muzzle_axis": [
             [
@@ -383,7 +383,7 @@
             -0.3154800857086343,
             0.648486842845526,
             555.2683446702415,
-            115.75756204579935
+            126.75756204579935
           ]
         }
       ]
@@ -471,7 +471,7 @@
           "effect_index": 7,
           "mouth": [
             489,
-            280
+            291
           ],
           "muzzle_axis": [
             [
@@ -495,7 +495,7 @@
             -0.31322127841239106,
             0.6438437389588039,
             555.1418932914166,
-            119.4914959957836
+            130.4914959957836
           ]
         }
       ]
@@ -583,7 +583,7 @@
           "effect_index": 0,
           "mouth": [
             489,
-            287
+            302
           ],
           "muzzle_axis": [
             [
@@ -607,7 +607,7 @@
             -0.35346847980712853,
             0.626603214203546,
             564.5137206860684,
-            129.70652648582782
+            144.70652648582782
           ]
         }
       ]
@@ -695,7 +695,7 @@
           "effect_index": 1,
           "mouth": [
             489,
-            287
+            302
           ],
           "muzzle_axis": [
             [
@@ -719,7 +719,7 @@
             -0.35346847980712853,
             0.626603214203546,
             564.5940544314791,
-            128.0998515776136
+            143.0998515776136
           ]
         }
       ]
@@ -807,7 +807,7 @@
           "effect_index": 2,
           "mouth": [
             471,
-            281
+            300
           ],
           "muzzle_axis": [
             [
@@ -831,7 +831,7 @@
             -0.3613242335637294,
             0.6241054943373506,
             548.553319585815,
-            122.57574741110301
+            141.575747411103
           ]
         }
       ]
@@ -919,7 +919,7 @@
           "effect_index": 3,
           "mouth": [
             471,
-            281
+            300
           ],
           "muzzle_axis": [
             [
@@ -943,7 +943,7 @@
             -0.3604577485911545,
             0.6226088384756303,
             548.367340402156,
-            122.95566168589656
+            141.95566168589656
           ]
         }
       ]
@@ -1031,7 +1031,7 @@
           "effect_index": 4,
           "mouth": [
             469,
-            277
+            285
           ],
           "muzzle_axis": [
             [
@@ -1055,7 +1055,7 @@
             -0.3798087202342603,
             0.6109966368985927,
             552.2771902670163,
-            121.22888443609665
+            129.22888443609665
           ]
         }
       ]
@@ -1143,7 +1143,7 @@
           "effect_index": 5,
           "mouth": [
             469,
-            277
+            285
           ],
           "muzzle_axis": [
             [
@@ -1167,7 +1167,7 @@
             -0.3798087202342603,
             0.6109966368985927,
             551.6661936301177,
-            120.84907571586237
+            128.84907571586237
           ]
         }
       ]
@@ -1255,7 +1255,7 @@
           "effect_index": 6,
           "mouth": [
             469,
-            277
+            283
           ],
           "muzzle_axis": [
             [
@@ -1279,7 +1279,7 @@
             -0.3613242335637294,
             0.6241054943373506,
             546.9146438193787,
-            117.95164191676568
+            123.95164191676568
           ]
         }
       ]
@@ -1367,7 +1367,7 @@
           "effect_index": 7,
           "mouth": [
             469,
-            277
+            283
           ],
           "muzzle_axis": [
             [
@@ -1391,7 +1391,7 @@
             -0.35873718654537334,
             0.619636958578372,
             546.5198447653048,
-            121.66679822585337
+            127.66679822585337
           ]
         }
       ]
@@ -1479,7 +1479,7 @@
           "effect_index": 0,
           "mouth": [
             481,
-            279
+            300
           ],
           "muzzle_axis": [
             [
@@ -1503,7 +1503,7 @@
             -0.3350693761385772,
             0.6366318146632967,
             551.900679990923,
-            119.57399083326499
+            140.573990833265
           ]
         }
       ]
@@ -1591,7 +1591,7 @@
           "effect_index": 1,
           "mouth": [
             481,
-            279
+            300
           ],
           "muzzle_axis": [
             [
@@ -1615,7 +1615,7 @@
             -0.3350693761385772,
             0.6366318146632967,
             551.9341869285367,
-            117.96565782779982
+            138.96565782779982
           ]
         }
       ]
@@ -1703,7 +1703,7 @@
           "effect_index": 2,
           "mouth": [
             474,
-            273
+            287
           ],
           "muzzle_axis": [
             [
@@ -1727,7 +1727,7 @@
             -0.33587483136967955,
             0.6381621796023911,
             545.1047018009612,
-            111.57855604373205
+            125.57855604373205
           ]
         }
       ]
@@ -1815,7 +1815,7 @@
           "effect_index": 3,
           "mouth": [
             474,
-            273
+            287
           ],
           "muzzle_axis": [
             [
@@ -1839,7 +1839,7 @@
             -0.3350693761385772,
             0.6366318146632967,
             544.9341869285367,
-            111.96565782779982
+            125.96565782779982
           ]
         }
       ]
@@ -1858,7 +1858,8 @@
     "browser_page_errors": false,
     "integrated_game_tested": false,
     "atlas_cells_equal_exported_frames": true,
-    "no_high_alpha_edge_clipping": true
+    "no_high_alpha_edge_clipping": true,
+    "other_head_anchors_and_all_directions_preserved": true
   },
   "limitations": [
     "Mouth annotations are visual estimates (approximately 3 px uncertainty), not anatomical ground truth.",
@@ -1867,8 +1868,8 @@
   ],
   "files": {
     "README.md": {
-      "bytes": 5262,
-      "sha256": "39130961210398d82479f9c485b085b385d240eb338f66425fe3c07b339187f5"
+      "bytes": 5826,
+      "sha256": "4ad96ad397e9987933c92ddcdcf04efee715c0e8af97d7743ab43c00a56e6d6e"
     },
     "candidates/001_flame-effects.png": {
       "bytes": 1114875,
@@ -1879,24 +1880,28 @@
       "sha256": "846a0b03971cc93bc51cfb559243ca84ca93282be8c70c9a4782320b84447e42"
     },
     "mouth-anchors.json": {
-      "bytes": 8811,
-      "sha256": "ac3c7b989ef67795b285b15242e71d1d5734e85186b62bf3aa8e3628e450f92f"
+      "bytes": 9044,
+      "sha256": "7aafc4fc4ad5cecaf987a93cb2319587c4c94d7ba97ea484f6da152658d216c2"
     },
     "prompts/001_flame-effects_v1.0.0_20261031.md": {
       "bytes": 3289,
       "sha256": "6b873bc81380273465486b38ed409428218b610ad58b5b62c43a713062209c98"
     },
     "reports/browser-frame-001.png": {
-      "bytes": 217758,
-      "sha256": "19c1de9a794afe7f8672fe283f6762ae68187f58baa39dd9c9b979e6ba95c076"
+      "bytes": 221043,
+      "sha256": "14d3ba5195ef244cb2a2a5f0633e0e1a4ffe720770c72f6c6da9d70a703e8490"
     },
     "reports/browser-report.json": {
-      "bytes": 37936,
-      "sha256": "a104055d148444fb0bd7ce33545525d76880e52db3dd2f3755426632393441fc"
+      "bytes": 37932,
+      "sha256": "79f66deaef48ffc7d7a0d510fba9e33d3bcf32b07c87b518b9e9a3acfcc2c964"
+    },
+    "reports/leading-mouth-correction.json": {
+      "bytes": 1634,
+      "sha256": "32963ca669608a0d19f06fc27b158eeca2357878b4727ad13127ae5f1197b930"
     },
     "reports/mouth-anchor-check.png": {
-      "bytes": 218684,
-      "sha256": "7fafa767727cc8ce080bc3658a897e9a1bba5833920fbe71b2c590356de8fbc8"
+      "bytes": 222163,
+      "sha256": "8780033793042463be01600d83c05bca88eafbd48245fcc5ec920aeb10eac3ab"
     },
     "reports/rejected-fixed-spread.json": {
       "bytes": 812,
@@ -1907,13 +1912,14 @@
       "sha256": "fe5796a5672816ae2e5b2a43df34579ea43ff3b841e5e8624a4e87e6f1b92ac0"
     },
     "spritesheet/run-fire-atlas.png": {
-      "bytes": 3926081,
-      "sha256": "c3b77ee91113417483644759639d6004ec62fb642e81511ca883f368216d8902"
+      "bytes": 4026535,
+      "sha256": "0fa2e14fd0a18a52883e1d2164da03f76873b103cd588f6b0a561a16ab4e74b3"
     },
     "spritesheet/run-fire-loop.gif": {
-      "bytes": 1448798,
-      "sha256": "0a38420f127b641bf76ad2cb760c50317109079baa15ffdadcd08f07e3449453"
+      "bytes": 1469510,
+      "sha256": "320bfd8252dca54a0d56114fbb0c2593e4e264fdd0ad187deb3e37b9614d57df"
     }
   },
-  "direction_method": "Each head in each body pose uses its individually annotated rear-to-front muzzle-axis vector; no fixed global fan angles."
+  "direction_method": "Each head in each body pose uses its individually annotated rear-to-front muzzle-axis vector; no fixed global fan angles.",
+  "leading_head_anchor_correction": "Only the foremost/lower head emission Y was lowered into the open-mouth cavity in all eight source poses; other heads and all muzzle axes remain unchanged."
 }

@@ -1,5 +1,5 @@
 {
-  "version": "1.1.0",
+  "version": "1.2.0",
   "source_commit": "4876d1a066f31453e844a8932cb12d94529db2ae",
   "source": "../run-stabilized-v1/frames/",
   "source_frame_size": [
@@ -70,7 +70,7 @@
         "lower": {
           "mouth": [
             478,
-            279
+            288
           ],
           "muzzle_axis": [
             [
@@ -125,7 +125,7 @@
         "lower": {
           "mouth": [
             489,
-            280
+            291
           ],
           "muzzle_axis": [
             [
@@ -180,7 +180,7 @@
         "lower": {
           "mouth": [
             489,
-            287
+            302
           ],
           "muzzle_axis": [
             [
@@ -235,7 +235,7 @@
         "lower": {
           "mouth": [
             471,
-            281
+            300
           ],
           "muzzle_axis": [
             [
@@ -290,7 +290,7 @@
         "lower": {
           "mouth": [
             469,
-            277
+            285
           ],
           "muzzle_axis": [
             [
@@ -345,7 +345,7 @@
         "lower": {
           "mouth": [
             469,
-            277
+            283
           ],
           "muzzle_axis": [
             [
@@ -400,7 +400,7 @@
         "lower": {
           "mouth": [
             481,
-            279
+            300
           ],
           "muzzle_axis": [
             [
@@ -455,7 +455,7 @@
         "lower": {
           "mouth": [
             474,
-            273
+            287
           ],
           "muzzle_axis": [
             [
@@ -470,5 +470,6 @@
         }
       }
     }
-  ]
+  ],
+  "leading_head_correction": "Lower/rightmost/frontmost head: emission moved downward into the visible open-mouth cavity, away from nose/upper teeth, in all eight poses. Other two heads and every muzzle direction remain unchanged."
 }
