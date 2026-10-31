@@ -1,7 +1,7 @@
 # Cerbero — cattura, checkpoint C-B
 
-**Versione:** 1.0.1 · **Data:** 31 ottobre 2026, Europe/Rome. Timestamp preciso in `manifest.json`.
-**Stato corrente:** C-B 1.0.0 respinta dall’utente; retake 1.0.1 candidato in attesa di approvazione, con tutte le teste protese e testa inferiore/destra ancora più avanzata. C-C non prodotta; cattura completa e integrazione non completate. PR in bozza: https://github.com/rickymusu-bit/quiz/pull/103.
+**Versione:** 1.1.0 · **Data:** 31 ottobre 2026, Europe/Rome. Timestamp preciso in `manifest.json`.
+**Stato corrente:** C-B 1.0.1 approvata dall’utente («Va bene. Procediamo.»); C-C 1.1.0 candidata da approvare. Cattura completa e integrazione non completate. PR in bozza: https://github.com/rickymusu-bit/quiz/pull/103.
 
 Applicati `AGENTS.md` e `docs/PROTOCOLLO_SPRITE_ANIMATI_v16.0.0_20261031.md`. La richiesta corrente seleziona esclusivamente `../run-stabilized-v1/frames/008.png` come riferimento indispensabile, superando per questo checkpoint le precedenti proposte multiposa/multiriferimento. I documenti precedenti restano storici, non prompt eseguiti. La corsa è approvata come asset; 008 non viene automaticamente approvato come raccordo definitivo C-A.
 
@@ -13,7 +13,28 @@ Per il pacchetto dell’asset uso `MAJOR.MINOR.PATCH`: MAJOR per una nuova famig
 
 La 1.0.0 resta conservata come respinta, collegata alla decisione `reports/REJECTION_C_B_v1.0.1_20261031.json`. Il nuovo tentativo usa soltanto il canonico 008 e la regione teste/colli; una maschera deterministica protegge tutti i canali fuori regione. Le sezioni dopo il resoconto 1.0.1 conservano la lavorazione storica 1.0.0; i suoi giudizi di conformità sono superati dalla bocciatura dell’utente.
 
-## Retake 1.0.1 — esito attuale
+## C-C 1.1.0 — checkpoint attuale
+
+L’approvazione utente è collegata all’esatto hash di C-B in `reports/APPROVAL_C_B_v1.1.0_20261031.json`. Non serve rigenerare o ricodificare la C-B approvata: resta immutata nel percorso esistente. Versione del pacchetto **1.1.0** per aggiunta compatibile della nuova posa C-C; la versione della posa C-B rimane 1.0.1. `003_C_C` è l’ID immutabile del nuovo tentativo.
+
+Il prompt e il preflight sono stati pubblicati nel commit `d3e9ef5545372520f1f08bcf6efde0d43947e0d9` prima della chiamata. Entrambi i PNG sono stati realmente passati a ImageGen: prima la C-B approvata come sorgente di editing, poi 008 come identità canonica. Un solo nuovo output RGBA 1290×1219. Il grezzo rimane conservato in `candidates/003_C_C_raw_v1.1.0_20261031.png`; seed e prompt interno non sono esposti.
+
+Il derivato `candidates/003_C_C_masked_v1.1.0_20261031.png` mostra la chiusura della mandibola centrale e l’abbassamento articolato dei due anteriori verso il sostegno. Non rappresenta ancora piedi piantati, frenata completa o strattonamento. Torace, bacino, posteriori e coda conservano la posa approvata. Le teste laterali rimangono nel loro ordine e gli overlap non vengono modificati per esporre il morso. Verificata l’identità RGBA di tre ROI della testa superiore e della testa destra (faccia e corno), elencate nel report.
+
+Reinserimento con maschera separata per morso e anteriori tramite la stessa ricetta del tool esterno sprites-post al commit bloccato. **11797 pixel modificati dentro maschera, zero fuori** sui quattro canali, inclusi RGB sotto alpha zero. Canvas nativo **552×522**; scala uniforme grezzo→contesto **0,414**, offset **(+3,+5)**, rotazione zero, bicubico una volta e sfumatura 1 px solo interna alla maschera. La registrazione è inizializzata con la ROI toracica stabile, non certificata da precisione anatomica. Il corpo protetto ha allineamento globale identità e tre landmark invariati (bacino, massa spalla, torace superiore).
+
+Le stime manuali del punto di presa sono C-B `[439,240]`, C-C `[439,235]` con incertezza circa 4 px ciascuna: lo scarto stimato è 5 px, entro l’incertezza combinata delle annotazioni, ma **non prova un aggancio esatto**. Il perno stimato C-C è `[418,235]`. La coupé non è stata generata dentro lo sprite; prima del composito occorre calibrare e verificare nel mondo il contatto bocca–retro del veicolo. Questa candidata non certifica quel passaggio.
+
+La GIF B/C alterna due estremi a 500 ms ciascuno, senza interpolazione. È diagnostica da PNG, non una cattura runtime né il movimento completo al ritmo di gioco. Non sono stati generati C-D, compositi, atlanti o intermedi. Il ciclo di corsa e la posa B approvata restano intatti.
+
+```bash
+python assets/hell-race/production/cerbero/capture-v1/reports/REPLAY_C_C_v1.1.0_20261031.py \
+  --repo /percorso/quiz --tool-root /percorso/sprites-post --out /tmp/cc-1.1.0-nuova
+```
+
+Verificati PNG/RGBA/alpha, hash dei due input e del grezzo, conservazione RGBA fuori maschera e delle ROI laterali, replay deterministico del derivato, riferimenti del manifest, GIF a due pose e dimensione ridotta dell’adattatore. Nessuna modifica a runtime o integrazione; non è dichiarata l’esecuzione della suite funzionale locale. **Approvazione esplicita di C-C richiesta prima del composito e del completamento del Gate 1. Nessun merge.**
+
+## Retake 1.0.1 — lavorazione storica, ora approvata
 
 Riferimento effettivo unico: PNG canonico 008, verificato e ispezionato nuovamente. La candidata respinta non è allegata al generatore. Prompt `002_C_B` e preflight sono stati pubblicati nel commit `c38248cf4d4d694b57e5b6be1bb8cf01fcae41bf` prima della chiamata. Un solo nuovo output, 1290×1219 RGBA; nessuna C-C o altra posa generata. Il prompt vieta esplicitamente riordino, cambio di profondità e spostamenti per enfasi visiva.
 
