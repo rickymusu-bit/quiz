@@ -169,9 +169,13 @@ Nessun merge senza esplicita approvazione dell'utente.
 
 **Regola specifica per Hellscape — veicoli:** durante accelerazione, decelerazione e corsa, **lunghezza, larghezza e proporzioni della carrozzeria restano costanti**. Mostrare velocità e terreno irregolare mediante traslazione, rotazione coerente del veicolo, movimento e compressione delle sospensioni, rotazione delle ruote, polvere/scintille ed eventuale camera tracking. La carrozzeria non deve espandersi o restringersi orizzontalmente. Una collisione può produrre danni locali coerenti con sollecitazione e materiale, non una deformazione elastica globale e reversibile.
 
-## 5. Fonti e mantenimento
+## 5. Correzioni locali di sprite: applicazione specifica Hellscape
 
-- **Metodo generale:** [protocollo sprite v14](PROTOCOLLO_SPRITE_ANIMATI_v14.0.0_20261031.md).
+Nel protocollo generale v14 già presente in main, l'esempio narrativo usava la correzione della testa centrale di Cerbero (mandibola e attacco del collo). È un **esempio di intervento**, non una prescrizione universale. La realizzazione effettiva del postprocessing è la pipeline `scripts/sprite_postprocess.py` con editor della PR #94; consultare [correzioni locali v1.1](SPRITE_LOCAL_PATCHES_v1.1.0_20261031.md). Non duplicare lo strumento e non presupporre API ImageGen disponibili. Il protocollo v15 conserva le norme generali del §7.7.
+
+## 6. Fonti e mantenimento
+
+- **Metodo generale:** [protocollo sprite v14](PROTOCOLLO_SPRITE_ANIMATI_v15.0.0_20261031.md).
 - **Norme trasversali:** [AGENTS.md](../AGENTS.md).
 - **Specifiche esistenti:** [Omen/Cerbero/layout](HELLSCAPE_SPEC_OMEN_CERBERO_LAYOUT_v1.md), [cinematiche](HELLSCAPE_SPEC_CINEMATICHE_v1.2.0.md) e successive revisioni; non sostituire tali documenti senza un audit delle precedenze.
 - **Produzione cattura veicoli:** la PR #96 contiene un piano dedicato, non mergiato al momento dell'estrazione; non interpretare questo fascicolo come implementazione di quel piano.
