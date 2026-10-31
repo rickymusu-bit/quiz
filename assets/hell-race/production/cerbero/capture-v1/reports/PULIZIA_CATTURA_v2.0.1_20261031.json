@@ -1,0 +1,35 @@
+{
+  "version": "2.0.1",
+  "updated_at": "2026-10-31T13:56:21.672357+01:00",
+  "source_revision": "4d7be0145b6c4714b4201083f85d1173ea19afe0",
+  "scope": "Capture production folder and outdated integration document; no runtime deletion.",
+  "before_capture": {
+    "files": 48,
+    "bytes": 4117568
+  },
+  "removed_capture_files": 27,
+  "removed_capture_bytes": 2832082,
+  "removed_external_documents": [
+    "docs/CERBERO_INTEGRAZIONE_MOVIMENTI_v1.0.0_20261031.md"
+  ],
+  "replacement_document": "docs/CERBERO_INTEGRAZIONE_MOVIMENTI_v2.0.0_20261031.md",
+  "archive_index": "archive/bite-v1/index.json",
+  "checks": {
+    "retained_originals_sha256": "passed",
+    "approved_C-B_RGBA_replay": "passed",
+    "unchanged_assets_outside_capture": 78,
+    "current_markdown_links": 9,
+    "current_archive_references": "passed",
+    "diff_whitespace": "checked with git diff --cached --check"
+  },
+  "preserved_sources": [
+    "Approved run-stabilized-v1 package",
+    "Pinned standalone sprites-post tool",
+    "Existing runtime, tests, assets and canonical-input CI",
+    "Protocol v16 and historical protocol files still referenced by other documents"
+  ],
+  "not_performed": [
+    "Full functional/browser suite; runtime unchanged"
+  ],
+  "merge": "not_authorized"
+}

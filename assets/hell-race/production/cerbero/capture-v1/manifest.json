@@ -1,6 +1,6 @@
 {
-  "version": "2.0.0",
-  "updated_at": "2026-10-31T13:42:46.444232+01:00",
+  "version": "2.0.1",
+  "updated_at": "2026-10-31T13:56:21.672357+01:00",
   "timezone": "Europe/Rome",
   "subject": "Cerbero",
   "action": "capture_fire_slowdown_shove_lava",
@@ -23,25 +23,24 @@
   "pull_request": "https://github.com/rickymusu-bit/quiz/pull/103",
   "versioning": {
     "scheme": "MAJOR.MINOR.PATCH for capture package",
-    "this_change": "1.1.0 -> 2.0.0: incompatible choreography, fire/slowdown/body shove/fall replace bite/grip; no redesign."
+    "this_change": "2.0.0 -> 2.0.1: cleanup and reference maintenance only. Current action plan remains 2.0.0."
   },
-  "previous_work": {
-    "snapshot_manifest": "reports/MANIFEST_CATTURA_v1.1.0_20261031.json",
-    "snapshot_revision": "7ab019ec39fe4e076cf56ef86145b61996dfc7de",
-    "C-B": {
-      "version": "1.0.1",
-      "path": "candidates/002_C_B_masked_v1.0.1_20261031.png",
-      "sha256": "0ce883a438ba3a693a0013247bf9f4405a7d0d7325eb7365efd233aacf42fd59",
-      "decision": "reports/APPROVAL_C_B_v1.1.0_20261031.json",
-      "source_revision": "41e8088a38cc658ba8a26b3dcf380520078820e1"
-    },
-    "C-C_1.1.0": "superseded_unapproved",
-    "C-C_1.1.1": "not_generated"
+  "archive": {
+    "path": "archive/bite-v1/index.json",
+    "sha256": "5b5691953760734b2ae92cbe2d1b8815d99d594bdde0206b65b87184ef980f83",
+    "role": "Minimum durable evidence for superseded bite capture; not active work"
+  },
+  "approved_historical_pose": {
+    "path": "archive/bite-v1/approved/002_C_B_masked_v1.0.1_20261031.png",
+    "sha256": "0ce883a438ba3a693a0013247bf9f4405a7d0d7325eb7365efd233aacf42fd59",
+    "version": "1.0.1",
+    "approval": "archive/bite-v1/reports/APPROVAL_C_B_v1.1.0_20261031.json",
+    "scope": "Approved for old bite action only; does not approve a shove pose."
   },
   "files": [
     {
       "path": "README.md",
-      "sha256": "6080c1217a0f4aa2d71c5f883fc3aa71e09589b306fd5f1db7475fa5c0b64e9f"
+      "sha256": "bbd1311295d0a5dcf77cbc0b4f0e7432a6fccd41d4da92a5a57fe6a872ec68d9"
     },
     {
       "path": "PIANO_CATTURA_SPINTA_LAVA_v2.0.0_20261031.md",
@@ -50,8 +49,16 @@
     {
       "path": "reports/DECISIONE_CATTURA_v2.0.0_20261031.json",
       "sha256": "36606e557d9d7e840b7aa43f5a8b84d41e7a37e2b62be54197c86e85c0718147"
+    },
+    {
+      "path": "reports/PULIZIA_CATTURA_v2.0.1_20261031.json",
+      "sha256": "418cc8100c84613e5df41e2940b84d43e7d670e64808f0873b2d422ce8155b77"
     }
   ],
+  "integration_document": {
+    "path": "docs/CERBERO_INTEGRAZIONE_MOVIMENTI_v2.0.0_20261031.md",
+    "sha256": "e9b8061e742beb2829e8eade43a6020d4181071559c0345651ee5480e9ea62b1"
+  },
   "approval": {
     "new_direction": "requested_by_user",
     "new_pose_assets": "not_created",

@@ -1,4 +1,4 @@
-"""Replay C-B 1.0.1 through pinned external sprites-post APIs only."""
+"""Replay archived approved C-B with pinned external sprites-post APIs. Cleanup wrapper 2.0.1."""
 import argparse
 import json
 import sys
@@ -17,8 +17,8 @@ import sprite_postprocess as core
 import sprite_edits
 from sprite_patches import raster, registration, verification
 
-base = args.repo / 'assets/hell-race/production/cerbero/capture-v1'
-original_path = base.parent / 'run-stabilized-v1/frames/008.png'
+base = args.repo / 'assets/hell-race/production/cerbero/capture-v1/archive/bite-v1'
+original_path = args.repo / 'assets/hell-race/production/cerbero/run-stabilized-v1/frames/008.png'
 raw_path = base / 'candidates/002_C_B_raw_v1.0.1_20261031.png'
 mask_path = base / 'references/002_C_B_heads_effective_mask_v1.0.1_20261031.png'
 original, raw = Image.open(original_path).convert('RGBA'), Image.open(raw_path).convert('RGBA')

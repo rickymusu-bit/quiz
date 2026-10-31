@@ -1,0 +1,316 @@
+{
+  "version": "2.0.1",
+  "updated_at": "2026-10-31T13:56:21.672357+01:00",
+  "purpose": "Durable minimum evidence for superseded bite capture; not current production instructions.",
+  "source_revision": "4d7be0145b6c4714b4201083f85d1173ea19afe0",
+  "canonical": {
+    "path": "assets/hell-race/production/cerbero/run-stabilized-v1/frames/008.png",
+    "asset_version": "1.0.0",
+    "revision": "3e73adec8457458441f5c4eae121d05c03312c17",
+    "sha256": "3081b2c69468b6ed30871d7fa48a77de39f59c4acd5050d08a4a22a8c0575b44",
+    "preservation": "Existing tracked original retained byte for byte, no duplicate required (protocol 8.1).",
+    "approval": "Run asset approved; definitive C-A raccord approval not implied."
+  },
+  "attempts": [
+    {
+      "id": "001_C_B",
+      "version": "1.0.0",
+      "state": "rejected_by_user",
+      "request": "prompts/001_C_B_request_v1.0.0_20261031.json",
+      "png": "diagnostics/001_C_B_aligned_v1.0.0_20261031.png",
+      "reason": "Central head given prominence by displacing the side/rightmost head."
+    },
+    {
+      "id": "002_C_B",
+      "version": "1.0.1",
+      "state": "approved_for_superseded_bite_action",
+      "request": "prompts/002_C_B_request_v1.0.1_20261031.json",
+      "png": "approved/002_C_B_masked_v1.0.1_20261031.png",
+      "raw": "candidates/002_C_B_raw_v1.0.1_20261031.png",
+      "approval": "reports/APPROVAL_C_B_v1.1.0_20261031.json",
+      "replay": "reports/REPLAY_C_B_ARCHIVIO_v2.0.1_20261031.py"
+    },
+    {
+      "id": "003_C_C",
+      "version": "1.1.0",
+      "state": "superseded_unapproved",
+      "request": "prompts/003_C_C_request_v1.1.0_20261031.json",
+      "png": "diagnostics/003_C_C_masked_v1.1.0_20261031.png",
+      "reason": "Only central jaw closes and heads remain too high; capture action subsequently replaced."
+    }
+  ],
+  "files": [
+    {
+      "original_path": "candidates/002_C_B_masked_v1.0.1_20261031.png",
+      "path": "approved/002_C_B_masked_v1.0.1_20261031.png",
+      "sha256": "0ce883a438ba3a693a0013247bf9f4405a7d0d7325eb7365efd233aacf42fd59",
+      "bytes": 158693,
+      "preservation": "byte_for_byte"
+    },
+    {
+      "original_path": "candidates/002_C_B_raw_v1.0.1_20261031.png",
+      "path": "candidates/002_C_B_raw_v1.0.1_20261031.png",
+      "sha256": "11c8992dc5b61968191d7f017c1366bced7b5e90479c6cb09d8ca2db3babd355",
+      "bytes": 738482,
+      "preservation": "byte_for_byte"
+    },
+    {
+      "original_path": "candidates/001_C_B_aligned_v1.0.0_20261031.png",
+      "path": "diagnostics/001_C_B_aligned_v1.0.0_20261031.png",
+      "sha256": "8a722da9b921eb6c9ba57a28ff9a5b25171d2af915691416a110ae28ffba2da5",
+      "bytes": 164749,
+      "preservation": "byte_for_byte"
+    },
+    {
+      "original_path": "candidates/003_C_C_masked_v1.1.0_20261031.png",
+      "path": "diagnostics/003_C_C_masked_v1.1.0_20261031.png",
+      "sha256": "6e0925db5d7d6af51a749dc9a011a897fdc63d93c7a85af98dd997a6c76609c5",
+      "bytes": 164853,
+      "preservation": "byte_for_byte"
+    },
+    {
+      "original_path": "prompts/001_C_B_request_v1.0.0_20261031.json",
+      "path": "prompts/001_C_B_request_v1.0.0_20261031.json",
+      "sha256": "e36bf8bd92a178cb1eb434fbb1951918ce3cdfc293b8d426bc9dbdf657efa3e3",
+      "bytes": 3484,
+      "preservation": "byte_for_byte"
+    },
+    {
+      "original_path": "prompts/002_C_B_request_v1.0.1_20261031.json",
+      "path": "prompts/002_C_B_request_v1.0.1_20261031.json",
+      "sha256": "71886cb9c761687cac4b984e97113bec11105c491685563d6b4f92a77056312d",
+      "bytes": 3755,
+      "preservation": "byte_for_byte"
+    },
+    {
+      "original_path": "prompts/003_C_C_request_v1.1.0_20261031.json",
+      "path": "prompts/003_C_C_request_v1.1.0_20261031.json",
+      "sha256": "d2a075d5cf7780ab735b027d88ed8df1ca1b3f6e2b24ca19e1c6ff425ccad355",
+      "bytes": 4123,
+      "preservation": "byte_for_byte"
+    },
+    {
+      "original_path": "references/002_C_B_heads_mask_v1.0.1_20261031.png",
+      "path": "references/002_C_B_heads_mask_v1.0.1_20261031.png",
+      "sha256": "8ddf20d27c96463250ec798fac636f425f8dc6494ae1c84ee8aa1765be10f184",
+      "bytes": 1075,
+      "preservation": "byte_for_byte"
+    },
+    {
+      "original_path": "references/002_C_B_heads_effective_mask_v1.0.1_20261031.png",
+      "path": "references/002_C_B_heads_effective_mask_v1.0.1_20261031.png",
+      "sha256": "d3b8bfec0936f24fa6d17e3da2930ed6e585f6f62a6e33def5aff95331bb035f",
+      "bytes": 1027,
+      "preservation": "byte_for_byte"
+    },
+    {
+      "original_path": "reports/APPROVAL_C_B_v1.1.0_20261031.json",
+      "path": "reports/APPROVAL_C_B_v1.1.0_20261031.json",
+      "sha256": "a5a4d414e453ff7b145328f95490cbb827be688cbb659c63d8dab7164353c91c",
+      "bytes": 523,
+      "preservation": "byte_for_byte"
+    },
+    {
+      "original_path": "reports/REJECTION_C_B_v1.0.1_20261031.json",
+      "path": "reports/REJECTION_C_B_v1.0.1_20261031.json",
+      "sha256": "8045556557afd7735a0392d02ee73e120a5b7974a84bd30d66e29ad5e8f743ef",
+      "bytes": 762,
+      "preservation": "byte_for_byte"
+    },
+    {
+      "original_path": "reports/MASK_REFINEMENT_C_B_v1.0.1_20261031.json",
+      "path": "reports/MASK_REFINEMENT_C_B_v1.0.1_20261031.json",
+      "sha256": "e234e7365f410991c2640c40d970a4a58ae240a4529c0767b28d7a12aaa864b7",
+      "bytes": 1083,
+      "preservation": "byte_for_byte"
+    },
+    {
+      "original_path": "reports/PREFLIGHT_C_B_v1.0.0_20261031.json",
+      "path": "reports/PREFLIGHT_C_B_v1.0.0_20261031.json",
+      "sha256": "11e80caecfb38552e6ddf801d9280b479c8f8cdee006810ec6cda2fc2f6b082a",
+      "bytes": 2011,
+      "preservation": "byte_for_byte"
+    },
+    {
+      "original_path": "reports/PREFLIGHT_C_B_v1.0.1_20261031.json",
+      "path": "reports/PREFLIGHT_C_B_v1.0.1_20261031.json",
+      "sha256": "62659ade77b019427d9a30e7cf6bfe18e612c250a3e76bb07988d732be5e6928",
+      "bytes": 3280,
+      "preservation": "byte_for_byte"
+    },
+    {
+      "original_path": "reports/PREFLIGHT_C_C_v1.1.0_20261031.json",
+      "path": "reports/PREFLIGHT_C_C_v1.1.0_20261031.json",
+      "sha256": "69f81594f4f01d59594fed224e0f4f5c7bb8a8ba5fd27af085b8fbdbe7cc60da",
+      "bytes": 4315,
+      "preservation": "byte_for_byte"
+    },
+    {
+      "original_path": "reports/VERIFICATION_C_B_v1.0.1_20261031.json",
+      "path": "reports/VERIFICATION_C_B_v1.0.1_20261031.json",
+      "sha256": "59a84da73dcf1a6511702bb949e00d4ad4544e24a3ace49c9fdef350deb45315",
+      "bytes": 3719,
+      "preservation": "byte_for_byte"
+    },
+    {
+      "original_path": "reports/VERIFICATION_C_C_v1.1.0_20261031.json",
+      "path": "reports/VERIFICATION_C_C_v1.1.0_20261031.json",
+      "sha256": "f9174f0595759469058c2f935b0e63309c090d2056d710f3bb06dde4a913d441",
+      "bytes": 4251,
+      "preservation": "byte_for_byte"
+    },
+    {
+      "original_path": "reports/REPLAY_C_B_v1.0.1_20261031.py",
+      "path": "reports/REPLAY_C_B_ARCHIVIO_v2.0.1_20261031.py",
+      "sha256": "7ada9f669f071157492835f229c38cd70c9c0667161896207867648b30575b2a",
+      "bytes": 5133,
+      "preservation": "wrapper_updated_for_archive_paths_only",
+      "original_sha256": "fef67b003eeaf770e908e64381a128faca018efc3498444c9372e3dd8f99e819"
+    },
+    {
+      "path": "README.md",
+      "sha256": "6852a5cc1b8210174f4f6d94116c955fd03653ecad8043e1d83703eda21b4422",
+      "bytes": 2844,
+      "role": "archive_usage"
+    }
+  ],
+  "removed": [
+    {
+      "path": "SCHEDA_CONTESTO_GATE1_v1.0.0_20261031.md",
+      "sha256": "640f61c49d100854db8f60f70187ed617f617a9cb231db095fcffc1d3a48758b",
+      "bytes": 4984
+    },
+    {
+      "path": "PIANO_ASSET_CATTURA_v1.0.0_20261031.md",
+      "sha256": "f50da702cb35b9198c8ff1f8265f0593ad0e60ad279f0c46d6eefa8091eee4b8",
+      "bytes": 17260
+    },
+    {
+      "path": "candidates/001_C_B_raw_v1.0.0_20261031.png",
+      "sha256": "4317f2a478d9b28ebe20078c9bfc265a0aaefa3bebd90f420490a460227ad543",
+      "bytes": 734064
+    },
+    {
+      "path": "candidates/003_C_C_raw_v1.1.0_20261031.png",
+      "sha256": "cf95307620aaae5c48f68bd555cd99c18df9589cc2aaf06a2d289098cc1b8f96",
+      "bytes": 745839
+    },
+    {
+      "path": "references/003_C_C_mask_v1.1.0_20261031.png",
+      "sha256": "94001b72fc51a1aaad1fa0693f208452caa78ce14b31da13f169fd78da9fe0c2",
+      "bytes": 1362
+    },
+    {
+      "path": "reports/REPLAY_C_B_v1.0.1_20261031.py",
+      "sha256": "fef67b003eeaf770e908e64381a128faca018efc3498444c9372e3dd8f99e819",
+      "bytes": 5056
+    },
+    {
+      "path": "reports/REPLAY_C_B_v1.0.0_20261031.py",
+      "sha256": "9a35d1d7811fdc9991db98b69e0984f5f36b6c9be25c9fa5ac19475aa31c6ad0",
+      "bytes": 3903
+    },
+    {
+      "path": "reports/008_C_B_flip_v1.0.0_20261031.gif",
+      "sha256": "c346af95601f48553d3a5bcd0e9ce4388e3b0ceecd0b67902957fc9b4d90f7e4",
+      "bytes": 107984
+    },
+    {
+      "path": "reports/008_C_B_flip_v1.0.1_20261031.gif",
+      "sha256": "3da08bfcc8cf86397d2d7de0659107cd1ad1b0903527d1e96e6d721da41de856",
+      "bytes": 105931
+    },
+    {
+      "path": "reports/C_B_C_C_onion_v1.1.0_20261031.png",
+      "sha256": "e242a482934c2c062a5ca987726ee9ef1d6b78dd7c6b63bd2f17366f7d6d592a",
+      "bytes": 151962
+    },
+    {
+      "path": "reports/REPLAY_C_C_v1.1.0_20261031.py",
+      "sha256": "0dd284caebbef4ba12cef8b7991ed20f604ae64117828c110e0c390402f11d44",
+      "bytes": 4531
+    },
+    {
+      "path": "reports/008_C_B_adapter_scale_v1.0.1_20261031.gif",
+      "sha256": "42339e6d7fc8b62acfa14221ee9e4d59ff7a305a8724e05fda7048c9975b432c",
+      "bytes": 26152
+    },
+    {
+      "path": "reports/C_B_C_C_adapter_scale_v1.1.0_20261031.gif",
+      "sha256": "1480dd0826f1792dc744b2148ac5289cf44091829f462776a3dee188d53b68ff",
+      "bytes": 26903
+    },
+    {
+      "path": "reports/RECIPE_C_C_v1.1.0_20261031.json",
+      "sha256": "f2f9b0ebd4697d22748f50baa657f94350cb7f152e2f4f8a6866c28c56597947",
+      "bytes": 216711
+    },
+    {
+      "path": "reports/MANIFEST_CATTURA_v1.1.0_20261031.json",
+      "sha256": "2ee81c615d8e26aba70d7292eb77941a8da78d80c4842548feb9085bf02c71d8",
+      "bytes": 7683
+    },
+    {
+      "path": "reports/C_B_C_C_flip_v1.1.0_20261031.gif",
+      "sha256": "df0425cd25a9057606e5117efec4e4a4613fcba96e91284c896934d3ef121ed6",
+      "bytes": 108827
+    },
+    {
+      "path": "reports/ALIGNMENT_C_B_v1.0.0_20261031.json",
+      "sha256": "47c7366a6726cdf7d1f75ca94759798d25322ee6fca087db2c4284e4b885a52d",
+      "bytes": 2788
+    },
+    {
+      "path": "reports/008_C_B_adapter_scale_v1.0.0_20261031.gif",
+      "sha256": "0e5abc0c50a6d1a255af3bef0d8c5948b9ac1b4e83b5c043368feb8b638a0746",
+      "bytes": 26704
+    },
+    {
+      "path": "reports/MANIFEST_C_B_v1.0.1_20261031.json",
+      "sha256": "004fedfd4354bc062aa75e45344e4f2da484e68676389ebed33ba6de8bc416fa",
+      "bytes": 8017
+    },
+    {
+      "path": "reports/008_C_B_onion_v1.0.1_20261031.png",
+      "sha256": "96ca97db4cba74209e041a112352df83ce5c8c6b0f47dfb03a54ee78fba32446",
+      "bytes": 148394
+    },
+    {
+      "path": "reports/MANIFEST_C_B_v1.0.0_20261031.json",
+      "sha256": "7a4699ffe1748199822fff8b45456a7567c5ada1b3f4a37952643b632a57cce1",
+      "bytes": 7087
+    },
+    {
+      "path": "reports/008_C_B_onion_v1.0.0_20261031.png",
+      "sha256": "b12cd4229930df5980e65f16ee45a15ca918aa21f41d36d28349607d9c61fbf6",
+      "bytes": 155459
+    },
+    {
+      "path": "reports/RECIPE_C_B_v1.0.1_20261031.json",
+      "sha256": "af230c65e2303eaa768f19c926e00151868a615732ee7bcf549825993adb81f7",
+      "bytes": 201042
+    },
+    {
+      "path": "prompts/003_C_C_v1.1.0_20261031.txt",
+      "sha256": "18d61f55bfd40c3e6ddb613c25a792fa02156cdfcb1327e4b5bd18c6593e4463",
+      "bytes": 2702
+    },
+    {
+      "path": "prompts/001_C_B_v1.0.0_20261031.txt",
+      "sha256": "dd61a6c77f630a345ac1206a4cbac27b84ca774fbcbc2dc69719b1619de3e6d2",
+      "bytes": 2057
+    },
+    {
+      "path": "prompts/002_C_B_v1.0.1_20261031.txt",
+      "sha256": "6509f530d00545f39cc3212001e1f380ef7e59ccd74c8341eecaaa05b422e2cb",
+      "bytes": 2446
+    },
+    {
+      "path": "prompts/C_B_C_C_v1.0.0_20261031.md",
+      "sha256": "af07fdb5d854001f6268835684140dc701f4f56be574a9f9b160b8c2ecec569d",
+      "bytes": 6234
+    }
+  ],
+  "historical_path_policy": "Original service arguments and review/preflight JSON remain immutable. Paths inside them are historical provenance; resolve retained assets using original_path -> path here. Removed prompt txt content remains exactly in request arguments.prompt; removed raw failures are not needed for retained diagnostic inspection.",
+  "runtime_integration": false
+}
