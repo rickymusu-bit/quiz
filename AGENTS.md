@@ -5,7 +5,7 @@
 ## Gerarchia delle fonti e documenti di progetto
 
 - Questo file definisce **come lavorare** nel repository; non sostituisce le specifiche del prodotto.
-- Per i dettagli di Hellscape consultare [Specifiche di progetto e casi degli asset — v1.0.0](docs/HELLSCAPE_PROJECT_RULES_v1.0.0_20261031.md) e le specifiche di singole funzionalità, incluse le loro revisioni più recenti.
+- Per i dettagli di Hellscape consultare [Specifiche di progetto e casi degli asset — v1.0.0](docs/HELLSCAPE_PROJECT_RULES_v1.0.1_20261031.md) e le specifiche di singole funzionalità, incluse le loro revisioni più recenti.
 - Per la progettazione e la correzione delle animazioni consultare [Protocollo operativo per sprite animati coerenti — v15.0.0](docs/PROTOCOLLO_SPRITE_ANIMATI_v15.0.0_20261031.md). Evitare duplicazioni delle sue norme in questo file.
 - Applicare prima i vincoli condivisi; per identità, palette, movimenti, risoluzioni, tempistiche e interazioni verificare gli asset canonici e i documenti specifici. Tra specifiche in conflitto prevale l'ultima disposizione esplicitamente approvata, dopo verifica della provenienza.
 - **Distinzione obbligatoria:** una spiegazione o un esempio non vale come nuova istruzione di progetto. Non trasformare valori, GIF, personaggi o screenshot di un esempio in requisiti per altri asset.
