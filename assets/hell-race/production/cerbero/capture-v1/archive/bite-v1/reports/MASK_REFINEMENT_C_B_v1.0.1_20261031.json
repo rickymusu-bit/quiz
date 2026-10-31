@@ -1,0 +1,62 @@
+{
+  "version": "1.0.1",
+  "updated_at": "2026-10-31T13:14:33.646505+01:00",
+  "stage": "post_generation_deterministic_refinement",
+  "reason": "Protect dorsal spikes at the left edge of the originally authorized head/neck region after detecting contour drift in the first reinsertion. Narrow support only; no extra pixels authorized, no extra generation.",
+  "parent_mask": "references/002_C_B_heads_mask_v1.0.1_20261031.png",
+  "effective_mask": "references/002_C_B_heads_effective_mask_v1.0.1_20261031.png",
+  "polygon": [
+    [
+      350,
+      142
+    ],
+    [
+      370,
+      125
+    ],
+    [
+      540,
+      125
+    ],
+    [
+      540,
+      325
+    ],
+    [
+      438,
+      325
+    ],
+    [
+      403,
+      309
+    ],
+    [
+      380,
+      283
+    ],
+    [
+      350,
+      275
+    ],
+    [
+      334,
+      251
+    ],
+    [
+      334,
+      215
+    ],
+    [
+      350,
+      215
+    ]
+  ],
+  "context_box": [
+    0,
+    0,
+    552,
+    522
+  ],
+  "sha256": "d3b8bfec0936f24fa6d17e3da2930ed6e585f6f62a6e33def5aff95331bb035f",
+  "subset_of_original_mask_verified": true
+}

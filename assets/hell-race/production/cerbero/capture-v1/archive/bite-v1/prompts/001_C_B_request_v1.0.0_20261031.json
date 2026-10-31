@@ -1,0 +1,26 @@
+{
+  "version": "1.0.0",
+  "updated_at": "2026-10-31T12:49:54.804709+01:00",
+  "prompt_id": "001_C_B",
+  "tool": "image_gen.imagegen",
+  "arguments": {
+    "prompt": "Edit the provided PNG reference itself to produce exactly ONE isolated full-body pose C-B of the SAME approved Hellscape Cerberus. The reference is the actual canonical run frame 008.png, not a suggestion for a new character.\n\nPreserve the reference's exact identity, three distinct horned heads and all three connected necks, four articulated legs with the same occlusions, muscular crimson fleshy body, exposed rib-like details, dorsal bony spikes, curved tail, ivory claws and teeth, amber eyes, dark outlines, lighting, visual density, pixel-textured painterly game-sprite style and red/bone palette. Keep the same side view facing RIGHT and the same body scale, torso placement, limb bone lengths and overall proportions. Preserve the torso, pelvis, legs, tail and the two noncentral heads as closely as possible.\n\nMake ONLY the next reach action: extend the CENTRAL neck forward and slightly downward by articulating its connected neck joints, without stretching its bones or enlarging the skull; open the CENTRAL jaws clearly and widely around their anatomical hinge, ready to bite an invisible target at image right. The CENTRAL head means the middle of the three visible heads: its face is near x=411, y=255 in the 552x522 reference, between the upper head and the lowest/rightmost head. Keep this head identifiable and its neck visibly continuous from thorax to skull. Preserve the upper and lowest head identities and attachments. The body retains the source's forward airborne final-stride momentum; do not introduce planted feet, abrupt braking, a new gait or extra limbs. No contact or closed bite yet.\n\nDeliver this single complete C-B pose as one RGBA PNG with real fully transparent background, ideally on the same 552x522 canvas, preserving the ample transparent padding and leaving all horns, claws, tail and the extended muzzle fully inside the canvas. No other subjects, vehicle, scenery, floor, shadows on a ground plane, fire, effects, lettering, annotations, panels or decorative presentation. Output only the isolated sprite image.",
+    "referenced_image_paths": [
+      "/workspace/quiz/assets/hell-race/production/cerbero/run-stabilized-v1/frames/008.png"
+    ],
+    "transparent_background": true
+  },
+  "result": {
+    "output_path": "/workspace/generated_images/exec-05d600bb-b069-4e3f-9366-8f43fedea9c7.png",
+    "artifact_identifier": "exec-05d600bb-b069-4e3f-9366-8f43fedea9c7",
+    "identifier_note": "Identifier comes from tool output filename; separate service request ID was not exposed.",
+    "output_hint": "Generated images are saved to /workspace/generated_images as /workspace/generated_images/exec-05d600bb-b069-4e3f-9366-8f43fedea9c7.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link."
+  },
+  "not_exposed": [
+    "seed",
+    "model revision",
+    "internal prompt",
+    "server-side input hash receipt"
+  ],
+  "prompt_serialization_note": "The pre-generation .txt adds a terminal LF for text-file serialization; arguments.prompt here records the exact string passed, without terminal LF. No wording was changed."
+}

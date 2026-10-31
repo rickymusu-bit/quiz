@@ -1,0 +1,12 @@
+{
+  "version": "1.1.0",
+  "updated_at": "2026-10-31T13:23:50.757998+01:00",
+  "pose": "C-B",
+  "asset_version": "1.0.1",
+  "status": "approved_by_user",
+  "user_instruction": "Va bene. Procediamo.",
+  "path": "candidates/002_C_B_masked_v1.0.1_20261031.png",
+  "sha256": "0ce883a438ba3a693a0013247bf9f4405a7d0d7325eb7365efd233aacf42fd59",
+  "source_revision": "41e8088a38cc658ba8a26b3dcf380520078820e1",
+  "scope": "Approval of exact C-B pose; authorizes next C-C checkpoint. No merge, runtime or whole capture approval."
+}

@@ -1,0 +1,18 @@
+{
+  "version": "2.0.0",
+  "updated_at": "2026-10-31T13:42:46.444232+01:00",
+  "source": "latest user instruction, supersedes bite capture",
+  "instruction": "Prima dell’avvicinamento, fiammata del cerbero che dà fuoco al veicolo, che rallenta e quindi viene raggiunto",
+  "previous_action": "bite capture",
+  "previous_C-C_version": "1.1.0",
+  "previous_C-C_state": "superseded_unapproved",
+  "previous_C-C_path": "candidates/003_C_C_masked_v1.1.0_20261031.png",
+  "previous_C-C_sha256": "6e0925db5d7d6af51a749dc9a011a897fdc63d93c7a85af98dd997a6c76609c5",
+  "planned_1.1.1_generated": false,
+  "new_action": "fire at distance -> ignite losing vehicle -> vehicle slows -> Cerberus catches up -> body shove -> fall off bridge into lava -> resume run",
+  "new_assets_generated": 0,
+  "merge": "not_authorized",
+  "runtime": "unchanged",
+  "intermediate_fire_jump_crush": "Jump/crush superseded before generating art or publishing its plan; fire confirmed as initial cause of slowdown.",
+  "preceding_instruction": "No allora niente salto, solo una spinta che manda fuori strada il veicolo e giù dal ponte nella lava"
+}

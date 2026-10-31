@@ -1,0 +1,14 @@
+{
+  "version": "1.0.1",
+  "updated_at": "2026-10-31T13:08:55.374471+01:00",
+  "reviewer": "user",
+  "status": "rejected",
+  "target_version": "1.0.0",
+  "target_raw": "candidates/001_C_B_raw_v1.0.0_20261031.png",
+  "target_aligned": "candidates/001_C_B_aligned_v1.0.0_20261031.png",
+  "target_sha256": "8a722da9b921eb6c9ba57a28ff9a5b25171d2af915691416a110ae28ffba2da5",
+  "reason": "Head at image right was displaced behind/below the centrally extended head. Anatomically impossible rearrangement to emphasize middle head.",
+  "requested_correction": "All three heads reach toward vehicle; no head displacement for compositional prominence.",
+  "canonical_for_retake": "assets/hell-race/production/cerbero/run-stabilized-v1/frames/008.png",
+  "C-C": "blocked"
+}

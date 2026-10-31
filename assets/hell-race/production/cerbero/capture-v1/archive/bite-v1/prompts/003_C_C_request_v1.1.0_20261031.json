@@ -1,0 +1,27 @@
+{
+  "version": "1.1.0",
+  "prompt_id": "003_C_C",
+  "tool": "image_gen.imagegen",
+  "arguments": {
+    "prompt": "Edit the FIRST attached PNG, the APPROVED C-B pose of the same Hellscape Cerberus. The SECOND attachment is canonical frame 008.png for identity only. Output exactly ONE isolated full-body C-C bite-contact pose, transparent RGBA, side view facing RIGHT, same 552x522 canvas and body placement.\n\nThis pose is the immediate next physical instant after approved C-B: the CENTER/MIDDLE head closes its jaws around an invisible vehicle rear to its right, while the creature retains forward inertia. In the approved first attachment, the CENTER head is the intermediate visible head, muzzle near x=443,y=234; its jaw hinge is near x=414,y=237. Preserve the skull position and open-to-close jaw articulation around that hinge. Aim the grip gap near x=439,y=240 in reference coordinates. Close the central mandible firmly toward its upper jaw, leaving only the small gap needed to grip an invisible bumper. Keep the tooth rows, jaw hinge and neck continuous and anatomically plausible. No backward head teleport, no sudden neck shortening, no skull scaling, no long detached lip.\n\nThe other TWO heads stay aimed toward the vehicle exactly as in approved C-B: the upper head remains above the middle, and the lower/rightmost head stays the farthest to image right. Preserve their skulls, horns, positions and attachments. Natural overlap is correct. NEVER move any head aside, backward, down, forward, or to another depth just to expose the central bite. Preserve the foreground lower-head horn where it naturally occludes the middle mouth; do not change the anatomy for legibility.\n\nFor the first transfer toward braking support, lower the two forepaws a little from their forward airborne reach, articulating elbows and wrists with unchanged bone lengths. The forelegs begin reaching toward the ground; do not show an already planted, fully braked stance. Keep the chest and pelvis placement, torso volume, hindlimbs, dorsal spikes and curled tail unchanged. Hindquarters still carry forward momentum. This is the initial bite, not the later braking/shaking pose.\n\nKeep the exact same red fleshy/bony character identity, three connected heads and necks, four legs with the same near/far identity and plausible occlusions, horns, ivory claws/teeth, amber eyes, dark outlines, palette, lighting and pixel-textured painterly sprite style. Restrict changes to the central bite region and the articulated forelimb reach. Preserve every other part as closely as possible. Keep all extremities inside the original transparent padding.\n\nNo vehicle, bumper, props, floor, scenery, fire, dust, text, panels or decorative composition. Do not depict the invisible target. Return only this single complete C-C sprite PNG.",
+    "referenced_image_paths": [
+      "/workspace/quiz/assets/hell-race/production/cerbero/capture-v1/candidates/002_C_B_masked_v1.0.1_20261031.png",
+      "/workspace/quiz/assets/hell-race/production/cerbero/run-stabilized-v1/frames/008.png"
+    ],
+    "transparent_background": true
+  },
+  "pre_generation_commit": "d3e9ef5545372520f1f08bcf6efde0d43947e0d9",
+  "result": {
+    "output_path": "/workspace/generated_images/exec-581372de-6528-406e-8e49-9bdb28a44cf5.png",
+    "artifact_identifier": "exec-581372de-6528-406e-8e49-9bdb28a44cf5",
+    "output_hint": "Generated images are saved to /workspace/generated_images as /workspace/generated_images/exec-581372de-6528-406e-8e49-9bdb28a44cf5.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link."
+  },
+  "unavailable": [
+    "seed",
+    "model revision",
+    "internal prompt",
+    "separate server-side input hash receipt"
+  ],
+  "prompt_serialization_note": "Text file adds terminal LF; arguments.prompt preserves exact submitted string.",
+  "updated_at": "2026-10-31T13:25:10.490300+01:00"
+}

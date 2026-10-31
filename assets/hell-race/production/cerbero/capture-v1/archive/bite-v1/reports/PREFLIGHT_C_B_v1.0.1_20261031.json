@@ -1,0 +1,95 @@
+{
+  "version": "1.0.1",
+  "updated_at": "2026-10-31T13:08:55.374471+01:00",
+  "status": "passed_before_generation",
+  "retake_of": "001_C_B / 1.0.0",
+  "source": {
+    "path": "assets/hell-race/production/cerbero/run-stabilized-v1/frames/008.png",
+    "revision": "3e73adec8457458441f5c4eae121d05c03312c17",
+    "sha256": "3081b2c69468b6ed30871d7fa48a77de39f59c4acd5050d08a4a22a8c0575b44",
+    "size": [
+      552,
+      522
+    ]
+  },
+  "preflight": {
+    "visually_inspected": true,
+    "editing_input_field": "referenced_image_paths",
+    "paths": [
+      "/workspace/quiz/assets/hell-race/production/cerbero/run-stabilized-v1/frames/008.png"
+    ],
+    "verification": "Readable actual local PNG, inspected via view_image; imagegen schema accepts absolute local image files as editing inputs. Pass this path directly. Separate service ingestion receipt not exposed.",
+    "rejected_candidate_provided_to_generator": false
+  },
+  "scope": "C-B only: all three necks reach forward together, no promotion/reordering for visual emphasis; lower/rightmost head R stays frontmost. Same airborne stride.",
+  "mask": {
+    "path": "references/002_C_B_heads_mask_v1.0.1_20261031.png",
+    "sha256": "8ddf20d27c96463250ec798fac636f425f8dc6494ae1c84ee8aa1765be10f184",
+    "polygon": [
+      [
+        320,
+        142
+      ],
+      [
+        370,
+        125
+      ],
+      [
+        540,
+        125
+      ],
+      [
+        540,
+        325
+      ],
+      [
+        438,
+        325
+      ],
+      [
+        403,
+        309
+      ],
+      [
+        380,
+        283
+      ],
+      [
+        350,
+        275
+      ],
+      [
+        334,
+        251
+      ],
+      [
+        320,
+        215
+      ]
+    ],
+    "coordinate_system": "Canonical 552x522, top-left origin. Polygon rasterized with pinned sprites-post preparation.region.",
+    "context_box": [
+      0,
+      0,
+      552,
+      522
+    ],
+    "transmitted_to_generator": false,
+    "reason": "Tool accepts image references but has no mask field; apply mask deterministically after generation using sprites-post raster.apply. All RGBA bytes outside mask must remain identical to 008."
+  },
+  "prompt": {
+    "id": "002_C_B",
+    "path": "prompts/002_C_B_v1.0.1_20261031.txt",
+    "sha256": "6509f530d00545f39cc3212001e1f380ef7e59ccd74c8341eecaaa05b422e2cb",
+    "serialization": "Terminal LF in text file; exact tool arguments logged separately."
+  },
+  "stop_rule": "No image-free fallback. If reference transmission fails, stop. Reject candidate if head order/neck assignment changes.",
+  "versioning": {
+    "scheme": "MAJOR.MINOR.PATCH for the capture asset work package",
+    "MAJOR": "New action family or incompatible identity/anatomical/coordinate contract. Does not authorize redesign.",
+    "MINOR": "Compatible addition of a new pose/capability to the package.",
+    "PATCH": "Correction/retake of the same existing pose without changing the canonical identity or action.",
+    "this_change": "1.0.0 -> 1.0.1: corrected C-B, newly requested all-head reach; no new action/pose ID.",
+    "separate_namespaces": "Prompt ID 002 is immutable attempt sequence; protocol 16.0.0 and external tool versions remain unchanged. Date YYYYMMDD in filename and ISO-8601 updated_at with Europe/Rome offset in metadata."
+  }
+}

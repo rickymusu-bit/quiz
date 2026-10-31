@@ -1,0 +1,136 @@
+{
+  "outside_mask_changed_pixels": 0,
+  "inside_mask_changed_pixels": 19127,
+  "alpha_changed_pixels": 14665,
+  "technical_pass": true,
+  "status": "candidate_awaiting_visual_approval",
+  "visual_checks": {
+    "defect_fixed": "not_reviewed",
+    "identity": "not_reviewed",
+    "anatomy_mechanics": "not_reviewed",
+    "neighbor_continuity": "not_reviewed",
+    "anchors": "not_reviewed",
+    "materials_lighting": "not_reviewed",
+    "no_halos_seams": "not_reviewed",
+    "final_scale": "not_reviewed"
+  },
+  "runtime_capture": "not_performed; diagnostic GIF is not game evidence",
+  "version": "1.0.1",
+  "updated_at": "2026-10-31T13:14:33.989689+01:00",
+  "source_sha256": "3081b2c69468b6ed30871d7fa48a77de39f59c4acd5050d08a4a22a8c0575b44",
+  "raw_sha256": "11c8992dc5b61968191d7f017c1366bced7b5e90479c6cb09d8ca2db3babd355",
+  "mask_sha256": "d3b8bfec0936f24fa6d17e3da2930ed6e585f6f62a6e33def5aff95331bb035f",
+  "final_sha256": "0ce883a438ba3a693a0013247bf9f4405a7d0d7325eb7365efd233aacf42fd59",
+  "tool_revision": "870e1274aee5fd42ede786cff7eec944087c7771",
+  "tool_modules": {
+    "sprite_edits.py": "9cc2b4db4607f6f3342ada6e6bc005969b1c51fd76ef526f9986fbb72e4c3342",
+    "sprite_patches/raster.py": "83e2c1063a21e9a63d46622c0126ce296fdbdece4d36d3d632ca82e10701a618",
+    "sprite_patches/registration.py": "78e0b1b157547fe7be0af1413fa666ef86a9dbf2487a5bc3ce2eb142e0a98cf0",
+    "sprite_patches/verification.py": "39627861dcb027125283f65e3876fc3ca6cf353701ec4a780b14c36aec42de29"
+  },
+  "registration": {
+    "matrix": [
+      0.4,
+      -0.0,
+      4.0,
+      0.0,
+      0.4,
+      10.0
+    ],
+    "landmark_count": 0,
+    "max_residual_px": 0,
+    "residuals_px": [],
+    "candidate_size": [
+      1400,
+      1300
+    ],
+    "target_size": [
+      552,
+      522
+    ],
+    "mapping_mode": "uniform",
+    "input_mapping_matrix": [
+      0.4,
+      0,
+      4.0,
+      0,
+      0.4,
+      10.0
+    ],
+    "registration": "explicit_mapping_unverified",
+    "resampling": "bicubic"
+  },
+  "registration_basis": "Body ROI (260,250,64,48) photometric search initialized uniform scale/translation; manual selection 0.4,+4,+10 after visual framing check. Photometric score is not anatomical precision. Raw-to-context geometry remains provisional; final body registration is exact identity.",
+  "transparent_extension": {
+    "original_size": [
+      1290,
+      1219
+    ],
+    "padded_size": [
+      1400,
+      1300
+    ],
+    "offset": [
+      0,
+      0
+    ],
+    "reason": "Explicit transparent context at right/bottom covers frozen mask; no synthesis, cropping or alteration of raw pixels."
+  },
+  "global_alignment": {
+    "matrix": [
+      1,
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "stable_body_landmarks": {
+      "shoulder_mass_center": [
+        340,
+        275.3333333333
+      ],
+      "upper_thorax": [
+        319,
+        247.3333333333
+      ],
+      "lower_thorax": [
+        358,
+        308.3333333333
+      ]
+    },
+    "residual_px": 0,
+    "basis": "Exact RGBA preservation outside mask, including all three body landmarks; not a fitted/raw-landmark precision claim."
+  },
+  "canvas": [
+    552,
+    522
+  ],
+  "mask_application": [
+    [
+      {
+        "type": "patch",
+        "outside_mask_changed_pixels": 0,
+        "approval": "pending_visual_review",
+        "crop_box": [
+          0,
+          0,
+          552,
+          522
+        ],
+        "package_id": "capture-C-B-1.0.1",
+        "id": "002_C_B_v1.0.1",
+        "enabled": true
+      }
+    ]
+  ],
+  "gif": {
+    "encoded_frames": 2,
+    "durations_ms": [
+      500,
+      500
+    ],
+    "total_duration_ms": 1000
+  },
+  "timing": "500ms per diagnostic exposure; not production timing or complete animation"
+}

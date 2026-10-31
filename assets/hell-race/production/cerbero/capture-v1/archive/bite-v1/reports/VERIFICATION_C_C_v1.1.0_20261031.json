@@ -1,0 +1,162 @@
+{
+  "outside_mask_changed_pixels": 0,
+  "inside_mask_changed_pixels": 11797,
+  "alpha_changed_pixels": 8446,
+  "technical_pass": true,
+  "status": "candidate_awaiting_visual_approval",
+  "visual_checks": {
+    "defect_fixed": "not_reviewed",
+    "identity": "not_reviewed",
+    "anatomy_mechanics": "not_reviewed",
+    "neighbor_continuity": "not_reviewed",
+    "anchors": "not_reviewed",
+    "materials_lighting": "not_reviewed",
+    "no_halos_seams": "not_reviewed",
+    "final_scale": "not_reviewed"
+  },
+  "runtime_capture": "not_performed; diagnostic GIF is not game evidence",
+  "version": "1.1.0",
+  "updated_at": "2026-10-31T13:26:35.333322+01:00",
+  "source_sha256": "0ce883a438ba3a693a0013247bf9f4405a7d0d7325eb7365efd233aacf42fd59",
+  "raw_sha256": "cf95307620aaae5c48f68bd555cd99c18df9589cc2aaf06a2d289098cc1b8f96",
+  "mask_sha256": "94001b72fc51a1aaad1fa0693f208452caa78ce14b31da13f169fd78da9fe0c2",
+  "final_sha256": "6e0925db5d7d6af51a749dc9a011a897fdc63d93c7a85af98dd997a6c76609c5",
+  "tool_revision": "870e1274aee5fd42ede786cff7eec944087c7771",
+  "tool_modules": {
+    "sprite_edits.py": "9cc2b4db4607f6f3342ada6e6bc005969b1c51fd76ef526f9986fbb72e4c3342",
+    "sprite_patches/raster.py": "83e2c1063a21e9a63d46622c0126ce296fdbdece4d36d3d632ca82e10701a618",
+    "sprite_patches/registration.py": "78e0b1b157547fe7be0af1413fa666ef86a9dbf2487a5bc3ce2eb142e0a98cf0",
+    "sprite_patches/verification.py": "39627861dcb027125283f65e3876fc3ca6cf353701ec4a780b14c36aec42de29"
+  },
+  "registration": {
+    "matrix": [
+      0.414,
+      -0.0,
+      3.0,
+      0.0,
+      0.414,
+      5.0
+    ],
+    "landmark_count": 0,
+    "max_residual_px": 0,
+    "residuals_px": [],
+    "candidate_size": [
+      1290,
+      1219
+    ],
+    "target_size": [
+      552,
+      522
+    ],
+    "mapping_mode": "uniform",
+    "input_mapping_matrix": [
+      0.414,
+      0,
+      3.0,
+      0,
+      0.414,
+      5.0
+    ],
+    "registration": "explicit_mapping_unverified",
+    "resampling": "bicubic"
+  },
+  "registration_basis": "Pinned core.match_region photometric initialization on stable thorax ROI (260,250,64,40), scales 0.400..0.440 in 0.002 steps; selected best score 8.89935 at 0.414,+3,+5. Photometric score is not anatomical precision. Final stable-body registration is identity because protected RGBA is preserved.",
+  "global_alignment": {
+    "matrix": [
+      1,
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "stable_landmarks": {
+      "pelvis_mass_center": [
+        190,
+        285
+      ],
+      "shoulder_mass_center": [
+        340,
+        275.3333333333
+      ],
+      "upper_thorax": [
+        319,
+        247.3333333333
+      ]
+    },
+    "residual_px": 0,
+    "basis": "Exact unchanged RGBA outside mask; landmark coordinates manually estimated, not raw fitted points."
+  },
+  "canvas": [
+    552,
+    522
+  ],
+  "mask_application": [
+    [
+      {
+        "type": "patch",
+        "outside_mask_changed_pixels": 0,
+        "approval": "pending_visual_review",
+        "crop_box": [
+          0,
+          0,
+          552,
+          522
+        ],
+        "package_id": "capture-C-C-1.1.0",
+        "id": "003_C_C_v1.1.0",
+        "enabled": true
+      }
+    ]
+  ],
+  "gif": {
+    "encoded_frames": 2,
+    "durations_ms": [
+      500,
+      500
+    ],
+    "total_duration_ms": 1000
+  },
+  "timing": "Two 500ms diagnostic exposures; no production timing or physical contact certification.",
+  "protected_side_head_rois_exact_rgba": {
+    "upper_head": [
+      375,
+      150,
+      490,
+      217
+    ],
+    "rightmost_face": [
+      461,
+      256,
+      516,
+      312
+    ],
+    "rightmost_horn": [
+      446,
+      247,
+      488,
+      267
+    ]
+  },
+  "anchors": {
+    "status": "manual_estimates_pending_vehicle_calibration",
+    "source_CB_mouth_contact": [
+      439,
+      240
+    ],
+    "candidate_CC_mouth_contact": [
+      439,
+      235
+    ],
+    "candidate_CC_jaw_hinge": [
+      418,
+      235
+    ],
+    "estimated_delta_px": [
+      0,
+      -5
+    ],
+    "uncertainty_per_annotation_px": 4,
+    "note": "Two manual source/result annotations have combined uncertainty up to 8 px. Approximate gap position is retained; exact vehicle locking is unverified and is not approved by the isolated pose."
+  }
+}

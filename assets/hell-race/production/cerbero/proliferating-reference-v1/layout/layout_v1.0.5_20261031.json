@@ -1,0 +1,51 @@
+{
+  "scope": "User-approved static composition, not gameplay capture or animation integration.",
+  "logicalRaster": [
+    768,
+    576
+  ],
+  "viewport": [
+    1024,
+    768
+  ],
+  "actor": {
+    "originalPixelsUnchanged": true,
+    "uniformScale": 0.174,
+    "left": 10,
+    "top": 159,
+    "width": 267.264,
+    "height": 178.176,
+    "sourceGroundEstimate": 1000,
+    "groundEstimate": 333,
+    "rotation": 0,
+    "warp": false,
+    "png": "assets/hell-race/production/cerbero/proliferating-reference-v1/reference.png"
+  },
+  "car": {
+    "width": 66.96,
+    "height": 38.53005586592178,
+    "png": "assets/hell-race/production/cerbero/proliferating-reference-v1/references/coupe_V0_intact.png",
+    "instances": [
+      {
+        "x": 565,
+        "ground": 306
+      },
+      {
+        "x": 675,
+        "ground": 275
+      }
+    ]
+  },
+  "foreground": "Native bridge front layer drawn after actors, occlusion retained",
+  "limits": [
+    "Actor ground landmark is a manual estimate, not biomechanical validation.",
+    "Actual actor camera/depth compatibility must be reviewed.",
+    "Car positions are illustrative layout choices in this prototype, not a saved game state.",
+    "Source PNG untouched; this screenshot is a deterministic composition."
+  ],
+  "version": "1.0.5",
+  "updated_at": "2026-10-31T15:14:35.468013+01:00",
+  "change": "User requested 40% smaller: width and height multiplied by 0.6, same left/ground placement.",
+  "source_sha256": "f5f5216a2b20c3b07354b3e91a00b68608c92751434abec1d303b9e1be0bab1f",
+  "sceneTime": 2
+}

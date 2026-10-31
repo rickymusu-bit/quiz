@@ -1,0 +1,82 @@
+{
+  "version": "3.0.0",
+  "updated_at": "2026-10-31T15:14:35.468013+01:00",
+  "timezone": "Europe/Rome",
+  "subject": "Cerbero",
+  "action": "capture_fire_slowdown_shove_lava",
+  "state": "approved_new_reference_action_not_implemented",
+  "plan": "PIANO_CATTURA_SPINTA_LAVA_v3.0.0_20261031.md",
+  "scope": "Fire before approach ignites losing vehicle; it slows and is reached, body-shoved off bridge into lava. Plan only, no new generated artwork/runtime/merge.",
+  "canonical": {
+    "path": "assets/hell-race/production/cerbero/proliferating-reference-v1/reference.png",
+    "asset_version": "1.0.0",
+    "package_version": "1.0.5",
+    "sha256": "f5f5216a2b20c3b07354b3e91a00b68608c92751434abec1d303b9e1be0bab1f",
+    "approval": "User approved original first design and 40%-reduced layout; save and merge authorized."
+  },
+  "protocol": {
+    "path": "docs/PROTOCOLLO_SPRITE_ANIMATI_v16.0.0_20261031.md",
+    "version": "16.0.0",
+    "sha256": "5fcc40b5bc81690fbc348746294e60cdbe13c76d6744279ffbd354ab2b407585"
+  },
+  "pull_request": "https://github.com/rickymusu-bit/quiz/pull/103",
+  "versioning": {
+    "scheme": "MAJOR.MINOR.PATCH for capture package",
+    "this_change": "2.0.1 -> 3.0.0: explicit user-approved new multihead identity replaces old three-headed canonical production reference; action sequence unchanged."
+  },
+  "archive": {
+    "path": "archive/bite-v1/index.json",
+    "sha256": "5b5691953760734b2ae92cbe2d1b8815d99d594bdde0206b65b87184ef980f83",
+    "role": "Minimum durable evidence for superseded bite capture; not active work"
+  },
+  "approved_historical_pose": {
+    "path": "archive/bite-v1/approved/002_C_B_masked_v1.0.1_20261031.png",
+    "sha256": "0ce883a438ba3a693a0013247bf9f4405a7d0d7325eb7365efd233aacf42fd59",
+    "version": "1.0.1",
+    "approval": "archive/bite-v1/reports/APPROVAL_C_B_v1.1.0_20261031.json",
+    "scope": "Approved for old bite action only; does not approve a shove pose."
+  },
+  "files": [
+    {
+      "path": "README.md",
+      "sha256": "e65cb0a98e46bcf7ed26c0f498475bfd9d29f97cb2bdd864fd795e1c67ca1cec"
+    },
+    {
+      "path": "PIANO_CATTURA_SPINTA_LAVA_v3.0.0_20261031.md",
+      "sha256": "e2a1ce216b1c31e947be43255c9db3d497d05b4fb0f14c32a6b60b18e7b2d6f7"
+    },
+    {
+      "path": "PIANO_CATTURA_SPINTA_LAVA_v2.0.0_20261031.md",
+      "sha256": "0af70986e99fffdee5c4e08d8b4772a12f3da06a6537edccf136c0be55d77bc8"
+    },
+    {
+      "path": "reports/DECISIONE_CATTURA_v2.0.0_20261031.json",
+      "sha256": "36606e557d9d7e840b7aa43f5a8b84d41e7a37e2b62be54197c86e85c0718147"
+    },
+    {
+      "path": "reports/PULIZIA_CATTURA_v2.0.1_20261031.json",
+      "sha256": "418cc8100c84613e5df41e2940b84d43e7d670e64808f0873b2d422ce8155b77"
+    }
+  ],
+  "integration_document": {
+    "path": "docs/CERBERO_INTEGRAZIONE_MOVIMENTI_v3.0.0_20261031.md",
+    "sha256": "960cad812b63f7b8265fd50522bb5c810fe27f06ffc43336ea27cf2bc17b2ff1"
+  },
+  "approval": {
+    "new_direction": "requested_by_user",
+    "new_pose_assets": "static reference saved, animation poses not created",
+    "full_animation": "not_approved",
+    "runtime": "unchanged",
+    "merge": "explicitly_authorized_after_checks",
+    "reference_and_scale": "approved_by_user"
+  },
+  "historical_run_reference": {
+    "path": "assets/hell-race/production/cerbero/run-stabilized-v1/frames/008.png",
+    "asset_version": "1.0.0",
+    "revision": "3e73adec8457458441f5c4eae121d05c03312c17",
+    "sha256": "3081b2c69468b6ed30871d7fa48a77de39f59c4acd5050d08a4a22a8c0575b44",
+    "preservation": "Existing tracked original retained byte for byte, no duplicate required (protocol 8.1).",
+    "approval": "Run asset approved; definitive C-A raccord approval not implied."
+  },
+  "approved_reference_manifest": "assets/hell-race/production/cerbero/proliferating-reference-v1/manifest.json"
+}
