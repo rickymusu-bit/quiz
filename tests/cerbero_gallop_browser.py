@@ -51,13 +51,26 @@ try:
             "FoolCerberoGallop.ready() && FoolCerbero.ready()", timeout=120000
         )
         page.evaluate("document.fonts.ready")
+        # The gallop API is intentionally Object.freeze()'d. Do not monkeypatch
+        # its render function: a non-strict assignment silently fails and would
+        # produce zero observations even if the animation really plays.
+        # Observe real calls to the browser's canvas drawing API instead.
         page.evaluate("""() => {
           window.__gallopFrames = [];
-          const real = FoolCerberoGallop.render;
-          FoolCerberoGallop.render = function (...args) {
-            const result = real(...args);
-            if (result) window.__gallopFrames.push(result.frame);
-            return result;
+          const original = CanvasRenderingContext2D.prototype.drawImage;
+          CanvasRenderingContext2D.prototype.drawImage = function (...args) {
+            const image = args[0];
+            const source = image?.currentSrc || image?.src || '';
+            if (typeof source === 'string' &&
+                source.includes('/cerbero/run-stabilized-v1/atlas.png') &&
+                args.length >= 9) {
+              const sx = args[1], sy = args[2];
+              if (Number.isFinite(sx) && Number.isFinite(sy))
+                window.__gallopFrames.push(
+                  Math.floor(sy / 522) * 4 + Math.floor(sx / 552)
+                );
+            }
+            return original.apply(this, args);
           };
         }""")
         page.clock.pause_at(page.evaluate("Date.now()+1000"))
