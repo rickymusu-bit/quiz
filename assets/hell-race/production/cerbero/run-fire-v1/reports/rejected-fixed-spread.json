@@ -1,0 +1,23 @@
+{
+  "reason": "User: Flames should come out of the Cerberus mouths and have the same direction of the head they come out of.",
+  "cause": "Fixed world angles -10/0/+8 degrees created an arbitrary fan independent of the head axes.",
+  "previous_jets": {
+    "upper": {
+      "angle_degrees": -10,
+      "length_px": 250,
+      "phase_offset": 0
+    },
+    "middle": {
+      "angle_degrees": 0,
+      "length_px": 280,
+      "phase_offset": 2
+    },
+    "lower": {
+      "angle_degrees": 8,
+      "length_px": 300,
+      "phase_offset": 4
+    }
+  },
+  "previous_gif_sha256": "a8bd1ca5e11199ee6b2676c85638de6ee9ee7ecc79abb81cd16f143d10769201",
+  "correction": "Derive each emission angle from two individually inspected points on that head muzzle in each source running pose. Re-inspect mouth opening positions."
+}

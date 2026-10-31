@@ -1,0 +1,130 @@
+{
+  "version": "1.0.0",
+  "image": "candidates/001_flame-effects.png",
+  "sha256": "6b23798b833d857bc19f13acea24f418e8fa652b8f0d7aa4ed0daa4e0622a0e8",
+  "size": [
+    1774,
+    887
+  ],
+  "mode": "RGBA",
+  "alpha_extrema": [
+    0,
+    255
+  ],
+  "prompt": "prompts/001_flame-effects_v1.0.0_20261031.md",
+  "generation_id": "exec-af70be24-e870-462c-9631-65f2585b277f",
+  "frames": [
+    {
+      "index": 0,
+      "rect": [
+        0,
+        0,
+        443,
+        443
+      ],
+      "root": [
+        16,
+        242
+      ],
+      "reach_px": 417
+    },
+    {
+      "index": 1,
+      "rect": [
+        443,
+        0,
+        444,
+        443
+      ],
+      "root": [
+        17,
+        244
+      ],
+      "reach_px": 417
+    },
+    {
+      "index": 2,
+      "rect": [
+        887,
+        0,
+        443,
+        443
+      ],
+      "root": [
+        17,
+        244
+      ],
+      "reach_px": 416
+    },
+    {
+      "index": 3,
+      "rect": [
+        1330,
+        0,
+        444,
+        443
+      ],
+      "root": [
+        17,
+        244
+      ],
+      "reach_px": 417
+    },
+    {
+      "index": 4,
+      "rect": [
+        0,
+        443,
+        443,
+        444
+      ],
+      "root": [
+        16,
+        245
+      ],
+      "reach_px": 417
+    },
+    {
+      "index": 5,
+      "rect": [
+        443,
+        443,
+        444,
+        444
+      ],
+      "root": [
+        17,
+        245
+      ],
+      "reach_px": 417
+    },
+    {
+      "index": 6,
+      "rect": [
+        887,
+        443,
+        443,
+        444
+      ],
+      "root": [
+        17,
+        245
+      ],
+      "reach_px": 416
+    },
+    {
+      "index": 7,
+      "rect": [
+        1330,
+        443,
+        444,
+        444
+      ],
+      "root": [
+        15,
+        242
+      ],
+      "reach_px": 419
+    }
+  ]
+}

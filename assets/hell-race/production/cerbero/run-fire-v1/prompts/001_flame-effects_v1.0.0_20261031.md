@@ -20,3 +20,10 @@ Every plume starts at the SAME fixed left-of-cell emission root, very narrow at 
 Animate a continuous sustained flame stream over all eight frames: small tongues and internal eddies travel outward to the right while the emission root and overall reach stay stable, with modest natural flicker. Frame 8 must transition back to frame 1. No startup/shutdown or blank frames. The base must remain a thin bright emission root with no detached blobs; all flame tongues belong to the connected plume. No detached sparks or embers. A little translucent warm edge glow is allowed, with real alpha and no painted dark halo.
 
 Composition: use a wide overall canvas, with elongated flame plumes and sufficient room for their full tips. Keep all eight plumes at the same base scale. The character in the reference must not appear anywhere in the effect atlas.
+
+## Result recorded after generation
+
+Generated 2026-10-31 (Europe/Rome), output ID exec-af70be24-e870-462c-9631-65f2585b277f.
+Saved unchanged at candidates/001_flame-effects.png; 1774 × 887 RGBA; alpha extrema 0..255.
+SHA-256: 6b23798b833d857bc19f13acea24f418e8fa652b8f0d7aa4ed0daa4e0622a0e8.
+Eight effect-only plumes were extracted by grid regions recorded in flame-atlas.json and animated as independent mouth-attached layers. Status: candidate for visual review.

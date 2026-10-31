@@ -1,0 +1,474 @@
+{
+  "version": "1.1.0",
+  "source_commit": "4876d1a066f31453e844a8932cb12d94529db2ae",
+  "source": "../run-stabilized-v1/frames/",
+  "source_frame_size": [
+    552,
+    522
+  ],
+  "canvas": [
+    880,
+    522
+  ],
+  "duration_ms": 800,
+  "sample_duration_ms": 50,
+  "body_frame_duration_ms": 100,
+  "annotation": "Mouth emission centers and rear-to-front muzzle-axis point pairs visually inspected for every head and pose. Axes, not fixed spread angles, define the outgoing flame directions. Estimated point uncertainty 3 px; angular alignment is a visual estimate.",
+  "mouth_uncertainty_px": 3,
+  "jets": {
+    "upper": {
+      "length_px": 250,
+      "phase_offset": 0
+    },
+    "middle": {
+      "length_px": 280,
+      "phase_offset": 2
+    },
+    "lower": {
+      "length_px": 300,
+      "phase_offset": 4
+    }
+  },
+  "frames": [
+    {
+      "index": 1,
+      "source": "../run-stabilized-v1/frames/001.png",
+      "sha256": "c71d33dedf4d644fa87911ca312027015ffc0ed89334bf298f878c1f24c70fa3",
+      "heads": {
+        "upper": {
+          "mouth": [
+            454,
+            220
+          ],
+          "muzzle_axis": [
+            [
+              426,
+              211
+            ],
+            [
+              461,
+              222
+            ]
+          ]
+        },
+        "middle": {
+          "mouth": [
+            427,
+            252
+          ],
+          "muzzle_axis": [
+            [
+              398,
+              240
+            ],
+            [
+              434,
+              254
+            ]
+          ]
+        },
+        "lower": {
+          "mouth": [
+            478,
+            279
+          ],
+          "muzzle_axis": [
+            [
+              448,
+              263
+            ],
+            [
+              485,
+              282
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "index": 2,
+      "source": "../run-stabilized-v1/frames/002.png",
+      "sha256": "0b253fdcbf63b2abdc49b2ffd8bfb3ccd7452ed4010a22eb73b4cc5d42a22ccd",
+      "heads": {
+        "upper": {
+          "mouth": [
+            462,
+            221
+          ],
+          "muzzle_axis": [
+            [
+              434,
+              211
+            ],
+            [
+              470,
+              223
+            ]
+          ]
+        },
+        "middle": {
+          "mouth": [
+            435,
+            251
+          ],
+          "muzzle_axis": [
+            [
+              406,
+              240
+            ],
+            [
+              442,
+              254
+            ]
+          ]
+        },
+        "lower": {
+          "mouth": [
+            489,
+            280
+          ],
+          "muzzle_axis": [
+            [
+              459,
+              266
+            ],
+            [
+              496,
+              284
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "index": 3,
+      "source": "../run-stabilized-v1/frames/003.png",
+      "sha256": "68261a3334d302dbc0cc848dd9d0dbdf8bedac1f694f5597a193b60b3aa9c4d0",
+      "heads": {
+        "upper": {
+          "mouth": [
+            461,
+            224
+          ],
+          "muzzle_axis": [
+            [
+              434,
+              213
+            ],
+            [
+              469,
+              226
+            ]
+          ]
+        },
+        "middle": {
+          "mouth": [
+            431,
+            254
+          ],
+          "muzzle_axis": [
+            [
+              403,
+              241
+            ],
+            [
+              439,
+              258
+            ]
+          ]
+        },
+        "lower": {
+          "mouth": [
+            489,
+            287
+          ],
+          "muzzle_axis": [
+            [
+              457,
+              270
+            ],
+            [
+              496,
+              292
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "index": 4,
+      "source": "../run-stabilized-v1/frames/004.png",
+      "sha256": "12019f5d87741c4bebe51d8b1ffc2b6efd13530029edfb0caa91be4d5d94dd44",
+      "heads": {
+        "upper": {
+          "mouth": [
+            447,
+            220
+          ],
+          "muzzle_axis": [
+            [
+              419,
+              211
+            ],
+            [
+              455,
+              223
+            ]
+          ]
+        },
+        "middle": {
+          "mouth": [
+            420,
+            250
+          ],
+          "muzzle_axis": [
+            [
+              394,
+              238
+            ],
+            [
+              428,
+              253
+            ]
+          ]
+        },
+        "lower": {
+          "mouth": [
+            471,
+            281
+          ],
+          "muzzle_axis": [
+            [
+              440,
+              263
+            ],
+            [
+              478,
+              285
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "index": 5,
+      "source": "../run-stabilized-v1/frames/005.png",
+      "sha256": "70788ec256fb180c25b4167c1e3da28a64e7691fb792f9560a9aaec1797b1091",
+      "heads": {
+        "upper": {
+          "mouth": [
+            449,
+            192
+          ],
+          "muzzle_axis": [
+            [
+              421,
+              181
+            ],
+            [
+              456,
+              195
+            ]
+          ]
+        },
+        "middle": {
+          "mouth": [
+            418,
+            238
+          ],
+          "muzzle_axis": [
+            [
+              389,
+              225
+            ],
+            [
+              425,
+              243
+            ]
+          ]
+        },
+        "lower": {
+          "mouth": [
+            469,
+            277
+          ],
+          "muzzle_axis": [
+            [
+              439,
+              259
+            ],
+            [
+              476,
+              282
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "index": 6,
+      "source": "../run-stabilized-v1/frames/006.png",
+      "sha256": "03e1a79f08d1301ac31c740139db8baafe051289fdd5bc34c1d2e3cf9920b580",
+      "heads": {
+        "upper": {
+          "mouth": [
+            449,
+            191
+          ],
+          "muzzle_axis": [
+            [
+              420,
+              180
+            ],
+            [
+              455,
+              193
+            ]
+          ]
+        },
+        "middle": {
+          "mouth": [
+            413,
+            236
+          ],
+          "muzzle_axis": [
+            [
+              384,
+              224
+            ],
+            [
+              420,
+              241
+            ]
+          ]
+        },
+        "lower": {
+          "mouth": [
+            469,
+            277
+          ],
+          "muzzle_axis": [
+            [
+              438,
+              261
+            ],
+            [
+              476,
+              283
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "index": 7,
+      "source": "../run-stabilized-v1/frames/007.png",
+      "sha256": "db222bf9be434ad54e56a7878bd4bdda4ba53b257084045ef0748617e30f464a",
+      "heads": {
+        "upper": {
+          "mouth": [
+            457,
+            219
+          ],
+          "muzzle_axis": [
+            [
+              427,
+              210
+            ],
+            [
+              464,
+              221
+            ]
+          ]
+        },
+        "middle": {
+          "mouth": [
+            424,
+            250
+          ],
+          "muzzle_axis": [
+            [
+              395,
+              238
+            ],
+            [
+              433,
+              253
+            ]
+          ]
+        },
+        "lower": {
+          "mouth": [
+            481,
+            279
+          ],
+          "muzzle_axis": [
+            [
+              451,
+              264
+            ],
+            [
+              489,
+              284
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "index": 8,
+      "source": "../run-stabilized-v1/frames/008.png",
+      "sha256": "3081b2c69468b6ed30871d7fa48a77de39f59c4acd5050d08a4a22a8c0575b44",
+      "heads": {
+        "upper": {
+          "mouth": [
+            449,
+            210
+          ],
+          "muzzle_axis": [
+            [
+              420,
+              201
+            ],
+            [
+              457,
+              212
+            ]
+          ]
+        },
+        "middle": {
+          "mouth": [
+            419,
+            242
+          ],
+          "muzzle_axis": [
+            [
+              389,
+              229
+            ],
+            [
+              428,
+              245
+            ]
+          ]
+        },
+        "lower": {
+          "mouth": [
+            474,
+            273
+          ],
+          "muzzle_axis": [
+            [
+              444,
+              256
+            ],
+            [
+              482,
+              276
+            ]
+          ]
+        }
+      }
+    }
+  ]
+}
