@@ -1,4 +1,4 @@
-> **Concept superato per il nuovo Hellscape:** la [specifica Bafometto v1.1.0](HELLSCAPE_BAFOMETTO_DIREZIONE_CINEMATICA_v1.1.0_20261031.md) prevede una **porta finale integrata nel percorso**, non un portale che emerge dalla lava o cade dall'alto. Il testo seguente è conservato solo come documentazione del vecchio runtime e della sua evoluzione. Nessun nuovo finale è stato implementato.
+> **Concept superato per il nuovo Hellscape:** la [specifica Bafometto v1.2.0](HELLSCAPE_BAFOMETTO_DIREZIONE_CINEMATICA_v1.2.0_20261031.md) prevede una **porta finale integrata nel percorso**, non un portale che emerge dalla lava o cade dall'alto. Il testo seguente è conservato solo come documentazione del vecchio runtime e della sua evoluzione. Nessun nuovo finale è stato implementato.
 
 > Documento storico. Per regole, corsie, portale dall’alto e crollo si applica [la specifica v1.3.0](HELLSCAPE_CORREZIONI_CODEX_v1.3.0.md).
 
