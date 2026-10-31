@@ -72,6 +72,8 @@ function qualityPreview() {
   for (const file of ["assets/game-over.png"])
     assets[file] = data(file);
   addCerberoAssets(assets);
+  assets["assets/hell-race/production/cerbero/run-stabilized-v1/atlas.png"] =
+    data("assets/hell-race/production/cerbero/run-stabilized-v1/atlas.png");
   const config = { texts, assets };
   const pages = {};
   for (const file of ["index.html", "Fool.html", "Fool_regole.html"]) {
