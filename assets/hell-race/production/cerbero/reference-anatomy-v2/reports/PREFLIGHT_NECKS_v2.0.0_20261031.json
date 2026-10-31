@@ -1,0 +1,121 @@
+{
+  "version": "2.0.0",
+  "updated_at": "2026-10-31T14:08:03.844323+01:00",
+  "status": "passed_before_generation",
+  "purpose": "Correct canonical reference anatomy, not generate another animation pose.",
+  "authorization": {
+    "request": "Reference nearest/right head lacks a neck, left/far neck too long; repair before further animations.",
+    "clarification": "la sinistra del cerbero, la testa più lontana dall’osservatore.",
+    "scope": "Anatomical left/right, not screen directions; user explicitly authorizes neck proportion correction."
+  },
+  "source": {
+    "path": "assets/hell-race/production/cerbero/run-stabilized-v1/frames/008.png",
+    "revision": "3e73adec8457458441f5c4eae121d05c03312c17",
+    "asset_version": "1.0.0",
+    "sha256": "3081b2c69468b6ed30871d7fa48a77de39f59c4acd5050d08a4a22a8c0575b44",
+    "size": [
+      552,
+      522
+    ],
+    "mode": "RGBA"
+  },
+  "input_link": {
+    "tool": "image_gen.imagegen",
+    "field": "referenced_image_paths",
+    "paths": [
+      "/workspace/quiz-reference/assets/hell-race/production/cerbero/run-stabilized-v1/frames/008.png"
+    ],
+    "verification": "Actual PNG exists in isolated worktree, decoded/hash checked, viewed directly; tool schema accepts absolute local image paths as editing references. No separate server ingestion receipt exposed.",
+    "other_images": "Historical A/B inspected for context only; rejected capture poses not used."
+  },
+  "mask": {
+    "path": "references/001_NECKS_mask_v2.0.0_20261031.png",
+    "sha256": "9c0b6f94d5834eac47b25c09efc8cd3a8cc75979c694d6634258fc324a937309",
+    "polygon": [
+      [
+        342,
+        132
+      ],
+      [
+        542,
+        132
+      ],
+      [
+        542,
+        329
+      ],
+      [
+        443,
+        329
+      ],
+      [
+        403,
+        307
+      ],
+      [
+        376,
+        289
+      ],
+      [
+        351,
+        277
+      ],
+      [
+        335,
+        253
+      ],
+      [
+        333,
+        225
+      ],
+      [
+        342,
+        215
+      ]
+    ],
+    "context_box": [
+      0,
+      0,
+      552,
+      522
+    ],
+    "transmitted": false,
+    "application": "Pinned sprites-post deterministic masked replacement after generation; no mask input API claimed."
+  },
+  "anatomical_mapping": {
+    "left": "Far/upper head away from observer; shorten neck while preserving head size.",
+    "right": "Near/lower-right head closest to observer; reconstruct own connected neck.",
+    "middle": "Preserve existing identity, skull and connection as far as feasible.",
+    "depth": "Retain occlusion order; do not make all heads/neck paths visible for emphasis."
+  },
+  "technical_choice": "Generative local correction because neck tissue/root anatomy must be drawn; rigid movement alone does not reconstruct it. Mask protects torso/legs/tail and global body placement.",
+  "context_audit": {
+    "sources": [
+      "assets/hell-race.js",
+      "assets/hell-cerbero-gallop.js",
+      "assets/hell-motion.js",
+      "docs/HELLSCAPE_PROJECT_RULES_v1.0.1_20261031.md",
+      "run-stabilized-v1 README, frame 008 and A/B sources"
+    ],
+    "camera": "Same canonical right-facing side view; no new camera or game placement.",
+    "role": "Replacement identity reference proposal; no runtime swap or new action.",
+    "scale": "Native 552x522; current preview adapter ratio 221/500=0.442, only diagnostic use.",
+    "mechanics": "Same extended airborne stride. Only requested neck joint geometry/proportions change."
+  },
+  "versioning": "Reference anatomy 2.0.0 is a separate MAJOR namespace for user-authorized canonical anatomical contract correction; capture package remains 2.0.1 and source run remains 1.0.0. Candidate is not approved.",
+  "prompt": {
+    "id": "001_NECKS",
+    "path": "prompts/001_NECKS_v2.0.0_20261031.txt",
+    "sha256": "4208a1f639f422d0f619112b22aa1e8c4f389813453f881884dee0fc0c8fb743",
+    "serialization": "Text file terminal LF; exact arguments logged after call."
+  },
+  "stop_rule": "No generation if source cannot be forwarded. No promotion into canonical use until user approval.",
+  "generation_parameters": {
+    "transparent_background": true
+  },
+  "unavailable": [
+    "seed",
+    "model revision",
+    "internal prompt"
+  ]
+}
