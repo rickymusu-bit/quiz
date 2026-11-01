@@ -1,0 +1,18 @@
+{
+  "date": "2026-11-01",
+  "guide": "source/guides/AB_blank_solo_asfalto.png",
+  "size": [
+    2172,
+    724
+  ],
+  "blank_rect": [
+    512,
+    620,
+    1600,
+    724
+  ],
+  "left_source": "A ultimi 512 pixel",
+  "center_source": "AB primo riempimento, 1088 pixel",
+  "right_source": "B primi 572 pixel",
+  "purpose": "Correzione generativa della strada AB; architetture e contesti già presenti come vincoli."
+}

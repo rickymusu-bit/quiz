@@ -1,0 +1,14 @@
+Fill ONLY the white rectangular missing patch in the ASPHALT at the bottom of this already completed HELLSCAPE panorama. This is a local repair of AB, not a new composition. One single guide image is provided with approved A on the left, the completed connecting architecture in the center, and approved B on the right.
+
+White editable patch: x=512..1599, y=620..723 on the 2172 x 724 canvas. EVERYTHING ELSE IS ALREADY FINISHED and must stay at its exact coordinates, scale, geometry, color and detail: all architecture, the thin rear curb at y~615, the road on the left and right and the rest of the image. Do not move, redraw, recolor, resize, crop, reframe, sharpen or reinterpret the existing painting. Complete only the missing asphalt, using the actual asphalt immediately above and beside the white patch as constraints. Preserve the full image height of 724 pixels.
+
+The patch must become one continuous worn, damp dark-gray asphalt surface that smoothly joins the EXISTING road to its LEFT and RIGHT and along its TOP, with NO visible rectangular edge, brightness step, changed texture scale or sudden change of wet sheen. Match the cold desaturated road at both x=512 and x=1600. Fine small aggregate, subtle irregular damp reflections and restrained cracks. Keep it flat and horizontal. Do not add markings, objects, rubble or figures. Its local tone should be calibrated to the existing asphalt, not made into a brighter reflective strip or darker black patch.
+
+Do not change any concrete tower, viaduct, steel girder, pillar, pipe, fog, lamp or building silhouette. The input architecture already correctly connects the two scenes. Output the WHOLE completed opaque PNG with only the missing road repaired, no crop, same canvas layout.
+
+GENERARE UNA SOLA IMMAGINE PANORAMICA A PIENO FORMATO.
+NON CREARE UNO STORYBOARD.
+NON CREARE TRITTICI, GRIGLIE, COLLAGE, CONTACT SHEET O IMMAGINI SUDDIVISE IN FASCE.
+NON INSERIRE TITOLI, NUMERI, LETTERE, ETICHETTE, DIDASCALIE, LOGHI, WATERMARK O QUALSIASI TESTO.
+NON INSERIRE BORDI, CORNICI, LINEE DIVISORIE O PANNELLI.
+No people, characters, animals, vehicles, dominant lava, gothic castles or traditional fantasy symbols. No unpainted white area may remain.

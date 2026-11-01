@@ -1,0 +1,156 @@
+{
+  "date": "2026-11-01",
+  "authorization": "Richiesta utente: una sola immagine A-blank-B, completare blank e ritagliare A e B; altezza comune, larghezze libere.",
+  "height": 724,
+  "context_width": 512,
+  "blank_width": 1148,
+  "guides": [
+    {
+      "transition": "AB",
+      "guide": "source/guides/A_blank_B.png",
+      "guide_size": [
+        2172,
+        724
+      ],
+      "left_context": {
+        "image": "A",
+        "path": "images/hellscape_cemento_A.png",
+        "source_crop": [
+          1660,
+          0,
+          2172,
+          724
+        ],
+        "guide_rect": [
+          0,
+          0,
+          512,
+          724
+        ],
+        "sha256": "c13630caee0c8438c82251381907db4b6d7c4173786967a05d39815c6d085d16"
+      },
+      "blank_rect": [
+        512,
+        0,
+        1660,
+        724
+      ],
+      "right_context": {
+        "image": "B",
+        "path": "images/hellscape_cemento_B.png",
+        "source_crop": [
+          0,
+          0,
+          512,
+          724
+        ],
+        "guide_rect": [
+          1660,
+          0,
+          2172,
+          724
+        ],
+        "sha256": "6540cbee62558d46dd9ed82a088b68549b5ce576f1d03851953e3a9db6c0dc41"
+      },
+      "guide_sha256": "695f8bd15594a037bb3dad77f56a9e2ad87155bfb4231f375408599beb7f2f5f"
+    },
+    {
+      "transition": "BC",
+      "guide": "source/guides/B_blank_C.png",
+      "guide_size": [
+        2172,
+        724
+      ],
+      "left_context": {
+        "image": "B",
+        "path": "images/hellscape_cemento_B.png",
+        "source_crop": [
+          1660,
+          0,
+          2172,
+          724
+        ],
+        "guide_rect": [
+          0,
+          0,
+          512,
+          724
+        ],
+        "sha256": "6540cbee62558d46dd9ed82a088b68549b5ce576f1d03851953e3a9db6c0dc41"
+      },
+      "blank_rect": [
+        512,
+        0,
+        1660,
+        724
+      ],
+      "right_context": {
+        "image": "C",
+        "path": "images/hellscape_cemento_C.png",
+        "source_crop": [
+          0,
+          0,
+          512,
+          724
+        ],
+        "guide_rect": [
+          1660,
+          0,
+          2172,
+          724
+        ],
+        "sha256": "e120a5148c6d3bb781971ee868c5f24465894eb5464af053715fece64efcc00b"
+      },
+      "guide_sha256": "20500dbcba17e252166699bb334d2c584e3a7581c15f46b2515d76f13c20dc20"
+    },
+    {
+      "transition": "CA",
+      "guide": "source/guides/C_blank_A.png",
+      "guide_size": [
+        2172,
+        724
+      ],
+      "left_context": {
+        "image": "C",
+        "path": "images/hellscape_cemento_C.png",
+        "source_crop": [
+          1660,
+          0,
+          2172,
+          724
+        ],
+        "guide_rect": [
+          0,
+          0,
+          512,
+          724
+        ],
+        "sha256": "e120a5148c6d3bb781971ee868c5f24465894eb5464af053715fece64efcc00b"
+      },
+      "blank_rect": [
+        512,
+        0,
+        1660,
+        724
+      ],
+      "right_context": {
+        "image": "A",
+        "path": "images/hellscape_cemento_A.png",
+        "source_crop": [
+          0,
+          0,
+          512,
+          724
+        ],
+        "guide_rect": [
+          1660,
+          0,
+          2172,
+          724
+        ],
+        "sha256": "c13630caee0c8438c82251381907db4b6d7c4173786967a05d39815c6d085d16"
+      },
+      "guide_sha256": "2a9df1d420b02712a86b6117a97a2668374ea852d24d0266ade88f34020d3f59"
+    }
+  ]
+}

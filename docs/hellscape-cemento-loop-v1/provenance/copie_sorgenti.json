@@ -1,0 +1,151 @@
+{
+  "date": "2026-11-01",
+  "note": "Percorsi originali del workspace conservati esclusivamente come provenienza; usare i percorsi relativi del pacchetto per accedere ai file.",
+  "copies": [
+    {
+      "file": "images/hellscape_cemento_A.png",
+      "workspace_origin": "/workspace/hellscape-fondali/hellscape_cemento_A.png",
+      "sha256": "c13630caee0c8438c82251381907db4b6d7c4173786967a05d39815c6d085d16"
+    },
+    {
+      "file": "images/hellscape_cemento_AB.png",
+      "workspace_origin": "/workspace/hellscape-raccordi-riempimento/hellscape_cemento_AB.png",
+      "sha256": "c131be8218159bc8c1ce779f138138e629959a2b3a9c0ed4c2337cb95fa3cf2e"
+    },
+    {
+      "file": "images/hellscape_cemento_B.png",
+      "workspace_origin": "/workspace/hellscape-fondali/hellscape_cemento_B.png",
+      "sha256": "6540cbee62558d46dd9ed82a088b68549b5ce576f1d03851953e3a9db6c0dc41"
+    },
+    {
+      "file": "images/hellscape_cemento_BC.png",
+      "workspace_origin": "/workspace/hellscape-raccordi-riempimento/hellscape_cemento_BC.png",
+      "sha256": "e915e8dd432181bbe51d9c71e50ec5f5ca77d31d8fa8d1e3bda663d8e71341e6"
+    },
+    {
+      "file": "images/hellscape_cemento_C.png",
+      "workspace_origin": "/workspace/hellscape-fondali/hellscape_cemento_C.png",
+      "sha256": "e120a5148c6d3bb781971ee868c5f24465894eb5464af053715fece64efcc00b"
+    },
+    {
+      "file": "images/hellscape_cemento_CA.png",
+      "workspace_origin": "/workspace/hellscape-raccordi-riempimento/hellscape_cemento_CA.png",
+      "sha256": "f66eba9a352c08aa49431ba0d67bc1d46b5dad97a29dfaaf5cecd8781271e9e4"
+    },
+    {
+      "file": "previews/AB_B.png",
+      "workspace_origin": "/workspace/hellscape-raccordi-riempimento/giunzioni/AB_B.png",
+      "sha256": "75fcb5f74f89d3f6b1ef82e39c294fa2ee9613792bfef5a7b3b3b9f281edda8a"
+    },
+    {
+      "file": "previews/A_AB.png",
+      "workspace_origin": "/workspace/hellscape-raccordi-riempimento/giunzioni/A_AB.png",
+      "sha256": "47ef3962d9f131c4212d0fec33376760ba49c255c36b45d8fa8beeda3f0480c5"
+    },
+    {
+      "file": "previews/BC_C.png",
+      "workspace_origin": "/workspace/hellscape-raccordi-riempimento/giunzioni/BC_C.png",
+      "sha256": "c8f4caee26f222f2c9087b31fbc0e690a379a7640b611c043fe45ef053cfaaea"
+    },
+    {
+      "file": "previews/B_BC.png",
+      "workspace_origin": "/workspace/hellscape-raccordi-riempimento/giunzioni/B_BC.png",
+      "sha256": "b8cf49253d4b0ea5cb5ef735ece50b29613fe15a65e4718d5583585859fafc64"
+    },
+    {
+      "file": "previews/CA_A.png",
+      "workspace_origin": "/workspace/hellscape-raccordi-riempimento/giunzioni/CA_A.png",
+      "sha256": "d247cc2d7de49e381b58012f074431fc61b4128486379f53053f556b30bd4e79"
+    },
+    {
+      "file": "previews/C_CA.png",
+      "workspace_origin": "/workspace/hellscape-raccordi-riempimento/giunzioni/C_CA.png",
+      "sha256": "e902dd458f94ecaa5d359ed277f45cdd1acb2914dc43c62cf04ffb047b82ba41"
+    },
+    {
+      "file": "previews/anteprima_scorrimento.mp4",
+      "workspace_origin": "/workspace/hellscape-raccordi-riempimento/anteprima_scorrimento.mp4",
+      "sha256": "f50cd8fff4cc1f533fb68cf18f4700dd3db83720d49b94bf8ba9897cede0f4c7"
+    },
+    {
+      "file": "previews/hellscape_ciclo.png",
+      "workspace_origin": "/workspace/hellscape-raccordi-riempimento/hellscape_ciclo.png",
+      "sha256": "1ca90623c415b8348bc2f70615ac20a0cbf889bb2202cd5c9c78ef603b52d443"
+    },
+    {
+      "file": "prompts/A.txt",
+      "workspace_origin": "/workspace/hellscape-fondali/prompts/A.txt",
+      "sha256": "3e2fcc39788f4e75dca34c5793f88c3c7516790648977da2e5b8fd08411d1b82"
+    },
+    {
+      "file": "prompts/AB.txt",
+      "workspace_origin": "/workspace/hellscape-raccordi-riempimento/prompts/AB.txt",
+      "sha256": "9e11cda3689f01cd4fca6a9723ca0e3aa559a98a459c907a23cf209e4149c68b"
+    },
+    {
+      "file": "prompts/AB_correzione_asfalto.txt",
+      "workspace_origin": "/workspace/hellscape-raccordi-riempimento/prompts/AB_correzione_asfalto.txt",
+      "sha256": "43e635fff8bc6b7093bcbdeefa12ad8fed1552c8cdc60183b048ff52cd78fd55"
+    },
+    {
+      "file": "prompts/B.txt",
+      "workspace_origin": "/workspace/hellscape-fondali/prompts/B_rigenerazione_formato.txt",
+      "sha256": "6be4777de83013d9f30afb5bdf0ab6b4ea5a31219e3d48014dfb8018df26f912"
+    },
+    {
+      "file": "prompts/BC.txt",
+      "workspace_origin": "/workspace/hellscape-raccordi-riempimento/prompts/BC.txt",
+      "sha256": "dda3c4defc790c97e10cfbb840cad38b5fd5a49ec4e3cb66fd89244e0e5fb328"
+    },
+    {
+      "file": "prompts/C.txt",
+      "workspace_origin": "/workspace/hellscape-fondali/prompts/C_rigenerazione_formato.txt",
+      "sha256": "0862ad9268f146a89bd76e22cc69c493482010db22e82baf4e2060f30a032649"
+    },
+    {
+      "file": "prompts/CA.txt",
+      "workspace_origin": "/workspace/hellscape-raccordi-riempimento/prompts/CA.txt",
+      "sha256": "f21b2ce74ae9aa7c40218f4b3fc2eef52d1c8aa0e2d3dd2e8e2c788375c007a1"
+    },
+    {
+      "file": "source/generated/AB_completamento_asfalto.png",
+      "workspace_origin": "/workspace/generated_images/exec-ebabfcf7-d4c9-464e-a5f8-6f4ae6483e32.png",
+      "sha256": "1ad29b3d599e8a5605d17b5e2fd96872a1ba5ff5d5ae84daa00c286ba29fae60"
+    },
+    {
+      "file": "source/generated/AB_primo_riempimento.png",
+      "workspace_origin": "/workspace/generated_images/exec-06f930e5-93e7-4c20-8087-7d3f75e5a554.png",
+      "sha256": "a09228a566ceaf4dffa0f55256a856c3557dfd06ede876ff58a3fd12224bed1b"
+    },
+    {
+      "file": "source/generated/BC_completamento.png",
+      "workspace_origin": "/workspace/generated_images/exec-6bac5c7b-21fc-41ed-aa62-06b99450b37f.png",
+      "sha256": "98654bbbe2667474ed7f66efc8b208081834238d1a3dbd293cba250d433c0bf8"
+    },
+    {
+      "file": "source/generated/CA_completamento.png",
+      "workspace_origin": "/workspace/generated_images/exec-dd5125fa-3d05-4c3b-87ca-2422bd8c0e10.png",
+      "sha256": "8cf9156a0bd8080b66ab9f0ab77ed6c74e6f6a46e7bb8db71d299c0e8f2b353f"
+    },
+    {
+      "file": "source/guides/AB_blank_solo_asfalto.png",
+      "workspace_origin": "/workspace/hellscape-raccordi-riempimento/guide/AB_blank_solo_asfalto.png",
+      "sha256": "f232f12bbc511a11305c0a6e0046f94f70299a346c17669c34706c42ff89a205"
+    },
+    {
+      "file": "source/guides/A_blank_B.png",
+      "workspace_origin": "/workspace/hellscape-raccordi-riempimento/guide/A_blank_B.png",
+      "sha256": "695f8bd15594a037bb3dad77f56a9e2ad87155bfb4231f375408599beb7f2f5f"
+    },
+    {
+      "file": "source/guides/B_blank_C.png",
+      "workspace_origin": "/workspace/hellscape-raccordi-riempimento/guide/B_blank_C.png",
+      "sha256": "20500dbcba17e252166699bb334d2c584e3a7581c15f46b2515d76f13c20dc20"
+    },
+    {
+      "file": "source/guides/C_blank_A.png",
+      "workspace_origin": "/workspace/hellscape-raccordi-riempimento/guide/C_blank_A.png",
+      "sha256": "2a9df1d420b02712a86b6117a97a2668374ea852d24d0266ade88f34020d3f59"
+    }
+  ]
+}

@@ -1,0 +1,116 @@
+{
+  "transition": "BC",
+  "original_sha256": "98654bbbe2667474ed7f66efc8b208081834238d1a3dbd293cba250d433c0bf8",
+  "output_size": [
+    2172,
+    724
+  ],
+  "nominal_crop_rect": [
+    512,
+    0,
+    1660,
+    724
+  ],
+  "crop_rect": [
+    512,
+    0,
+    1618,
+    724
+  ],
+  "transition_size": [
+    1106,
+    724
+  ],
+  "transition_sha256": "e915e8dd432181bbe51d9c71e50ec5f5ca77d31d8fa8d1e3bda663d8e71341e6",
+  "cut_registration": "Ricerca della posizione effettiva dei contesti nel completamento, senza deformazioni o correzioni dei pixel. Confronto dei 128 pixel di contesto architettonico entro ±160 pixel dal bordo nominale, poi scelta del taglio entro ±1 pixel dal miglior allineamento per ridurre il salto delle colonne adiacenti.",
+  "matches": {
+    "left": {
+      "nominal_x": 512,
+      "registration_peak": {
+        "x": 513,
+        "context_architecture_mae": 11.54518,
+        "boundary_rgb_mae": 11.064457
+      },
+      "chosen": {
+        "x": 512,
+        "context_architecture_mae": 11.832992,
+        "boundary_rgb_mae": 9.491713
+      },
+      "next_best": [
+        {
+          "x": 513,
+          "context_architecture_mae": 11.54518,
+          "boundary_rgb_mae": 11.064457
+        },
+        {
+          "x": 514,
+          "context_architecture_mae": 16.285002,
+          "boundary_rgb_mae": 11.699355
+        },
+        {
+          "x": 511,
+          "context_architecture_mae": 17.263718,
+          "boundary_rgb_mae": 9.815377
+        }
+      ],
+      "nominal": {
+        "x": 512,
+        "context_architecture_mae": 11.832992,
+        "boundary_rgb_mae": 9.491713
+      }
+    },
+    "right": {
+      "nominal_x": 1660,
+      "registration_peak": {
+        "x": 1617,
+        "context_architecture_mae": 9.920018,
+        "boundary_rgb_mae": 13.703499
+      },
+      "chosen": {
+        "x": 1618,
+        "context_architecture_mae": 12.591197,
+        "boundary_rgb_mae": 13.673573
+      },
+      "next_best": [
+        {
+          "x": 1617,
+          "context_architecture_mae": 9.920018,
+          "boundary_rgb_mae": 13.703499
+        },
+        {
+          "x": 1616,
+          "context_architecture_mae": 13.496969,
+          "boundary_rgb_mae": 16.535452
+        },
+        {
+          "x": 1619,
+          "context_architecture_mae": 16.916748,
+          "boundary_rgb_mae": 13.048343
+        }
+      ],
+      "nominal": {
+        "x": 1660,
+        "context_architecture_mae": 34.659176,
+        "boundary_rgb_mae": 41.493095
+      }
+    }
+  },
+  "joins": [
+    {
+      "join": "B_BC",
+      "preview": "previews/B_BC.png",
+      "mean_absolute_rgb_difference": 9.492,
+      "architecture": 9.536,
+      "road": 8.96
+    },
+    {
+      "join": "BC_C",
+      "preview": "previews/BC_C.png",
+      "mean_absolute_rgb_difference": 13.674,
+      "architecture": 14.505,
+      "road": 9.101
+    }
+  ],
+  "original_generation_file": "exec-6bac5c7b-21fc-41ed-aa62-06b99450b37f.png",
+  "completed_image": "source/generated/BC_completamento.png"
+}

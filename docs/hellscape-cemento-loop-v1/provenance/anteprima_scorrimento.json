@@ -1,0 +1,29 @@
+{
+  "purpose": "Anteprima di scorrimento dei soli asset accostati, non registrazione del runtime del gioco.",
+  "source": "previews/hellscape_ciclo.png",
+  "source_sha256": "1ca90623c415b8348bc2f70615ac20a0cbf889bb2202cd5c9c78ef603b52d443",
+  "period_pixels": 9845,
+  "viewport": [
+    1448,
+    724
+  ],
+  "frames": 985,
+  "fps": 30,
+  "duration_seconds": 32.833333333333336,
+  "processing": "Ritaglio mobile alla scala 1:1 del ciclo, con riavvolgimento sui pixel di A. Nessuna dissolvenza o interpolazione tra fondali; compressione video H.264.",
+  "ffprobe": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "width": 1448,
+        "height": 724,
+        "avg_frame_rate": "30/1",
+        "duration": "32.833333",
+        "nb_frames": "985"
+      }
+    ]
+  },
+  "video_sha256": "f50cd8fff4cc1f533fb68cf18f4700dd3db83720d49b94bf8ba9897cede0f4c7",
+  "bytes": 3902853
+}

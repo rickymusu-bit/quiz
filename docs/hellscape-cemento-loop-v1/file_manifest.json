@@ -1,0 +1,284 @@
+{
+  "version": "1.0.0",
+  "date": "2026-11-01",
+  "files": [
+    {
+      "path": "HELLSCAPE_CEMENTO_CICLO_v1.0.0_20261101.md",
+      "bytes": 6705,
+      "sha256": "2fac01dcd08347b066d4179c1d6058bb2fa2eb12650ca1dab083c39affe37370"
+    },
+    {
+      "path": "README.md",
+      "bytes": 2308,
+      "sha256": "3807cbf59386751ba56504fa404ce1b43f70244ff31253a1d7385793d7e9d394"
+    },
+    {
+      "path": "ciclo.json",
+      "bytes": 1287,
+      "sha256": "a9d80b055c37245d91ec4fc3ccccffe4d66d88c6f19ef856b63f2aba92118952"
+    },
+    {
+      "path": "generazioni.json",
+      "bytes": 3958,
+      "sha256": "ec54c1781571ce29d9e19f4b0ef86e23301ec241dee594828426a77e37b367c7"
+    },
+    {
+      "path": "images/hellscape_cemento_A.png",
+      "bytes": 2851920,
+      "sha256": "c13630caee0c8438c82251381907db4b6d7c4173786967a05d39815c6d085d16",
+      "width": 2172,
+      "height": 724,
+      "mode": "RGB"
+    },
+    {
+      "path": "images/hellscape_cemento_AB.png",
+      "bytes": 1274831,
+      "sha256": "c131be8218159bc8c1ce779f138138e629959a2b3a9c0ed4c2337cb95fa3cf2e",
+      "width": 1090,
+      "height": 724,
+      "mode": "RGB"
+    },
+    {
+      "path": "images/hellscape_cemento_B.png",
+      "bytes": 2835632,
+      "sha256": "6540cbee62558d46dd9ed82a088b68549b5ce576f1d03851953e3a9db6c0dc41",
+      "width": 2172,
+      "height": 724,
+      "mode": "RGB"
+    },
+    {
+      "path": "images/hellscape_cemento_BC.png",
+      "bytes": 1322610,
+      "sha256": "e915e8dd432181bbe51d9c71e50ec5f5ca77d31d8fa8d1e3bda663d8e71341e6",
+      "width": 1106,
+      "height": 724,
+      "mode": "RGB"
+    },
+    {
+      "path": "images/hellscape_cemento_C.png",
+      "bytes": 2903019,
+      "sha256": "e120a5148c6d3bb781971ee868c5f24465894eb5464af053715fece64efcc00b",
+      "width": 2172,
+      "height": 724,
+      "mode": "RGB"
+    },
+    {
+      "path": "images/hellscape_cemento_CA.png",
+      "bytes": 1368499,
+      "sha256": "f66eba9a352c08aa49431ba0d67bc1d46b5dad97a29dfaaf5cecd8781271e9e4",
+      "width": 1133,
+      "height": 724,
+      "mode": "RGB"
+    },
+    {
+      "path": "previews/AB_B.png",
+      "bytes": 1165013,
+      "sha256": "75fcb5f74f89d3f6b1ef82e39c294fa2ee9613792bfef5a7b3b3b9f281edda8a",
+      "width": 960,
+      "height": 724,
+      "mode": "RGB"
+    },
+    {
+      "path": "previews/A_AB.png",
+      "bytes": 1143916,
+      "sha256": "47ef3962d9f131c4212d0fec33376760ba49c255c36b45d8fa8beeda3f0480c5",
+      "width": 960,
+      "height": 724,
+      "mode": "RGB"
+    },
+    {
+      "path": "previews/BC_C.png",
+      "bytes": 1208371,
+      "sha256": "c8f4caee26f222f2c9087b31fbc0e690a379a7640b611c043fe45ef053cfaaea",
+      "width": 960,
+      "height": 724,
+      "mode": "RGB"
+    },
+    {
+      "path": "previews/B_BC.png",
+      "bytes": 1156553,
+      "sha256": "b8cf49253d4b0ea5cb5ef735ece50b29613fe15a65e4718d5583585859fafc64",
+      "width": 960,
+      "height": 724,
+      "mode": "RGB"
+    },
+    {
+      "path": "previews/CA_A.png",
+      "bytes": 1153193,
+      "sha256": "d247cc2d7de49e381b58012f074431fc61b4128486379f53053f556b30bd4e79",
+      "width": 960,
+      "height": 724,
+      "mode": "RGB"
+    },
+    {
+      "path": "previews/C_CA.png",
+      "bytes": 1166681,
+      "sha256": "e902dd458f94ecaa5d359ed277f45cdd1acb2914dc43c62cf04ffb047b82ba41",
+      "width": 960,
+      "height": 724,
+      "mode": "RGB"
+    },
+    {
+      "path": "previews/anteprima_scorrimento.mp4",
+      "bytes": 3902853,
+      "sha256": "f50cd8fff4cc1f533fb68cf18f4700dd3db83720d49b94bf8ba9897cede0f4c7"
+    },
+    {
+      "path": "previews/hellscape_ciclo.png",
+      "bytes": 11902113,
+      "sha256": "1ca90623c415b8348bc2f70615ac20a0cbf889bb2202cd5c9c78ef603b52d443",
+      "width": 9845,
+      "height": 724,
+      "mode": "RGB"
+    },
+    {
+      "path": "prompts/A.txt",
+      "bytes": 3246,
+      "sha256": "3e2fcc39788f4e75dca34c5793f88c3c7516790648977da2e5b8fd08411d1b82"
+    },
+    {
+      "path": "prompts/AB.txt",
+      "bytes": 3547,
+      "sha256": "9e11cda3689f01cd4fca6a9723ca0e3aa559a98a459c907a23cf209e4149c68b"
+    },
+    {
+      "path": "prompts/AB_correzione_asfalto.txt",
+      "bytes": 2211,
+      "sha256": "43e635fff8bc6b7093bcbdeefa12ad8fed1552c8cdc60183b048ff52cd78fd55"
+    },
+    {
+      "path": "prompts/B.txt",
+      "bytes": 4358,
+      "sha256": "6be4777de83013d9f30afb5bdf0ab6b4ea5a31219e3d48014dfb8018df26f912"
+    },
+    {
+      "path": "prompts/BC.txt",
+      "bytes": 3522,
+      "sha256": "dda3c4defc790c97e10cfbb840cad38b5fd5a49ec4e3cb66fd89244e0e5fb328"
+    },
+    {
+      "path": "prompts/C.txt",
+      "bytes": 5339,
+      "sha256": "0862ad9268f146a89bd76e22cc69c493482010db22e82baf4e2060f30a032649"
+    },
+    {
+      "path": "prompts/CA.txt",
+      "bytes": 4068,
+      "sha256": "f21b2ce74ae9aa7c40218f4b3fc2eef52d1c8aa0e2d3dd2e8e2c788375c007a1"
+    },
+    {
+      "path": "provenance/AB_guida_asfalto.json",
+      "bytes": 415,
+      "sha256": "fdf06c6aa36ae89c894fa217158aa925ae857584bc4ded25b04c987939faf198"
+    },
+    {
+      "path": "provenance/AB_ritaglio.json",
+      "bytes": 2990,
+      "sha256": "7e4d673762cca86b6c06ce19f336ba44897fcae79a17138d2aa49ce559bcfa22"
+    },
+    {
+      "path": "provenance/BC_ritaglio.json",
+      "bytes": 2988,
+      "sha256": "33e1a1af25ed2cbdd3f8123987cf19fda4d4c8cf5db23a957d75497400ba3af7"
+    },
+    {
+      "path": "provenance/CA_ritaglio.json",
+      "bytes": 2991,
+      "sha256": "9f7e38cc848e5cbe0a978e1b717003db8ffcc71b638a1b7c8fe5f52a7648cb43"
+    },
+    {
+      "path": "provenance/anteprima_scorrimento.json",
+      "bytes": 900,
+      "sha256": "4742083ee883d00718c58e6db94341b70f1eb7ae49d24e28fb9c14ba9c389f3d"
+    },
+    {
+      "path": "provenance/copie_sorgenti.json",
+      "bytes": 6917,
+      "sha256": "e0806e8de528dcbbd9b732333d1b5815b3e9a1526895a030da321c0df6a7f955"
+    },
+    {
+      "path": "provenance/guide.json",
+      "bytes": 3438,
+      "sha256": "376b4b58f113c1e106c53e04a79053d2d144b7a253113a2c175df6a104e4c042"
+    },
+    {
+      "path": "provenance/verifica_giunzioni.json",
+      "bytes": 1776,
+      "sha256": "77bfafa33c0a4f77e796380dc4cebf9fefcd3596f5626e13d1b0d5016e90a40d"
+    },
+    {
+      "path": "source/generated/AB_completamento_asfalto.png",
+      "bytes": 2681788,
+      "sha256": "1ad29b3d599e8a5605d17b5e2fd96872a1ba5ff5d5ae84daa00c286ba29fae60",
+      "width": 2172,
+      "height": 724,
+      "mode": "RGB"
+    },
+    {
+      "path": "source/generated/AB_primo_riempimento.png",
+      "bytes": 2838752,
+      "sha256": "a09228a566ceaf4dffa0f55256a856c3557dfd06ede876ff58a3fd12224bed1b",
+      "width": 2172,
+      "height": 724,
+      "mode": "RGB"
+    },
+    {
+      "path": "source/generated/BC_completamento.png",
+      "bytes": 2880005,
+      "sha256": "98654bbbe2667474ed7f66efc8b208081834238d1a3dbd293cba250d433c0bf8",
+      "width": 2172,
+      "height": 724,
+      "mode": "RGB"
+    },
+    {
+      "path": "source/generated/CA_completamento.png",
+      "bytes": 2812831,
+      "sha256": "8cf9156a0bd8080b66ab9f0ab77ed6c74e6f6a46e7bb8db71d299c0e8f2b353f",
+      "width": 2171,
+      "height": 724,
+      "mode": "RGB"
+    },
+    {
+      "path": "source/guides/AB_blank_solo_asfalto.png",
+      "bytes": 2474402,
+      "sha256": "f232f12bbc511a11305c0a6e0046f94f70299a346c17669c34706c42ff89a205",
+      "width": 2172,
+      "height": 724,
+      "mode": "RGB"
+    },
+    {
+      "path": "source/guides/A_blank_B.png",
+      "bytes": 1296614,
+      "sha256": "695f8bd15594a037bb3dad77f56a9e2ad87155bfb4231f375408599beb7f2f5f",
+      "width": 2172,
+      "height": 724,
+      "mode": "RGB"
+    },
+    {
+      "path": "source/guides/B_blank_C.png",
+      "bytes": 1325878,
+      "sha256": "20500dbcba17e252166699bb334d2c584e3a7581c15f46b2515d76f13c20dc20",
+      "width": 2172,
+      "height": 724,
+      "mode": "RGB"
+    },
+    {
+      "path": "source/guides/C_blank_A.png",
+      "bytes": 1283565,
+      "sha256": "2a9df1d420b02712a86b6117a97a2668374ea852d24d0266ade88f34020d3f59",
+      "width": 2172,
+      "height": 724,
+      "mode": "RGB"
+    }
+  ],
+  "verified": [
+    "copy_bytes",
+    "PNG_integrity",
+    "common_height",
+    "native_crops",
+    "cycle_pixels",
+    "join_preview_pixels",
+    "video_ffprobe",
+    "relative_markdown_links"
+  ]
+}

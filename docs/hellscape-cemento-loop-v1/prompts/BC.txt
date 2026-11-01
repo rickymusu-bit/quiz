@@ -1,0 +1,17 @@
+Fill the WHITE MISSING CENTER of the attached single HELLSCAPE panorama guide. Edit this image in place, do not create a new interpretation of its painted parts. This is transition BC: LEFT fixed strip = the right end of approved B (viaducts); RIGHT fixed strip = the left end of approved C (concave industrial megastructure). The known strips are already positioned correctly. Paint only the blank area between them.
+
+Input dimensions: 2172 x 724. Painted LEFT region x=0..511 must stay in its exact original position, scale, geometry and color. WHITE EDIT AREA x=512..1659 extends the full height. Painted RIGHT region x=1660..2171 must stay in its exact original position, scale, geometry and color. Keep both existing strips, including the road pixels, intact. No crop, resize, zoom, reframe or movement of the known regions. Return the full completed canvas, opaque PNG, height 724; preserve coordinate positions. The center is missing painting, not sky: replace ALL of its white pixels.
+
+At the left gap boundary, continue the actual cut viaducts, their precise heights and slopes, exposed steel undersides, large concrete pier surfaces and fog from the left strip. Across the gap, viaduct decks progressively thicken and merge into heavy concrete overhead masses and an enclosed industrial service cavity. Long steel beams develop into ducts and bracing. Monumental bent corroded pipes weave into deep nearly black industrial chambers. At the right gap boundary, connect directly into the existing curved concave concrete wall and its recessed ribs, pipework, lights, dark negative spaces and structural mass: match each interrupted contour and its illumination, rather than inventing a different right-hand building. Architecture becomes more congested and enclosed toward the right. One real physical transition from open elevated road infrastructure into the belly of a megastructure, with no vertical dividing column or abrupt split.
+
+The dark damp asphalt road must be smoothly completed across the blank with identical elevation, apparent width and grain to the actual road on both sides. Rear edge about y=615, asphalt covers the lower 15%. Especially match the road's brightness and wet highlights at both boundaries; do not create a visibly lighter/darker road patch. Horizontal road, fixed level human-eye-height lateral camera suitable for a 2D side-scrolling game, no central vanishing-point road or scale change.
+
+Exact same cold almost monochromatic concrete gray, graphite, black and muted oxidized steel as the fixed strips. Extremely detailed painterly industrial dystopia, immense irrational reinforced-concrete architecture, physically convincing weight, cracks, rough aggregate, rust, humidity, grime, mineral crusts. Atmospheric industrial fog, restrained tiny cold artificial lights, no colored spectacle. Original new connecting geometry only in the gap; no repeated buildings, no copying blocks of the fixed strips into the center.
+
+GENERARE UNA SOLA IMMAGINE PANORAMICA A PIENO FORMATO.
+NON CREARE UNO STORYBOARD.
+NON CREARE TRITTICI, GRIGLIE, COLLAGE, CONTACT SHEET O IMMAGINI SUDDIVISE IN FASCE.
+NON INSERIRE TITOLI, NUMERI, LETTERE, ETICHETTE, DIDASCALIE, LOGHI, WATERMARK O QUALSIASI TESTO.
+NON INSERIRE BORDI, CORNICI, LINEE DIVISORIE O PANNELLI.
+No characters, people, animals, silhouettes, vehicles, dominant lava, gothic castles or traditional fantasy symbols.
+The final output is one completed continuous painting with no white gap, guides, panel boundaries or visible fill seams.
