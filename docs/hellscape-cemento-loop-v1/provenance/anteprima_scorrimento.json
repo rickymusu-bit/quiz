@@ -1,7 +1,7 @@
 {
   "purpose": "Anteprima di scorrimento dei soli asset accostati, non registrazione del runtime del gioco.",
   "source": "previews/hellscape_ciclo.png",
-  "source_sha256": "1ca90623c415b8348bc2f70615ac20a0cbf889bb2202cd5c9c78ef603b52d443",
+  "source_sha256": "d51cce2a81f7070b1e5d6359496e7777613acbadca475f41ca84118803349731",
   "period_pixels": 9845,
   "viewport": [
     1448,
@@ -24,6 +24,6 @@
       }
     ]
   },
-  "video_sha256": "f50cd8fff4cc1f533fb68cf18f4700dd3db83720d49b94bf8ba9897cede0f4c7",
-  "bytes": 3902853
+  "video_sha256": "3c7c3c3a59c24b2029997aad1796da23b1bf7e789afccf02878a3d2100e56c36",
+  "bytes": 3907158
 }

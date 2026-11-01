@@ -9,8 +9,8 @@
     },
     {
       "file": "images/hellscape_cemento_AB.png",
-      "workspace_origin": "/workspace/hellscape-raccordi-riempimento/hellscape_cemento_AB.png",
-      "sha256": "c131be8218159bc8c1ce779f138138e629959a2b3a9c0ed4c2337cb95fa3cf2e"
+      "workspace_origin": "/workspace/hellscape-ritocco-AB-B/hellscape_cemento_AB_ritocco_v1.png",
+      "sha256": "4eda20fa53a51afa339f634a64c7daa7edd95d827d7210974d0a713c01451bcc"
     },
     {
       "file": "images/hellscape_cemento_B.png",
@@ -34,8 +34,8 @@
     },
     {
       "file": "previews/AB_B.png",
-      "workspace_origin": "/workspace/hellscape-raccordi-riempimento/giunzioni/AB_B.png",
-      "sha256": "75fcb5f74f89d3f6b1ef82e39c294fa2ee9613792bfef5a7b3b3b9f281edda8a"
+      "workspace_origin": "/workspace/hellscape-ritocco-AB-B/giunzione_AB_B_ritoccata.png",
+      "sha256": "c7052ea3b7949e3faeceb842ec408b26f874bd7852b263966d51c0c8469d8ec3"
     },
     {
       "file": "previews/A_AB.png",
@@ -61,16 +61,6 @@
       "file": "previews/C_CA.png",
       "workspace_origin": "/workspace/hellscape-raccordi-riempimento/giunzioni/C_CA.png",
       "sha256": "e902dd458f94ecaa5d359ed277f45cdd1acb2914dc43c62cf04ffb047b82ba41"
-    },
-    {
-      "file": "previews/anteprima_scorrimento.mp4",
-      "workspace_origin": "/workspace/hellscape-raccordi-riempimento/anteprima_scorrimento.mp4",
-      "sha256": "f50cd8fff4cc1f533fb68cf18f4700dd3db83720d49b94bf8ba9897cede0f4c7"
-    },
-    {
-      "file": "previews/hellscape_ciclo.png",
-      "workspace_origin": "/workspace/hellscape-raccordi-riempimento/hellscape_ciclo.png",
-      "sha256": "1ca90623c415b8348bc2f70615ac20a0cbf889bb2202cd5c9c78ef603b52d443"
     },
     {
       "file": "prompts/A.txt",
@@ -146,6 +136,39 @@
       "file": "source/guides/C_blank_A.png",
       "workspace_origin": "/workspace/hellscape-raccordi-riempimento/guide/C_blank_A.png",
       "sha256": "2a9df1d420b02712a86b6117a97a2668374ea852d24d0266ade88f34020d3f59"
+    },
+    {
+      "file": "source/history/hellscape_cemento_AB_prima_ritocco.png",
+      "workspace_origin": "/workspace/hellscape-raccordi-riempimento/hellscape_cemento_AB.png",
+      "sha256": "c131be8218159bc8c1ce779f138138e629959a2b3a9c0ed4c2337cb95fa3cf2e"
+    },
+    {
+      "file": "source/guides/AB_B_prima_ritocco.png",
+      "workspace_origin": "/workspace/hellscape-raccordi-riempimento/giunzioni/AB_B.png",
+      "sha256": "75fcb5f74f89d3f6b1ef82e39c294fa2ee9613792bfef5a7b3b3b9f281edda8a"
+    },
+    {
+      "file": "source/generated/AB_B_ritocco_locale.png",
+      "workspace_origin": "/workspace/hellscape-ritocco-AB-B/generazione_originale.png",
+      "sha256": "dddd1a364868b88c723482a1f94c45138a241c259c3ae5a0bff36509a80d1bcb"
+    },
+    {
+      "file": "prompts/AB_B_ritocco_locale.txt",
+      "workspace_origin": "/workspace/hellscape-ritocco-AB-B/prompt_effettivo.txt",
+      "sha256": "8870ac10f26cc1bf7b8c0e8e2bc578445a7ff4eec5ad7671d8db0015687f0e5d"
+    }
+  ],
+  "version": "1.1.0",
+  "derived": [
+    {
+      "file": "previews/hellscape_ciclo.png",
+      "source": "ciclo.json + images/",
+      "method": "accostamento 1:1 degli asset correnti"
+    },
+    {
+      "file": "previews/anteprima_scorrimento.mp4",
+      "source": "previews/hellscape_ciclo.png",
+      "metadata": "provenance/anteprima_scorrimento.json"
     }
   ]
 }

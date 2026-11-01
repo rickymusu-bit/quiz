@@ -1,10 +1,10 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "date": "2026-11-01",
   "repository": "rickymusu-bit/quiz",
   "source_commit": "30b5df8b5955640f38defb6b03e1edc39a524415",
-  "authorization": "Richiesta utente nella conversazione: caricare tutte queste immagini e il video del ciclo sul GitHub.",
-  "status": "Archivio di produzione; A/B/C già approvati, raccordi candidati con differenze residue ai bordi. Nessuna integrazione nel runtime.",
+  "authorization": "Approvazione utente del ritocco mostrato nella conversazione e richiesta: aggiorna AB e B con questa nuova giunzione, poi carica su GitHub. Nessuna autorizzazione al merge o alla modifica del runtime.",
+  "status": "Archivio aggiornato con ritocco AB→B approvato; A/B/C originali conservati. Nessuna integrazione nel runtime.",
   "generator": "image_gen.imagegen",
   "selected_main_generations": [
     {
@@ -83,8 +83,8 @@
       "prompt": "prompts/AB_correzione_asfalto.txt",
       "original_generation_file": "exec-ebabfcf7-d4c9-464e-a5f8-6f4ae6483e32.png",
       "completed_image": "source/generated/AB_completamento_asfalto.png",
-      "status": "finale",
-      "output": "images/hellscape_cemento_AB.png",
+      "status": "base_archiviata_del_ritocco_locale_approvato",
+      "output": "source/history/hellscape_cemento_AB_prima_ritocco.png",
       "crop": [
         511,
         0,
@@ -94,10 +94,43 @@
     }
   ],
   "history_note": "Le rigenerazioni di formato dei principali sono documentate nei prompt completi selezionati. Sono archiviati i candidati citati dall’utente, non i tentativi scartati successivi con Leonardo/Gemini o canvas largo. I tre riempimenti iniziali e la correzione asfalto AB sono chiamate individuali e sequenziali.",
-  "processing": "Principali nativi; raccordi ritagliati senza deformazioni, resize o blending. Video di montaggio dei sei asset, non registrazione del gioco.",
+  "processing": "Principali nativi conservati; BC/CA restano ritagli originali. AB sostituito con il ritocco locale approvato, generazione riportata alla scala originale e montata solo negli ultimi 140 px di AB; B integra. Il video usa i sei asset aggiornati.",
   "limitations": [
     "Differenze residue di microtexture e tono dell’asfalto.",
     "Non certificato un ciclo perfetto pixel per pixel o già verificato nel runtime.",
     "Il generatore ha parzialmente reinterpretato i contesti; i principali approvati sono conservati integralmente."
+  ],
+  "local_retouches": [
+    {
+      "junction": "AB→B",
+      "operation": "generazione_locale_e_montaggio_conservativo_approvato",
+      "generator": "image_gen.imagegen",
+      "generator_calls": 1,
+      "guide": "source/guides/AB_B_prima_ritocco.png",
+      "prompt": "prompts/AB_B_ritocco_locale.txt",
+      "original_generation_file": "exec-1b1a4a41-b07b-4b96-9b55-db342a98675e.png",
+      "raw_output": "source/generated/AB_B_ritocco_locale.png",
+      "raw_dimensions": [
+        1444,
+        1089
+      ],
+      "base_AB": "source/history/hellscape_cemento_AB_prima_ritocco.png",
+      "output": "images/hellscape_cemento_AB.png",
+      "output_dimensions": [
+        1090,
+        724
+      ],
+      "preview": "previews/AB_B.png",
+      "B": "images/hellscape_cemento_B.png",
+      "modified_AB_region_xyxy": [
+        950,
+        0,
+        1090,
+        724
+      ],
+      "B_preserved_byte_for_byte": true,
+      "approval": "Utente: va bene. aggiorna AB e B con questa nuova giunzione. poi carica su github.",
+      "processing_details": "provenance/AB_B_ritocco_approvato.json"
+    }
   ]
 }

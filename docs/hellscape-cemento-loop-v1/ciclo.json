@@ -56,6 +56,7 @@
     }
   ],
   "cycle_png": "previews/hellscape_ciclo.png",
-  "processing": "Accostamento dei file con i propri pixel originali, senza blending, deformazione o ridimensionamento; anteprima di montaggio asset, non evidenza del runtime.",
-  "video": "previews/anteprima_scorrimento.mp4"
+  "processing": "Accostamento alla scala 1:1 dei sei asset correnti, senza blending tra file; AB incorpora il ritocco locale approvato della giunzione AB→B. Anteprima di montaggio asset, non evidenza del runtime.",
+  "video": "previews/anteprima_scorrimento.mp4",
+  "asset_revision": "1.1.0"
 }

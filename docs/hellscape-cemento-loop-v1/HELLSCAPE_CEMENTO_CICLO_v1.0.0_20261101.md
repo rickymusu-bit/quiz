@@ -1,5 +1,7 @@
 # Hellscape — archivio del ciclo in cemento
 
+> Revisione storica precedente al ritocco AB → B. Per i file correnti consultare la [versione 1.1.0](HELLSCAPE_CEMENTO_CICLO_v1.1.0_20261101.md). AB precedente è conservato in `source/history/hellscape_cemento_AB_prima_ritocco.png`.
+
 **Versione:** 1.0.0 · **Data:** 2026-11-01.
 
 **Fonte:** brief e approvazioni della conversazione; richiesta corrente dell’utente di caricare queste immagini e il video del ciclo su GitHub.
