@@ -1,0 +1,17 @@
+EDIT THE PROVIDED SINGLE IMAGE BY FILLING ONLY ITS WHITE CENTRAL GAP. This is the HELLSCAPE AB transition guide: the LEFT painted strip is the exact RIGHTMOST 512 pixels of approved panorama A; the RIGHT painted strip is the exact LEFTMOST 512 pixels of approved panorama B. These strips are fixed image content to retain, NOT separate references to reinterpret. Complete the missing physical architecture BETWEEN them in place.
+
+The input canvas is 2172 x 724. LEFT FIXED CONTENT: x=0 through 511. EDITABLE WHITE GAP ONLY: x=512 through 1659, full height. RIGHT FIXED CONTENT: x=1660 through 2171. Output a single completed opaque PNG at the same 724-pixel height and the same coordinate layout, preferably the same width. Do NOT scale, zoom, crop, reframe, move or redraw either fixed strip. Retain the original known pixels outside the white gap. The white central rectangle is a visual inpainting guide: replace its entire area with finished painting. Leave no white remnant, straight patch boundary, vertical seam, panel division or unpainted region.
+
+Synthesize NEW connecting architecture ONLY INSIDE THE GAP. At x=512, CONTINUE the actual cut concrete facades, upright pipes, mist and small maintenance structures from the left painted strip at their exact heights and angles. Across the gap the last dense blind concrete towers gradually become giant structural piers, and their maintenance levels broaden into reinforced concrete and exposed steel motorway spans. At x=1659, JOIN DIRECTLY to every cut structure along the inside edge of the right painted strip, including the dark overhead viaduct underside, corroded steel beams, immense concrete supports and fog spaces. This must be a convincing physical connection to the existing pixels, with the major architectural contours and light values continuous at both gap boundaries. Do not cover the boundaries with decorative pillars to conceal a mismatch.
+
+Continue the dark damp asphalt at the BOTTOM across the full gap, connecting the actual road edges and grain in the fixed strips. Road remains horizontal, rear edge approximately y=615, bottom 15% of frame. Match scale, aggregate, highlights and subdued wet texture smoothly at both sides, no dark rectangular patch. Same fixed level human-eye-height lateral camera for a 2D side-scrolling game, no central road vanishing point, no perspective or scale change.
+
+Match the provided painting exactly in cold almost monochrome gray, graphite and black; restrained desaturated rust; monumental irrational reinforced concrete and steel; extremely detailed painterly weathering, rough aggregate, cracks, humidity, grime and mineral crusts; pale industrial mist and discreet tiny cold utility lights. The scene progresses from A's tight vertical forest at left to B's open multilevel viaduct labyrinth at right. Invent connecting structures in the blank area without copying repeated buildings or duplicating the strips. No new figures or road obstructions.
+
+GENERARE UNA SOLA IMMAGINE PANORAMICA A PIENO FORMATO.
+NON CREARE UNO STORYBOARD.
+NON CREARE TRITTICI, GRIGLIE, COLLAGE, CONTACT SHEET O IMMAGINI SUDDIVISE IN FASCE.
+NON INSERIRE TITOLI, NUMERI, LETTERE, ETICHETTE, DIDASCALIE, LOGHI, WATERMARK O QUALSIASI TESTO.
+NON INSERIRE BORDI, CORNICI, LINEE DIVISORIE O PANNELLI.
+The input has a deliberately blank center; the OUTPUT must be one continuous fully completed painting, with no visible construction guide.
+No characters, people, animals, silhouettes, vehicles, dominant lava, gothic castles or traditional fantasy symbols.

@@ -1,0 +1,81 @@
+{
+  "date": "2026-11-01",
+  "status": "approved_for_asset_archive_not_integrated",
+  "original_AB": {
+    "path": "source/history/hellscape_cemento_AB_prima_ritocco.png",
+    "sha256": "c131be8218159bc8c1ce779f138138e629959a2b3a9c0ed4c2337cb95fa3cf2e"
+  },
+  "original_B": {
+    "path": "images/hellscape_cemento_B.png",
+    "sha256": "6540cbee62558d46dd9ed82a088b68549b5ce576f1d03851953e3a9db6c0dc41"
+  },
+  "generator_calls": 1,
+  "checks": {
+    "AB_original_pixels_x_0_949_unchanged": true,
+    "B_original_pixels_preserved": true,
+    "joint_matches_actual_candidate_and_B": true,
+    "height_724_preserved": true,
+    "png_integrity": true
+  },
+  "boundary_rgb_mae_descriptive_only": {
+    "before": {
+      "all": 7.42,
+      "architecture_y_0_614": 5.766,
+      "road_y_615_723": 16.752
+    },
+    "after": {
+      "all": 1.831,
+      "architecture_y_0_614": 1.675,
+      "road_y_615_723": 2.716
+    }
+  },
+  "output_files": {
+    "images/hellscape_cemento_AB.png": {
+      "bytes": 1278276,
+      "sha256": "4eda20fa53a51afa339f634a64c7daa7edd95d827d7210974d0a713c01451bcc"
+    },
+    "images/hellscape_cemento_B.png": {
+      "bytes": 2835632,
+      "sha256": "6540cbee62558d46dd9ed82a088b68549b5ce576f1d03851953e3a9db6c0dc41"
+    },
+    "previews/AB_B.png": {
+      "bytes": 1168208,
+      "sha256": "c7052ea3b7949e3faeceb842ec408b26f874bd7852b263966d51c0c8469d8ec3"
+    },
+    "source/guides/AB_B_prima_ritocco.png": {
+      "bytes": 1165013,
+      "sha256": "75fcb5f74f89d3f6b1ef82e39c294fa2ee9613792bfef5a7b3b3b9f281edda8a"
+    },
+    "source/generated/AB_B_ritocco_locale.png": {
+      "bytes": 2678353,
+      "sha256": "dddd1a364868b88c723482a1f94c45138a241c259c3ae5a0bff36509a80d1bcb"
+    },
+    "prompts/AB_B_ritocco_locale.txt": {
+      "bytes": 2252,
+      "sha256": "8870ac10f26cc1bf7b8c0e8e2bc578445a7ff4eec5ad7671d8db0015687f0e5d"
+    }
+  },
+  "approval": "Utente: va bene. aggiorna AB e B con questa nuova giunzione. poi carica su github.",
+  "processing": {
+    "resize_raw_to": [
+      960,
+      724
+    ],
+    "method": "Lanczos, quindi montaggio locale sul solo lato AB",
+    "AB_destination_x": [
+      950,
+      1090
+    ],
+    "generation_preview_x": [
+      340,
+      480
+    ],
+    "horizontal_blend_ramp_x": [
+      340,
+      395
+    ],
+    "regions": "cavalcavia superiore, ponte intermedio e asfalto; raccordo bordo 16 px derivato dalle prime colonne originali di B; correzione graduale luminosità asfalto a bassa frequenza",
+    "B": "nessuna modifica ai byte o ai pixel",
+    "no_additional_generation_this_update": true
+  }
+}

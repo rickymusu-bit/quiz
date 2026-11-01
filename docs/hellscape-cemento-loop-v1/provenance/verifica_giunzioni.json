@@ -1,0 +1,56 @@
+{
+  "note": "Misure descrittive dei pixel delle colonne estreme, non certificazione percettiva o geometrica. AB→B usa il ritocco approvato; B è originale e immutata.",
+  "joins": [
+    {
+      "join": "A->AB",
+      "previous_mean_absolute_rgb_boundary_difference_0_255": 32.473,
+      "mean_absolute_rgb_boundary_difference_0_255": 8.795,
+      "architecture_mae": 7.47,
+      "road_mae": 16.266,
+      "preview": "previews/A_AB.png"
+    },
+    {
+      "join": "AB->B",
+      "previous_mean_absolute_rgb_boundary_difference_0_255": 7.42,
+      "mean_absolute_rgb_boundary_difference_0_255": 1.831,
+      "architecture_mae": 1.675,
+      "road_mae": 2.716,
+      "preview": "previews/AB_B.png"
+    },
+    {
+      "join": "B->BC",
+      "previous_mean_absolute_rgb_boundary_difference_0_255": 59.698,
+      "mean_absolute_rgb_boundary_difference_0_255": 9.492,
+      "architecture_mae": 9.573,
+      "road_mae": 9.031,
+      "preview": "previews/B_BC.png"
+    },
+    {
+      "join": "BC->C",
+      "previous_mean_absolute_rgb_boundary_difference_0_255": 40.078,
+      "mean_absolute_rgb_boundary_difference_0_255": 13.674,
+      "architecture_mae": 14.49,
+      "road_mae": 9.067,
+      "preview": "previews/BC_C.png"
+    },
+    {
+      "join": "C->CA",
+      "previous_mean_absolute_rgb_boundary_difference_0_255": 15.917,
+      "mean_absolute_rgb_boundary_difference_0_255": 10.233,
+      "architecture_mae": 9.504,
+      "road_mae": 14.352,
+      "preview": "previews/C_CA.png"
+    },
+    {
+      "join": "CA->A",
+      "previous_mean_absolute_rgb_boundary_difference_0_255": 27.506,
+      "mean_absolute_rgb_boundary_difference_0_255": 7.78,
+      "architecture_mae": 7.778,
+      "road_mae": 7.795,
+      "preview": "previews/CA_A.png"
+    }
+  ],
+  "version": "1.1.0",
+  "date": "2026-11-01",
+  "split_y": 615
+}

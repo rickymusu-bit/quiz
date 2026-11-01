@@ -1,0 +1,62 @@
+{
+  "date": "2026-11-01",
+  "sequence": [
+    "A",
+    "AB",
+    "B",
+    "BC",
+    "C",
+    "CA",
+    "A"
+  ],
+  "height": 724,
+  "period_pixels": 9845,
+  "placements": [
+    {
+      "image": "A",
+      "file": "images/hellscape_cemento_A.png",
+      "x": 0,
+      "width": 2172,
+      "height": 724
+    },
+    {
+      "image": "AB",
+      "file": "images/hellscape_cemento_AB.png",
+      "x": 2172,
+      "width": 1090,
+      "height": 724
+    },
+    {
+      "image": "B",
+      "file": "images/hellscape_cemento_B.png",
+      "x": 3262,
+      "width": 2172,
+      "height": 724
+    },
+    {
+      "image": "BC",
+      "file": "images/hellscape_cemento_BC.png",
+      "x": 5434,
+      "width": 1106,
+      "height": 724
+    },
+    {
+      "image": "C",
+      "file": "images/hellscape_cemento_C.png",
+      "x": 6540,
+      "width": 2172,
+      "height": 724
+    },
+    {
+      "image": "CA",
+      "file": "images/hellscape_cemento_CA.png",
+      "x": 8712,
+      "width": 1133,
+      "height": 724
+    }
+  ],
+  "cycle_png": "previews/hellscape_ciclo.png",
+  "processing": "Accostamento alla scala 1:1 dei sei asset correnti, senza blending tra file; AB incorpora il ritocco locale approvato della giunzione AB→B. Anteprima di montaggio asset, non evidenza del runtime.",
+  "video": "previews/anteprima_scorrimento.mp4",
+  "asset_revision": "1.1.0"
+}

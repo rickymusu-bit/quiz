@@ -1,0 +1,136 @@
+{
+  "version": "1.1.0",
+  "date": "2026-11-01",
+  "repository": "rickymusu-bit/quiz",
+  "source_commit": "30b5df8b5955640f38defb6b03e1edc39a524415",
+  "authorization": "Approvazione utente del ritocco mostrato nella conversazione e richiesta: aggiorna AB e B con questa nuova giunzione, poi carica su GitHub. Nessuna autorizzazione al merge o alla modifica del runtime.",
+  "status": "Archivio aggiornato con ritocco AB→B approvato; A/B/C originali conservati. Nessuna integrazione nel runtime.",
+  "generator": "image_gen.imagegen",
+  "selected_main_generations": [
+    {
+      "image": "A",
+      "prompt": "prompts/A.txt",
+      "output": "images/hellscape_cemento_A.png",
+      "original_generation_file": "exec-8840d0dc-a788-4b8d-83cd-b97dfd5515e0.png",
+      "reference_images": []
+    },
+    {
+      "image": "B",
+      "prompt": "prompts/B.txt",
+      "output": "images/hellscape_cemento_B.png",
+      "original_generation_file": "exec-e04b48d3-dec9-41cf-8143-34797667a43e.png",
+      "reference_images": [
+        "images/hellscape_cemento_A.png"
+      ]
+    },
+    {
+      "image": "C",
+      "prompt": "prompts/C.txt",
+      "output": "images/hellscape_cemento_C.png",
+      "original_generation_file": "exec-6dcdf9e4-113d-48a3-a534-5ce72c134c70.png",
+      "reference_images": [
+        "images/hellscape_cemento_A.png",
+        "images/hellscape_cemento_B.png"
+      ]
+    }
+  ],
+  "transition_generations": [
+    {
+      "transition": "AB",
+      "operation": "riempimento_centrale",
+      "guide": "source/guides/A_blank_B.png",
+      "prompt": "prompts/AB.txt",
+      "original_generation_file": "exec-06f930e5-93e7-4c20-8087-7d3f75e5a554.png",
+      "completed_image": "source/generated/AB_primo_riempimento.png",
+      "status": "candidato_intermedio_usato_per_correzione_asfalto"
+    },
+    {
+      "transition": "BC",
+      "operation": "riempimento_centrale",
+      "guide": "source/guides/B_blank_C.png",
+      "prompt": "prompts/BC.txt",
+      "original_generation_file": "exec-6bac5c7b-21fc-41ed-aa62-06b99450b37f.png",
+      "completed_image": "source/generated/BC_completamento.png",
+      "status": "finale",
+      "output": "images/hellscape_cemento_BC.png",
+      "crop": [
+        512,
+        0,
+        1618,
+        724
+      ]
+    },
+    {
+      "transition": "CA",
+      "operation": "riempimento_centrale",
+      "guide": "source/guides/C_blank_A.png",
+      "prompt": "prompts/CA.txt",
+      "original_generation_file": "exec-dd5125fa-3d05-4c3b-87ca-2422bd8c0e10.png",
+      "completed_image": "source/generated/CA_completamento.png",
+      "status": "finale",
+      "output": "images/hellscape_cemento_CA.png",
+      "crop": [
+        512,
+        0,
+        1645,
+        724
+      ]
+    },
+    {
+      "transition": "AB",
+      "operation": "correzione_generativa_solo_asfalto",
+      "guide": "source/guides/AB_blank_solo_asfalto.png",
+      "prompt": "prompts/AB_correzione_asfalto.txt",
+      "original_generation_file": "exec-ebabfcf7-d4c9-464e-a5f8-6f4ae6483e32.png",
+      "completed_image": "source/generated/AB_completamento_asfalto.png",
+      "status": "base_archiviata_del_ritocco_locale_approvato",
+      "output": "source/history/hellscape_cemento_AB_prima_ritocco.png",
+      "crop": [
+        511,
+        0,
+        1601,
+        724
+      ]
+    }
+  ],
+  "history_note": "Le rigenerazioni di formato dei principali sono documentate nei prompt completi selezionati. Sono archiviati i candidati citati dall’utente, non i tentativi scartati successivi con Leonardo/Gemini o canvas largo. I tre riempimenti iniziali e la correzione asfalto AB sono chiamate individuali e sequenziali.",
+  "processing": "Principali nativi conservati; BC/CA restano ritagli originali. AB sostituito con il ritocco locale approvato, generazione riportata alla scala originale e montata solo negli ultimi 140 px di AB; B integra. Il video usa i sei asset aggiornati.",
+  "limitations": [
+    "Differenze residue di microtexture e tono dell’asfalto.",
+    "Non certificato un ciclo perfetto pixel per pixel o già verificato nel runtime.",
+    "Il generatore ha parzialmente reinterpretato i contesti; i principali approvati sono conservati integralmente."
+  ],
+  "local_retouches": [
+    {
+      "junction": "AB→B",
+      "operation": "generazione_locale_e_montaggio_conservativo_approvato",
+      "generator": "image_gen.imagegen",
+      "generator_calls": 1,
+      "guide": "source/guides/AB_B_prima_ritocco.png",
+      "prompt": "prompts/AB_B_ritocco_locale.txt",
+      "original_generation_file": "exec-1b1a4a41-b07b-4b96-9b55-db342a98675e.png",
+      "raw_output": "source/generated/AB_B_ritocco_locale.png",
+      "raw_dimensions": [
+        1444,
+        1089
+      ],
+      "base_AB": "source/history/hellscape_cemento_AB_prima_ritocco.png",
+      "output": "images/hellscape_cemento_AB.png",
+      "output_dimensions": [
+        1090,
+        724
+      ],
+      "preview": "previews/AB_B.png",
+      "B": "images/hellscape_cemento_B.png",
+      "modified_AB_region_xyxy": [
+        950,
+        0,
+        1090,
+        724
+      ],
+      "B_preserved_byte_for_byte": true,
+      "approval": "Utente: va bene. aggiorna AB e B con questa nuova giunzione. poi carica su github.",
+      "processing_details": "provenance/AB_B_ritocco_approvato.json"
+    }
+  ]
+}
