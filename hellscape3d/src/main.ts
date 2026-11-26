@@ -4,6 +4,7 @@
  *
  * Parametri: ?seed=… (città), ?steps=N (azioni automatiche iniziali, senza
  * regia), ?timer=S (secondi per domanda), ?view=overview, ?motion=reduced,
+ * ?intro=off (senza l'apertura di Bafometto),
  * ?reveal=all (SOLO SVILUPPO: città intera), ?occlusion=off (SOLO SVILUPPO:
  * ostacoli opachi, per confronto), ?test=1 (espone ai test la risposta corretta).
  * Tasti: 1–4 risposte e alternative, Invio lancia il dado, Spazio o S
@@ -64,6 +65,9 @@ const canvas = document.querySelector<HTMLCanvasElement>("#scene")!;
 const fade = document.querySelector<HTMLElement>("#fade")!;
 const renderer = new GrayboxRenderer(canvas);
 const director = new CameraDirector(game.map, layout, state, { reducedMotion });
+renderer.setSeat(director.seatPosition);
+// Intervento d'apertura di Bafometto, solo per una partita nuova.
+if (steps === 0 && !revealAll && params.get("intro") !== "off") director.intro();
 let frame: Frame = director.getFrame();
 let builtKey = "";
 let model: SceneModel = buildModel();
@@ -71,6 +75,9 @@ let model: SceneModel = buildModel();
 let question: { key: string; data: FakeQuestion; timer: QuestionTimer } | null = null;
 let die: { value: number; hideAt: number | null } | null = null;
 let toast: { text: string; until: number } | null = null;
+/** Battuta di Bafometto visibile, con il tempo di lettura (anche con il movimento ridotto). */
+let speech: { text: string; until: number } | null = null;
+const spoken: string[] = [];
 let clock = 0;
 
 const hud = new Hud(document.querySelector<HTMLElement>("#hud")!, {
@@ -183,7 +190,16 @@ function drawFrame(seconds: number): void {
   if (Math.abs(inset - target) < 0.5) inset = target;
   renderer.setBottomInset(inset);
   // Gli ostacoli fra camera e giocatore attivo diventano trasparenti.
-  if (occlusionEnabled) occluders = renderer.updateOcclusion(frame.pawns[frame.activePlayerId]!);
+  // Sulla sede di Bafometto la pedina non è inquadrata: niente ostacoli da rendere trasparenti.
+  if (occlusionEnabled) occluders = frame.bafometto?.kind === "seat" ? renderer.clearOcclusion() : renderer.updateOcclusion(frame.pawns[frame.activePlayerId]!);
+  renderer.setBafometto(
+    frame.bafometto?.kind === "terminal" ? { kind: "terminal", position: layout.positions[frame.bafometto.cellId]! } : frame.bafometto,
+  );
+  for (const line of director.takeAnnouncements()) {
+    speech = { text: line.text, until: clock + 3.5 };
+    spoken.push(line.moment);
+  }
+  if (speech && clock >= speech.until) speech = null;
   fade.style.opacity = String(frame.fade);
   renderer.render();
 
@@ -203,6 +219,7 @@ function drawFrame(seconds: number): void {
     panel: lastPanel,
     die: die?.value ?? null,
     toast: toast?.text ?? null,
+    speech: speech?.text ?? null,
     dev: `Prova non pubblicata · seme ${seed}${revealAll ? " · CITTÀ RIVELATA" : ""}${reducedMotion ? " · movimento ridotto" : ""} · velocità ×${speed} · A automatico · V vista`,
   };
   hud.update(hudState);
@@ -231,6 +248,11 @@ function drawFrame(seconds: number): void {
       minimap: minimapCells,
       occluders: { tiles: occluders.tiles.length, pillars: occluders.pillars.length, walkways: occluders.walkways.length, masses: occluders.masses.length },
       occluderIds: [...occluders.tiles, ...occluders.pillars],
+      bafometto: frame.bafometto,
+      spoken: [...spoken],
+      speech: speech?.text ?? null,
+      seat: director.seatPosition,
+      cameraTarget: frame.camera.target,
       inset,
       activeScreen: renderer.project(frame.pawns[frame.activePlayerId]!),
       panelTop: panelInset() > 0 ? window.innerHeight - panelInset() : null,

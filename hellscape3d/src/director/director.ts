@@ -15,6 +15,7 @@ import { forwardWithin } from "../logic/graph.ts";
 import type { GameEvent, GameState } from "../logic/state.ts";
 import type { CityMap } from "../logic/types.ts";
 import type { CityLayout, Vec3 } from "../layout/types.ts";
+import { BAFOMETTO_LINES, seatPose, seatPosition, type BafomettoMoment } from "./bafometto.ts";
 
 export interface CameraPose {
   target: Vec3;
@@ -32,6 +33,16 @@ export interface Frame {
   explored: string[];
   /** Giocatore attivo secondo la presentazione (può seguire di qualche istante lo stato). */
   activePlayerId: string;
+  /** Manifestazione di Bafometto in corso: nella sede o su un terminale locale. */
+  bafometto: BafomettoPresence | null;
+}
+
+export type BafomettoPresence = { kind: "seat" } | { kind: "terminal"; cellId: string };
+
+/** Battuta di Bafometto da mostrare nell'interfaccia; prodotta anche con il movimento ridotto. */
+export interface Announcement {
+  moment: BafomettoMoment;
+  text: string;
 }
 
 export type TransitionKind = "near" | "district" | "far";
@@ -59,6 +70,10 @@ export const TIMING = Object.freeze({
   fork: 0.7,
   special: 0.5,
   exit: 1.2,
+  /** Dissolvenza verso la sede e ritorno, per ciascun passaggio. */
+  seatFade: 0.35,
+  seatHold: 2.4,
+  terminalHold: 1.6,
   transition: { near: 0.7, district: 1.25, far: 0.8 } as Readonly<Record<TransitionKind, number>>,
 });
 
@@ -119,6 +134,7 @@ const cloneFrame = (frame: Frame): Frame => ({
   fade: frame.fade,
   explored: [...frame.explored],
   activePlayerId: frame.activePlayerId,
+  bafometto: frame.bafometto ? { ...frame.bafometto } : null,
 });
 
 function addExplored(frame: Frame, ids: readonly string[]): void {
@@ -142,6 +158,8 @@ export class CameraDirector {
   private readonly queue: Clip[] = [];
   private current: Clip | null = null;
   private elapsed = 0;
+  private readonly announcements: Announcement[] = [];
+  private readonly seat: Vec3;
 
   constructor(map: CityMap, layout: CityLayout, state: GameState, options: DirectorOptions = {}) {
     this.map = map;
@@ -154,7 +172,24 @@ export class CameraDirector {
       fade: 0,
       explored: [...state.explored],
       activePlayerId: active.id,
+      bafometto: null,
     };
+    this.seat = seatPosition(this.at(map.startId));
+  }
+
+  /** Posizione della sede di Bafometto (dipende solo dalla partenza). */
+  get seatPosition(): Vec3 {
+    return { ...this.seat };
+  }
+
+  /** Battute prodotte dalla regia dall'ultima chiamata. */
+  takeAnnouncements(): Announcement[] {
+    return this.announcements.splice(0);
+  }
+
+  /** Intervento d'apertura di Bafometto, dalla sua sede. */
+  intro(): void {
+    this.queue.push(this.seatClip("intro", (frame) => ({ target: { ...frame.pawns[frame.activePlayerId]! }, ...SHOTS.ordinary })));
   }
 
   get busy(): boolean {
@@ -194,11 +229,14 @@ export class CameraDirector {
           this.queue.push(this.cameraClip(TIMING.fork, () => this.forkPose(event.cellId)));
           break;
         case "arrived":
-          if (event.special) this.queue.push(this.holdClip(TIMING.special));
+          if (event.special === "terminale") this.queue.push(this.terminalClip(event.cellId));
+          else if (event.special) this.queue.push(this.holdClip(TIMING.special));
           break;
-        case "gameEnded":
-          this.queue.push(this.cameraClip(TIMING.exit, () => ({ target: this.at(this.map.exitId), ...SHOTS.exit })));
+        case "gameEnded": {
+          const exitPose = (): CameraPose => ({ target: this.at(this.map.exitId), ...SHOTS.exit });
+          this.queue.push(this.cameraClip(TIMING.exit, exitPose), this.seatClip("end", exitPose));
           break;
+        }
         default:
           break;
       }
@@ -265,6 +303,75 @@ export class CameraDirector {
       apply: (frame, u) => {
         const t = ease(u);
         frame.camera = { target: lerpVec(from.target, to.target, t), distance: lerp(from.distance, to.distance, t), pitch: lerp(from.pitch, to.pitch, t) };
+      },
+    };
+  }
+
+  /**
+   * Intervento significativo: dissolvenza, inquadratura della sede, battuta,
+   * dissolvenza e ritorno. Nessun tragitto della camera fra sede e giocatore.
+   */
+  private seatClip(moment: BafomettoMoment, back: (frame: Frame) => CameraPose): Clip {
+    const fade = this.time(TIMING.seatFade);
+    const hold = this.time(TIMING.seatHold);
+    const total = 4 * fade + hold;
+    let from: CameraPose, to: CameraPose;
+    let announced = false;
+    return {
+      duration: total,
+      begin: (frame) => {
+        from = clonePose(frame.camera);
+        to = back(frame);
+        announced = false;
+      },
+      apply: (frame, u) => {
+        const t = u * total;
+        const announce = (): void => {
+          if (announced) return;
+          announced = true;
+          this.announcements.push({ moment, text: BAFOMETTO_LINES[moment] });
+        };
+        if (total === 0 || u >= 1) {
+          announce();
+          frame.camera = clonePose(to);
+          frame.fade = 0;
+          frame.bafometto = null;
+          return;
+        }
+        if (t < fade) {
+          frame.fade = ease(t / fade);
+          frame.camera = clonePose(from);
+        } else if (t < 3 * fade + hold) {
+          announce();
+          frame.bafometto = { kind: "seat" };
+          frame.camera = seatPose(this.seat);
+          frame.fade = t < 2 * fade ? ease(1 - (t - fade) / fade) : t < 2 * fade + hold ? 0 : ease((t - 2 * fade - hold) / fade);
+        } else {
+          frame.bafometto = null;
+          frame.camera = clonePose(to);
+          frame.fade = ease(1 - (t - 3 * fade - hold) / fade);
+        }
+      },
+    };
+  }
+
+  /** Scambio frequente: manifestazione locale sul terminale, senza passare dalla sede. */
+  private terminalClip(cellId: string): Clip {
+    const move = this.time(TIMING.question);
+    const total = move + this.time(TIMING.terminalHold);
+    let from: CameraPose;
+    const to: CameraPose = { target: this.at(cellId), ...SHOTS.question };
+    return {
+      duration: total,
+      begin: (frame) => {
+        from = clonePose(frame.camera);
+        frame.bafometto = { kind: "terminal", cellId };
+        this.announcements.push({ moment: "terminal", text: BAFOMETTO_LINES.terminal });
+      },
+      apply: (frame, u) => {
+        const t = ease(total === 0 ? 1 : Math.min(1, (u * total) / Math.max(move, 1e-9)));
+        frame.camera = { target: lerpVec(from.target, to.target, t), distance: lerp(from.distance, to.distance, t), pitch: lerp(from.pitch, to.pitch, t) };
+        frame.bafometto = u >= 1 ? null : { kind: "terminal", cellId };
       },
     };
   }

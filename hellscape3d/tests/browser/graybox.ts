@@ -46,6 +46,9 @@ interface DebugInfo {
   occluders: { tiles: number; pillars: number; walkways: number; masses: number };
   activeScreen: { x: number; y: number } | null;
   panelTop: number | null;
+  bafometto: { kind: "seat" } | { kind: "terminal"; cellId: string } | null;
+  spoken: string[];
+  speech: string | null;
   totalCells: number;
   stats: { tiles: number; walkways: number; stubs: number; masses: number; players: number };
 }
@@ -62,8 +65,13 @@ const CASES = [
   { name: "citta-rivelata-sviluppo", query: "seed=graybox-1&reveal=all&view=overview" },
 ] as const;
 
-async function waitReady(page: Page): Promise<void> {
+/** Pagina pronta e regia ferma; un'eventuale apertura di Bafometto viene saltata (ha una verifica dedicata). */
+async function waitReady(page: Page, skipIntro = true): Promise<void> {
   await page.waitForFunction(() => (window as unknown as { __hellscape3d?: DebugInfo }).__hellscape3d?.ready === true, null, { timeout: 30_000 });
+  if (skipIntro && (await info(page)).busy) {
+    await page.keyboard.press("KeyS");
+    await page.waitForFunction(() => (window as unknown as { __hellscape3d: DebugInfo }).__hellscape3d.busy === false, null, { timeout: 5_000 });
+  }
 }
 
 /** A regia ferma: celle mostrate = esplorate = disegnate, pedine sulle caselle dello stato. */
@@ -216,12 +224,25 @@ try {
       assertSettled(debug);
 
       // Scadenza del timer.
-      await page.goto(`${url}?seed=graybox-1&steps=15&timer=1`);
+      // Si attende la condizione, non un tempo fisso: il timer avanza al massimo di 1 s per fotogramma,
+      // e un fotogramma lento (compilazione degli shader in WebGL software) rallenterebbe un'attesa fissa.
+      // Timer di 3 s: abbastanza lungo da non scadere prima del controllo iniziale, anche con
+      // i primi fotogrammi lenti dopo il caricamento (con 1 s era già scaduto alla lettura).
+      await page.goto(`${url}?seed=graybox-1&steps=15&timer=3`);
       await waitReady(page);
-      await page.waitForTimeout(1600);
-      await waitIdle();
       debug = await info(page);
-      assert.notEqual(debug.stateActivePlayerId, player, "la scadenza non passa il turno");
+      assert.equal(debug.panel, "question");
+      assert.equal(debug.timer!.total, 3);
+      assert.equal(debug.stateActivePlayerId, player);
+      await page.waitForFunction(
+        (before) => {
+          const d = (window as unknown as { __hellscape3d: DebugInfo }).__hellscape3d;
+          return d.stateActivePlayerId !== before && !d.busy;
+        },
+        player,
+        { timeout: 15_000 },
+      );
+      assertSettled(await info(page));
       console.log(`ok   ${device.name} · risposta errata e scadenza del timer`);
 
       // Bivio: numeri sugli imbocchi, scelta da tastiera.
@@ -262,6 +283,57 @@ try {
     } catch (error) {
       failures++;
       console.log(`FAIL ${device.name} · ostacoli: ${(error as Error).message}`);
+    }
+    // Bafometto: apertura dalla sede, terminale locale, intervento finale, movimento ridotto.
+    try {
+      const seatState = (): Promise<unknown> =>
+        page.waitForFunction(() => (window as unknown as { __hellscape3d: DebugInfo }).__hellscape3d.bafometto?.kind === "seat", null, { timeout: 8_000 });
+      await page.goto(`${url}?seed=graybox-1`);
+      await waitReady(page, false);
+      await seatState();
+      let debug = await info(page);
+      assert.deepEqual(debug.spoken, ["intro"]);
+      assert.ok(await page.locator(".hud-speech").isVisible(), "battuta non visibile");
+      assert.deepEqual(debug.rendered, debug.shown, "la sede mostra celle non esplorate");
+      assert.equal(debug.panel, null, "pannelli visibili durante l'intervento");
+      assert.equal(await page.locator(".hud-panel").isVisible(), false, "contenitore del pannello visibile");
+      await page.screenshot({ path: join(artifacts, `bafometto-sede-${device.name}.png`) });
+      await page.keyboard.press("KeyS");
+      debug = await info(page);
+      assertSettled(debug);
+      assert.equal(debug.panel, "question");
+
+      await page.goto(`${url}?seed=graybox-1&steps=30`);
+      await waitReady(page);
+      await page.keyboard.press("KeyA");
+      await page.waitForFunction(() => (window as unknown as { __hellscape3d: DebugInfo }).__hellscape3d.bafometto?.kind === "terminal", null, { timeout: 10_000 });
+      debug = await info(page);
+      assert.ok(debug.spoken.includes("terminal") && !debug.spoken.includes("intro"));
+      assert.ok(await page.locator(".hud-speech").isVisible());
+      await page.screenshot({ path: join(artifacts, `bafometto-terminale-${device.name}.png`) });
+      await page.waitForFunction(() => (window as unknown as { __hellscape3d: DebugInfo }).__hellscape3d.busy === false, null, { timeout: 10_000 });
+      assertSettled(await info(page));
+
+      await page.goto(`${url}?seed=graybox-1&steps=36`);
+      await waitReady(page);
+      await page.keyboard.press("KeyA");
+      await seatState();
+      await page.waitForFunction(() => (window as unknown as { __hellscape3d: DebugInfo }).__hellscape3d.busy === false, null, { timeout: 10_000 });
+      debug = await info(page);
+      assert.equal(debug.phase, "ended");
+      assert.equal(debug.panel, "ended");
+      assert.ok(debug.spoken.includes("end"));
+
+      await page.goto(`${url}?seed=graybox-1&motion=reduced`);
+      await waitReady(page, false);
+      debug = await info(page);
+      assert.equal(debug.busy, false);
+      assert.deepEqual(debug.spoken, ["intro"]);
+      assert.ok(await page.locator(".hud-speech").isVisible(), "battuta assente con il movimento ridotto");
+      console.log(`ok   ${device.name} · Bafometto: sede, terminale, fine partita, movimento ridotto`);
+    } catch (error) {
+      failures++;
+      console.log(`FAIL ${device.name} · Bafometto: ${(error as Error).message}`);
     }
     // Movimento ridotto: nessuna animazione, presentazione sempre allineata allo stato.
     try {
