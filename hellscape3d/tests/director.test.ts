@@ -31,6 +31,7 @@ const distance = (a: { x: number; y: number; z: number }, b: { x: number; y: num
 
 function assertMatchesState(frame: Frame, state: GameState, layout: CityLayout): void {
   assert.deepEqual(frame.explored, state.explored);
+  assert.deepEqual(frame.traversed, state.traversed);
   for (const player of state.players) assert.ok(distance(frame.pawns[player.id]!, layout.positions[player.cellId]!) < 1e-9, `${player.id} fuori posto`);
   assert.equal(frame.activePlayerId, state.players[state.activeIndex]!.id);
   assert.equal(frame.fade, 0);
@@ -49,6 +50,11 @@ test("al termine di ogni azione la presentazione coincide con lo stato del motor
         // A ogni fotogramma: solo celle già esplorate nello stato, pedine sulle passerelle.
         const explored = new Set(step.after.explored);
         for (const id of frame.explored) assert.ok(explored.has(id), `${seed}: cella mostrata prima di essere esplorata`);
+        // Tratti percorsi: mai prima che lo siano nello stato, e solo fra caselle già mostrate.
+        for (const edge of frame.traversed) {
+          assert.ok(step.after.traversed.includes(edge), `${seed}: tratto ${edge} mostrato prima di essere percorso`);
+          for (const id of edge.split(">")) assert.ok(frame.explored.includes(id));
+        }
         for (const [id, p] of Object.entries(frame.pawns)) {
           const onPath = Object.values(game.map.cells).some((cell) =>
             [cell.id, ...cell.next].some((other) => pointSegmentDistance2D(p, layout.positions[cell.id]!, layout.positions[other]!) < 1e-6),
@@ -60,6 +66,18 @@ test("al termine di ogni azione la presentazione coincide con lo stato del motor
       assertMatchesState(frame, step.after, layout);
     }
   }
+});
+
+test("i tratti percorsi compaiono uno alla volta mentre la pedina avanza", () => {
+  const { game, layout, steps } = playthrough("regia-tratti");
+  const step = steps.find((s) => s.after.traversed.length - s.before.traversed.length >= 3)!;
+  const director = new CameraDirector(game.map, layout, step.before);
+  director.enqueue(step.events, step.after);
+  const counts: number[] = [];
+  while (director.busy) counts.push(director.update(1 / 30).traversed.length);
+  assert.ok(new Set(counts).size >= 3, "tratti non rivelati progressivamente");
+  for (let i = 1; i < counts.length; i++) assert.ok(counts[i]! >= counts[i - 1]!);
+  assert.equal(counts.at(-1), step.after.traversed.length);
 });
 
 test("le celle compaiono quando la pedina le raggiunge con lo sguardo, non prima", () => {

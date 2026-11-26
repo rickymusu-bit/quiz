@@ -8,6 +8,7 @@
  */
 import { GENERATOR_VERSION } from "./config.ts";
 import { resolveRules, type Game } from "./engine.ts";
+import { splitEdge, visitedCells } from "./exploration.ts";
 import { generateCityMap } from "./generator.ts";
 import { isRngState } from "./rng.ts";
 import type { GameState } from "./state.ts";
@@ -15,8 +16,12 @@ import { DIFFICULTIES, type CityMap, type GeneratorConfig } from "./types.ts";
 
 export const SAVE_KEY = "hellscape3d-save";
 export const SAVE_FORMAT = "hellscape3d-save";
-/** 2: bivio come punto di passaggio (stato senza `forkContext`). I salvataggi precedenti vengono rifiutati. */
-export const SAVE_VERSION = 2;
+/**
+ * 2: bivio come punto di passaggio (stato senza `forkContext`).
+ * 3: tratti percorsi (`traversed`) per la minimappa.
+ * I salvataggi di versioni precedenti vengono rifiutati.
+ */
+export const SAVE_VERSION = 3;
 
 export interface SaveFile {
   format: typeof SAVE_FORMAT;
@@ -109,6 +114,18 @@ export function validateState(map: CityMap, value: unknown): string[] {
   if (!Number.isInteger(state.turn) || state.turn < 1) issues.push("numero di turno non valido");
   if (!Array.isArray(state.explored) || !state.explored.every(has)) issues.push("aree esplorate non valide");
   else for (const player of state.players) if (!state.explored.includes(player.cellId)) issues.push(`${player.id}: casella non esplorata`);
+  const traversedOk =
+    Array.isArray(state.traversed) &&
+    state.traversed.every((edge, i, all) => {
+      if (typeof edge !== "string" || (i > 0 && all[i - 1]! >= edge)) return false;
+      const [from, to] = splitEdge(edge);
+      return has(from) && map.cells[from]!.next.includes(to) && (!Array.isArray(state.explored) || (state.explored.includes(from) && state.explored.includes(to)));
+    });
+  if (!traversedOk) issues.push("tratti percorsi non validi");
+  else {
+    const visited = new Set(visitedCells(map.startId, state.traversed));
+    for (const player of state.players) if (!visited.has(player.cellId)) issues.push(`${player.id}: casella non percorsa`);
+  }
   if (!isRngState(state.dice)) issues.push("stato del dado non valido");
 
   const active = state.players[state.activeIndex]!;

@@ -46,6 +46,11 @@ interface DebugInfo {
   correctIndex?: number;
   forkChoices: { number: number; to: string; anchored: boolean }[];
   minimap: string[];
+  minimapJunctions: number;
+  minimapExit: boolean;
+  /** Caselle percorse nello stato e nella presentazione. */
+  visited: string[];
+  shownVisited: string[];
   activePlayerId: string;
   stateActivePlayerId: string;
   occluders: { tiles: number; pillars: number; walkways: number; masses: number };
@@ -102,7 +107,10 @@ function assertSettled(debug: DebugInfo): void {
   assert.equal(debug.busy, false);
   assert.deepEqual(debug.shown, debug.explored);
   assert.deepEqual(debug.rendered, debug.explored);
-  assert.deepEqual(debug.minimap, debug.explored, "minimappa diversa dalle celle esplorate");
+  // Minimappa: solo caselle percorse; l'uscita resta un simbolo finché nessuno la raggiunge.
+  assert.deepEqual(debug.minimap, debug.visited, "minimappa diversa dalle caselle percorse");
+  assert.deepEqual(debug.shownVisited, debug.visited);
+  assert.equal(debug.minimapExit, debug.phase !== "ended");
   assert.equal(debug.activePlayerId, debug.stateActivePlayerId);
   for (const [id, p] of Object.entries(debug.pawns)) {
     const q = debug.cellPositions[id]!;
@@ -189,7 +197,8 @@ try {
         animated++;
         assert.ok(during.shown.every((id) => during.explored.includes(id)), "celle mostrate prima di essere esplorate");
         assert.deepEqual(during.rendered, during.shown, "celle disegnate diverse da quelle mostrate dalla regia");
-        assert.deepEqual(during.minimap, during.shown, "minimappa diversa dalle celle mostrate");
+        assert.deepEqual(during.minimap, during.shownVisited, "minimappa diversa dalle caselle percorse mostrate");
+        assert.ok(during.shownVisited.every((id) => during.visited.includes(id)), "casella in minimappa prima di essere percorsa");
         assert.equal(during.panel, null, "pannello visibile durante la regia");
         if (animated === 2) {
           await page.keyboard.press("KeyS");
@@ -307,6 +316,8 @@ try {
       assert.ok(debug.forkChoices.length >= 2 && debug.forkChoices.every((c) => c.anchored), "alternative non segnalate nella scena");
       assert.equal(await page.locator(".hud-badge").count(), debug.forkChoices.length);
       const chosen = debug.forkChoices[1]!.to;
+      // Rami non ancora percorsi da nessuno: dopo la scelta deve comparirne soltanto quello imboccato.
+      const others = debug.forkChoices.map((c) => c.to).filter((to) => to !== chosen && !debug.minimap.includes(to));
       await page.keyboard.press("Digit2");
       await page.waitForTimeout(100);
       await waitIdle();
@@ -314,6 +325,9 @@ try {
       assertSettled(debug);
       assert.ok(debug.explored.includes(chosen));
       assert.notEqual(debug.playerCells[mover], beforeFork, "dopo la scelta il giocatore resta prima del bivio");
+      assert.ok(debug.minimapJunctions >= 1, "bivio percorso assente dalla minimappa");
+      assert.ok(debug.minimap.includes(chosen) && !others.some((id) => debug.minimap.includes(id)), "minimappa: ramo scelto assente o ramo non imboccato presente");
+      await page.locator(".hud-minimap").screenshot({ path: join(artifacts, `minimappa-bivio-${device.name}.png`) });
       console.log(`ok   ${device.name} · scelta al bivio durante l'avanzamento, passi residui sul ramo scelto`);
     } catch (error) {
       failures++;
@@ -384,7 +398,7 @@ try {
             if (d.stats.primitives < d.stats.totalPrimitives) unloaded++;
             slowestBuild = Math.max(slowestBuild, d.stats.lastBuildMs);
             assert.deepEqual(d.rendered, d.shown, "vista presentata alterata dai settori");
-            assert.deepEqual(d.minimap, d.shown, "minimappa alterata dai settori");
+            assert.deepEqual(d.minimap, d.shownVisited, "minimappa alterata dai settori");
             // Le caselle su cui si trovano le pedine nello stato restano disegnate, anche durante la regia.
             // (una casella non ancora mostrata dalla regia non fa parte della vista presentata).
             for (const cell of Object.values(d.playerCells)) {
@@ -453,6 +467,7 @@ try {
       debug = await info(page);
       assert.equal(debug.phase, "ended");
       assert.equal(debug.panel, "ended");
+      assert.equal(debug.minimapExit, false, "uscita raggiunta ancora mostrata come simbolo");
       assert.ok(debug.spoken.includes("end"));
 
       await page.goto(`${url}?seed=graybox-1&motion=reduced`);

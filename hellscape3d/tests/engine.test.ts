@@ -104,6 +104,10 @@ test("bivio attraversato avanzando: sospensione, scelta senza domanda, il bivio 
     assert.equal(path[0], option.to);
     assert.equal(path.length, 3);
     assert.equal(second.state.committedBranch, null);
+    // Tratti percorsi: uno per passo, consecutivi, compreso quello che attraversa il bivio.
+    const walked = [beforeFork, ...path];
+    for (let k = 1; k < walked.length; k++) assert.ok(second.state.traversed.includes(`${walked[k - 1]}>${walked[k]}`));
+    for (const other of options) if (other.to !== option.to) assert.ok(!second.state.traversed.includes(`${beforeFork}>${other.to}`), "ramo non imboccato registrato");
     assert.equal(second.state.activeIndex, 1);
   }
 });

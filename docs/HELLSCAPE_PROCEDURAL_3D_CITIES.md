@@ -158,14 +158,14 @@ Aperte dalla revisione del 26 novembre:
 - soglie degli indizi dell'uscita e loro aspetto;
 - angolo della camera nella scena di corsa: laterale, come la cornice compositiva del runner precedente nelle [regole di progetto](HELLSCAPE_PROJECT_RULES_v1.0.1_20261031.md), alle spalle o a tre quarti; va scelto prima dei modelli e delle animazioni definitive dei personaggi;
 - lunghezza del ciclo dello scenario e velocità di corsa nelle varie fasi, compreso il rallentamento durante la domanda;
-- forma della minimappa (disposizione reale o schematica delle caselle percorse) e posizione del nodo dell'uscita;
+- forma della minimappa e posizione del nodo dell'uscita: decisa la disposizione reale delle caselle percorse. L'uscita è in una posizione fissa in alto a sinistra, la direzione in cui avanza in generale il percorso con l'orientamento della minimappa. La proposta approvata indicava «in alto a destra» per un errore sull'orientamento: la posizione resta da confermare;
 - bilanciamento con la nuova regola dei bivi: va rifatto con simulazioni, perché oggi il bivio è una casella e il calcolo tiene conto della scelta a inizio turno.
 
 ### Stato del prototipo rispetto alla revisione del 26 novembre
 
-Il prototipo in `hellscape3d/` implementa la regola dei bivi di questa revisione: bivio come punto di passaggio nel generatore e nel motore, salvataggi del formato precedente conservati a parte, bilanciamento rifatto. Per il resto implementa ancora la versione precedente: mostra la città a tre quarti con tutti i giocatori, una minimappa delle zone esplorate (comprese due caselle oltre i giocatori e i tratti verso la nebbia) e le alternative del bivio con lunghezza relativa e difficoltà esplicite. Le modifiche vanno fatte per passi giudicabili:
+Il prototipo in `hellscape3d/` implementa due parti di questa revisione. La prima è la regola dei bivi: bivio come punto di passaggio nel generatore e nel motore, salvataggi del formato precedente conservati a parte, bilanciamento rifatto. La seconda è la minimappa delle sole caselle percorse, con i bivi come punti di diramazione e l'uscita come simbolo fisso. Per il resto implementa ancora la versione precedente: mostra la città a tre quarti con tutti i giocatori e le alternative del bivio con lunghezza relativa e difficoltà esplicite. Le modifiche vanno fatte per passi giudicabili:
 1. bivio come punto di passaggio nel generatore e nel motore (fatto);
-2. minimappa delle sole caselle percorse con l'uscita simbolica;
+2. minimappa delle sole caselle percorse con l'uscita simbolica (fatto);
 3. scena di corsa in graybox: scenario ciclico per casella, giocatori nella stessa casella, bivio con imbocchi ed etichette, movimento ridotto;
 4. indizi dell'uscita provvisori.
 
