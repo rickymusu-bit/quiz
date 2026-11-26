@@ -92,6 +92,8 @@ function perform(action: GameAction): void {
   state = result.state;
   for (const event of result.events) if (event.type === "diceRolled") die = { value: event.value, hideAt: null };
   director.enqueue(result.events, state);
+  // Le clip istantanee (movimento ridotto) si completano subito; quelle animate partono soltanto.
+  frame = director.update(0);
   // Aggiornamento immediato di scena, interfaccia e dati di debug, salvo azioni nate durante il disegno (scadenza del timer).
   if (!drawing) draw(0);
 }
