@@ -3,10 +3,11 @@
  * Disegna esclusivamente il SceneModel ricevuto; non conosce mappa né stato.
  */
 import * as THREE from "three";
-import { DEFAULT_LAYOUT_CONFIG, VIEW_DIRECTION } from "../layout/layout.ts";
 import type { Vec3 } from "../layout/types.ts";
 import type { CameraPose } from "../director/director.ts";
+import { ABYSS_Y, cameraPosition, PILLAR_WIDTH, TILE, tileScale, WALKWAY } from "../scene/dimensions.ts";
 import type { SceneModel, SceneSegment } from "../scene/model.ts";
+import { findOccluders, NO_OCCLUDERS, occludersKey, type Occluders } from "../scene/occlusion.ts";
 import { playerColor } from "../ui/palette.ts";
 
 export type CameraMode = "player" | "overview";
@@ -19,8 +20,8 @@ const DISTRICT_TINT: Readonly<Record<string, number>> = {
   motori: 0x948577,
   sommita: 0x9a9ba3,
 };
-const TILE = { size: 2.6, thickness: 0.5 };
-const WALKWAY = { width: 1.3, thickness: 0.25 };
+/** Opacità dei volumi resi trasparenti perché nascondono il giocatore attivo. */
+const OCCLUDER_OPACITY = 0.18;
 const OVERVIEW_PITCH = THREE.MathUtils.degToRad(50);
 const OVERVIEW_MIN_DISTANCE = 24;
 
@@ -40,6 +41,12 @@ export class GrayboxRenderer {
   private sun = new THREE.DirectionalLight(0xffe2c0, 2.4);
   private stats: RenderStats = { tiles: 0, walkways: 0, stubs: 0, masses: 0, players: 0 };
   private pawns = new Map<string, THREE.Group>();
+  private model: SceneModel | null = null;
+  /** Volumi che possono nascondere la pedina: ricostruiti quando cambiano gli ostacoli. */
+  private occludable = new THREE.Group();
+  private occlusion: Occluders = NO_OCCLUDERS;
+  private occlusionKey = "";
+  private readonly faded = new Map<THREE.Material, THREE.Material>();
   private readonly unitBox = new THREE.BoxGeometry(1, 1, 1);
   private readonly materials = {
     tile: new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.85, metalness: 0.05 }),
@@ -67,7 +74,7 @@ export class GrayboxRenderer {
     this.scene.add(this.sun, this.sun.target, this.content);
     const abyss = new THREE.Mesh(new THREE.PlaneGeometry(2000, 2000), this.materials.abyss);
     abyss.rotation.x = -Math.PI / 2;
-    abyss.position.y = DEFAULT_LAYOUT_CONFIG.abyssY;
+    abyss.position.y = ABYSS_Y;
     this.scene.add(abyss);
   }
 
@@ -84,41 +91,108 @@ export class GrayboxRenderer {
   /** Ricostruisce la scena statica (caselle, passerelle, masse) e le pedine. */
   setModel(model: SceneModel): void {
     this.clearContent();
-    const tiles = model.tiles;
-    const tileMesh = new THREE.InstancedMesh(this.unitBox, this.materials.tile, Math.max(1, tiles.length));
-    const pillarMesh = new THREE.InstancedMesh(this.unitBox, this.materials.pillar, Math.max(1, tiles.length));
-    const matrix = new THREE.Matrix4();
-    const color = new THREE.Color();
-    tiles.forEach((tile, i) => {
-      const scale = tile.kind === "fork" ? 1.4 : tile.kind === "start" || tile.kind === "exit" ? 1.6 : 1;
-      const p = tile.position;
-      matrix.compose(new THREE.Vector3(p.x, p.y - TILE.thickness / 2, p.z), new THREE.Quaternion(), new THREE.Vector3(TILE.size * scale, TILE.thickness, TILE.size * scale));
-      tileMesh.setMatrixAt(i, matrix);
-      tileMesh.setColorAt(i, color.setHex(DISTRICT_TINT[tile.district] ?? 0x8c8f94).multiplyScalar(tile.kind === "fork" ? 1.15 : 1));
-      const height = p.y - TILE.thickness - DEFAULT_LAYOUT_CONFIG.abyssY;
-      matrix.compose(new THREE.Vector3(p.x, DEFAULT_LAYOUT_CONFIG.abyssY + height / 2, p.z), new THREE.Quaternion(), new THREE.Vector3(0.7, height, 0.7));
-      pillarMesh.setMatrixAt(i, matrix);
-      if (tile.special) this.addSpecialMarker(tile.special, p);
-      if (tile.kind === "exit") this.addGate(p);
-    });
-    tileMesh.count = tiles.length;
-    pillarMesh.count = tiles.length;
-    this.addShadowed(tileMesh, pillarMesh);
-    this.addSegments(model.walkways, this.materials.walkway);
-    this.addSegments(model.stubs, this.materials.stub);
-
-    const massMesh = new THREE.InstancedMesh(this.unitBox, this.materials.mass, Math.max(1, model.masses.length));
-    model.masses.forEach((mass, i) => {
-      matrix.compose(new THREE.Vector3(mass.x, (mass.top + mass.bottom) / 2, mass.z), new THREE.Quaternion(), new THREE.Vector3(mass.width, mass.top - mass.bottom, mass.depth));
-      massMesh.setMatrixAt(i, matrix);
-    });
-    massMesh.count = model.masses.length;
-    this.addShadowed(massMesh);
-
+    this.model = model;
+    this.content.add(this.occludable);
+    for (const tile of model.tiles) {
+      if (tile.special) this.addSpecialMarker(tile.special, tile.position);
+      if (tile.kind === "exit") this.addGate(tile.position);
+    }
+    this.addSegments(model.stubs, this.materials.stub, this.content);
+    this.occlusion = NO_OCCLUDERS;
+    this.occlusionKey = "";
+    this.buildOccludable();
     this.pawns.clear();
     for (const player of model.players) this.pawns.set(player.id, this.addPlayer(player.index, player.active));
     this.setPawnPositions(Object.fromEntries(model.players.map((p) => [p.id, p.position])));
-    this.stats = { tiles: tiles.length, walkways: model.walkways.length, stubs: model.stubs.length, masses: model.masses.length, players: model.players.length };
+    this.stats = { tiles: model.tiles.length, walkways: model.walkways.length, stubs: model.stubs.length, masses: model.masses.length, players: model.players.length };
+  }
+
+  /**
+   * Rende trasparenti i volumi fra la camera e la pedina in `focus` (§6).
+   * Va chiamato dopo aver posizionato la camera; restituisce gli ostacoli trovati.
+   */
+  updateOcclusion(focus: Vec3): Occluders {
+    if (!this.model) return NO_OCCLUDERS;
+    const p = this.camera.position;
+    const occlusion = findOccluders(this.model, { x: p.x, y: p.y, z: p.z }, focus);
+    const key = occludersKey(occlusion);
+    if (key !== this.occlusionKey) {
+      this.occlusion = occlusion;
+      this.occlusionKey = key;
+      this.buildOccludable();
+    }
+    return this.occlusion;
+  }
+
+  /** Caselle, piloni, passerelle e masse, divisi fra opachi e trasparenti secondo gli ostacoli correnti. */
+  private buildOccludable(): void {
+    const model = this.model!;
+    this.disposeChildren(this.occludable);
+    const occ = {
+      tiles: new Set(this.occlusion.tiles),
+      pillars: new Set(this.occlusion.pillars),
+      walkways: new Set(this.occlusion.walkways),
+      masses: new Set(this.occlusion.masses),
+    };
+    const color = new THREE.Color();
+    this.addBoxes(
+      model.tiles.map((tile) => {
+        const scale = tileScale(tile.kind);
+        const p = tile.position;
+        return {
+          faded: occ.tiles.has(tile.id),
+          position: new THREE.Vector3(p.x, p.y - TILE.thickness / 2, p.z),
+          scale: new THREE.Vector3(TILE.size * scale, TILE.thickness, TILE.size * scale),
+          color: color.setHex(DISTRICT_TINT[tile.district] ?? 0x8c8f94).multiplyScalar(tile.kind === "fork" ? 1.15 : 1).clone(),
+        };
+      }),
+      this.materials.tile,
+    );
+    this.addBoxes(
+      model.tiles.map((tile) => {
+        const p = tile.position;
+        const height = p.y - TILE.thickness - ABYSS_Y;
+        return { faded: occ.pillars.has(tile.id), position: new THREE.Vector3(p.x, ABYSS_Y + height / 2, p.z), scale: new THREE.Vector3(PILLAR_WIDTH, height, PILLAR_WIDTH) };
+      }),
+      this.materials.pillar,
+    );
+    this.addSegments(model.walkways, this.materials.walkway, this.occludable, occ.walkways);
+    this.addBoxes(
+      model.masses.map((mass, i) => ({
+        faded: occ.masses.has(i),
+        position: new THREE.Vector3(mass.x, (mass.top + mass.bottom) / 2, mass.z),
+        scale: new THREE.Vector3(mass.width, mass.top - mass.bottom, mass.depth),
+      })),
+      this.materials.mass,
+    );
+  }
+
+  /** Istanze di parallelepipedi, in due gruppi: opachi e trasparenti. */
+  private addBoxes(boxes: { faded: boolean; position: THREE.Vector3; scale: THREE.Vector3; rotation?: THREE.Quaternion; color?: THREE.Color }[], material: THREE.Material): void {
+    for (const faded of [false, true]) {
+      const chosen = boxes.filter((b) => b.faded === faded);
+      if (chosen.length === 0) continue;
+      const mesh = new THREE.InstancedMesh(this.unitBox, faded ? this.fadedMaterial(material) : material, chosen.length);
+      const matrix = new THREE.Matrix4();
+      chosen.forEach((box, i) => {
+        mesh.setMatrixAt(i, matrix.compose(box.position, box.rotation ?? new THREE.Quaternion(), box.scale));
+        if (box.color) mesh.setColorAt(i, box.color);
+      });
+      mesh.castShadow = true;
+      mesh.receiveShadow = !faded;
+      mesh.userData.faded = faded;
+      this.occludable.add(mesh);
+    }
+  }
+
+  private fadedMaterial(material: THREE.Material): THREE.Material {
+    let faded = this.faded.get(material);
+    if (!faded) {
+      faded = material.clone();
+      Object.assign(faded, { transparent: true, opacity: OCCLUDER_OPACITY, depthWrite: false });
+      this.faded.set(material, faded);
+    }
+    return faded;
   }
 
   /** Posizioni delle pedine; quelle sulla stessa casella vengono affiancate. */
@@ -151,6 +225,25 @@ export class GrayboxRenderer {
     this.placeCamera(sphere.center, distance, OVERVIEW_PITCH);
   }
 
+  /**
+   * Riserva `pixels` in basso (pannello dell'interfaccia): il punto inquadrato
+   * resta al centro dell'area libera. Inquadratura decentrata, senza spostare
+   * la camera né deformare l'immagine.
+   */
+  setBottomInset(pixels: number): void {
+    const width = this.renderer.domElement.clientWidth,
+      height = this.renderer.domElement.clientHeight;
+    const inset = Math.max(0, Math.min(height * 0.6, pixels));
+    if (inset < 0.5) {
+      this.camera.clearViewOffset();
+      this.camera.aspect = width / height;
+    } else {
+      this.camera.aspect = width / (height + inset);
+      this.camera.setViewOffset(width, height + inset, 0, inset, width, height);
+    }
+    this.camera.updateProjectionMatrix();
+  }
+
   /** Coordinate in pixel CSS di un punto della scena; null se dietro la camera o fuori dall'inquadratura. */
   project(p: Vec3): { x: number; y: number } | null {
     const v = new THREE.Vector3(p.x, p.y, p.z).project(this.camera);
@@ -171,21 +264,31 @@ export class GrayboxRenderer {
     }
   }
 
-  private addSegments(segments: readonly SceneSegment[], material: THREE.Material): void {
+  private addSegments(segments: readonly SceneSegment[], material: THREE.Material, parent: THREE.Group, faded: ReadonlySet<number> = new Set()): void {
     if (segments.length === 0) return;
-    const mesh = new THREE.InstancedMesh(this.unitBox, material, segments.length);
-    const matrix = new THREE.Matrix4();
     const axis = new THREE.Vector3(1, 0, 0);
-    segments.forEach((segment, i) => {
+    const boxes = segments.map((segment, i) => {
       const a = new THREE.Vector3(segment.a.x, segment.a.y - WALKWAY.thickness, segment.a.z);
       const b = new THREE.Vector3(segment.b.x, segment.b.y - WALKWAY.thickness, segment.b.z);
       const direction = b.clone().sub(a);
       const length = direction.length();
-      const rotation = new THREE.Quaternion().setFromUnitVectors(axis, direction.normalize());
-      matrix.compose(a.clone().add(b).multiplyScalar(0.5), rotation, new THREE.Vector3(length, WALKWAY.thickness, WALKWAY.width));
-      mesh.setMatrixAt(i, matrix);
+      return {
+        faded: faded.has(i),
+        position: a.clone().add(b).multiplyScalar(0.5),
+        rotation: new THREE.Quaternion().setFromUnitVectors(axis, direction.normalize()),
+        scale: new THREE.Vector3(length, WALKWAY.thickness, WALKWAY.width),
+      };
     });
-    this.addShadowed(mesh);
+    if (parent === this.occludable) {
+      this.addBoxes(boxes, material);
+      return;
+    }
+    const mesh = new THREE.InstancedMesh(this.unitBox, material, boxes.length);
+    const matrix = new THREE.Matrix4();
+    boxes.forEach((box, i) => mesh.setMatrixAt(i, matrix.compose(box.position, box.rotation, box.scale)));
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    parent.add(mesh);
   }
 
   private addSpecialMarker(kind: string, p: Vec3): void {
@@ -233,8 +336,8 @@ export class GrayboxRenderer {
   }
 
   private placeCamera(target: THREE.Vector3, distance: number, pitch: number): void {
-    const offset = new THREE.Vector3(VIEW_DIRECTION.x * Math.cos(pitch), Math.sin(pitch), VIEW_DIRECTION.z * Math.cos(pitch)).multiplyScalar(distance);
-    this.camera.position.copy(target).add(offset);
+    const position = cameraPosition({ x: target.x, y: target.y, z: target.z }, distance, pitch);
+    this.camera.position.set(position.x, position.y, position.z);
     this.camera.lookAt(target);
     this.camera.far = distance + 250;
     this.camera.updateProjectionMatrix();
@@ -249,8 +352,14 @@ export class GrayboxRenderer {
   }
 
   private clearContent(): void {
-    for (const object of [...this.content.children]) {
-      this.content.remove(object);
+    this.disposeChildren(this.occludable);
+    this.disposeChildren(this.content);
+  }
+
+  private disposeChildren(group: THREE.Group): void {
+    for (const object of [...group.children]) {
+      group.remove(object);
+      if (object === this.occludable) continue;
       object.traverse((child) => {
         if (child instanceof THREE.InstancedMesh) child.dispose();
         if (child instanceof THREE.Mesh && child.geometry !== this.unitBox) child.geometry.dispose();
@@ -261,7 +370,7 @@ export class GrayboxRenderer {
   dispose(): void {
     this.clearContent();
     this.unitBox.dispose();
-    for (const material of Object.values(this.materials)) material.dispose();
+    for (const material of [...Object.values(this.materials), ...this.faded.values()]) material.dispose();
     this.renderer.dispose();
   }
 }

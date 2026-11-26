@@ -43,6 +43,9 @@ interface DebugInfo {
   minimap: string[];
   activePlayerId: string;
   stateActivePlayerId: string;
+  occluders: { tiles: number; pillars: number; walkways: number; masses: number };
+  activeScreen: { x: number; y: number } | null;
+  panelTop: number | null;
   totalCells: number;
   stats: { tiles: number; walkways: number; stubs: number; masses: number; players: number };
 }
@@ -239,6 +242,26 @@ try {
     } catch (error) {
       failures++;
       console.log(`FAIL ${device.name} · interfaccia: ${(error as Error).message}`);
+    }
+    // Ostacoli: la passerella sopraelevata davanti alla pedina diventa trasparente; il pannello non la copre.
+    try {
+      for (const occlusion of ["on", "off"] as const) {
+        await page.goto(`${url}?seed=graybox-16&steps=14${occlusion === "off" ? "&occlusion=off" : ""}`);
+        await waitReady(page);
+        await page.waitForFunction(() => {
+          const d = (window as unknown as { __hellscape3d: DebugInfo }).__hellscape3d;
+          return d.panelTop !== null && d.activeScreen !== null && Math.abs(window.innerHeight - d.panelTop - (d as unknown as { inset: number }).inset) < 1;
+        }, null, { timeout: 10_000 });
+        const debug = await info(page);
+        if (occlusion === "on") assert.equal(debug.occluders.walkways, 1, "passerella occludente non rilevata");
+        else assert.equal(debug.occluders.walkways + debug.occluders.tiles + debug.occluders.masses, 0);
+        assert.ok(debug.activeScreen!.y < debug.panelTop!, `pedina sotto il pannello (${debug.activeScreen!.y} ≥ ${debug.panelTop})`);
+        await page.screenshot({ path: join(artifacts, `ostacolo-${occlusion}-${device.name}.png`) });
+      }
+      console.log(`ok   ${device.name} · ostacolo trasparente e pedina sopra il pannello`);
+    } catch (error) {
+      failures++;
+      console.log(`FAIL ${device.name} · ostacoli: ${(error as Error).message}`);
     }
     // Movimento ridotto: nessuna animazione, presentazione sempre allineata allo stato.
     try {
