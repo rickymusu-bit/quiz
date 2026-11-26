@@ -1,12 +1,12 @@
 # Hellscape — città procedurali 3D e regia di gioco
 
-**Data:** 2026-11-25  
-**Stato:** specifica di redesign approvata nella conversazione del 25 novembre 2026, proposta per integrazione documentale.  
-**Ambito:** nuovo gioco da tavolo digitale a turni su schermo condiviso; nessuna modifica al runtime in questa PR.
+**Data:** 2026-11-25, aggiornata il 2026-11-26  
+**Stato:** specifica di redesign approvata nella conversazione del 25 novembre 2026; la revisione del 26 novembre (rappresentazione in corsa, minimappa, bivi) è approvata nella conversazione del 26 novembre 2026 e proposta per integrazione documentale.  
+**Ambito:** nuovo gioco da tavolo digitale a turni su schermo condiviso; nessuna modifica al runtime pubblicato né al prototipo in questa PR.
 
 ## 1. Obiettivo e precedenza
 
-La gara consiste nell'uscire da una città infernale controllata da Bafometto biomeccanico. Il mondo è tridimensionale, stilizzato, generato proceduralmente per ogni nuova partita e osservato mediante una camera prevalentemente a tre quarti. Il gioco non è un open world: i personaggi si spostano lungo percorsi discreti.
+La gara consiste nell'uscire da una città infernale controllata da Bafometto biomeccanico. Il mondo è tridimensionale, stilizzato e generato proceduralmente per ogni nuova partita. Il gioco non è un open world: i personaggi si spostano lungo percorsi discreti. Nessuno conosce il percorso né quanto manca alla fine: la schermata mostra un giocatore alla volta, sempre in corsa nel tratto di città in cui si trova (§6), e la minimappa soltanto le caselle già percorse (§3).
 
 Questa specifica aggiorna per il redesign le indicazioni relative al runner, alla sequenza obbligatoria dei sei quartieri e alla rappresentazione grafica 2D/2.5D. Il runtime pubblicato, i salvataggi e gli asset storici non vengono modificati da questa PR. Le specifiche precedenti rimangono valide per gli aspetti non in conflitto; eventuali incompatibilità di regolamento non trattate qui devono essere risolte prima dell'implementazione. Riferimenti: [direzione cinematica precedente](HELLSCAPE_BAFOMETTO_DIREZIONE_CINEMATICA_v1.2.0_20261031.md), [regole di progetto precedenti](HELLSCAPE_PROJECT_RULES_v1.0.1_20261031.md), [README del runtime](../README.md).
 
@@ -20,15 +20,19 @@ Il solo tema da implementare nella prima fase è **Megastrutture**. Non è richi
 
 - Generare un seed casuale a ogni nuova partita e una mappa deterministica a partire da seed, tema e configurazione. Lo stesso insieme di input e versione del generatore deve riprodurre la stessa mappa.
 - Generare per prima la rete logica: partenza, caselle, archi, bivi, distretti, eventi, uscita e punti di interazione pertinenti. Tutti i percorsi proposti devono consentire la fuga; evitare vicoli ciechi involontari, cicli che impediscono la progressione e lunghezze eccessive.
-- A ogni bivio indicare la lunghezza **relativa** dei percorsi verso l'uscita (più breve, intermedio se pertinente, più lungo) e la difficoltà delle domande. Il confronto si riferisce al cammino residuo verso l'uscita, non soltanto al prossimo incrocio. In caso di successive diramazioni, usare un criterio coerente e dichiarato internamente, per esempio la minima distanza residua raggiungibile dopo aver scelto il ramo; non promettere una lunghezza esatta del percorso effettivamente seguito.
+- A ogni bivio le alternative si presentano con etichette generiche e tematiche, per esempio «scorciatoia pericolosa» e «strada sicura», non con lunghezze o difficoltà esplicite. L'etichetta corrisponde alla posizione del ramo nell'ordine delle lunghezze **relative** verso l'uscita (più breve, intermedio se pertinente, più lungo), che resta legata alla difficoltà delle domande. Il confronto si riferisce al cammino residuo verso l'uscita, non soltanto al prossimo incrocio. In caso di successive diramazioni, usare un criterio coerente e dichiarato internamente, per esempio la minima distanza residua raggiungibile dopo aver scelto il ramo; non promettere una lunghezza esatta del percorso effettivamente seguito. Le etichette appartengono al tema della città; quella del ramo intermedio è da definire.
 - I percorsi più brevi comportano domande più difficili; quelli più lunghi domande più facili. Verificare mediante simulazioni che le alternative siano plausibilmente competitive, tenendo conto di probabilità di risposta corretta, dado ed eventi. Le soglie numeriche e i profili di bilanciamento non sono ancora fissati.
-- Non esporre numero di caselle residue, distanza esatta, posizione precisa dell'uscita, né eventi futuri. I primi segmenti e il ramo scelto sono visibili; curve, ostacoli, dislivelli e oscurità nascondono il seguito.
-- La minimappa condivisa mostra i giocatori, quello attivo e le aree già esplorate collettivamente; non mostra la rete sconosciuta né una vista globale che consenta di ricostruire le lunghezze nascoste. La nebbia di guerra è uno stato esplicito, non soltanto un effetto estetico. Anche transizioni della camera, HUD e inquadrature speciali devono rispettarlo.
+- Non esporre numero di caselle residue, distanza esatta, posizione dell'uscita, né eventi futuri. Si vede soltanto la casella in cui si trova il giocatore mostrato; al bivio, l'imbocco dei rami, non il loro seguito.
+- **Minimappa.** Mostra soltanto le caselle già percorse da almeno un giocatore e i tratti fra caselle consecutive percorse, senza caselle viste in anticipo né tratti verso l'ignoto. Indica la posizione di tutti i giocatori e quello attivo. Un bivio percorso compare come nodo, con i soli rami già imboccati. L'uscita è un nodo con un'icona propria, staccato dal grafo e in posizione simbolica fissa (per esempio sul bordo): la sua collocazione non deve suggerire direzione o distanza. Diventa una casella del grafo solo quando qualcuno la raggiunge.
+- **Indizi dell'uscita.** L'avvicinamento all'uscita si avverte da segni ambientali nella scena di corsa: luce naturale, uccelli in volo, vegetazione. L'intensità dipende dalla minima distanza residua dalla casella corrente, per soglie grossolane (indicativamente: nessun indizio, poi luce, poi uccelli e vegetazione nelle ultime caselle) e non in modo continuo, così che non si possano contare le caselle. Prima della scelta a un bivio gli indizi non distinguono i rami. Valori delle soglie e aspetto degli indizi sono da definire con il bilanciamento e la direzione artistica.
+- La nebbia di guerra è uno stato esplicito, non soltanto un effetto estetico. Scena di corsa, transizioni, HUD, minimappa e inquadrature speciali devono rispettarla.
 - La logica interna conserva le distanze esatte necessarie al generatore; non esporle nell'interfaccia. Non si promette segretezza anti-manomissione rispetto agli strumenti di sviluppo di un browser locale.
 
 ### Turno e stato di gioco
 
-Il giocatore attivo risponde a una domanda; se corretta, lancia il dado e avanza di conseguenza. Gli effetti ordinari delle caselle si applicano esclusivamente alla casella di arrivo, non a quelle attraversate. Un bivio incontrato durante l'avanzamento deve permettere la scelta prima di proseguire; la semantica esatta della difficoltà quando un turno attraversa un bivio va definita nella specifica del regolamento prima del relativo sviluppo. Il cambio di camera non cambia lo stato di gioco.
+Il giocatore attivo risponde a una domanda; se corretta, lancia il dado e avanza di conseguenza. Gli effetti ordinari delle caselle si applicano esclusivamente alla casella di arrivo, non a quelle attraversate. Il cambio di inquadratura non cambia lo stato di gioco.
+
+**Bivi.** A un bivio si arriva soltanto avanzando, e lì si sceglie soltanto dove andare: la scelta non comporta domande. Chi raggiunge un bivio si ferma e sceglie subito, anche se il bivio è l'ultima casella del suo avanzamento; con passi residui prosegue sul ramo scelto. Chi termina l'avanzamento sul bivio vi resta con il ramo già scelto, che non può più cambiare. La domanda del turno successivo ha la difficoltà di quel ramo, e anche dopo una risposta errata la scelta resta valida: la scelta appartiene al giocatore, non al turno. Più giocatori sullo stesso bivio possono avere scelto rami diversi. La partita non comincia su un bivio.
 
 Conservare la direzione di progetto già discussa per crediti, salute, Omen e Bafometto; non ridefinirne in questo documento prezzi, valori numerici o condizioni di vittoria e recupero non ancora formalizzate. Il nuovo modello non deve essere confuso con il punteggio e il runner attualmente pubblicati.
 
@@ -68,32 +72,38 @@ Kit minimo: piattaforma/pavimento, parete/facciata, pilastro, ponte/passerella, 
 
 Generare geometricamente volumi e strutture semplici; usare materiali procedurali o texture prodotte e verificate appositamente; riservare modelli dedicati a personaggi, Bafometto e macchinari complessi. Variare proporzioni, altezza, combinazioni e materiali entro regole coerenti. Le texture e gli asset devono avere provenienza e licenze documentate. I personaggi complessi richiedono rigging e animazioni; non si presuppone che un generatore di immagini produca direttamente modelli 3D utilizzabili.
 
-## 6. Personaggi e regia
+## 6. Personaggi, scena di corsa e regia
 
-I personaggi sono modelli 3D animati, non pedine statiche; camminano, reagiscono agli eventi e manifestano lo stato di salute. Il giocatore attivo è sempre identificabile mediante HUD e segnale visivo coerente. La vista ordinaria è a tre quarti, di tipo isometrico/ortografico o prospettico a seconda della leggibilità; la regia può cambiare distanza, inclinazione e campo visivo. Gli ostacoli che nascondono il personaggio attivo vengono resi temporaneamente trasparenti o tagliati, senza rivelare zone ancora sconosciute.
+I personaggi sono modelli 3D animati, non pedine statiche; corrono, reagiscono agli eventi e manifestano lo stato di salute. I giocatori sono in gara fra loro, quindi chi si trova in un tratto di percorso è mostrato in corsa.
 
-| Fase | Inquadratura |
+### Scena di corsa
+
+- **Un giocatore alla volta.** La schermata mostra il giocatore attivo che corre sul posto mentre lo scenario della sua casella gli scorre intorno. Gli altri giocatori compaiono solo se si trovano nella stessa casella: allora corrono insieme. Il giocatore attivo è identificabile mediante HUD e segnale visivo coerente.
+- **Una casella, un ciclo.** Ogni casella ha un tratto di scenario proprio, costruito proceduralmente dal tema, dal distretto e dal seme con il kit modulare. Il tratto scorre senza interruzioni e si ripete identico dopo un periodo, in modo che la ripetizione non mostri giunture. Lo scenario deriva soltanto dalla casella corrente e non anticipa nulla del seguito, salvo gli indizi dell'uscita (§3).
+- **Avanzamento.** La corsa accelera e a ogni casella attraversata lo scenario passa al tratto della casella successiva, con un passaggio breve e continuo. All'arrivo si torna alla corsa ordinaria.
+- **Risposta errata o tempo scaduto.** Il giocatore continua a correre nello stesso tratto: è in gara, ma non guadagna terreno.
+- **Bivio.** Chi si trova sul bivio è fermo. La scena mostra l'imbocco dei rami, due o tre passaggi, con le etichette generiche (§3) e nessuna informazione sul seguito. Dopo la scelta il giocatore riprende a correre verso il ramo scelto.
+- **Leggibilità.** Durante la domanda lo scorrimento è lento o attenuato e il pannello ha uno sfondo pieno. Con il movimento ridotto lo scenario non scorre: si mostra un'immagine ferma del tratto e i cambi di casella avvengono per stacco.
+
+| Fase | Rappresentazione |
 | --- | --- |
-| Inizio turno | Giocatore attivo e contesto locale, indicazione del turno |
-| Domanda | Avvicinamento al personaggio, domanda sovrapposta in HTML/CSS |
-| Dado | Inquadratura o animazione dedicata, esito leggibile |
-| Avanzamento | Camera di inseguimento, campo sufficiente a leggere il percorso |
-| Bivio | Visuale delle alternative locali, nessuna lunghezza esatta |
-| Arrivo/evento | Inquadratura contestuale, risoluzione dell'evento |
-| Fine turno | Transizione al giocatore successivo |
+| Inizio turno | Stacco sulla scena di corsa del giocatore attivo, indicazione del turno |
+| Domanda | Corsa rallentata, domanda sovrapposta in HTML/CSS |
+| Dado | Animazione dedicata, esito leggibile |
+| Avanzamento | Corsa accelerata, cambio di scenario a ogni casella |
+| Bivio | Giocatore fermo davanti agli imbocchi, scelta fra etichette generiche |
+| Arrivo/evento | Inquadratura contestuale nella scena della casella, risoluzione dell'evento |
+| Fine turno | Transizione alla scena del giocatore successivo |
 
-Il timer della domanda non deve consumare tempo mentre la regia ne impedisce la lettura o l'interazione. Orientamento coerente fra inquadrature ordinarie, rotazioni limitate e opzione movimento ridotto; animazioni accelerabili o saltabili senza cambiare gli esiti.
+Il timer della domanda non deve consumare tempo mentre la regia ne impedisce la lettura o l'interazione. Animazioni accelerabili o saltabili senza cambiare gli esiti.
 
 ### Transizioni fra giocatori
 
-- Vicini sulla stessa strada: traslazione fluida, indicativamente 0,5–1 s.
-- Nello stesso distretto: breve allontanamento, traslazione e avvicinamento, indicativamente 1–1,5 s, soltanto lungo visuali già consentite.
-- Lontani o separati da aree inesplorate: breve dissolvenza, oscurità, fumo o interferenza, cambio di posizione fuori campo e riapertura sul destinatario, indicativamente 0,5–1 s. Non sorvolare tutta la città né svelare nuovi percorsi.
-- Interazione con Bafometto: cambio di inquadratura dedicato, con gli stessi vincoli di segretezza. I tempi sono obiettivi di prototipazione, non valori immutabili.
+Il passaggio da un giocatore all'altro è un cambio di scena breve: dissolvenza, oscurità, fumo o interferenza, indicativamente 0,5–1 s. Se il giocatore successivo è nella stessa casella non serve cambiare scena. La transizione non sorvola la città e non mostra percorsi. I tempi sono obiettivi di prototipazione, non valori immutabili.
 
-Bafometto può avere una sede fisica, una sala monumentale o una macchina centrale, e manifestarsi attraverso terminali, monitor o apparizioni locali. La regia passa alla sua sede per gli interventi significativi e ritorna al giocatore interessato; gli scambi frequenti, come l'acquisto di Omen, privilegiano una manifestazione locale. Nessun tragitto obbligatorio della camera fra la sede e il giocatore. La sua posizione scenografica non deve essere usata per rivelare l'uscita o la topologia nascosta.
+Bafometto può avere una sede fisica, una sala monumentale o una macchina centrale, e manifestarsi attraverso terminali, monitor o apparizioni locali nella scena di corsa. La regia passa alla sua sede per gli interventi significativi e ritorna al giocatore interessato; gli scambi frequenti, come l'acquisto di Omen, privilegiano una manifestazione locale. La sua posizione scenografica non deve essere usata per rivelare l'uscita o la topologia nascosta.
 
-Il CameraDirector riceve eventi dal motore e gestisce inquadrature, transizioni, interruzioni e salti. Non assegna ricompense, non consuma turni e non determina gli esiti di dado o domanda. Il motore resta l'autorità sullo stato.
+Il CameraDirector riceve eventi dal motore e gestisce scene, transizioni, interruzioni e salti. Non assegna ricompense, non consuma turni e non determina gli esiti di dado o domanda. Il motore resta l'autorità sullo stato.
 
 ## 7. Architettura tecnica proposta
 
@@ -101,8 +111,8 @@ La distribuzione resta un sito web statico, utilizzabile in partita locale a sch
 
 - **MapGenerator:** seed, grafo, difficoltà, vincoli, validazione; testabile senza browser.
 - **CityTheme:** catalogo moduli, materiali, palette, regole di assemblaggio, atmosfera e varianti. Primo tema: MegastructuresCityTheme.
-- **CityBuilder:** layout spaziale, assemblaggio, validazione geometrica e caricamento della scena.
-- **CameraDirector:** regia e transizioni indipendenti dalla logica.
+- **CityBuilder:** scenario ciclico di ogni casella, assemblaggio, validazione geometrica e caricamento della scena.
+- **CameraDirector:** scene di corsa, regia e transizioni indipendenti dalla logica.
 - **GameState:** posizioni, turno, eventi, inventario, salute, crediti, aree esplorate e dati di ripresa.
 
 Stack proposto: Three.js/WebGL per rendering 3D, TypeScript e Vite per il nuovo codice, HTML/CSS per HUD, menu e domande, Blender e glTF/GLB per modelli complessi. Nessun motore fisico completo necessario: i movimenti lungo gli archi possono essere controllati da interpolazione e animazione. Queste sono scelte approvate come direzione, da verificare nel prototipo e non dipendenze già introdotte.
@@ -111,7 +121,7 @@ Separare le sequenze casuali della logica da quelle puramente decorative; non pe
 
 ## 8. Prestazioni e accessibilità
 
-La mappa logica viene generata integralmente all'avvio, la scena grafica per settori attorno al giocatore attivo e alle destinazioni delle transizioni. Le zone lontane possono essere scaricate senza perdere stato logico. Preparare il settore di destinazione prima di terminare una dissolvenza; evitare schermate vuote, scatti e indiscrezioni visive.
+La mappa logica viene generata integralmente all'avvio. La scena grafica contiene il tratto della casella corrente e, durante avanzamenti e transizioni, quello di destinazione; gli altri possono essere scaricati senza perdere stato logico. Preparare il tratto di destinazione prima di terminare una dissolvenza o un cambio di casella; evitare schermate vuote, scatti e indiscrezioni visive.
 
 Usare istanze per elementi ripetuti, livelli di dettaglio, riutilizzo di materiali e geometrie, culling e budget di luci/ombre/particelle. Prevedere qualità adattabile, visuale leggibile su desktop e mobile in orizzontale, HUD accessibile e movimento ridotto. Stabilire budget misurabili di memoria, tempi e frame rate dopo la misura del prototipo, senza promettere prestazioni non verificate.
 
@@ -120,9 +130,10 @@ Usare istanze per elementi ripetuti, livelli di dettaglio, riutilizzo di materia
 Realizzare esclusivamente Megastrutture:
 - un kit modulare minimo e un generatore di grafo e layout;
 - area iniziale, uscita, almeno un bivio con alternative di difficoltà e lunghezza relativa diversa, due o tre tipi di nodo speciale;
-- un modello giocatore provvisorio, con almeno due istanze giocabili per provare cambi turno vicini e lontani;
+- un modello giocatore provvisorio con ciclo di corsa, con almeno due istanze giocabili per provare cambi turno e giocatori nella stessa casella;
+- la scena di corsa con scenario ciclico per casella, cambio di scenario durante l'avanzamento e indizi dell'uscita provvisori;
 - una scena/interfaccia provvisoria di Bafometto;
-- domanda, dado, avanzamento, scelta, arrivo, cambio turno, nebbia di guerra e minimappa;
+- domanda, dado, avanzamento, scelta al bivio, arrivo, cambio turno, nebbia di guerra e minimappa delle caselle percorse;
 - ripresa della partita con lo stesso mondo.
 
 Fasi suggerite: (1) modello logico e test; (2) graybox 3D modulare con camera; (3) kit e direzione artistica; (4) personaggi, Bafometto, atmosfera e ottimizzazione. Non sviluppare altre città prima di convalidare il primo tema. Non avviare un rifacimento totale del runtime in questa PR.
@@ -131,15 +142,36 @@ Fasi suggerite: (1) modello logico e test; (2) graybox 3D modulare con camera; (
 
 - Seed uguale, tema/configurazione/versione uguali: stessa mappa; seed diversi producono varietà effettiva. Test su una pluralità di seed, includendo casi limite e fallback.
 - Tutti i rami offerti sono raggiungibili e coerenti con la lunghezza relativa e la difficoltà; nessuna geometria impedisce il movimento. Le alternative non sono manifestamente dominate nelle simulazioni.
-- Il giocatore vede soltanto i dati autorizzati dal sistema di esplorazione; HUD, minimappa, camera, dissolvenze e tagli di geometria non svelano la mappa sconosciuta.
-- Camera funzionante fra due giocatori vicini e lontani e fra Bafometto e giocatore; nessuna perdita dello stato, doppia risoluzione, consumo di timer durante blocchi o modifica dell'esito saltando un'animazione.
-- Ricaricamento conserva mondo e progressi; caricamento/scaricamento dei settori conserva la topologia e la posizione dei giocatori.
+- Il giocatore vede soltanto i dati autorizzati: la casella corrente, gli imbocchi del bivio e gli indizi a soglie. HUD, minimappa, scena di corsa e transizioni non svelano la mappa sconosciuta; la minimappa contiene soltanto caselle percorse e l'uscita in posizione simbolica.
+- Al bivio la scelta avviene all'arrivo, senza domanda, e resta valida per il turno successivo anche dopo una risposta errata.
+- Lo scenario di ogni casella si ripete senza giunture visibili e cambia a ogni casella attraversata; la schermata mostra il solo giocatore attivo, più chi si trova nella sua casella.
+- Transizioni funzionanti fra giocatori in caselle diverse e nella stessa casella e fra Bafometto e giocatore; nessuna perdita dello stato, doppia risoluzione, consumo di timer durante blocchi o modifica dell'esito saltando un'animazione.
+- Ricaricamento conserva mondo e progressi, compreso il ramo scelto da chi è fermo su un bivio; caricamento e scaricamento degli scenari non alterano topologia e posizione dei giocatori.
 - Verificare compatibilità desktop/mobile e qualità con registrazioni reali del browser, viewport e revisione secondo AGENTS.md. Nessuna evidenza di runtime è richiesta o dichiarata per la presente PR esclusivamente documentale.
 
 ## 10. Decisioni ancora aperte
 
-Prima delle relative implementazioni, definire lunghezza/durata delle gare, numero e distribuzione dei bivi, profili di bilanciamento, regole di domanda ai bivi, valori e condizioni di salute/crediti/Omen, schema di salvataggio e migrazione, quantità degli asset e budget prestazionali. La scelta automatica o manuale della città può attendere l'introduzione della seconda città.
+Prima delle relative implementazioni, definire lunghezza/durata delle gare, numero e distribuzione dei bivi, profili di bilanciamento, valori e condizioni di salute/crediti/Omen, schema di salvataggio e migrazione, quantità degli asset e budget prestazionali. La scelta automatica o manuale della città può attendere l'introduzione della seconda città.
+
+Aperte dalla revisione del 26 novembre:
+- etichetta del ramo intermedio ed eventuali varianti delle etichette per tema;
+- soglie degli indizi dell'uscita e loro aspetto;
+- angolo della camera nella scena di corsa: laterale, come la cornice compositiva del runner precedente nelle [regole di progetto](HELLSCAPE_PROJECT_RULES_v1.0.1_20261031.md), alle spalle o a tre quarti; va scelto prima dei modelli e delle animazioni definitive dei personaggi;
+- lunghezza del ciclo dello scenario e velocità di corsa nelle varie fasi, compreso il rallentamento durante la domanda;
+- forma della minimappa (disposizione reale o schematica delle caselle percorse) e posizione del nodo dell'uscita;
+- bilanciamento con la nuova regola dei bivi: va rifatto con simulazioni, perché oggi tiene conto della scelta a inizio turno.
+
+### Stato del prototipo rispetto alla revisione del 26 novembre
+
+Il prototipo in `hellscape3d/` implementa ancora la versione precedente. Mostra la città a tre quarti con tutti i giocatori, una minimappa delle zone esplorate (comprese due caselle oltre i giocatori e i tratti verso la nebbia) e la scelta del bivio a inizio turno con domanda. Le modifiche vanno fatte per passi giudicabili:
+1. regola dei bivi nel motore, con salvataggio compatibile e bilanciamento rifatto;
+2. minimappa delle sole caselle percorse con l'uscita simbolica;
+3. scena di corsa in graybox: scenario ciclico per casella, giocatori nella stessa casella, bivio con imbocchi ed etichette, movimento ridotto;
+4. indizi dell'uscita provvisori.
+
+Restano utili generatore, motore, salvataggi, domande, kit modulare e minimappa. La vista della città a tre quarti resta come strumento di sviluppo per giudicare le mappe. Transizioni di camera nella città, ostacoli trasparenti e caricamento per settori perdono il loro scopo nel gioco: si rimuovono, dopo aver verificato le dipendenze, quando la scena di corsa li avrà sostituiti.
 
 ## Registro delle variazioni
 
 - 2026-11-25: consolidamento delle decisioni approvate nella conversazione sul redesign: mappe procedurali, informazione parziale, 3D stilizzato, una città per gara, Megastrutture come primo tema, generazione modulare e regia dinamica.
+- 2026-11-26: rappresentazione in corsa al posto della vista a tre quarti come schermata di gioco (un giocatore alla volta, insieme se nella stessa casella, scenario ciclico per casella); minimappa delle sole caselle percorse con l'uscita come nodo simbolico staccato; indizi dell'uscita a soglie; bivi raggiunti solo avanzando, con scelta all'arrivo, senza domanda e con etichette generiche; stato del prototipo e passi di adeguamento.
