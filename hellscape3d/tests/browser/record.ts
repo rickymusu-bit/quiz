@@ -25,6 +25,8 @@ const { values } = parseArgs({
     name: { type: "string", default: "regia" },
     query: { type: "string", default: "" },
     fps: { type: "string", default: "10" },
+    /** Dopo N azioni ricarica la pagina senza parametri, per registrare la ripresa della partita. */
+    "reload-after": { type: "string", default: "" },
   },
 });
 const width = Number(values.width),
@@ -55,8 +57,16 @@ await page.waitForTimeout(800);
 // Si gioca dall'interfaccia, con pause leggibili; una risposta su quattro è volutamente errata.
 type Debug = { busy: boolean; panel: string | null; correctIndex?: number; forkChoices: { number: number }[] };
 const debug = (): Promise<Debug> => page.evaluate(() => (window as unknown as { __hellscape3d: Debug }).__hellscape3d);
+const reloadAfter = values["reload-after"] === "" ? -1 : Number(values["reload-after"]);
 for (let i = 0; i < Number(values.actions); i++) {
   await page.waitForFunction(() => !(window as unknown as { __hellscape3d: { busy: boolean } }).__hellscape3d.busy, null, { timeout: 20_000 });
+  if (i === reloadAfter) {
+    await page.waitForTimeout(700);
+    // Senza seme né mosse: la pagina riprende la partita salvata (test=1 serve solo a conoscere la risposta corretta).
+    await page.goto(`${url}?test=1`);
+    await page.waitForFunction(() => (window as unknown as { __hellscape3d?: { ready: boolean } }).__hellscape3d?.ready === true);
+    await page.waitForTimeout(1500);
+  }
   const d = await debug();
   if (d.panel === "question") {
     await page.waitForTimeout(1300);
