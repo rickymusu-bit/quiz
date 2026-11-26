@@ -126,7 +126,7 @@ class Builder {
 function tileModule(b: Builder, tile: SceneModel["tiles"][number], exits: readonly Vec3[]): void {
   const p = tile.position;
   const half = halfSize(tile.kind);
-  const tint = shade(DISTRICT_TINT[tile.district] ?? CONCRETE.light, tile.kind === "fork" ? 1.12 : 1);
+  const tint = DISTRICT_TINT[tile.district] ?? CONCRETE.light;
   b.ref = { kind: "tile", key: tileKey(tile.id) };
   // Lastra, piastra di calpestio e travi incrociate sotto.
   b.box("concrete", { x: p.x, y: p.y - TILE.thickness / 2, z: p.z }, { x: half * 2, y: TILE.thickness, z: half * 2 }, tint);
@@ -158,7 +158,7 @@ function tileModule(b: Builder, tile: SceneModel["tiles"][number], exits: readon
       b.beam("metal", { ...post, y: p.y + KIT.railingHeight }, { ...other, y: p.y + KIT.railingHeight }, 0.06, 0.06);
     }
   });
-  // Bivi, partenza e uscita: lampioni agli spigoli, salvo dove arriva una passerella.
+  // Partenza e uscita: lampioni agli spigoli, salvo dove arriva una passerella.
   if (tile.kind !== "path") {
     for (const [sx, sz] of [
       [1, 1],

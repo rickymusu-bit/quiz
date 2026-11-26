@@ -41,7 +41,7 @@ npm test                           # suite core completa, che comprende i test N
 | `render/graybox.ts` | renderer Three.js: istanze per caselle, passerelle, piloni e masse; camera a tre quarti |
 | `main.ts`, `index.html` | pagina di prova non pubblicata |
 
-**Layout.** La rete viene scomposta in corridoi e bivi. Il percorso avanza sempre lungo X, con svolte di 90° verso ±Z e rampe di 1,5 unità; le caselle distano 4 unità. Ai bivi il ramo più breve procede diritto e diventa una passerella sopraelevata; gli altri escono di lato, procedono paralleli e rientrano, eventualmente a una quota più bassa. I rami sono percorsi su griglia: se lo scarto rispetto al ramo breve è dispari, l'ultimo passo è diagonale. Così nessuna casella cade a metà di un angolo, dove disterebbe dalla precedente solo 2,83 unità e le piastrelle si sovrapporrebbero.
+**Layout.** La rete viene scomposta in corridoi e bivi. Il percorso avanza sempre lungo X, con svolte di 90° verso ±Z e rampe di 1,5 unità; le caselle distano 4 unità. Dalla casella prima di un bivio partono i rami: il più breve procede diritto e diventa una passerella sopraelevata; gli altri escono di lato, procedono paralleli e rientrano, eventualmente a una quota più bassa. I rami sono percorsi su griglia: se lo scarto rispetto al ramo breve è dispari, l'ultimo passo è diagonale. Così nessuna casella cade a metà di un angolo, dove disterebbe dalla precedente solo 2,83 unità e le piastrelle si sovrapporrebbero.
 
 Ogni disposizione viene verificata: distanza minima fra caselle, passerelle che non si toccano né attraversano caselle (salvo 3,5 unità di dislivello), lunghezza dei tratti e pendenza. Se 12 tentativi falliscono si usa la disposizione rettilinea, valida per costruzione e verificata comunque. Su 300 città di prova è servita una volta. Il layout usa i flussi pseudocasuali `layout:N` e `decor:masses`, separati da quelli della logica, e non modifica la mappa. Le masse edilizie restano ad almeno 4,5 unità dal percorso; dal lato della camera sono più basse del percorso, per non coprirlo.
 
@@ -107,7 +107,7 @@ Quando un pannello occupa la parte bassa dello schermo, l'inquadratura si decent
 - **Ripresa:** senza parametri la pagina riprende la partita salvata. Il mondo viene ricostruito da seme, configurazione e versione del generatore e confrontato con l'impronta salvata; lo stato è quello del motore. L'apertura di Bafometto non si ripete e compare l'avviso «Partita ripresa».
 - **Partita nuova:** `?seed=`, `?steps=` o `?new=1` avviano esplicitamente una partita nuova, che sostituisce il salvataggio; «Nuova città» fa lo stesso.
 - **Quando si salva:** all'avvio di una partita nuova e dopo ogni azione, prima e indipendentemente dalla regia.
-- **Salvataggio incompatibile** (versione, generatore o impronta diversi, dati non validi): non si perde. Viene copiato in `hellscape3d-save-scartato`, parte una partita nuova e compare un avviso. I salvataggi del gioco pubblicato (`fool-v1`, `fool-settings-v1`) non vengono toccati.
+- **Salvataggio incompatibile** (versione, generatore o impronta diversi, dati non validi): non si perde. Viene copiato in `hellscape3d-save-scartato`, parte una partita nuova e compare un avviso. I salvataggi del gioco pubblicato (`fool-v1`, `fool-settings-v1`) non vengono toccati. È il caso dei salvataggi fatti prima del bivio come punto di passaggio (formato 1, generatore 1.0.0): il formato attuale è il 2.
 - **Timer della domanda:** il tempo residuo si salva ogni mezzo secondo e alla chiusura della pagina (`hellscape3d-domanda`), legato a partita, turno e giocatore. Ricaricare non restituisce tempo; una domanda già scaduta scade al primo fotogramma.
 - **Senza `localStorage`:** la partita funziona, con l'avviso che non potrà essere ripresa.
 
@@ -119,7 +119,7 @@ Lo script di registrazione accetta `--reload-after N` per ricaricare la pagina d
 
 | Elemento | Moduli |
 | --- | --- |
-| Casella | lastra, piastra di calpestio, travi incrociate, ringhiera sul perimetro; lampioni agli spigoli di bivi, partenza e uscita |
+| Casella | lastra, piastra di calpestio, travi incrociate, ringhiera sul perimetro; lampioni agli spigoli di partenza e uscita |
 | Pilone | capitello, fusto, anelli di controvento ogni 7 unità |
 | Passerella | piano di calpestio, cordoli, montanti e corrimano, condotto sotto il piano |
 | Massa edilizia | corpo, marcapiani ogni 3,5 unità, costoloni agli spigoli, macchinari e serbatoi sul tetto, tubazione in facciata (solo nei 32 m alti: più in basso c'è la nebbia) |
@@ -154,7 +154,7 @@ Verifiche nel browser: con il raggio calcolato l'immagine del canvas coincide pi
 
 ## Rete generata
 
-Sequenza di corridoi e bivi; i rami di ogni bivio (2 o 3) si ricongiungono all'inizio del corridoio successivo. La rete è aciclica, ogni cella è raggiungibile dalla partenza e raggiunge l'uscita. Il ramo più corto ha domande difficili, il più lungo facili, l'eventuale intermedio medie. La lunghezza relativa si basa sulla minima distanza residua verso l'uscita dopo la scelta, come indicato dalla specifica. Le lunghezze di due rami dello stesso bivio differiscono di almeno due caselle.
+Sequenza di corridoi e bivi; i rami di ogni bivio (2 o 3) si ricongiungono all'inizio del corridoio successivo. Il bivio non è una casella (specifica §3): l'ultima casella di un corridoio ha come successive le prime caselle dei rami, e le alternative (`options`) sono indicizzate da quella casella. Il generatore è alla versione 2.0.0; le mappe della 1.0.0, in cui il bivio era una casella, non sono più riproducibili. La rete è aciclica, ogni cella è raggiungibile dalla partenza e raggiunge l'uscita. Il ramo più corto ha domande difficili, il più lungo facili, l'eventuale intermedio medie. La lunghezza relativa si basa sulla minima distanza residua verso l'uscita dopo la scelta, come indicato dalla specifica. Le lunghezze di due rami dello stesso bivio differiscono di almeno due caselle.
 
 Gli identificativi delle celle sono opachi e assegnati da una permutazione casuale: non rivelano l'ordine di costruzione né le distanze. L'uscita è nel distretto «Sommità», gli altri distretti si distribuiscono in base al seed. A parità di seed, tema, configurazione e versione del generatore la mappa è identica; l'impronta (`fingerprint`) lo verifica.
 
@@ -164,13 +164,15 @@ Se nessuno dei tentativi (6 per impostazione predefinita) supera la validazione 
 
 Per ogni bivio si calcolano i turni attesi dalla partenza imponendo ciascun ramo, con scelta ottimale agli altri bivi. Lo scarto fra le alternative non deve superare 0,6 turni. Il generatore sceglie le lunghezze costruendo la rete all'indietro dall'uscita, così che il valore a valle sia già noto.
 
-Un primo criterio confrontava i rami soltanto per chi inizia il turno sul bivio. Le simulazioni hanno mostrato che così il ramo breve risultava sistematicamente favorito: chi sceglieva sempre il ramo lungo impiegava fino al 12% di turni in più. Il caso più frequente è infatti l'attraversamento durante l'avanzamento: i passi già guadagnati con una domanda media valgono di più su un ramo difficile. Il criterio attuale tiene conto di entrambi i casi. Su 40 mappe, con 1000 partite simulate per strategia, «sempre il più breve», «sempre il più lungo» e «casuale» differiscono in mediana del 2% di turni medi e al massimo del 6%; la strategia migliore cambia da una mappa all'altra.
+Il bivio si attraversa soltanto avanzando, a dado già lanciato: il calcolo assume che il giocatore scelga il ramo conoscendo i passi residui. Il valore di un ramo si misura da un tratto virtuale a monte, perché chi entra nel ramo porta con sé i passi residui del dado: è ciò che rende competitivi i rami difficili.
+
+Misure con la regola attuale (bivio come punto di passaggio): su 1000 semi lo scarto massimo fra i rami di un bivio è 0,51 turni attesi e il fallback non è mai servito. Su 40 mappe, con 4000 partite simulate per strategia, «sempre il più breve», «sempre il più lungo» e «casuale» differiscono in mediana del 2,8% di turni medi e al massimo del 7,1%. La strategia migliore cambia da una mappa all'altra: su 40 mappe, con 1000 partite, 21 volte «sempre il più lungo», 16 «sempre il più breve», 3 «casuale». Con la regola precedente, in cui il bivio era una casella, gli stessi valori erano 2% e 6%. Il massimo è più alto perché una strategia fissa somma gli scarti di 2–3 bivi. Stringere la soglia di selezione (0,3 o 0,2 turni) non dà differenze distinguibili dal rumore statistico. Le soglie restano quindi invariate in attesa dei profili di bilanciamento definitivi (§10).
 
 Il calcolo dipende dal profilo ipotetico di risposta corretta (facile 0,85, media 0,65, difficile 0,45) e ignora gli effetti delle caselle speciali, non ancora definiti. Andrà ripetuto quando profili ed effetti saranno decisi.
 
 ## Turno e segretezza
 
-Fasi: `question` → (`roll` se la risposta è corretta) → movimento → arrivo → turno successivo. Un bivio attraversato sospende il movimento (`fork`, contesto `movement`) fino alla scelta, poi si consumano i passi residui. Il motore è l'unica autorità: `applyAction` non modifica lo stato ricevuto, rifiuta le azioni fuori fase (niente doppie risoluzioni) e il dado dipende solo dallo stato del suo flusso, non dalle animazioni.
+Fasi: `question` → (`roll` se la risposta è corretta) → movimento → arrivo → turno successivo. Un bivio attraversato sospende il movimento (`fork`) fino alla scelta del ramo, senza domanda; il bivio non conta come passo e poi si consumano i passi residui. Il motore è l'unica autorità: `applyAction` non modifica lo stato ricevuto, rifiuta le azioni fuori fase (niente doppie risoluzioni) e il dado dipende solo dallo stato del suo flusso, non dalle animazioni.
 
 `publicView` contiene soltanto celle esplorate, archi fra celle esplorate, l'indicazione che un percorso prosegue nella nebbia e, al bivio, lunghezza relativa e difficoltà delle alternative. Non contiene distanze, seed, impronta, configurazione né stato del dado. L'esplorazione è collettiva: ogni casella attraversata rivela le due successive, quindi le alternative di un bivio sono sempre visibili quando lo si raggiunge. Come previsto dalla specifica, non c'è protezione contro chi ispeziona il browser.
 
@@ -178,11 +180,11 @@ Fasi: `question` → (`roll` se la risposta è corretta) → movimento → arriv
 
 La specifica (§3, §10) lascia aperte queste decisioni. Le scelte seguenti servono solo a rendere il modello eseguibile e sono isolate nel motore e nella configurazione:
 
-1. La difficoltà della domanda è quella della casella su cui inizia il turno. Chi inizia il turno su un bivio sceglie prima il ramo e riceve una domanda della difficoltà di quel ramo; se sbaglia resta sul bivio e al turno successivo può cambiare scelta. Chi attraversa un bivio durante l'avanzamento sceglie senza nuova domanda.
+1. La difficoltà della domanda è quella della casella su cui inizia il turno. Il bivio segue la specifica (§3): si attraversa soltanto avanzando, si sceglie il ramo senza domanda, non conta come passo e nessun avanzamento vi termina.
 2. Risposta errata o tempo scaduto: nessun movimento.
 3. Dado a sei facce; i passi oltre l'uscita si perdono; vince il primo che esce e la partita termina.
 4. Caselle speciali di Megastrutture: «Terminale di Bafometto» ed «Evento industriale». Producono l'evento d'arrivo, ma senza effetti finché salute, crediti e Omen non saranno formalizzati.
-5. Dimensioni della gara: 2–3 bivi, corridoi di 2–4 caselle, ramo lungo di 7–12, percorso più breve fra 16 e 36 passi, più lungo fino a 53 (su 1000 seed). Un giocatore solitario impiega in media 10–19 turni per uscire.
+5. Dimensioni della gara: 2–3 bivi, corridoi di 2–4 caselle, ramo lungo di 7–12, percorso più breve fra 15 e 35 passi, più lungo fino a 50 (su 1000 seed). Un giocatore solitario impiega in media 10–20 turni per uscire (simulazioni con le tre strategie su 40 mappe).
 6. Da 1 a 6 giocatori (la simulazione usa il giocatore singolo; il prototipo almeno due).
 
 ## Non ancora realizzato

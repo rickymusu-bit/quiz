@@ -9,6 +9,7 @@
  * Struttura supportata: sequenza di corridoi e bivi i cui rami sono catene che
  * si ricongiungono in una stessa casella, come prodotta da MapGenerator 1.x.
  */
+import { hasJunction } from "../logic/graph.ts";
 import { rngFromSeed, type Rng } from "../logic/rng.ts";
 import type { Cell, CityMap } from "../logic/types.ts";
 import { distance2D, pointSegmentDistance2D, segmentDistance2D, smoothstep, verticalGap } from "./geometry.ts";
@@ -63,7 +64,8 @@ export function decompose(map: CityMap): Stage[] {
     if (visited.has(id)) throw new LayoutError(`Struttura non supportata: ${id} visitata due volte`);
     visited.add(id);
     const cell: Cell = map.cells[id]!;
-    if (cell.kind !== "fork") {
+    // La casella prima del bivio occupa il punto da cui partono i rami.
+    if (!hasJunction(cell)) {
       corridor.push(id);
       id = cell.kind === "exit" ? null : cell.next[0]!;
       continue;
@@ -84,7 +86,7 @@ export function decompose(map: CityMap): Stage[] {
       ends.add(current);
     }
     const mergeId = [...ends][0]!;
-    if (ends.size !== 1 || map.cells[mergeId]!.kind !== "path" || branches.some((b) => b.length === 0)) {
+    if (ends.size !== 1 || map.cells[mergeId]!.kind !== "path" || hasJunction(map.cells[mergeId]!) || branches.some((b) => b.length === 0)) {
       throw new LayoutError(`Struttura del bivio ${id} non supportata`);
     }
     stages.push({ type: "fork", forkId: id, branches, mergeId });

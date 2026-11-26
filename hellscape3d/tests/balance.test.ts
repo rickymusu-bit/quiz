@@ -7,11 +7,11 @@ const PROFILE: AnswerProfile = { facile: 0.8, media: 0.5, difficile: 0.25 };
 
 test("turni attesi: casi calcolabili a mano", () => {
   const cells = {
-    s: { kind: "start" as const, next: ["m"], difficulty: "media" as const },
-    m: { kind: "path" as const, next: ["e"], difficulty: "facile" as const },
-    e: { kind: "exit" as const, next: [], difficulty: "media" as const },
+    s: { next: ["m"], difficulty: "media" as const },
+    m: { next: ["e"], difficulty: "facile" as const },
+    e: { next: [], difficulty: "media" as const },
   };
-  const { cells: values } = expectedTurns({ exitId: "e", cells }, PROFILE, 6);
+  const values = expectedTurns({ exitId: "e", cells }, PROFILE, 6);
   assert.equal(values.get("e"), 0);
   // A un passo dall'uscita basta una risposta corretta: 1/p.
   assert.ok(Math.abs(values.get("m")! - 1 / 0.8) < 1e-12);

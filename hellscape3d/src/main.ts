@@ -239,7 +239,7 @@ function currentPanel(): Panel | null {
         difficulty: option.difficulty,
         anchor: mode === "player" ? renderer.project(layout.positions[option.to]!) : null,
       }));
-      return { kind: "fork", key: `f:${state.turn}:${active.cellId}:${state.forkContext}`, choices };
+      return { kind: "fork", key: `f:${state.turn}:${active.cellId}:${state.stepsLeft}`, choices };
     }
     case "ended":
       return { kind: "ended", key: "end", winnerName: state.players.find((p) => p.id === state.winnerId)!.name };
@@ -396,6 +396,7 @@ function drawFrame(seconds: number): void {
       pawns: frame.pawns,
       cellPositions: Object.fromEntries(state.players.map((p) => [p.id, layout.positions[p.cellId]])),
       playerCells: Object.fromEntries(state.players.map((p) => [p.id, p.cellId])),
+      stepsLeft: state.stepsLeft,
       fade: frame.fade,
       totalCells: Object.keys(game.map.cells).length,
       stats: renderer.getStats(),

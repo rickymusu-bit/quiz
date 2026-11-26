@@ -154,8 +154,8 @@ export class Hud {
     g.setLineDash([]);
     const size = Math.max(3, shapes.scale * 1.6);
     for (const cell of shapes.cells) {
-      g.fillStyle = cell.kind === "exit" ? "#39ff88" : cell.kind === "fork" ? "#d9d9de" : "#9a9ca3";
-      const s = cell.kind === "fork" || cell.kind === "exit" ? size * 1.3 : size;
+      g.fillStyle = cell.kind === "exit" ? "#39ff88" : "#9a9ca3";
+      const s = cell.kind === "exit" ? size * 1.3 : size;
       g.fillRect(cell.x - s / 2, cell.y - s / 2, s, s);
     }
     for (const player of shapes.players) {

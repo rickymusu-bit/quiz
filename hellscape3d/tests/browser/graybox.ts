@@ -59,6 +59,7 @@ interface DebugInfo {
   totalCells: number;
   loadedTiles: string[];
   playerCells: Record<string, string>;
+  stepsLeft: number;
   loadedSectors: string[];
   stats: {
     primitives: number;
@@ -295,11 +296,14 @@ try {
       assertSettled(await info(page));
       console.log(`ok   ${device.name} · risposta errata e scadenza del timer`);
 
-      // Bivio: numeri sugli imbocchi, scelta da tastiera.
+      // Bivio: si incontra solo avanzando, numeri sugli imbocchi, scelta da tastiera, poi i passi residui.
       await page.goto(`${url}?seed=graybox-1&steps=7`);
       await waitReady(page);
       debug = await info(page);
       assert.equal(debug.panel, "fork");
+      assert.ok(debug.stepsLeft > 0, "scelta al bivio fuori da un avanzamento");
+      const mover = debug.stateActivePlayerId;
+      const beforeFork = debug.playerCells[mover]!;
       assert.ok(debug.forkChoices.length >= 2 && debug.forkChoices.every((c) => c.anchored), "alternative non segnalate nella scena");
       assert.equal(await page.locator(".hud-badge").count(), debug.forkChoices.length);
       const chosen = debug.forkChoices[1]!.to;
@@ -309,7 +313,8 @@ try {
       debug = await info(page);
       assertSettled(debug);
       assert.ok(debug.explored.includes(chosen));
-      console.log(`ok   ${device.name} · scelta al bivio`);
+      assert.notEqual(debug.playerCells[mover], beforeFork, "dopo la scelta il giocatore resta prima del bivio");
+      console.log(`ok   ${device.name} · scelta al bivio durante l'avanzamento, passi residui sul ramo scelto`);
     } catch (error) {
       failures++;
       console.log(`FAIL ${device.name} · interfaccia: ${(error as Error).message}`);
@@ -317,7 +322,7 @@ try {
     // Ostacoli: la passerella sopraelevata davanti alla pedina diventa trasparente; il pannello non la copre.
     try {
       for (const occlusion of ["on", "off"] as const) {
-        await page.goto(`${url}?seed=graybox-16&steps=14${occlusion === "off" ? "&occlusion=off" : ""}`);
+        await page.goto(`${url}?seed=graybox-38&steps=9${occlusion === "off" ? "&occlusion=off" : ""}`);
         await waitReady(page);
         await page.waitForFunction(() => {
           const d = (window as unknown as { __hellscape3d: DebugInfo }).__hellscape3d;
@@ -429,7 +434,7 @@ try {
       assertSettled(debug);
       assert.equal(debug.panel, "question");
 
-      await page.goto(`${url}?seed=graybox-1&steps=30`);
+      await page.goto(`${url}?seed=graybox-3&steps=7`);
       await waitReady(page);
       await page.keyboard.press("KeyA");
       await page.waitForFunction(() => (window as unknown as { __hellscape3d: DebugInfo }).__hellscape3d.bafometto?.kind === "terminal", null, { timeout: 10_000 });
@@ -440,7 +445,7 @@ try {
       await page.waitForFunction(() => (window as unknown as { __hellscape3d: DebugInfo }).__hellscape3d.busy === false, null, { timeout: 10_000 });
       assertSettled(await info(page));
 
-      await page.goto(`${url}?seed=graybox-1&steps=36`);
+      await page.goto(`${url}?seed=graybox-1&steps=40`);
       await waitReady(page);
       await page.keyboard.press("KeyA");
       await seatState();

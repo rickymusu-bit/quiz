@@ -5,7 +5,7 @@ import { DIFFICULTIES, type GeneratorConfig, type Range } from "./types.ts";
  * seed, tema e configurazione, produce una mappa diversa: i salvataggi la usano
  * per riconoscere mondi non più riproducibili.
  */
-export const GENERATOR_VERSION = "1.0.0";
+export const GENERATOR_VERSION = "2.0.0";
 
 /**
  * Valori PROVVISORI per il prototipo. Lunghezza della gara, numero dei bivi e
@@ -57,7 +57,8 @@ export function resolveGeneratorConfig(partial: Partial<GeneratorConfig> = {}): 
   const config: GeneratorConfig = {
     forkCount: checkRange("forkCount", merged.forkCount, 1, 12),
     branchesPerFork: checkRange("branchesPerFork", merged.branchesPerFork, 2, 3),
-    corridorLength: checkRange("corridorLength", merged.corridorLength, 1, 40),
+    // Almeno due caselle: quella di ricongiungimento e quella prima del bivio successivo sono distinte.
+    corridorLength: checkRange("corridorLength", merged.corridorLength, 2, 40),
     longBranchLength: checkRange("longBranchLength", merged.longBranchLength, 3, 60),
     minBranchGap: checkNumber("minBranchGap", merged.minBranchGap, 1, 20, true),
     dieFaces: checkNumber("dieFaces", merged.dieFaces, 2, 20, true),

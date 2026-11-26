@@ -1,14 +1,17 @@
 /**
  * Motore dei turni: unica autorità sullo stato di gioco.
  *
- * Turno: domanda; se corretta, dado e avanzamento. Ai bivi incontrati durante
- * l'avanzamento il movimento si sospende fino alla scelta. Gli effetti si
- * applicano soltanto alla casella d'arrivo.
+ * Turno: domanda; se corretta, dado e avanzamento. Gli effetti si applicano
+ * soltanto alla casella d'arrivo.
  *
- * Regole PROVVISORIE, in attesa della specifica del regolamento (§3, §10):
+ * Bivi (specifica §3): il bivio non è una casella ma il punto di passaggio
+ * dopo una casella con più successive. Lo si attraversa soltanto avanzando:
+ * l'avanzamento si sospende, il giocatore sceglie il ramo senza domanda e
+ * prosegue con i passi residui. Il bivio non conta come passo e nessun
+ * avanzamento vi termina.
+ *
+ * Regole PROVVISORIE, in attesa della specifica del regolamento (§10):
  * - la difficoltà della domanda è quella della casella su cui inizia il turno;
- *   chi inizia il turno su un bivio sceglie prima il ramo, e la domanda ha la
- *   difficoltà di quel ramo;
  * - risposta errata o tempo scaduto: nessun movimento;
  * - i passi oltre l'uscita vanno persi; vince il primo che esce;
  * - le caselle speciali producono l'evento d'arrivo ma non hanno ancora effetti.
@@ -17,6 +20,7 @@ import { reveal } from "./exploration.ts";
 import { generateCityMap, type GenerateOptions } from "./generator.ts";
 import { randomSeed, rngFromSeed, rngFromState } from "./rng.ts";
 import type { AnswerOutcome, GameAction, GameEvent, GameState, PlayerState, RulesConfig } from "./state.ts";
+import { hasJunction } from "./graph.ts";
 import type { CityMap, Difficulty } from "./types.ts";
 
 export class GameRuleError extends Error {
@@ -71,7 +75,6 @@ export function startGame(
     activeIndex: 0,
     turn: 0,
     phase: "question",
-    forkContext: null,
     committedBranch: null,
     questionDifficulty: null,
     stepsLeft: 0,
@@ -139,19 +142,11 @@ function beginTurn(map: CityMap, state: GameState, events: GameEvent[]): void {
   state.stepsLeft = 0;
   state.lastRoll = null;
   events.push({ type: "turnStarted", turn: state.turn, playerId: player.id, cellId: player.cellId });
-  const cell = map.cells[player.cellId]!;
-  if (cell.kind === "fork") {
-    state.phase = "fork";
-    state.forkContext = "turn-start";
-    events.push({ type: "branchChoiceRequested", playerId: player.id, cellId: cell.id, context: "turn-start" });
-  } else {
-    askQuestion(state, player, cell.difficulty, events);
-  }
+  askQuestion(state, player, map.cells[player.cellId]!.difficulty, events);
 }
 
 function askQuestion(state: GameState, player: PlayerState, difficulty: Difficulty, events: GameEvent[]): void {
   state.phase = "question";
-  state.forkContext = null;
   state.questionDifficulty = difficulty;
   events.push({ type: "questionRequested", playerId: player.id, difficulty });
 }
@@ -161,14 +156,8 @@ function chooseBranch(map: CityMap, state: GameState, player: PlayerState, to: s
   const option = map.options[player.cellId]?.find((o) => o.to === to);
   if (!option) throw new GameRuleError(`Ramo non disponibile da ${player.cellId}: ${to}`);
   events.push({ type: "branchChosen", playerId: player.id, cellId: player.cellId, to });
-  if (state.forkContext === "turn-start") {
-    state.committedBranch = to;
-    askQuestion(state, player, option.difficulty, events);
-  } else {
-    state.forkContext = null;
-    state.committedBranch = to;
-    move(map, state, player, events);
-  }
+  state.committedBranch = to;
+  move(map, state, player, events);
 }
 
 function answer(map: CityMap, state: GameState, player: PlayerState, outcome: AnswerOutcome, events: GameEvent[]): void {
@@ -193,7 +182,7 @@ function roll(map: CityMap, state: GameState, player: PlayerState, events: GameE
   move(map, state, player, events);
 }
 
-/** Avanza fino a esaurire i passi, raggiungere l'uscita o incontrare un bivio da scegliere. */
+/** Avanza fino a esaurire i passi o raggiungere l'uscita; a un bivio si sospende finché il ramo non è scelto. */
 function move(map: CityMap, state: GameState, player: PlayerState, events: GameEvent[]): void {
   const path: string[] = [];
   const revealed: string[] = [];
@@ -204,12 +193,11 @@ function move(map: CityMap, state: GameState, player: PlayerState, events: GameE
   while (state.stepsLeft > 0 && player.cellId !== map.exitId) {
     const cell = map.cells[player.cellId]!;
     let to: string;
-    if (cell.kind === "fork") {
+    if (hasJunction(cell)) {
       if (state.committedBranch === null) {
         flush();
         state.phase = "fork";
-        state.forkContext = "movement";
-        events.push({ type: "branchChoiceRequested", playerId: player.id, cellId: cell.id, context: "movement" });
+        events.push({ type: "branchChoiceRequested", playerId: player.id, cellId: cell.id, stepsLeft: state.stepsLeft });
         return;
       }
       to = state.committedBranch;
@@ -229,7 +217,6 @@ function move(map: CityMap, state: GameState, player: PlayerState, events: GameE
   if (arrival.id === map.exitId) {
     player.escaped = true;
     state.phase = "ended";
-    state.forkContext = null;
     state.winnerId = player.id;
     events.push({ type: "escaped", playerId: player.id }, { type: "gameEnded", winnerId: player.id });
     return;
