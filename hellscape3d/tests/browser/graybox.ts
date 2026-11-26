@@ -18,13 +18,23 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const artifacts = resolve(root, "../artifacts/hellscape3d");
 mkdirSync(artifacts, { recursive: true });
 
+interface Point {
+  x: number;
+  y: number;
+  z: number;
+}
+
 interface DebugInfo {
   ready: boolean;
   turn: number;
   phase: string;
   revealAll: boolean;
+  busy: boolean;
   explored: string[];
+  shown: string[];
   rendered: string[];
+  pawns: Record<string, Point>;
+  cellPositions: Record<string, Point>;
   totalCells: number;
   stats: { tiles: number; walkways: number; stubs: number; masses: number; players: number };
 }
@@ -40,6 +50,21 @@ const CASES = [
   { name: "panoramica-esplorata", query: "seed=graybox-1&steps=16&view=overview" },
   { name: "citta-rivelata-sviluppo", query: "seed=graybox-1&reveal=all&view=overview" },
 ] as const;
+
+async function waitReady(page: Page): Promise<void> {
+  await page.waitForFunction(() => (window as unknown as { __hellscape3d?: DebugInfo }).__hellscape3d?.ready === true, null, { timeout: 30_000 });
+}
+
+/** A regia ferma: celle mostrate = esplorate = disegnate, pedine sulle caselle dello stato. */
+function assertSettled(debug: DebugInfo): void {
+  assert.equal(debug.busy, false);
+  assert.deepEqual(debug.shown, debug.explored);
+  assert.deepEqual(debug.rendered, debug.explored);
+  for (const [id, p] of Object.entries(debug.pawns)) {
+    const q = debug.cellPositions[id]!;
+    assert.ok(Math.hypot(p.x - q.x, p.y - q.y, p.z - q.z) < 1e-6, `pedina ${id} non sulla sua casella`);
+  }
+}
 
 async function info(page: Page): Promise<DebugInfo> {
   return page.evaluate(() => (window as unknown as { __hellscape3d: DebugInfo }).__hellscape3d);
@@ -85,10 +110,10 @@ try {
       const label = `${device.name} · ${testCase.name}`;
       try {
         await page.goto(`${url}?${testCase.query}`);
-        await page.waitForFunction(() => (window as unknown as { __hellscape3d?: DebugInfo }).__hellscape3d?.ready === true, null, { timeout: 30_000 });
+        await waitReady(page);
         const debug = await info(page);
         if (debug.revealAll) assert.equal(debug.rendered.length, debug.totalCells, "città rivelata incompleta");
-        else assert.deepEqual(debug.rendered, debug.explored, "celle disegnate diverse da quelle esplorate");
+        else assertSettled(debug);
         assert.equal(debug.stats.tiles, debug.rendered.length);
         assert.equal(debug.stats.players, 2);
         const png = await page.screenshot({ path: join(artifacts, `${testCase.name}-${device.name}.png`) });
@@ -100,20 +125,52 @@ try {
         console.log(`FAIL ${label}: ${(error as Error).message}`);
       }
     }
-    // Avanzamento da tastiera: lo stato cambia e l'esplorazione non regredisce.
+    // Regia: animazione reale, salto e coerenza finale con lo stato.
     try {
       await page.goto(`${url}?seed=graybox-1`);
-      await page.waitForFunction(() => (window as unknown as { __hellscape3d?: DebugInfo }).__hellscape3d?.ready === true);
-      const before = await info(page);
-      for (let i = 0; i < 12; i++) await page.keyboard.press("Space");
+      await waitReady(page);
+      const first = await info(page);
+      let animated = 0;
+      for (let action = 0; action < 30 && animated < 2; action++) {
+        await page.keyboard.press("Space");
+        await page.waitForTimeout(120);
+        const during = await info(page);
+        if (!during.busy) continue;
+        animated++;
+        assert.ok(during.shown.every((id) => during.explored.includes(id)), "celle mostrate prima di essere esplorate");
+        assert.deepEqual(during.rendered, during.shown, "celle disegnate diverse da quelle mostrate dalla regia");
+        if (animated === 2) {
+          await page.keyboard.press("KeyS");
+          await page.waitForTimeout(50);
+          assert.equal((await info(page)).busy, false, "il salto non interrompe la regia");
+        } else {
+          await page.waitForFunction(() => (window as unknown as { __hellscape3d: DebugInfo }).__hellscape3d.busy === false, null, { timeout: 15_000 });
+        }
+        assertSettled(await info(page));
+      }
+      assert.equal(animated, 2, "nessuna regia animata osservata");
       const after = await info(page);
-      assert.ok(after.turn > before.turn, "lo spazio non fa avanzare la partita");
-      assert.ok(after.explored.length >= before.explored.length);
-      assert.deepEqual(after.rendered, after.explored);
-      console.log(`ok   ${device.name} · avanzamento da tastiera (turno ${before.turn} → ${after.turn})`);
+      assert.ok(after.turn > first.turn, "la partita non è avanzata");
+      console.log(`ok   ${device.name} · regia animata, salto e stato finale (turno ${first.turn} → ${after.turn})`);
     } catch (error) {
       failures++;
-      console.log(`FAIL ${device.name} · avanzamento da tastiera: ${(error as Error).message}`);
+      console.log(`FAIL ${device.name} · regia: ${(error as Error).message}`);
+    }
+    // Movimento ridotto: nessuna animazione, presentazione sempre allineata allo stato.
+    try {
+      await page.goto(`${url}?seed=graybox-1&motion=reduced`);
+      await waitReady(page);
+      for (let action = 0; action < 15; action++) {
+        await page.keyboard.press("Space");
+        await page.waitForTimeout(40);
+        const current = await info(page);
+        assert.equal(current.busy, false, "regia animata con movimento ridotto");
+        assertSettled(current);
+      }
+      console.log(`ok   ${device.name} · movimento ridotto`);
+    } catch (error) {
+      failures++;
+      console.log(`FAIL ${device.name} · movimento ridotto: ${(error as Error).message}`);
     }
     if (errors.length > 0) {
       failures++;
