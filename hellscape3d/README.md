@@ -4,7 +4,7 @@ Redesign descritto in [Città procedurali 3D e regia di gioco](../docs/HELLSCAPE
 
 Stato (§9 della specifica):
 - **fase 1, modello logico e test:** completata;
-- **fase 2, graybox 3D modulare con camera:** completata nel flusso di gioco (layout, nebbia, regia, interfaccia provvisoria, ostacoli, Bafometto provvisorio, ripresa). Il caricamento per settori resta da fare;
+- **fase 2, graybox 3D modulare con camera:** completata nel flusso di gioco (layout, nebbia, regia, interfaccia provvisoria, ostacoli, Bafometto provvisorio, ripresa, caricamento per settori);
 - **fase 3, kit e direzione artistica:** in corso. Primo passo consegnato: kit modulare procedurale con agganci e regole di assemblaggio, a tinte neutre. Restano palette, materiali e dettagli definitivi, che dipendono da decisioni di direzione artistica.
 
 Il codice è TypeScript con sola sintassi cancellabile. Il modello logico e il layout girano direttamente in Node (≥ 22.18) senza compilazione; la pagina di prova usa Vite e Three.js.
@@ -130,6 +130,16 @@ Lo script di registrazione accetta `--reload-after N` per ricaricare la pagina d
 
 **Non ancora:** sagome lontane (con la nebbia attuale non sarebbero visibili), palette, materiali e texture, illuminazione, macchinari animati. Sono decisioni di direzione artistica.
 
+## Caricamento per settori (§8)
+
+`scene/sectors.ts` divide il piano in settori di 16 unità. La scena grafica contiene solo gli elementi dei settori caricati, attorno al punto inquadrato e a ogni pedina, che è una possibile destinazione di un cambio di turno. Il kit si costruisce sull'intera vista presentata e poi si filtra, quindi un elemento ricaricato riappare identico. Scaricare toglie solo la grafica: mappa, stato, esplorazione, salvataggio e minimappa non leggono i settori. Le pedine non vengono mai scaricate. I settori si aggiornano prima di ogni disegno, quindi nessun fotogramma mostra un settore mancante, nemmeno alla fine di una dissolvenza. Con l'isteresi un settore entra entro il raggio e si scarica solo oltre il raggio più 16 unità.
+
+**Raggio calcolato, non scelto a mano.** Per il punto inquadrato il raggio è la massima distanza orizzontale dei volumi che possono comparire nell'immagine o proiettarvi un'ombra. Sono il tronco di piramide della camera, fino alla profondità in cui la nebbia copre tutto, e la camera d'ombra del sole, entrambi tagliati alla fascia di quote della città. Per le pedine vale il raggio della più ampia delle inquadrature ordinarie. Ottica, nebbia e ombra vengono da `scene/dimensions.ts`, la stessa fonte del renderer. I test confrontano il calcolo con i volumi di three.js e verificano, fotogramma per fotogramma, che il solo fuoco della camera tenga caricato tutto ciò che può comparire.
+
+**Effetto attuale: nessuno scaricamento.** Con la nebbia attuale il raggio va da circa 80 unità (bivio) a 150 (sede di Bafometto), mentre la diagonale delle caselle di una città non supera 115 unità (40 semi). Nei test resta caricato il 100% dei settori occupati. Il meccanismo diventerà efficace da solo quando la nebbia sarà più corta o le città più grandi: la distanza della nebbia è una scelta di atmosfera, rinviata con le altre decisioni artistiche. Per verificarlo oggi, `?sectors=R` (solo sviluppo) forza un raggio più corto, e allora si vedono comparire i settori. `?sectors=off` carica sempre la città intera, per confronto.
+
+Verifiche nel browser: con il raggio calcolato l'immagine del canvas coincide pixel per pixel con quella della città intera. Con `sectors=4` una partita avanzata scarica davvero parte della città, ma esplorazione, posizioni, turno e minimappa restano identici a quelli della stessa partita senza settori, e le caselle delle pedine restano sempre disegnate. Ogni cambio dei settori caricati ricostruisce l'intera scena statica: in quella prova circa 44 ricostruzioni in 24 azioni, la più lenta sotto 7 ms in WebGL software. Per le dimensioni attuali basta. Se una città più grande lo rendesse lento, si passerà a gruppi separati per settore.
+
 ## Rete generata
 
 Sequenza di corridoi e bivi; i rami di ogni bivio (2 o 3) si ricongiungono all'inizio del corridoio successivo. La rete è aciclica, ogni cella è raggiungibile dalla partenza e raggiunge l'uscita. Il ramo più corto ha domande difficili, il più lungo facili, l'eventuale intermedio medie. La lunghezza relativa si basa sulla minima distanza residua verso l'uscita dopo la scelta, come indicato dalla specifica. Le lunghezze di due rami dello stesso bivio differiscono di almeno due caselle.
@@ -165,4 +175,4 @@ La specifica (§3, §10) lascia aperte queste decisioni. Le scelte seguenti serv
 
 ## Non ancora realizzato
 
-Caricamento e scaricamento per settori (§8 e criteri di accettazione del §9): non ancora fatto. Proposta, da confermare: affrontarlo quando le città con il kit modulare saranno abbastanza pesanti da renderlo misurabile. Nelle fasi successive: kit modulare, direzione artistica, personaggi, Bafometto, durata definitiva del timer e selezione delle domande dalle banche esistenti. Il motore riceve solo l'esito della risposta.
+Budget misurabili di memoria, tempi e frame rate (§8): da fissare con misure su dispositivi reali, perché il rendering WebGL software della CI non è rappresentativo. Nelle fasi successive: direzione artistica, personaggi, Bafometto, durata definitiva del timer e selezione delle domande dalle banche esistenti. Il motore riceve solo l'esito della risposta.
