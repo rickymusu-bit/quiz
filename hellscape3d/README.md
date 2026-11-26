@@ -4,7 +4,8 @@ Redesign descritto in [Città procedurali 3D e regia di gioco](../docs/HELLSCAPE
 
 Stato (§9 della specifica):
 - **fase 1, modello logico e test:** completata;
-- **fase 2, graybox 3D modulare con camera:** in corso. Consegnati: layout spaziale, volumi graybox e nebbia di guerra nella scena (primo passo); pedine animate e CameraDirector (secondo passo); interfaccia provvisoria con domande fittizie e minimappa (terzo passo); ostacoli davanti alla camera e inquadratura sopra il pannello (quarto passo); scena provvisoria di Bafometto (quinto passo); ripresa della partita salvata (sesto passo). La pagina di prova copre ora il flusso di gioco della vertical slice (§9): città generata, domanda, dado, avanzamento, scelta, arrivo, cambio turno, nebbia di guerra, minimappa, Bafometto provvisorio e ripresa. Restano il kit modulare minimo, la direzione artistica e, fra i criteri di accettazione, il caricamento per settori.
+- **fase 2, graybox 3D modulare con camera:** completata nel flusso di gioco (layout, nebbia, regia, interfaccia provvisoria, ostacoli, Bafometto provvisorio, ripresa). Il caricamento per settori resta da fare;
+- **fase 3, kit e direzione artistica:** in corso. Primo passo consegnato: kit modulare procedurale con agganci e regole di assemblaggio, a tinte neutre. Restano palette, materiali e dettagli definitivi, che dipendono da decisioni di direzione artistica.
 
 Il codice è TypeScript con sola sintassi cancellabile. Il modello logico e il layout girano direttamente in Node (≥ 22.18) senza compilazione; la pagina di prova usa Vite e Three.js.
 
@@ -111,6 +112,23 @@ Quando un pannello occupa la parte bassa dello schermo, l'inquadratura si decent
 - **Senza `localStorage`:** la partita funziona, con l'avviso che non potrà essere ripresa.
 
 Lo script di registrazione accetta `--reload-after N` per ricaricare la pagina dopo N azioni e registrare la ripresa.
+
+## Kit modulare (fase 3, primo passo)
+
+`kit/kit.ts` trasforma il modello della scena in primitive (parallelepipedi e cilindri) raggruppate per elemento, secondo il kit minimo della specifica (§5). È puro e indipendente da Three.js; il renderer le disegna con istanze, tre materiali neutri (calcestruzzo, metallo, scuro) e le rende trasparenti per intero quando il loro elemento nasconde la pedina.
+
+| Elemento | Moduli |
+| --- | --- |
+| Casella | lastra, piastra di calpestio, travi incrociate, ringhiera sul perimetro; lampioni agli spigoli di bivi, partenza e uscita |
+| Pilone | capitello, fusto, anelli di controvento ogni 7 unità |
+| Passerella | piano di calpestio, cordoli, montanti e corrimano, condotto sotto il piano |
+| Massa edilizia | corpo, marcapiani ogni 3,5 unità, costoloni agli spigoli, macchinari e serbatoi sul tetto, tubazione in facciata (solo nei 32 m alti: più in basso c'è la nebbia) |
+
+**Agganci.** Ogni passerella si aggancia al bordo della piattaforma nel punto in cui la sua direzione esce dal quadrato della casella. La ringhiera corre sul perimetro e si interrompe solo entro 0,9 unità da quei punti. In piano il piano di calpestio va da aggancio ad aggancio. In pendenza sale da centro a centro, come una rampa che entra sulle piattaforme, e cordoli e corrimano seguono la stessa inclinazione. Così il dislivello di 1,5 unità non si concentra nel tratto libero fra i bordi: lì avrebbe prodotto scalette quasi verticali.
+
+**Stabilità.** Le varianti dipendono dal seme e dall'identità di ogni elemento, non da quante celle sono visibili, quindi un elemento non cambia aspetto esplorando. I monconi verso la nebbia aprono la ringhiera come farebbe la passerella completa. L'unica eccezione è voluta: dove arriva un ramo ancora nascosto la ringhiera resta chiusa, altrimenti l'apertura rivelerebbe il ramo, e si apre quando il ramo viene esplorato. La città intera di `graybox-1` conta circa 1 700 primitive, assemblate in pochi millisecondi.
+
+**Non ancora:** sagome lontane (con la nebbia attuale non sarebbero visibili), palette, materiali e texture, illuminazione, macchinari animati. Sono decisioni di direzione artistica.
 
 ## Rete generata
 

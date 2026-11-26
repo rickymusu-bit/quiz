@@ -18,6 +18,8 @@ export interface SceneTile {
 
 export interface SceneSegment {
   from: string;
+  /** Casella d'arrivo, solo per le passerelle (sempre visibile); assente nei monconi verso la nebbia. */
+  to?: string;
   a: Vec3;
   b: Vec3;
 }
@@ -57,7 +59,7 @@ export function buildSceneModel(map: CityMap, layout: CityLayout, view: PublicVi
   const walkways: SceneSegment[] = [];
   const stubs: SceneSegment[] = [];
   for (const cell of view.cells) {
-    for (const to of cell.next) walkways.push({ from: cell.id, a: at(cell.id), b: at(to) });
+    for (const to of cell.next) walkways.push({ from: cell.id, to, a: at(cell.id), b: at(to) });
     if (cell.continuesIntoFog) {
       // Unico dato non pubblico usato: la direzione del prossimo tratto, disegnato solo in parte.
       for (const to of map.cells[cell.id]!.next) {
