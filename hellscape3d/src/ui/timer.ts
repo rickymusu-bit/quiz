@@ -38,5 +38,5 @@ export class QuestionTimer {
   }
 }
 
-/** Durata PROVVISORIA della domanda, in secondi: il regolamento non la definisce ancora. */
-export const DEFAULT_QUESTION_SECONDS = 30;
+/** Durata PROVVISORIA della domanda, in secondi: il valore predefinito della versione precedente; il regolamento non la definisce ancora. */
+export const DEFAULT_QUESTION_SECONDS = 45;

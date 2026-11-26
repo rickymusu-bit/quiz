@@ -1,6 +1,6 @@
 # Hellscape 3D
 
-Redesign descritto in [Città procedurali 3D e regia di gioco](../docs/HELLSCAPE_PROCEDURAL_3D_CITIES.md). Il runtime pubblicato (`index.html`, `assets/`) non usa questo codice e non viene modificato; nemmeno i salvataggi `fool-v1` e `fool-settings-v1`. La pagina di prova della fase 2 non è pubblicata.
+Redesign descritto in [Città procedurali 3D e regia di gioco](../docs/HELLSCAPE_PROCEDURAL_3D_CITIES.md). Il runtime pubblicato (`index.html`, `assets/`) non usa questo codice e non viene modificato; nemmeno i salvataggi `fool-v1` e `fool-settings-v1`. Il prototipo legge, senza modificarle, le banche di domande del sito (`datasets.json`, `dataset/`); una modifica alle banche fa quindi partire anche i test del prototipo, perché la CI sceglie la verifica completa per ogni file fuori da `hellscape3d/`. La pagina di prova della fase 2 non è pubblicata.
 
 Stato (§9 della specifica):
 - **fase 1, modello logico e test:** completata;
@@ -47,7 +47,7 @@ Ogni disposizione viene verificata: distanza minima fra caselle, passerelle che 
 
 **Nebbia di guerra nella scena.** Il renderer disegna solo il modello della scena, costruito dalla vista pubblica: caselle esplorate, passerelle fra caselle esplorate, masse entro 16 unità da esse e, per ogni tratto che prosegue nella nebbia, un moncone pari al 40% della passerella. La direzione del moncone è l'unico dato non pubblico usato, ed è visibile solo per quel 40%. Un test verifica che nessun identificativo di cella nascosta compaia nel modello in alcun momento della partita.
 
-**Pagina di prova.** Senza parametri riprende la partita salvata. Parametri: `?seed=…` e `?steps=N` (azioni automatiche iniziali), che avviano una partita nuova, `?view=overview` (panoramica delle zone esplorate) e `?reveal=all`, che mostra l'intera città **solo per lo sviluppo**, per giudicare il layout. Tasti: 1–4 risposte e alternative, Invio lancia il dado, Spazio o S saltano la regia, F accelera ×3, V cambia inquadratura, A esegue un'azione automatica (sviluppo). `?motion=reduced` attiva il movimento ridotto, `?timer=S` cambia la durata della domanda, `?test=1` espone ai test la risposta corretta. Le azioni automatiche simulano le risposte con il profilo provvisorio.
+**Pagina di prova.** Senza parametri riprende la partita salvata. Parametri: `?seed=…` e `?steps=N` (azioni automatiche iniziali), che avviano una partita nuova, `?view=overview` (panoramica delle zone esplorate) e `?reveal=all`, che mostra l'intera città **solo per lo sviluppo**, per giudicare il layout. Tasti: 1–4 risposte e alternative, Invio chiude l'esito della risposta e lancia il dado, Spazio o S saltano la regia, F accelera ×3, V cambia inquadratura, A esegue un'azione automatica (sviluppo). `?motion=reduced` attiva il movimento ridotto, `?timer=S` cambia la durata della domanda, `?bank=ID` sceglie la banca di domande di una partita nuova, `?test=1` espone ai test la risposta corretta. Le azioni automatiche simulano le risposte con il profilo provvisorio.
 
 ## Pedine animate e regia (fase 2, secondo passo)
 
@@ -72,8 +72,8 @@ Durante la camminata le celle compaiono quando la pedina le raggiunge con lo sgu
 `ui/` contiene un'interfaccia HTML/CSS sopra la scena, provvisoria. I pannelli compaiono solo a regia ferma, quindi mostrano sempre la presentazione e non lo stato anticipato del motore. Sono pulsanti reali, raggiungibili da tastiera, con il primo elemento già selezionato.
 
 - **Turno:** numero del turno, giocatore attivo secondo la presentazione e elenco dei giocatori con i colori delle pedine.
-- **Domanda fittizia** (`ui/questions.ts`): un calcolo aritmetico, dichiarato fittizio, scelto in modo deterministico per partita, turno e giocatore. Facile: somma; media: prodotto; difficile: prodotto meno un numero. Quattro opzioni distinte, risposta con clic o tasti 1–4. Il collegamento alle banche di domande reali è un passo separato.
-- **Timer** (`ui/timer.ts`): 30 secondi, valore provvisorio. Scorre solo con la domanda visibile, a regia ferma e con la pagina in primo piano; alla scadenza la risposta vale come tempo scaduto. La domanda viene creata solo quando diventa visibile, quindi la regia non può consumarne il tempo.
+- **Domanda:** presa dalle banche della versione precedente (vedi «Domande»), con difficoltà e argomento; risposta con clic o tasti 1–4, poi esito con spiegazione.
+- **Timer** (`ui/timer.ts`): 45 secondi, il valore predefinito della versione precedente, ancora provvisorio. Scorre solo con la domanda visibile, a regia ferma e con la pagina in primo piano; alla scadenza la risposta vale come tempo scaduto. La domanda viene creata solo quando diventa visibile, quindi la regia non può consumarne il tempo.
 - **Dado:** pulsante (o Invio) dopo la risposta corretta; il risultato resta visibile durante la camminata.
 - **Bivio:** alternative ordinate dalla più breve alla più lunga, con lunghezza relativa e difficoltà (tasti 1–3). Gli stessi numeri compaiono nella scena sugli imbocchi dei rami, con il colore della difficoltà.
 - **Fine partita:** nome di chi è uscito e pulsante per una nuova città.
@@ -130,6 +130,18 @@ Lo script di registrazione accetta `--reload-after N` per ricaricare la pagina d
 
 **Non ancora:** sagome lontane (con la nebbia attuale non sarebbero visibili), palette, materiali e texture, illuminazione, macchinari animati. Sono decisioni di direzione artistica.
 
+## Domande (banche della versione precedente)
+
+Le domande vengono dalle banche del sito, le stesse della versione precedente: il catalogo `datasets.json` e i file `dataset/*.json` alla radice del repository, oggi Termologia e Introduzione alla fisica e alla misura, 100 domande ciascuna. La build di Vite le include come testo, una banca per blocco, caricato solo quando serve. Nessun file delle banche viene modificato.
+
+- **Lettura** (`questions/bank.ts`): stesse regole di `assets/js/datasets.js`, comprese quattro alternative distinte, lettera A–D, tre difficoltà presenti e ID non ripetuti. Un test carica il vecchio lettore e verifica che i due producano la stessa banca. Unica differenza: le formule LaTeX non sono ancora rese dal prototipo 3D, quindi una banca che le contiene viene rifiutata con un messaggio. Le banche attuali non ne contengono.
+- **Scelta** (`questions/deck.ts`, provvisoria): la difficoltà è quella decisa dal motore, cioè dal ramo. Fra le domande di quel livello se ne sceglie a caso, con un flusso derivato dal seme, una non ancora uscita nella partita; esaurite quelle, la meno recente. Le alternative vengono rimescolate, come nella versione precedente. Tutti gli argomenti della banca sono in gioco.
+- **Esito:** dopo la risposta compaiono esito, risposta data, risposta corretta e spiegazione. Il motore riceve l'esito con «Continua» (Invio), quindi il turno non passa prima che si sia letta la soluzione.
+- **Registro** (`hellscape3d-domande`): per ogni momento di domanda (turno e giocatore) registra la domanda assegnata, l'ordine delle alternative e la risposta, con banca e seme della partita. Si salva a ogni cambiamento. Un ricaricamento ripropone la stessa domanda, o il suo esito se si era già risposto, e non permette una seconda risposta. Una partita nuova apre un registro nuovo; una ripresa usa la banca con cui la partita era cominciata.
+- **Banca:** `?bank=ID` per una partita nuova, altrimenti la prima del catalogo. «Nuova città» conserva la banca.
+
+**Non ancora:** schermata di avvio con banca, argomenti, giocatori e durata; rendering delle formule (KaTeX nella versione precedente); riepilogo delle domande a fine partita. La durata del timer resta da fissare nel regolamento.
+
 ## Caricamento per settori (§8)
 
 `scene/sectors.ts` divide il piano in settori di 16 unità. La scena grafica contiene solo gli elementi dei settori caricati, attorno al punto inquadrato e a ogni pedina, che è una possibile destinazione di un cambio di turno. Il kit si costruisce sull'intera vista presentata e poi si filtra, quindi un elemento ricaricato riappare identico. Scaricare toglie solo la grafica: mappa, stato, esplorazione, salvataggio e minimappa non leggono i settori. Le pedine non vengono mai scaricate. I settori si aggiornano prima di ogni disegno, quindi nessun fotogramma mostra un settore mancante, nemmeno alla fine di una dissolvenza. Con l'isteresi un settore entra entro il raggio e si scarica solo oltre il raggio più 16 unità.
@@ -175,4 +187,4 @@ La specifica (§3, §10) lascia aperte queste decisioni. Le scelte seguenti serv
 
 ## Non ancora realizzato
 
-Budget misurabili di memoria, tempi e frame rate (§8): da fissare con misure su dispositivi reali, perché il rendering WebGL software della CI non è rappresentativo. Nelle fasi successive: direzione artistica, personaggi, Bafometto, durata definitiva del timer e selezione delle domande dalle banche esistenti. Il motore riceve solo l'esito della risposta.
+Budget misurabili di memoria, tempi e frame rate (§8): da fissare con misure su dispositivi reali, perché il rendering WebGL software della CI non è rappresentativo. Nelle fasi successive: direzione artistica, personaggi, Bafometto, schermata di avvio e durata definitiva del timer. Il motore riceve solo l'esito della risposta.

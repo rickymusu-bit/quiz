@@ -178,6 +178,30 @@
         margin: 6px 0 10px;
         font-size: 17px;
       }
+      .hud-outcome {
+        margin: 0 0 6px;
+        font-size: 17px;
+        font-weight: 600;
+      }
+      .hud-outcome.is-correct {
+        color: #8fd18f;
+      }
+      .hud-outcome.is-wrong,
+      .hud-outcome.is-timeout {
+        color: #f07a5a;
+      }
+      .hud-solution p {
+        margin: 0 0 6px;
+      }
+      .hud-answer.is-correct {
+        font-weight: 600;
+      }
+      .hud-explanation {
+        opacity: 0.85;
+      }
+      .hud-solution {
+        margin-bottom: 10px;
+      }
       .hud-options {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -259,6 +283,17 @@
         .hud-question-text {
           font-size: 14px;
           margin: 4px 0 6px;
+        }
+        .hud-outcome {
+          font-size: 15px;
+          margin-bottom: 4px;
+        }
+        .hud-solution {
+          font-size: 13px;
+          margin-bottom: 6px;
+        }
+        .hud-solution p {
+          margin-bottom: 3px;
         }
         .hud-option,
         .hud-primary {
