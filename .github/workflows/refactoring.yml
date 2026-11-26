@@ -122,6 +122,8 @@ jobs:
             command: npm run test:omen
           - suite: orientation
             command: npm run test:orientation
+          - suite: hellscape3d-browser
+            command: npm run test:hellscape3d:browser
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
@@ -164,6 +166,7 @@ jobs:
             artifacts/chase/
             artifacts/portal/
             artifacts/orientation/
+            artifacts/hellscape3d/
   hellscape3d:
     name: hellscape3d
     needs: impact
@@ -178,6 +181,25 @@ jobs:
       - run: npm ci
       - name: Controllo dei tipi e test del modello logico 3D
         run: npm run test:hellscape3d
+      - name: Riutilizza Chromium disponibile, altrimenti installa il browser di test
+        shell: bash
+        run: |
+          browser_path=$(command -v chromium || command -v chromium-browser || true)
+          if [ -z "$browser_path" ]; then
+            npx playwright install --with-deps chromium
+            browser_path=$(node -p "require('playwright').chromium.executablePath()")
+          fi
+          echo "CHROMIUM_PATH=$browser_path" >> "$GITHUB_ENV"
+      - name: Graybox 3D nel browser
+        run: npm run test:hellscape3d:browser
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hellscape-${{ github.sha }}-hellscape3d
+          if-no-files-found: ignore
+          retention-days: 7
+          compression-level: 0
+          path: artifacts/hellscape3d/
   verify:
     name: Tutte le verifiche richieste
     if: always()

@@ -1,12 +1,18 @@
-# Hellscape 3D — modello logico (fase 1)
+# Hellscape 3D
 
-Prima fase del redesign descritto in [Città procedurali 3D e regia di gioco](../docs/HELLSCAPE_PROCEDURAL_3D_CITIES.md), §9: modello logico e test, senza rendering. Il runtime pubblicato (`index.html`, `assets/`) non usa questo codice e non viene modificato; nemmeno i salvataggi `fool-v1` e `fool-settings-v1`.
+Redesign descritto in [Città procedurali 3D e regia di gioco](../docs/HELLSCAPE_PROCEDURAL_3D_CITIES.md). Il runtime pubblicato (`index.html`, `assets/`) non usa questo codice e non viene modificato; nemmeno i salvataggi `fool-v1` e `fool-settings-v1`. La pagina di prova della fase 2 non è pubblicata.
 
-Il codice è TypeScript con sola sintassi cancellabile, eseguito direttamente da Node (≥ 22.18) senza compilazione. `typescript` e `@types/node` servono soltanto al controllo dei tipi. Three.js e Vite non sono ancora introdotti: arriveranno con il graybox della fase 2.
+Stato (§9 della specifica):
+- **fase 1, modello logico e test:** completata;
+- **fase 2, graybox 3D modulare con camera:** in corso. Primo passo consegnato: layout spaziale, volumi graybox, nebbia di guerra nella scena, vista a tre quarti e panoramica. Mancano movimento animato delle pedine, CameraDirector con transizioni fra giocatori, interfaccia provvisoria con domande fittizie e minimappa.
+
+Il codice è TypeScript con sola sintassi cancellabile. Il modello logico e il layout girano direttamente in Node (≥ 22.18) senza compilazione; la pagina di prova usa Vite e Three.js.
 
 ```sh
-npm run test:hellscape3d   # controllo dei tipi e test del modello logico
-npm test                   # suite core completa, che li comprende
+npm run test:hellscape3d           # controllo dei tipi e test Node (logica, layout, scena)
+npm run test:hellscape3d:browser   # build Vite e verifica in Chromium, desktop e mobile orizzontale
+npm run dev:hellscape3d            # pagina di prova su http://127.0.0.1:5173
+npm test                           # suite core completa, che comprende i test Node
 ```
 
 ## Moduli (`src/logic/`)
@@ -23,6 +29,23 @@ npm test                   # suite core completa, che li comprende
 | `persistence.ts` | salvataggio nella chiave `hellscape3d-save`, ripresa e rifiuto dei salvataggi incompatibili |
 | `simulate.ts` | simulazioni Monte Carlo sul motore reale |
 | `themes/` | parte logica dei temi; per ora soltanto Megastrutture (distretti e caselle speciali) |
+
+## Graybox (fase 2, primo passo)
+
+| Modulo | Responsabilità |
+| --- | --- |
+| `layout/layout.ts` | CityBuilder spaziale: posizioni 3D delle caselle, verifica degli ingombri, masse edilizie |
+| `scene/model.ts` | modello puro della scena visibile, ricavato dalla vista pubblica |
+| `render/graybox.ts` | renderer Three.js: istanze per caselle, passerelle, piloni e masse; camera a tre quarti |
+| `main.ts`, `index.html` | pagina di prova non pubblicata |
+
+**Layout.** La rete viene scomposta in corridoi e bivi. Il percorso avanza sempre lungo X, con svolte di 90° verso ±Z e rampe di 1,5 unità; le caselle distano 4 unità. Ai bivi il ramo più breve procede diritto e diventa una passerella sopraelevata; gli altri escono di lato, procedono paralleli e rientrano, eventualmente a una quota più bassa. I rami sono percorsi su griglia: se lo scarto rispetto al ramo breve è dispari, l'ultimo passo è diagonale. Così nessuna casella cade a metà di un angolo, dove disterebbe dalla precedente solo 2,83 unità e le piastrelle si sovrapporrebbero.
+
+Ogni disposizione viene verificata: distanza minima fra caselle, passerelle che non si toccano né attraversano caselle (salvo 3,5 unità di dislivello), lunghezza dei tratti e pendenza. Se 12 tentativi falliscono si usa la disposizione rettilinea, valida per costruzione e verificata comunque. Su 300 città di prova è servita una volta. Il layout usa i flussi pseudocasuali `layout:N` e `decor:masses`, separati da quelli della logica, e non modifica la mappa. Le masse edilizie restano ad almeno 4,5 unità dal percorso; dal lato della camera sono più basse del percorso, per non coprirlo.
+
+**Nebbia di guerra nella scena.** Il renderer disegna solo il modello della scena, costruito dalla vista pubblica: caselle esplorate, passerelle fra caselle esplorate, masse entro 16 unità da esse e, per ogni tratto che prosegue nella nebbia, un moncone pari al 40% della passerella. La direzione del moncone è l'unico dato non pubblico usato, ed è visibile solo per quel 40%. Un test verifica che nessun identificativo di cella nascosta compaia nel modello in alcun momento della partita.
+
+**Pagina di prova.** Parametri: `?seed=…`, `?steps=N` (azioni automatiche iniziali), `?view=overview` (panoramica delle zone esplorate) e `?reveal=all`, che mostra l'intera città **solo per lo sviluppo**, per giudicare il layout. Tasti: Spazio esegue un'azione automatica, V cambia inquadratura. Le risposte sono simulate con il profilo provvisorio; le domande fittizie arriveranno con l'interfaccia provvisoria.
 
 ## Rete generata
 
@@ -57,8 +80,6 @@ La specifica (§3, §10) lascia aperte queste decisioni. Le scelte seguenti serv
 5. Dimensioni della gara: 2–3 bivi, corridoi di 2–4 caselle, ramo lungo di 7–12, percorso più breve fra 16 e 36 passi, più lungo fino a 53 (su 1000 seed). Un giocatore solitario impiega in media 10–19 turni per uscire.
 6. Da 1 a 6 giocatori (la simulazione usa il giocatore singolo; il prototipo almeno due).
 
-## Non compreso in questa fase
+## Non ancora realizzato
 
-Layout spaziale 3D, kit modulare, CityBuilder, CameraDirector, personaggi, Bafometto, minimappa grafica, timer della domanda e selezione delle domande dalle banche esistenti. Il motore riceve solo l'esito della risposta.
-
-Prossima fase suggerita dalla specifica: graybox 3D modulare con camera (Three.js e Vite), costruito sopra questo modello.
+Nella fase 2: movimento animato delle pedine, CameraDirector con transizioni fra giocatori e verso Bafometto, taglio o trasparenza degli ostacoli, interfaccia provvisoria con domande fittizie, minimappa, caricamento per settori. Nelle fasi successive: kit modulare, direzione artistica, personaggi, Bafometto, timer della domanda e selezione delle domande dalle banche esistenti. Il motore riceve solo l'esito della risposta.

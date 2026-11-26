@@ -1,6 +1,6 @@
 ## Redesign 3D in sviluppo
 
-Il nuovo gioco a città procedurali ([specifica](docs/HELLSCAPE_PROCEDURAL_3D_CITIES.md)) si sviluppa in `hellscape3d/`, separato dal sito pubblicato. Fase corrente: modello logico e test, senza rendering. Dettagli e regole provvisorie in [hellscape3d/README.md](hellscape3d/README.md).
+Il nuovo gioco a città procedurali ([specifica](docs/HELLSCAPE_PROCEDURAL_3D_CITIES.md)) si sviluppa in `hellscape3d/`, separato dal sito pubblicato. Fase corrente: graybox 3D (fase 2), con pagina di prova non pubblicata. Dettagli e regole provvisorie in [hellscape3d/README.md](hellscape3d/README.md).
 
 ## Modalità di esecuzione richiesta — sito online (30/10/2026)
 

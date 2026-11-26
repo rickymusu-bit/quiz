@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <link rel="icon" href="data:," />
+    <title>Hellscape 3D · graybox (sviluppo)</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: #17181c;
+        overflow: hidden;
+      }
+      #scene {
+        display: block;
+        width: 100vw;
+        height: 100vh;
+      }
+      #hud {
+        position: fixed;
+        top: 12px;
+        left: 12px;
+        margin: 0;
+        padding: 8px 10px;
+        font: 13px/1.4 system-ui, sans-serif;
+        color: #e6e6e6;
+        background: rgb(0 0 0 / 0.55);
+        border-radius: 6px;
+        white-space: pre;
+        pointer-events: none;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="scene" aria-label="Città di Hellscape, vista graybox"></canvas>
+    <pre id="hud" aria-live="polite"></pre>
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>
