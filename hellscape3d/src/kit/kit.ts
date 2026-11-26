@@ -62,7 +62,7 @@ export const KIT = Object.freeze({
   braceSpacing: 7,
 });
 
-const CONCRETE = { light: 0x8c8f94, mass: 0x4d5056, pillar: 0x5c5f65 };
+const CONCRETE = { light: 0x8c8f94, walkway: 0x8a8d93, mass: 0x4d5056, pillar: 0x5c5f65 };
 const DISTRICT_TINT: Readonly<Record<string, number>> = {
   fondazioni: 0x8b8682,
   ponti: 0x858c96,
@@ -130,7 +130,8 @@ function tileModule(b: Builder, tile: SceneModel["tiles"][number], exits: readon
   b.ref = { kind: "tile", key: tileKey(tile.id) };
   // Lastra, piastra di calpestio e travi incrociate sotto.
   b.box("concrete", { x: p.x, y: p.y - TILE.thickness / 2, z: p.z }, { x: half * 2, y: TILE.thickness, z: half * 2 }, tint);
-  b.box("metal", { x: p.x, y: p.y + 0.02, z: p.z }, { x: half * 2 - 0.35, y: 0.04, z: half * 2 - 0.35 });
+  // Piastra di calpestio più chiara della lastra: il percorso deve leggersi bene contro gli edifici.
+  b.box("concrete", { x: p.x, y: p.y + 0.02, z: p.z }, { x: half * 2 - 0.35, y: 0.04, z: half * 2 - 0.35 }, shade(tint, 1.25));
   for (const rotation of [0, Math.PI / 2]) {
     b.box("dark", { x: p.x, y: p.y - TILE.thickness - 0.17, z: p.z }, { x: half * 1.8, y: 0.34, z: 0.34 }, 0, { x: 0, y: rotation, z: 0 });
   }
@@ -212,7 +213,7 @@ function walkwayModule(b: Builder, segment: SceneSegment, exitA: Vec3, exitB: Ve
     nz = dx / run;
   const side = (p: Vec3, offset: number, lift: number): Vec3 => ({ x: p.x + nx * offset, y: p.y + lift, z: p.z + nz * offset });
   const deck = (p: Vec3): Vec3 => ({ ...p, y: p.y - WALKWAY.thickness / 2 });
-  b.beam("concrete", deck(sloped ? segment.a : start), deck(sloped ? segment.b : end), WALKWAY.thickness, WALKWAY.width, CONCRETE.pillar);
+  b.beam("concrete", deck(sloped ? segment.a : start), deck(sloped ? segment.b : end), WALKWAY.thickness, WALKWAY.width, CONCRETE.walkway);
   const half = WALKWAY.width / 2 - 0.06;
   for (const offset of [-half, half]) {
     b.beam("dark", side(start, offset, 0.1), side(end, offset, 0.1), 0.2, 0.12);
