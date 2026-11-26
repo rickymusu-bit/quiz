@@ -227,10 +227,14 @@ try {
       let debug = await info(page);
       assert.equal(debug.panel, "question");
       assert.ok(await page.locator(".hud-panel .hud-option").first().isVisible(), "risposte non visibili");
+      // Si attende la condizione, non un tempo fisso: i dati di debug si aggiornano a ogni fotogramma, e sul
+      // runner della CI (WebGL software) un fotogramma dopo il caricamento può durare più di un secondo.
       const before = debug.timer!.remaining;
-      await page.waitForTimeout(1200);
+      await page
+        .waitForFunction((start) => ((window as unknown as { __hellscape3d: DebugInfo }).__hellscape3d.timer?.remaining ?? start) <= start - 0.8, before, { timeout: 10_000 })
+        .catch(() => assert.fail("il timer non scorre con la domanda visibile"));
       debug = await info(page);
-      assert.ok(before - debug.timer!.remaining >= 0.8, "il timer non scorre con la domanda visibile");
+      assert.equal(debug.panel, "question");
       // Domanda vera dalla banca della versione precedente, con argomento.
       assert.ok(debug.questionId && !/fittizia/i.test(debug.questionText ?? ""), "domanda non presa dalla banca");
       assert.match((await page.locator(".hud-difficulty").textContent()) ?? "", / · \S/);
