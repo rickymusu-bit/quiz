@@ -52,7 +52,7 @@ interface DebugInfo {
   resumed: boolean;
   timerRemaining: number | null;
   totalCells: number;
-  stats: { tiles: number; walkways: number; stubs: number; masses: number; players: number };
+  stats: { primitives: number; tiles: number; walkways: number; stubs: number; masses: number; players: number };
 }
 
 const VIEWPORTS = [
@@ -142,6 +142,7 @@ try {
         if (debug.revealAll) assert.equal(debug.rendered.length, debug.totalCells, "città rivelata incompleta");
         else assertSettled(debug);
         assert.equal(debug.stats.tiles, debug.rendered.length);
+        assert.ok(debug.stats.primitives > debug.stats.tiles * 8, `kit modulare non disegnato (${debug.stats.primitives} primitive)`);
         assert.equal(debug.stats.players, 2);
         const png = await page.screenshot({ path: join(artifacts, `${testCase.name}-${device.name}.png`) });
         const spread = await luminanceSpread(png);

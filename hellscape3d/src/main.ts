@@ -218,7 +218,7 @@ function drawFrame(seconds: number): void {
   if (key !== builtKey) {
     renderer.resize(width, height);
     model = buildModel();
-    renderer.setModel(model);
+    renderer.setModel(model, seed);
     builtKey = key;
   }
   renderer.setPawnPositions(frame.pawns);
