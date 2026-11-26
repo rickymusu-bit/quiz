@@ -4,7 +4,7 @@ Redesign descritto in [Città procedurali 3D e regia di gioco](../docs/HELLSCAPE
 
 Stato (§9 della specifica):
 - **fase 1, modello logico e test:** completata;
-- **fase 2, graybox 3D modulare con camera:** in corso. Consegnati: layout spaziale, volumi graybox e nebbia di guerra nella scena (primo passo); pedine animate e CameraDirector (secondo passo); interfaccia provvisoria con domande fittizie e minimappa (terzo passo). Mancano gestione degli ostacoli davanti alla camera, ripresa della partita salvata nella pagina e una scena provvisoria di Bafometto, richieste dalla vertical slice (§9).
+- **fase 2, graybox 3D modulare con camera:** in corso. Consegnati: layout spaziale, volumi graybox e nebbia di guerra nella scena (primo passo); pedine animate e CameraDirector (secondo passo); interfaccia provvisoria con domande fittizie e minimappa (terzo passo); ostacoli davanti alla camera e inquadratura sopra il pannello (quarto passo). Mancano ripresa della partita salvata nella pagina e una scena provvisoria di Bafometto, richieste dalla vertical slice (§9).
 
 Il codice è TypeScript con sola sintassi cancellabile. Il modello logico e il layout girano direttamente in Node (≥ 22.18) senza compilazione; la pagina di prova usa Vite e Three.js.
 
@@ -80,6 +80,14 @@ Durante la camminata le celle compaiono quando la pedina le raggiunge con lo sgu
 
 Su schermi bassi (mobile orizzontale) pannelli e minimappa si riducono. Il tasto A esegue un'azione automatica, solo per lo sviluppo.
 
+## Ostacoli davanti alla camera (fase 2, quarto passo)
+
+`scene/occlusion.ts` individua i volumi disegnati (caselle, piloni, passerelle, masse) attraversati dal segmento fra la camera e la pedina attiva, ai piedi o alla testa. Il renderer li sposta in istanze con materiale semitrasparente (opacità 0,18) e ricostruisce questa parte della scena solo quando l'insieme degli ostacoli cambia. Poiché si disegnano solo zone già mostrate, guardare attraverso un ostacolo non rivela nulla di inesplorato. Dimensioni dei volumi e posizione della camera stanno in `scene/dimensions.ts`, condiviso da renderer e calcolo.
+
+Su 20 città, in oltre 14 000 fotogrammi di partita simulata, la pedina attiva risulta coperta nell'1,5% dei casi, sempre da elementi del percorso e mai da masse edilizie: la regola che le tiene basse dal lato della camera funziona. Il caso tipico è la passerella sopraelevata del ramo breve che passa davanti a una pedina sul ramo laterale più basso.
+
+Quando un pannello occupa la parte bassa dello schermo, l'inquadratura si decentra (`setViewOffset`) in modo che il punto inquadrato resti al centro dell'area libera, senza spostare la camera né deformare l'immagine. Il passaggio è graduale, istantaneo con il movimento ridotto. `?occlusion=off` disattiva le trasparenze, solo per confronto.
+
 ## Rete generata
 
 Sequenza di corridoi e bivi; i rami di ogni bivio (2 o 3) si ricongiungono all'inizio del corridoio successivo. La rete è aciclica, ogni cella è raggiungibile dalla partenza e raggiunge l'uscita. Il ramo più corto ha domande difficili, il più lungo facili, l'eventuale intermedio medie. La lunghezza relativa si basa sulla minima distanza residua verso l'uscita dopo la scelta, come indicato dalla specifica. Le lunghezze di due rami dello stesso bivio differiscono di almeno due caselle.
@@ -115,4 +123,4 @@ La specifica (§3, §10) lascia aperte queste decisioni. Le scelte seguenti serv
 
 ## Non ancora realizzato
 
-Nella fase 2: inquadrature e scena provvisoria di Bafometto, taglio o trasparenza degli ostacoli, ripresa della partita salvata nella pagina di prova, caricamento per settori. Nelle fasi successive: kit modulare, direzione artistica, personaggi, Bafometto, durata definitiva del timer e selezione delle domande dalle banche esistenti. Il motore riceve solo l'esito della risposta.
+Nella fase 2: inquadrature e scena provvisoria di Bafometto, ripresa della partita salvata nella pagina di prova, caricamento per settori. Nelle fasi successive: kit modulare, direzione artistica, personaggi, Bafometto, durata definitiva del timer e selezione delle domande dalle banche esistenti. Il motore riceve solo l'esito della risposta.

@@ -4,8 +4,8 @@
  *
  * Parametri: ?seed=… (città), ?steps=N (azioni automatiche iniziali, senza
  * regia), ?timer=S (secondi per domanda), ?view=overview, ?motion=reduced,
- * ?reveal=all (SOLO SVILUPPO: città intera), ?test=1 (espone ai test la
- * risposta corretta).
+ * ?reveal=all (SOLO SVILUPPO: città intera), ?occlusion=off (SOLO SVILUPPO:
+ * ostacoli opachi, per confronto), ?test=1 (espone ai test la risposta corretta).
  * Tasti: 1–4 risposte e alternative, Invio lancia il dado, Spazio o S
  * saltano la regia, F accelera ×3, V cambia inquadratura, A esegue
  * un'azione automatica (sviluppo).
@@ -15,6 +15,7 @@ import { applyAction, createGame, publicView, rngFromSeed, type GameAction, type
 import { buildCityLayout } from "./layout/layout.ts";
 import { GrayboxRenderer, type CameraMode } from "./render/graybox.ts";
 import { buildSceneModel, presentedView, revealAllView, type SceneModel } from "./scene/model.ts";
+import { NO_OCCLUDERS, type Occluders } from "./scene/occlusion.ts";
 import { Hud, type ForkChoice, type HudState, type Panel } from "./ui/hud.ts";
 import { minimapShapes } from "./ui/minimap.ts";
 import { fakeQuestion, type FakeQuestion } from "./ui/questions.ts";
@@ -24,6 +25,8 @@ const params = new URLSearchParams(location.search);
 const seed = params.get("seed") ?? "graybox-1";
 const revealAll = params.get("reveal") === "all";
 const testHooks = params.get("test") === "1";
+/** SOLO SVILUPPO: ?occlusion=off disattiva la trasparenza degli ostacoli, per confronto. */
+const occlusionEnabled = params.get("occlusion") !== "off";
 const reducedMotion = params.get("motion") === "reduced" || matchMedia("(prefers-reduced-motion: reduce)").matches;
 const questionSeconds = Math.max(1, Number(params.get("timer")) || DEFAULT_QUESTION_SECONDS);
 let mode: CameraMode = params.get("view") === "overview" ? "overview" : "player";
@@ -139,6 +142,15 @@ function currentPanel(): Panel | null {
 const ORDER = { "piu-breve": 0, intermedio: 1, "piu-lungo": 2 } as const;
 
 let lastPanel: Panel | null = null;
+let inset = 0;
+let occluders: Occluders = NO_OCCLUDERS;
+
+/** Altezza, dal fondo dello schermo, occupata dal pannello visibile. */
+function panelInset(): number {
+  const panel = document.querySelector<HTMLElement>(".hud-panel");
+  if (!panel || panel.hidden) return 0;
+  return Math.max(0, window.innerHeight - panel.getBoundingClientRect().top);
+}
 let minimapCells: string[] = [];
 
 let drawing = false;
@@ -165,6 +177,13 @@ function drawFrame(seconds: number): void {
   renderer.setPawnPositions(frame.pawns);
   if (mode === "overview") renderer.frameOverview(model);
   else renderer.setCameraPose(frame.camera);
+  // Il pannello in basso non copre il giocatore: l'inquadratura si centra nell'area libera.
+  const target = mode === "player" ? panelInset() : 0;
+  inset = reducedMotion ? target : inset + (target - inset) * Math.min(1, seconds * 8);
+  if (Math.abs(inset - target) < 0.5) inset = target;
+  renderer.setBottomInset(inset);
+  // Gli ostacoli fra camera e giocatore attivo diventano trasparenti.
+  if (occlusionEnabled) occluders = renderer.updateOcclusion(frame.pawns[frame.activePlayerId]!);
   fade.style.opacity = String(frame.fade);
   renderer.render();
 
@@ -210,6 +229,11 @@ function drawFrame(seconds: number): void {
       shown: [...frame.explored],
       rendered: model.tiles.map((t) => t.id),
       minimap: minimapCells,
+      occluders: { tiles: occluders.tiles.length, pillars: occluders.pillars.length, walkways: occluders.walkways.length, masses: occluders.masses.length },
+      occluderIds: [...occluders.tiles, ...occluders.pillars],
+      inset,
+      activeScreen: renderer.project(frame.pawns[frame.activePlayerId]!),
+      panelTop: panelInset() > 0 ? window.innerHeight - panelInset() : null,
       pawns: frame.pawns,
       cellPositions: Object.fromEntries(state.players.map((p) => [p.id, layout.positions[p.cellId]])),
       fade: frame.fade,
