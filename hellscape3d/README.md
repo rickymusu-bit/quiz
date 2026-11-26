@@ -4,7 +4,7 @@ Redesign descritto in [Città procedurali 3D e regia di gioco](../docs/HELLSCAPE
 
 Stato (§9 della specifica):
 - **fase 1, modello logico e test:** completata;
-- **fase 2, graybox 3D modulare con camera:** in corso. Consegnati: layout spaziale, volumi graybox e nebbia di guerra nella scena (primo passo); pedine animate e CameraDirector con transizioni fra giocatori (secondo passo). Mancano interfaccia provvisoria con domande fittizie, minimappa e gestione degli ostacoli davanti alla camera.
+- **fase 2, graybox 3D modulare con camera:** in corso. Consegnati: layout spaziale, volumi graybox e nebbia di guerra nella scena (primo passo); pedine animate e CameraDirector (secondo passo); interfaccia provvisoria con domande fittizie e minimappa (terzo passo). Mancano gestione degli ostacoli davanti alla camera, ripresa della partita salvata nella pagina e una scena provvisoria di Bafometto, richieste dalla vertical slice (§9).
 
 Il codice è TypeScript con sola sintassi cancellabile. Il modello logico e il layout girano direttamente in Node (≥ 22.18) senza compilazione; la pagina di prova usa Vite e Three.js.
 
@@ -12,7 +12,7 @@ Il codice è TypeScript con sola sintassi cancellabile. Il modello logico e il l
 npm run test:hellscape3d           # controllo dei tipi e test Node (logica, layout, scena)
 npm run test:hellscape3d:browser   # build Vite e verifica in Chromium, desktop e mobile orizzontale
 npm run dev:hellscape3d            # pagina di prova su http://127.0.0.1:5173
-npm run record:hellscape3d -- --seed graybox-9 --steps 12 --actions 9   # GIF reale in artifacts/hellscape3d/ (richiede ffmpeg)
+npm run record:hellscape3d -- --seed graybox-1 --steps 3 --actions 14   # GIF reale in artifacts/hellscape3d/ (richiede ffmpeg)
 npm test                           # suite core completa, che comprende i test Node
 ```
 
@@ -46,7 +46,7 @@ Ogni disposizione viene verificata: distanza minima fra caselle, passerelle che 
 
 **Nebbia di guerra nella scena.** Il renderer disegna solo il modello della scena, costruito dalla vista pubblica: caselle esplorate, passerelle fra caselle esplorate, masse entro 16 unità da esse e, per ogni tratto che prosegue nella nebbia, un moncone pari al 40% della passerella. La direzione del moncone è l'unico dato non pubblico usato, ed è visibile solo per quel 40%. Un test verifica che nessun identificativo di cella nascosta compaia nel modello in alcun momento della partita.
 
-**Pagina di prova.** Parametri: `?seed=…`, `?steps=N` (azioni automatiche iniziali), `?view=overview` (panoramica delle zone esplorate) e `?reveal=all`, che mostra l'intera città **solo per lo sviluppo**, per giudicare il layout. Tasti: Spazio esegue un'azione automatica (o salta la regia in corso), S salta la regia, F accelera ×3, V cambia inquadratura. `?motion=reduced` attiva il movimento ridotto. Le risposte sono simulate con il profilo provvisorio; le domande fittizie arriveranno con l'interfaccia provvisoria.
+**Pagina di prova.** Parametri: `?seed=…`, `?steps=N` (azioni automatiche iniziali), `?view=overview` (panoramica delle zone esplorate) e `?reveal=all`, che mostra l'intera città **solo per lo sviluppo**, per giudicare il layout. Tasti: 1–4 risposte e alternative, Invio lancia il dado, Spazio o S saltano la regia, F accelera ×3, V cambia inquadratura, A esegue un'azione automatica (sviluppo). `?motion=reduced` attiva il movimento ridotto, `?timer=S` cambia la durata della domanda, `?test=1` espone ai test la risposta corretta. Le azioni automatiche simulano le risposte con il profilo provvisorio.
 
 ## Pedine animate e regia (fase 2, secondo passo)
 
@@ -65,6 +65,20 @@ Ogni disposizione viene verificata: distanza minima fra caselle, passerelle che 
 Le transizioni fra giocatori dipendono dalla distanza calcolata sulla sola rete già mostrata. Fino a 4 passi è una traslazione (0,7 s). Fino a 12 passi nello stesso distretto la camera si allontana, trasla e si riavvicina (1,25 s). Negli altri casi, compresi i giocatori non collegati da zone esplorate, c'è una dissolvenza a nero: la camera cambia posizione solo a schermo oscurato (0,8 s), senza sorvolare la città. I tempi stanno negli intervalli indicativi della specifica e restano obiettivi di prototipazione.
 
 Durante la camminata le celle compaiono quando la pedina le raggiunge con lo sguardo, nello stesso ordine del motore, e non al momento del lancio. Con `?motion=reduced`, o con la preferenza di sistema per il movimento ridotto, la regia è istantanea. La direzione di vista resta sempre la stessa: la camera cambia distanza e inclinazione, mai orientamento.
+
+## Interfaccia provvisoria e minimappa (fase 2, terzo passo)
+
+`ui/` contiene un'interfaccia HTML/CSS sopra la scena, provvisoria. I pannelli compaiono solo a regia ferma, quindi mostrano sempre la presentazione e non lo stato anticipato del motore. Sono pulsanti reali, raggiungibili da tastiera, con il primo elemento già selezionato.
+
+- **Turno:** numero del turno, giocatore attivo secondo la presentazione e elenco dei giocatori con i colori delle pedine.
+- **Domanda fittizia** (`ui/questions.ts`): un calcolo aritmetico, dichiarato fittizio, scelto in modo deterministico per partita, turno e giocatore. Facile: somma; media: prodotto; difficile: prodotto meno un numero. Quattro opzioni distinte, risposta con clic o tasti 1–4. Il collegamento alle banche di domande reali è un passo separato.
+- **Timer** (`ui/timer.ts`): 30 secondi, valore provvisorio. Scorre solo con la domanda visibile, a regia ferma e con la pagina in primo piano; alla scadenza la risposta vale come tempo scaduto. La domanda viene creata solo quando diventa visibile, quindi la regia non può consumarne il tempo.
+- **Dado:** pulsante (o Invio) dopo la risposta corretta; il risultato resta visibile durante la camminata.
+- **Bivio:** alternative ordinate dalla più breve alla più lunga, con lunghezza relativa e difficoltà (tasti 1–3). Gli stessi numeri compaiono nella scena sugli imbocchi dei rami, con il colore della difficoltà.
+- **Fine partita:** nome di chi è uscito e pulsante per una nuova città.
+- **Minimappa** (`ui/minimap.ts`): vista dall'alto delle sole celle mostrate, dei tratti verso la nebbia e dei giocatori, con il giocatore attivo evidenziato. È orientata come la camera (in alto ciò che sta davanti alla vista) e si adatta alle sole zone esplorate, quindi non suggerisce l'estensione della città.
+
+Su schermi bassi (mobile orizzontale) pannelli e minimappa si riducono. Il tasto A esegue un'azione automatica, solo per lo sviluppo.
 
 ## Rete generata
 
@@ -101,4 +115,4 @@ La specifica (§3, §10) lascia aperte queste decisioni. Le scelte seguenti serv
 
 ## Non ancora realizzato
 
-Nella fase 2: interfaccia provvisoria con domande fittizie e blocco del timer durante la regia, minimappa, inquadrature verso Bafometto, taglio o trasparenza degli ostacoli, caricamento per settori. Nelle fasi successive: kit modulare, direzione artistica, personaggi, Bafometto, timer della domanda e selezione delle domande dalle banche esistenti. Il motore riceve solo l'esito della risposta.
+Nella fase 2: inquadrature e scena provvisoria di Bafometto, taglio o trasparenza degli ostacoli, ripresa della partita salvata nella pagina di prova, caricamento per settori. Nelle fasi successive: kit modulare, direzione artistica, personaggi, Bafometto, durata definitiva del timer e selezione delle domande dalle banche esistenti. Il motore riceve solo l'esito della risposta.
