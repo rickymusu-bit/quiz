@@ -4,7 +4,7 @@ Redesign descritto in [Città procedurali 3D e regia di gioco](../docs/HELLSCAPE
 
 Stato (§9 della specifica):
 - **fase 1, modello logico e test:** completata;
-- **fase 2, graybox 3D modulare con camera:** in corso. Consegnati: layout spaziale, volumi graybox e nebbia di guerra nella scena (primo passo); pedine animate e CameraDirector (secondo passo); interfaccia provvisoria con domande fittizie e minimappa (terzo passo); ostacoli davanti alla camera e inquadratura sopra il pannello (quarto passo). Mancano ripresa della partita salvata nella pagina e una scena provvisoria di Bafometto, richieste dalla vertical slice (§9).
+- **fase 2, graybox 3D modulare con camera:** in corso. Consegnati: layout spaziale, volumi graybox e nebbia di guerra nella scena (primo passo); pedine animate e CameraDirector (secondo passo); interfaccia provvisoria con domande fittizie e minimappa (terzo passo); ostacoli davanti alla camera e inquadratura sopra il pannello (quarto passo); scena provvisoria di Bafometto (quinto passo). Manca la ripresa della partita salvata nella pagina, richiesta dalla vertical slice (§9).
 
 Il codice è TypeScript con sola sintassi cancellabile. Il modello logico e il layout girano direttamente in Node (≥ 22.18) senza compilazione; la pagina di prova usa Vite e Three.js.
 
@@ -88,6 +88,17 @@ Su 20 città, in oltre 14 000 fotogrammi di partita simulata, la pedina attiva r
 
 Quando un pannello occupa la parte bassa dello schermo, l'inquadratura si decentra (`setViewOffset`) in modo che il punto inquadrato resti al centro dell'area libera, senza spostare la camera né deformare l'immagine. Il passaggio è graduale, istantaneo con il movimento ridotto. `?occlusion=off` disattiva le trasparenze, solo per confronto.
 
+## Bafometto provvisorio (fase 2, quinto passo)
+
+`director/bafometto.ts` e il regista danno a Bafometto una presenza provvisoria, secondo la specifica (§6):
+
+- **Sede:** una macchina monumentale in graybox su un pilone che sale dall'abisso, con occhi verdi che si accendono quando parla. Sta a distanza fissa dalla partenza (−46, −4, +8), dal lato −X dove il percorso non va mai. La posizione dipende solo dalla partenza, quindi non rivela uscita né topologia. Un test verifica su 80 città che resti lontana da percorso e masse.
+- **Interventi significativi** (apertura di una partita nuova, fine partita): dissolvenza, inquadratura della sede, battuta, dissolvenza e ritorno al giocatore o all'uscita. Nessun tragitto della camera fra sede e giocatore e nessuna cella rivelata.
+- **Scambi frequenti** (arrivo su una casella «Terminale di Bafometto»): manifestazione locale, senza passare dalla sede. Il terminale si illumina, la camera si avvicina e compare la battuta.
+- **Battute:** testi segnaposto in un riquadro dichiarato «testo provvisorio», mostrati per 3,5 s anche con il movimento ridotto, che invece rende istantanee le inquadrature. Gli effetti di Bafometto sul gioco (Omen, crediti, salute) non sono ancora definiti dal regolamento.
+
+`?intro=off` disattiva l'apertura.
+
 ## Rete generata
 
 Sequenza di corridoi e bivi; i rami di ogni bivio (2 o 3) si ricongiungono all'inizio del corridoio successivo. La rete è aciclica, ogni cella è raggiungibile dalla partenza e raggiunge l'uscita. Il ramo più corto ha domande difficili, il più lungo facili, l'eventuale intermedio medie. La lunghezza relativa si basa sulla minima distanza residua verso l'uscita dopo la scelta, come indicato dalla specifica. Le lunghezze di due rami dello stesso bivio differiscono di almeno due caselle.
@@ -123,4 +134,4 @@ La specifica (§3, §10) lascia aperte queste decisioni. Le scelte seguenti serv
 
 ## Non ancora realizzato
 
-Nella fase 2: inquadrature e scena provvisoria di Bafometto, ripresa della partita salvata nella pagina di prova, caricamento per settori. Nelle fasi successive: kit modulare, direzione artistica, personaggi, Bafometto, durata definitiva del timer e selezione delle domande dalle banche esistenti. Il motore riceve solo l'esito della risposta.
+Nella fase 2: ripresa della partita salvata nella pagina di prova, caricamento per settori. Nelle fasi successive: kit modulare, direzione artistica, personaggi, Bafometto, durata definitiva del timer e selezione delle domande dalle banche esistenti. Il motore riceve solo l'esito della risposta.

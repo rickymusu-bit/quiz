@@ -47,6 +47,8 @@ export class GrayboxRenderer {
   private occlusion: Occluders = NO_OCCLUDERS;
   private occlusionKey = "";
   private readonly faded = new Map<THREE.Material, THREE.Material>();
+  private readonly terminals = new Map<string, THREE.Mesh>();
+  private seatGroup: THREE.Group | null = null;
   private readonly unitBox = new THREE.BoxGeometry(1, 1, 1);
   private readonly materials = {
     tile: new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.85, metalness: 0.05 }),
@@ -58,6 +60,9 @@ export class GrayboxRenderer {
     gate: new THREE.MeshStandardMaterial({ color: 0x1d3a28, emissive: 0x39ff88, emissiveIntensity: 0.7 }),
     terminale: new THREE.MeshStandardMaterial({ color: 0x14201a, emissive: 0x3aff7a, emissiveIntensity: 0.5 }),
     evento: new THREE.MeshStandardMaterial({ color: 0x2a1a10, emissive: 0xff7a2a, emissiveIntensity: 0.6 }),
+    terminaleActive: new THREE.MeshStandardMaterial({ color: 0x14201a, emissive: 0x3aff7a, emissiveIntensity: 2.4 }),
+    seat: new THREE.MeshStandardMaterial({ color: 0x2c2a2e, roughness: 0.7, metalness: 0.3 }),
+    seatEyes: new THREE.MeshStandardMaterial({ color: 0x0a1a10, emissive: 0x39ff88, emissiveIntensity: 0.5 }),
   };
 
   constructor(canvas: HTMLCanvasElement) {
@@ -91,6 +96,7 @@ export class GrayboxRenderer {
   /** Ricostruisce la scena statica (caselle, passerelle, masse) e le pedine. */
   setModel(model: SceneModel): void {
     this.clearContent();
+    this.terminals.clear();
     this.model = model;
     this.content.add(this.occludable);
     for (const tile of model.tiles) {
@@ -120,6 +126,16 @@ export class GrayboxRenderer {
       this.occlusion = occlusion;
       this.occlusionKey = key;
       this.buildOccludable();
+    }
+    return this.occlusion;
+  }
+
+  /** Nessun volume trasparente (per inquadrature che non mostrano la pedina). */
+  clearOcclusion(): Occluders {
+    if (this.occlusionKey !== "") {
+      this.occlusion = NO_OCCLUDERS;
+      this.occlusionKey = "";
+      if (this.model) this.buildOccludable();
     }
     return this.occlusion;
   }
@@ -193,6 +209,45 @@ export class GrayboxRenderer {
       this.faded.set(material, faded);
     }
     return faded;
+  }
+
+  /**
+   * Sede di Bafometto, graybox: macchina monumentale su un pilone che sale
+   * dall'abisso. È uno sfondo fisso, indipendente dall'esplorazione.
+   */
+  setSeat(position: Vec3): void {
+    if (this.seatGroup) this.scene.remove(this.seatGroup);
+    const group = new THREE.Group();
+    const part = (material: THREE.Material, x: number, y: number, z: number, w: number, h: number, d: number, rz = 0): void => {
+      const mesh = new THREE.Mesh(this.unitBox, material);
+      mesh.scale.set(w, h, d);
+      mesh.position.set(x, y, z);
+      mesh.rotation.z = rz;
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      group.add(mesh);
+    };
+    const base = -2;
+    part(this.materials.seat, 0, (ABYSS_Y + base) / 2, 0, 6, base - ABYSS_Y, 6);
+    part(this.materials.seat, 0, base + 1, 0, 18, 2, 14);
+    part(this.materials.seat, 0, base + 9, 0, 8, 14, 6);
+    for (const side of [-1, 1]) {
+      part(this.materials.seat, side * 6.5, base + 7, 0, 5, 3, 3);
+      part(this.materials.seat, side * 2.4, base + 22.5, 0, 1, 6, 1, side * -0.45);
+    }
+    part(this.materials.seat, 0, base + 18, 0, 6, 4.5, 5);
+    // Occhi rivolti verso la camera della vista a tre quarti (lato -Z).
+    for (const side of [-1, 1]) part(this.materials.seatEyes, side * 1.3, base + 18.6, -2.55, 1.1, 0.6, 0.2);
+    group.position.set(position.x, position.y, position.z);
+    this.seatGroup = group;
+    this.scene.add(group);
+  }
+
+  /** Accende gli occhi della sede o il terminale su cui Bafometto si manifesta. */
+  setBafometto(presence: { kind: "seat" } | { kind: "terminal"; position: Vec3 } | null): void {
+    this.materials.seatEyes.emissiveIntensity = presence?.kind === "seat" ? 3 : 0.5;
+    const key = presence?.kind === "terminal" ? `${presence.position.x},${presence.position.y},${presence.position.z}` : null;
+    for (const [position, mesh] of this.terminals) mesh.material = position === key ? this.materials.terminaleActive : this.materials.terminale;
   }
 
   /** Posizioni delle pedine; quelle sulla stessa casella vengono affiancate. */
@@ -294,6 +349,7 @@ export class GrayboxRenderer {
   private addSpecialMarker(kind: string, p: Vec3): void {
     const material = kind === "terminale" ? this.materials.terminale : this.materials.evento;
     const marker = new THREE.Mesh(this.unitBox, material);
+    if (kind === "terminale") this.terminals.set(`${p.x},${p.y},${p.z}`, marker);
     if (kind === "terminale") marker.scale.set(0.3, 1.6, 1.1);
     else marker.scale.set(0.7, 0.7, 0.7);
     marker.position.set(p.x + (kind === "terminale" ? 0.9 : 0), p.y + marker.scale.y / 2, p.z);

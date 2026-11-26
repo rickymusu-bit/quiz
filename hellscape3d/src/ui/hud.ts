@@ -37,6 +37,8 @@ export interface HudState {
   panel: Panel | null;
   die: number | null;
   toast: string | null;
+  /** Battuta di Bafometto in corso. */
+  speech: string | null;
   dev: string;
 }
 
@@ -62,11 +64,13 @@ export class Hud {
   private readonly panel: HTMLElement;
   private readonly die: HTMLElement;
   private readonly toast: HTMLElement;
+  private readonly speech: HTMLElement;
   private readonly dev: HTMLElement;
   private readonly badges: HTMLElement;
   private readonly minimap: HTMLCanvasElement;
   private readonly actions: HudActions;
-  private panelKey = "";
+  /** Valore iniziale diverso da qualunque chiave, così il primo aggiornamento nasconde anche un pannello vuoto. */
+  private panelKey: string | null = null;
   private turnKey = "";
   private timerBar: HTMLElement | null = null;
   private timerText: HTMLElement | null = null;
@@ -81,6 +85,9 @@ export class Hud {
     this.die = root.appendChild(element("div", "hud-die"));
     this.die.setAttribute("aria-live", "polite");
     this.toast = root.appendChild(element("div", "hud-toast"));
+    this.speech = root.appendChild(element("figure", "hud-speech"));
+    this.speech.setAttribute("role", "status");
+    this.speech.setAttribute("aria-live", "polite");
     this.toast.setAttribute("role", "status");
     this.badges = root.appendChild(element("div", "hud-badges"));
     this.panel = root.appendChild(element("section", "hud-panel"));
@@ -94,6 +101,14 @@ export class Hud {
     this.die.hidden = state.die === null;
     this.toast.textContent = state.toast ?? "";
     this.toast.hidden = state.toast === null;
+    if (this.speech.dataset.text !== (state.speech ?? "")) {
+      this.speech.dataset.text = state.speech ?? "";
+      this.speech.replaceChildren();
+      if (state.speech) {
+        this.speech.append(element("figcaption", "hud-speech-who", "Bafometto · testo provvisorio"), element("blockquote", "hud-speech-text", state.speech));
+      }
+    }
+    this.speech.hidden = state.speech === null;
     this.dev.textContent = state.dev;
     this.renderBadges(state.panel);
     if (state.panel?.kind === "question" && this.timerBar && this.timerText) {

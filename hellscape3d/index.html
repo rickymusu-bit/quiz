@@ -108,6 +108,30 @@
         padding: 6px 14px;
         font-size: 15px;
       }
+      .hud-speech {
+        position: absolute;
+        top: 104px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: min(520px, calc(100vw - 420px));
+        margin: 0;
+        padding: 10px 16px;
+        background: rgb(6 18 10 / 0.82);
+        border: 1px solid #39ff88;
+        border-radius: 8px;
+        box-sizing: border-box;
+      }
+      .hud-speech-who {
+        font-size: 12px;
+        letter-spacing: 0.05em;
+        color: #39ff88;
+        margin-bottom: 4px;
+      }
+      .hud-speech-text {
+        margin: 0;
+        font-size: 17px;
+        font-style: italic;
+      }
       .hud-panel {
         position: absolute;
         left: 50%;
@@ -247,6 +271,14 @@
         }
         .hud-dev {
           display: none;
+        }
+        .hud-speech {
+          top: 52px;
+          width: calc(100vw - 300px);
+          padding: 6px 12px;
+        }
+        .hud-speech-text {
+          font-size: 14px;
         }
       }
     </style>
