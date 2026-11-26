@@ -7,6 +7,7 @@ import { DEFAULT_LAYOUT_CONFIG, VIEW_DIRECTION } from "../layout/layout.ts";
 import type { Vec3 } from "../layout/types.ts";
 import type { CameraPose } from "../director/director.ts";
 import type { SceneModel, SceneSegment } from "../scene/model.ts";
+import { playerColor } from "../ui/palette.ts";
 
 export type CameraMode = "player" | "overview";
 
@@ -18,7 +19,6 @@ const DISTRICT_TINT: Readonly<Record<string, number>> = {
   motori: 0x948577,
   sommita: 0x9a9ba3,
 };
-const PLAYER_COLORS = [0xd8452b, 0x2b8fd8, 0xe0b400, 0x8a3ad8, 0x2bd88a, 0xd82b9a];
 const TILE = { size: 2.6, thickness: 0.5 };
 const WALKWAY = { width: 1.3, thickness: 0.25 };
 const OVERVIEW_PITCH = THREE.MathUtils.degToRad(50);
@@ -151,6 +151,14 @@ export class GrayboxRenderer {
     this.placeCamera(sphere.center, distance, OVERVIEW_PITCH);
   }
 
+  /** Coordinate in pixel CSS di un punto della scena; null se dietro la camera o fuori dall'inquadratura. */
+  project(p: Vec3): { x: number; y: number } | null {
+    const v = new THREE.Vector3(p.x, p.y, p.z).project(this.camera);
+    if (v.z < -1 || v.z > 1 || Math.abs(v.x) > 1 || Math.abs(v.y) > 1) return null;
+    const canvas = this.renderer.domElement;
+    return { x: ((v.x + 1) / 2) * canvas.clientWidth, y: ((1 - v.y) / 2) * canvas.clientHeight };
+  }
+
   render(): void {
     this.renderer.render(this.scene, this.camera);
   }
@@ -203,7 +211,7 @@ export class GrayboxRenderer {
   }
 
   private addPlayer(index: number, active: boolean): THREE.Group {
-    const colour = PLAYER_COLORS[index % PLAYER_COLORS.length]!;
+    const colour = playerColor(index);
     const material = new THREE.MeshStandardMaterial({ color: colour, roughness: 0.5, emissive: colour, emissiveIntensity: active ? 0.35 : 0.05 });
     const group = new THREE.Group();
     const body = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.45, 1.3, 16), material);

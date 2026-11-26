@@ -3,7 +3,7 @@
  * video del browser registrato da Playwright in tempo reale e convertito in
  * GIF con ffmpeg. Non fa parte della CI.
  *
- * Uso: node hellscape3d/tests/browser/record.ts --seed graybox-9 --steps 12 --actions 10 \
+ * Uso: node hellscape3d/tests/browser/record.ts --seed graybox-9 --steps 12 --actions 14 \
  *        [--width 960 --height 540] [--name regia] [--query motion=reduced]
  * Richiede ffmpeg nel PATH. Output in artifacts/hellscape3d/.
  */
@@ -49,15 +49,29 @@ const browser = await chromium.launch({
 const context = await browser.newContext({ viewport: { width, height }, deviceScaleFactor: 1, recordVideo: { dir: work, size: { width, height } } });
 const page = await context.newPage();
 const started = Date.now();
-await page.goto(`${url}?seed=${values.seed}&steps=${values.steps}${values.query ? `&${values.query}` : ""}`);
+await page.goto(`${url}?seed=${values.seed}&steps=${values.steps}&test=1${values.query ? `&${values.query}` : ""}`);
 await page.waitForFunction(() => (window as unknown as { __hellscape3d?: { ready: boolean } }).__hellscape3d?.ready === true);
 await page.waitForTimeout(800);
+// Si gioca dall'interfaccia, con pause leggibili; una risposta su quattro è volutamente errata.
+type Debug = { busy: boolean; panel: string | null; correctIndex?: number; forkChoices: { number: number }[] };
+const debug = (): Promise<Debug> => page.evaluate(() => (window as unknown as { __hellscape3d: Debug }).__hellscape3d);
 for (let i = 0; i < Number(values.actions); i++) {
-  await page.keyboard.press("Space");
-  await page.waitForTimeout(100);
   await page.waitForFunction(() => !(window as unknown as { __hellscape3d: { busy: boolean } }).__hellscape3d.busy, null, { timeout: 20_000 });
-  await page.waitForTimeout(450);
+  const d = await debug();
+  if (d.panel === "question") {
+    await page.waitForTimeout(1300);
+    const index = i % 4 === 3 ? ((d.correctIndex ?? 0) + 1) % 4 : (d.correctIndex ?? 0);
+    await page.keyboard.press(`Digit${index + 1}`);
+  } else if (d.panel === "roll") {
+    await page.waitForTimeout(600);
+    await page.keyboard.press("Enter");
+  } else if (d.panel === "fork") {
+    await page.waitForTimeout(1300);
+    await page.keyboard.press(`Digit${(i % d.forkChoices.length) + 1}`);
+  } else break;
+  await page.waitForTimeout(150);
 }
+await page.waitForFunction(() => !(window as unknown as { __hellscape3d: { busy: boolean } }).__hellscape3d.busy, null, { timeout: 20_000 });
 await page.waitForTimeout(600);
 const seconds = (Date.now() - started) / 1000;
 const video = page.video()!;

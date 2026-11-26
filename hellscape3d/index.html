@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex" />
     <link rel="icon" href="data:," />
-    <title>Hellscape 3D · graybox (sviluppo)</title>
+    <title>Hellscape 3D · prototipo (sviluppo)</title>
     <style>
       html,
       body {
@@ -13,6 +13,8 @@
         height: 100%;
         background: #17181c;
         overflow: hidden;
+        font-family: system-ui, sans-serif;
+        color: #ececec;
       }
       #scene {
         display: block;
@@ -28,23 +30,231 @@
       }
       #hud {
         position: fixed;
+        inset: 0;
+        pointer-events: none;
+      }
+      #hud > * {
+        pointer-events: auto;
+      }
+      [hidden] {
+        display: none !important;
+      }
+      .hud-turn,
+      .hud-panel,
+      .hud-minimap,
+      .hud-die,
+      .hud-toast {
+        background: rgb(10 10 12 / 0.72);
+        border: 1px solid rgb(255 255 255 / 0.12);
+        border-radius: 8px;
+      }
+      .hud-turn {
+        position: absolute;
         top: 12px;
         left: 12px;
+        padding: 8px 12px;
+        font-size: 14px;
+      }
+      .hud-turn-title {
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+      .hud-players {
+        list-style: none;
         margin: 0;
-        padding: 8px 10px;
-        font: 13px/1.4 system-ui, sans-serif;
-        color: #e6e6e6;
-        background: rgb(0 0 0 / 0.55);
-        border-radius: 6px;
-        white-space: pre;
+        padding: 0;
+        display: flex;
+        gap: 12px;
+        font-size: 13px;
+        opacity: 0.85;
+      }
+      .hud-player.is-active {
+        opacity: 1;
+        font-weight: 600;
+      }
+      .hud-player.is-escaped {
+        opacity: 0.6;
+      }
+      .hud-dot {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        margin-right: 6px;
+        vertical-align: -1px;
+      }
+      .hud-minimap {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        width: 180px;
+        height: 180px;
         pointer-events: none;
+      }
+      .hud-die {
+        position: absolute;
+        top: 12px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 8px 16px;
+        font-size: 22px;
+        font-weight: 700;
+      }
+      .hud-toast {
+        position: absolute;
+        top: 64px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 6px 14px;
+        font-size: 15px;
+      }
+      .hud-panel {
+        position: absolute;
+        left: 50%;
+        bottom: 16px;
+        transform: translateX(-50%);
+        width: min(640px, calc(100vw - 32px));
+        padding: 14px 16px;
+        box-sizing: border-box;
+      }
+      .hud-question-head {
+        display: flex;
+        justify-content: space-between;
+        font-size: 13px;
+      }
+      .hud-difficulty {
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .hud-difficulty.is-facile {
+        color: #8fd18f;
+      }
+      .hud-difficulty.is-media {
+        color: #e6c35c;
+      }
+      .hud-difficulty.is-difficile {
+        color: #f07a5a;
+      }
+      .hud-timer {
+        height: 6px;
+        margin: 8px 0;
+        background: rgb(255 255 255 / 0.12);
+        border-radius: 3px;
+        overflow: hidden;
+      }
+      .hud-timer-bar {
+        height: 100%;
+        background: #d9d9de;
+        transform-origin: left;
+      }
+      .hud-timer-bar.is-low {
+        background: #f07a5a;
+      }
+      .hud-question-text {
+        margin: 6px 0 10px;
+        font-size: 17px;
+      }
+      .hud-options {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+      .hud-option,
+      .hud-primary {
+        font: inherit;
+        font-size: 16px;
+        padding: 10px 12px;
+        min-height: 44px;
+        color: inherit;
+        background: rgb(255 255 255 / 0.08);
+        border: 1px solid rgb(255 255 255 / 0.25);
+        border-radius: 6px;
+        cursor: pointer;
+        text-align: left;
+      }
+      .hud-option:hover,
+      .hud-option:focus-visible,
+      .hud-primary:hover,
+      .hud-primary:focus-visible {
+        background: rgb(255 255 255 / 0.18);
+        outline: 2px solid #fff1c2;
+        outline-offset: 1px;
+      }
+      .hud-primary {
+        width: 100%;
+        text-align: center;
+        font-weight: 600;
+      }
+      .hud-badges {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+      }
+      .hud-badge {
+        position: absolute;
+        transform: translate(-50%, -150%);
+        min-width: 26px;
+        padding: 2px 6px;
+        border-radius: 13px;
+        background: rgb(10 10 12 / 0.85);
+        border: 2px solid #d9d9de;
+        font-weight: 700;
+        text-align: center;
+      }
+      .hud-badge.is-facile {
+        border-color: #8fd18f;
+      }
+      .hud-badge.is-media {
+        border-color: #e6c35c;
+      }
+      .hud-badge.is-difficile {
+        border-color: #f07a5a;
+      }
+      .hud-dev {
+        position: absolute;
+        left: 12px;
+        bottom: 8px;
+        font-size: 11px;
+        opacity: 0.6;
+        pointer-events: none;
+      }
+      @media (max-height: 480px) {
+        .hud-turn {
+          font-size: 12px;
+          padding: 6px 10px;
+        }
+        .hud-minimap {
+          width: 120px;
+          height: 120px;
+        }
+        .hud-panel {
+          bottom: 8px;
+          padding: 8px 12px;
+          width: min(560px, calc(100vw - 280px));
+        }
+        .hud-question-text {
+          font-size: 14px;
+          margin: 4px 0 6px;
+        }
+        .hud-option,
+        .hud-primary {
+          font-size: 14px;
+          padding: 6px 10px;
+          min-height: 40px;
+        }
+        .hud-options {
+          gap: 6px;
+        }
+        .hud-dev {
+          display: none;
+        }
       }
     </style>
   </head>
   <body>
     <canvas id="scene" aria-label="Città di Hellscape, vista graybox"></canvas>
     <div id="fade" aria-hidden="true"></div>
-    <pre id="hud"></pre>
+    <div id="hud"></div>
     <script type="module" src="./src/main.ts"></script>
   </body>
 </html>
