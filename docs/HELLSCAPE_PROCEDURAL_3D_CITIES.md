@@ -23,7 +23,7 @@ Il solo tema da implementare nella prima fase è **Megastrutture**. Non è richi
 - A ogni bivio le alternative si presentano con etichette generiche e tematiche, per esempio «scorciatoia pericolosa» e «strada sicura», non con lunghezze o difficoltà esplicite. L'etichetta corrisponde alla posizione del ramo nell'ordine delle lunghezze **relative** verso l'uscita (più breve, intermedio se pertinente, più lungo), che resta legata alla difficoltà delle domande. Il confronto si riferisce al cammino residuo verso l'uscita, non soltanto al prossimo incrocio. In caso di successive diramazioni, usare un criterio coerente e dichiarato internamente, per esempio la minima distanza residua raggiungibile dopo aver scelto il ramo; non promettere una lunghezza esatta del percorso effettivamente seguito. Le etichette appartengono al tema della città; quella del ramo intermedio è da definire.
 - I percorsi più brevi comportano domande più difficili; quelli più lunghi domande più facili. Verificare mediante simulazioni che le alternative siano plausibilmente competitive, tenendo conto di probabilità di risposta corretta, dado ed eventi. Le soglie numeriche e i profili di bilanciamento non sono ancora fissati.
 - Non esporre numero di caselle residue, distanza esatta, posizione dell'uscita, né eventi futuri. Si vede soltanto la casella in cui si trova il giocatore mostrato; al bivio, l'imbocco dei rami, non il loro seguito.
-- **Minimappa.** Mostra soltanto le caselle già percorse da almeno un giocatore e i tratti fra caselle consecutive percorse, senza caselle viste in anticipo né tratti verso l'ignoto. Indica la posizione di tutti i giocatori e quello attivo. Un bivio percorso compare come nodo, con i soli rami già imboccati. L'uscita è un nodo con un'icona propria, staccato dal grafo e in posizione simbolica fissa (per esempio sul bordo): la sua collocazione non deve suggerire direzione o distanza. Diventa una casella del grafo solo quando qualcuno la raggiunge.
+- **Minimappa.** Mostra soltanto le caselle già percorse da almeno un giocatore e i tratti fra caselle consecutive percorse, senza caselle viste in anticipo né tratti verso l'ignoto. Indica la posizione di tutti i giocatori e quello attivo. Un bivio percorso compare come punto di diramazione, distinto dalle caselle, con i soli rami già imboccati. L'uscita è un nodo con un'icona propria, staccato dal grafo e in posizione simbolica fissa (per esempio sul bordo): la sua collocazione non deve suggerire direzione o distanza. Diventa una casella del grafo solo quando qualcuno la raggiunge.
 - **Indizi dell'uscita.** L'avvicinamento all'uscita si avverte da segni ambientali nella scena di corsa: luce naturale, uccelli in volo, vegetazione. L'intensità dipende dalla minima distanza residua dalla casella corrente, per soglie grossolane (indicativamente: nessun indizio, poi luce, poi uccelli e vegetazione nelle ultime caselle) e non in modo continuo, così che non si possano contare le caselle. Prima della scelta a un bivio gli indizi non distinguono i rami. Valori delle soglie e aspetto degli indizi sono da definire con il bilanciamento e la direzione artistica.
 - La nebbia di guerra è uno stato esplicito, non soltanto un effetto estetico. Scena di corsa, transizioni, HUD, minimappa e inquadrature speciali devono rispettarla.
 - La logica interna conserva le distanze esatte necessarie al generatore; non esporle nell'interfaccia. Non si promette segretezza anti-manomissione rispetto agli strumenti di sviluppo di un browser locale.
@@ -32,7 +32,7 @@ Il solo tema da implementare nella prima fase è **Megastrutture**. Non è richi
 
 Il giocatore attivo risponde a una domanda; se corretta, lancia il dado e avanza di conseguenza. Gli effetti ordinari delle caselle si applicano esclusivamente alla casella di arrivo, non a quelle attraversate. Il cambio di inquadratura non cambia lo stato di gioco.
 
-**Bivi.** A un bivio si arriva soltanto avanzando, e lì si sceglie soltanto dove andare: la scelta non comporta domande. Chi raggiunge un bivio si ferma e sceglie subito, anche se il bivio è l'ultima casella del suo avanzamento; con passi residui prosegue sul ramo scelto. Chi termina l'avanzamento sul bivio vi resta con il ramo già scelto, che non può più cambiare. La domanda del turno successivo ha la difficoltà di quel ramo, e anche dopo una risposta errata la scelta resta valida: la scelta appartiene al giocatore, non al turno. Più giocatori sullo stesso bivio possono avere scelto rami diversi. La partita non comincia su un bivio.
+**Bivi.** Il bivio non è una casella: è un punto di passaggio fra l'ultima casella prima della diramazione e la prima casella di ciascun ramo. Lo si attraversa soltanto avanzando, cioè dopo una risposta corretta e il lancio del dado. Chi lo raggiunge si ferma, sceglie la strada senza alcuna domanda e prosegue sul ramo scelto con i passi residui, fino alla casella indicata dal dado. Il bivio non conta come passo e nessun avanzamento può terminarvi: con il dado 4 e il bivio dopo 2 passi si arriva alla seconda casella del ramo. Chi termina l'avanzamento sull'ultima casella prima del bivio sceglierà durante l'avanzamento successivo. La difficoltà della domanda è sempre quella della casella in cui si trova il giocatore. La partita non comincia su un bivio.
 
 Conservare la direzione di progetto già discussa per crediti, salute, Omen e Bafometto; non ridefinirne in questo documento prezzi, valori numerici o condizioni di vittoria e recupero non ancora formalizzate. Il nuovo modello non deve essere confuso con il punteggio e il runner attualmente pubblicati.
 
@@ -82,7 +82,7 @@ I personaggi sono modelli 3D animati, non pedine statiche; corrono, reagiscono a
 - **Una casella, un ciclo.** Ogni casella ha un tratto di scenario proprio, costruito proceduralmente dal tema, dal distretto e dal seme con il kit modulare. Il tratto scorre senza interruzioni e si ripete identico dopo un periodo, in modo che la ripetizione non mostri giunture. Lo scenario deriva soltanto dalla casella corrente e non anticipa nulla del seguito, salvo gli indizi dell'uscita (§3).
 - **Avanzamento.** La corsa accelera e a ogni casella attraversata lo scenario passa al tratto della casella successiva, con un passaggio breve e continuo. All'arrivo si torna alla corsa ordinaria.
 - **Risposta errata o tempo scaduto.** Il giocatore continua a correre nello stesso tratto: è in gara, ma non guadagna terreno.
-- **Bivio.** Chi si trova sul bivio è fermo. La scena mostra l'imbocco dei rami, due o tre passaggi, con le etichette generiche (§3) e nessuna informazione sul seguito. Dopo la scelta il giocatore riprende a correre verso il ramo scelto.
+- **Bivio.** Durante l'avanzamento la corsa si interrompe davanti alla diramazione. La scena mostra l'imbocco dei rami, due o tre passaggi, con le etichette generiche (§3) e nessuna informazione sul seguito. Dopo la scelta il giocatore riprende a correre sul ramo scelto con i passi residui. Nessuno resta fermo su un bivio fra un turno e l'altro.
 - **Leggibilità.** Durante la domanda lo scorrimento è lento o attenuato e il pannello ha uno sfondo pieno. Con il movimento ridotto lo scenario non scorre: si mostra un'immagine ferma del tratto e i cambi di casella avvengono per stacco.
 
 | Fase | Rappresentazione |
@@ -91,7 +91,7 @@ I personaggi sono modelli 3D animati, non pedine statiche; corrono, reagiscono a
 | Domanda | Corsa rallentata, domanda sovrapposta in HTML/CSS |
 | Dado | Animazione dedicata, esito leggibile |
 | Avanzamento | Corsa accelerata, cambio di scenario a ogni casella |
-| Bivio | Giocatore fermo davanti agli imbocchi, scelta fra etichette generiche |
+| Bivio | Durante l'avanzamento: corsa interrotta davanti agli imbocchi, scelta fra etichette generiche, ripresa sul ramo scelto |
 | Arrivo/evento | Inquadratura contestuale nella scena della casella, risoluzione dell'evento |
 | Fine turno | Transizione alla scena del giocatore successivo |
 
@@ -143,10 +143,10 @@ Fasi suggerite: (1) modello logico e test; (2) graybox 3D modulare con camera; (
 - Seed uguale, tema/configurazione/versione uguali: stessa mappa; seed diversi producono varietà effettiva. Test su una pluralità di seed, includendo casi limite e fallback.
 - Tutti i rami offerti sono raggiungibili e coerenti con la lunghezza relativa e la difficoltà; nessuna geometria impedisce il movimento. Le alternative non sono manifestamente dominate nelle simulazioni.
 - Il giocatore vede soltanto i dati autorizzati: la casella corrente, gli imbocchi del bivio e gli indizi a soglie. HUD, minimappa, scena di corsa e transizioni non svelano la mappa sconosciuta; la minimappa contiene soltanto caselle percorse e l'uscita in posizione simbolica.
-- Al bivio la scelta avviene all'arrivo, senza domanda, e resta valida per il turno successivo anche dopo una risposta errata.
+- Il bivio si attraversa solo avanzando: la scelta non comporta domande, il bivio non conta come passo e nessun avanzamento vi termina; i passi residui proseguono sul ramo scelto.
 - Lo scenario di ogni casella si ripete senza giunture visibili e cambia a ogni casella attraversata; la schermata mostra il solo giocatore attivo, più chi si trova nella sua casella.
 - Transizioni funzionanti fra giocatori in caselle diverse e nella stessa casella e fra Bafometto e giocatore; nessuna perdita dello stato, doppia risoluzione, consumo di timer durante blocchi o modifica dell'esito saltando un'animazione.
-- Ricaricamento conserva mondo e progressi, compreso il ramo scelto da chi è fermo su un bivio; caricamento e scaricamento degli scenari non alterano topologia e posizione dei giocatori.
+- Ricaricamento conserva mondo e progressi, compresa una scelta al bivio in attesa durante un avanzamento, con i passi residui; caricamento e scaricamento degli scenari non alterano topologia e posizione dei giocatori.
 - Verificare compatibilità desktop/mobile e qualità con registrazioni reali del browser, viewport e revisione secondo AGENTS.md. Nessuna evidenza di runtime è richiesta o dichiarata per la presente PR esclusivamente documentale.
 
 ## 10. Decisioni ancora aperte
@@ -159,12 +159,12 @@ Aperte dalla revisione del 26 novembre:
 - angolo della camera nella scena di corsa: laterale, come la cornice compositiva del runner precedente nelle [regole di progetto](HELLSCAPE_PROJECT_RULES_v1.0.1_20261031.md), alle spalle o a tre quarti; va scelto prima dei modelli e delle animazioni definitive dei personaggi;
 - lunghezza del ciclo dello scenario e velocità di corsa nelle varie fasi, compreso il rallentamento durante la domanda;
 - forma della minimappa (disposizione reale o schematica delle caselle percorse) e posizione del nodo dell'uscita;
-- bilanciamento con la nuova regola dei bivi: va rifatto con simulazioni, perché oggi tiene conto della scelta a inizio turno.
+- bilanciamento con la nuova regola dei bivi: va rifatto con simulazioni, perché oggi il bivio è una casella e il calcolo tiene conto della scelta a inizio turno.
 
 ### Stato del prototipo rispetto alla revisione del 26 novembre
 
-Il prototipo in `hellscape3d/` implementa ancora la versione precedente. Mostra la città a tre quarti con tutti i giocatori, una minimappa delle zone esplorate (comprese due caselle oltre i giocatori e i tratti verso la nebbia) e la scelta del bivio a inizio turno con domanda. Le modifiche vanno fatte per passi giudicabili:
-1. regola dei bivi nel motore, con salvataggio compatibile e bilanciamento rifatto;
+Il prototipo in `hellscape3d/` implementa ancora la versione precedente. Mostra la città a tre quarti con tutti i giocatori, una minimappa delle zone esplorate (comprese due caselle oltre i giocatori e i tratti verso la nebbia) e il bivio come casella su cui ci si può fermare, con scelta a inizio turno e domanda. Le modifiche vanno fatte per passi giudicabili:
+1. bivio come punto di passaggio nel generatore e nel motore (non conta come passo, scelta durante l'avanzamento), salvataggi del formato precedente conservati a parte come già avviene per quelli incompatibili, bilanciamento rifatto;
 2. minimappa delle sole caselle percorse con l'uscita simbolica;
 3. scena di corsa in graybox: scenario ciclico per casella, giocatori nella stessa casella, bivio con imbocchi ed etichette, movimento ridotto;
 4. indizi dell'uscita provvisori.
@@ -175,3 +175,4 @@ Restano utili generatore, motore, salvataggi, domande, kit modulare e minimappa.
 
 - 2026-11-25: consolidamento delle decisioni approvate nella conversazione sul redesign: mappe procedurali, informazione parziale, 3D stilizzato, una città per gara, Megastrutture come primo tema, generazione modulare e regia dinamica.
 - 2026-11-26: rappresentazione in corsa al posto della vista a tre quarti come schermata di gioco (un giocatore alla volta, insieme se nella stessa casella, scenario ciclico per casella); minimappa delle sole caselle percorse con l'uscita come nodo simbolico staccato; indizi dell'uscita a soglie; bivi raggiunti solo avanzando, con scelta all'arrivo, senza domanda e con etichette generiche; stato del prototipo e passi di adeguamento.
+- 2026-11-26, correzione: il bivio non è una casella ma un punto di passaggio fra due caselle. Si sceglie durante l'avanzamento, senza domanda; non conta come passo, non vi si termina l'avanzamento e i passi residui proseguono sul ramo scelto. Sostituisce la regola della voce precedente, che permetteva di fermarsi sul bivio e conservare la scelta fra un turno e l'altro.
