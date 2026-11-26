@@ -7,10 +7,11 @@ export class QuestionTimer {
   private left: number;
   private fired = false;
 
-  constructor(seconds: number) {
+  /** `remaining` permette di riprendere una domanda dopo un ricaricamento, senza restituire tempo. */
+  constructor(seconds: number, remaining: number = seconds) {
     if (!(seconds > 0)) throw new RangeError("Durata del timer non valida");
     this.total = seconds;
-    this.left = seconds;
+    this.left = Number.isFinite(remaining) ? Math.max(0, Math.min(seconds, remaining)) : seconds;
   }
 
   get remaining(): number {

@@ -49,6 +49,8 @@ interface DebugInfo {
   bafometto: { kind: "seat" } | { kind: "terminal"; cellId: string } | null;
   spoken: string[];
   speech: string | null;
+  resumed: boolean;
+  timerRemaining: number | null;
   totalCells: number;
   stats: { tiles: number; walkways: number; stubs: number; masses: number; players: number };
 }
@@ -334,6 +336,55 @@ try {
     } catch (error) {
       failures++;
       console.log(`FAIL ${device.name} · Bafometto: ${(error as Error).message}`);
+    }
+    // Ripresa della partita salvata: stesso stato, nessuna apertura ripetuta, timer non restituito.
+    try {
+      await page.goto(`${url}?seed=graybox-1&intro=off`);
+      await waitReady(page);
+      await page.evaluate(() => localStorage.setItem("fool-v1", "runner-intatto"));
+      for (let i = 0; i < 9; i++) {
+        await page.keyboard.press("KeyA");
+        await page.waitForFunction(() => (window as unknown as { __hellscape3d: DebugInfo }).__hellscape3d.busy === false, null, { timeout: 15_000 });
+      }
+      const before = await info(page);
+      assert.ok(await page.evaluate(() => localStorage.getItem("hellscape3d-save") !== null), "salvataggio assente");
+      await page.goto(url);
+      await waitReady(page, false);
+      const after = await info(page);
+      assert.equal(after.resumed, true, "partita non ripresa");
+      assert.equal(after.busy, false, "apertura ripetuta alla ripresa");
+      assert.deepEqual(after.spoken, []);
+      assert.equal(after.turn, before.turn);
+      assert.equal(after.phase, before.phase);
+      assert.equal(after.stateActivePlayerId, before.stateActivePlayerId);
+      assert.deepEqual(after.explored, before.explored);
+      assert.deepEqual(after.cellPositions, before.cellPositions);
+      assertSettled(after);
+      assert.match((await page.locator(".hud-toast").textContent()) ?? "", /Partita ripresa/);
+
+      // Tempo residuo della domanda conservato attraverso il ricaricamento.
+      await page.goto(`${url}?seed=graybox-1&steps=15`);
+      await waitReady(page);
+      await page.waitForFunction(() => ((window as unknown as { __hellscape3d: DebugInfo }).__hellscape3d.timerRemaining ?? 30) <= 27, null, { timeout: 15_000 });
+      const left = (await info(page)).timerRemaining!;
+      await page.goto(url);
+      await waitReady(page, false);
+      const resumedLeft = (await info(page)).timerRemaining!;
+      assert.equal((await info(page)).panel, "question");
+      assert.ok(resumedLeft <= left + 0.6 && resumedLeft < 29, `tempo restituito dal ricaricamento (${left.toFixed(2)} → ${resumedLeft.toFixed(2)})`);
+
+      // Salvataggio incompatibile: conservato a parte, partita nuova con avviso.
+      await page.evaluate(() => localStorage.setItem("hellscape3d-save", '{"format":"hellscape3d-save","saveVersion":99}'));
+      await page.goto(url);
+      await waitReady(page);
+      assert.equal((await info(page)).resumed, false);
+      assert.equal(await page.evaluate(() => localStorage.getItem("hellscape3d-save-scartato")), '{"format":"hellscape3d-save","saveVersion":99}');
+      assert.match((await page.locator(".hud-toast").textContent()) ?? "", /non utilizzabile/);
+      assert.equal(await page.evaluate(() => localStorage.getItem("fool-v1")), "runner-intatto", "salvataggio del runner modificato");
+      console.log(`ok   ${device.name} · ripresa della partita, timer conservato, salvataggio incompatibile`);
+    } catch (error) {
+      failures++;
+      console.log(`FAIL ${device.name} · ripresa: ${(error as Error).message}`);
     }
     // Movimento ridotto: nessuna animazione, presentazione sempre allineata allo stato.
     try {

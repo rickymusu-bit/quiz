@@ -4,7 +4,7 @@ Redesign descritto in [Città procedurali 3D e regia di gioco](../docs/HELLSCAPE
 
 Stato (§9 della specifica):
 - **fase 1, modello logico e test:** completata;
-- **fase 2, graybox 3D modulare con camera:** in corso. Consegnati: layout spaziale, volumi graybox e nebbia di guerra nella scena (primo passo); pedine animate e CameraDirector (secondo passo); interfaccia provvisoria con domande fittizie e minimappa (terzo passo); ostacoli davanti alla camera e inquadratura sopra il pannello (quarto passo); scena provvisoria di Bafometto (quinto passo). Manca la ripresa della partita salvata nella pagina, richiesta dalla vertical slice (§9).
+- **fase 2, graybox 3D modulare con camera:** in corso. Consegnati: layout spaziale, volumi graybox e nebbia di guerra nella scena (primo passo); pedine animate e CameraDirector (secondo passo); interfaccia provvisoria con domande fittizie e minimappa (terzo passo); ostacoli davanti alla camera e inquadratura sopra il pannello (quarto passo); scena provvisoria di Bafometto (quinto passo); ripresa della partita salvata (sesto passo). La pagina di prova copre ora il flusso di gioco della vertical slice (§9): città generata, domanda, dado, avanzamento, scelta, arrivo, cambio turno, nebbia di guerra, minimappa, Bafometto provvisorio e ripresa. Restano il kit modulare minimo, la direzione artistica e, fra i criteri di accettazione, il caricamento per settori.
 
 Il codice è TypeScript con sola sintassi cancellabile. Il modello logico e il layout girano direttamente in Node (≥ 22.18) senza compilazione; la pagina di prova usa Vite e Three.js.
 
@@ -46,7 +46,7 @@ Ogni disposizione viene verificata: distanza minima fra caselle, passerelle che 
 
 **Nebbia di guerra nella scena.** Il renderer disegna solo il modello della scena, costruito dalla vista pubblica: caselle esplorate, passerelle fra caselle esplorate, masse entro 16 unità da esse e, per ogni tratto che prosegue nella nebbia, un moncone pari al 40% della passerella. La direzione del moncone è l'unico dato non pubblico usato, ed è visibile solo per quel 40%. Un test verifica che nessun identificativo di cella nascosta compaia nel modello in alcun momento della partita.
 
-**Pagina di prova.** Parametri: `?seed=…`, `?steps=N` (azioni automatiche iniziali), `?view=overview` (panoramica delle zone esplorate) e `?reveal=all`, che mostra l'intera città **solo per lo sviluppo**, per giudicare il layout. Tasti: 1–4 risposte e alternative, Invio lancia il dado, Spazio o S saltano la regia, F accelera ×3, V cambia inquadratura, A esegue un'azione automatica (sviluppo). `?motion=reduced` attiva il movimento ridotto, `?timer=S` cambia la durata della domanda, `?test=1` espone ai test la risposta corretta. Le azioni automatiche simulano le risposte con il profilo provvisorio.
+**Pagina di prova.** Senza parametri riprende la partita salvata. Parametri: `?seed=…` e `?steps=N` (azioni automatiche iniziali), che avviano una partita nuova, `?view=overview` (panoramica delle zone esplorate) e `?reveal=all`, che mostra l'intera città **solo per lo sviluppo**, per giudicare il layout. Tasti: 1–4 risposte e alternative, Invio lancia il dado, Spazio o S saltano la regia, F accelera ×3, V cambia inquadratura, A esegue un'azione automatica (sviluppo). `?motion=reduced` attiva il movimento ridotto, `?timer=S` cambia la durata della domanda, `?test=1` espone ai test la risposta corretta. Le azioni automatiche simulano le risposte con il profilo provvisorio.
 
 ## Pedine animate e regia (fase 2, secondo passo)
 
@@ -99,6 +99,19 @@ Quando un pannello occupa la parte bassa dello schermo, l'inquadratura si decent
 
 `?intro=off` disattiva l'apertura.
 
+## Ripresa della partita (fase 2, sesto passo)
+
+`session.ts` decide all'avvio fra ripresa e partita nuova, usando il salvataggio della fase 1 (`logic/persistence.ts`, chiave `hellscape3d-save`):
+
+- **Ripresa:** senza parametri la pagina riprende la partita salvata. Il mondo viene ricostruito da seme, configurazione e versione del generatore e confrontato con l'impronta salvata; lo stato è quello del motore. L'apertura di Bafometto non si ripete e compare l'avviso «Partita ripresa».
+- **Partita nuova:** `?seed=`, `?steps=` o `?new=1` avviano esplicitamente una partita nuova, che sostituisce il salvataggio; «Nuova città» fa lo stesso.
+- **Quando si salva:** all'avvio di una partita nuova e dopo ogni azione, prima e indipendentemente dalla regia.
+- **Salvataggio incompatibile** (versione, generatore o impronta diversi, dati non validi): non si perde. Viene copiato in `hellscape3d-save-scartato`, parte una partita nuova e compare un avviso. I salvataggi del gioco pubblicato (`fool-v1`, `fool-settings-v1`) non vengono toccati.
+- **Timer della domanda:** il tempo residuo si salva ogni mezzo secondo e alla chiusura della pagina (`hellscape3d-domanda`), legato a partita, turno e giocatore. Ricaricare non restituisce tempo; una domanda già scaduta scade al primo fotogramma.
+- **Senza `localStorage`:** la partita funziona, con l'avviso che non potrà essere ripresa.
+
+Lo script di registrazione accetta `--reload-after N` per ricaricare la pagina dopo N azioni e registrare la ripresa.
+
 ## Rete generata
 
 Sequenza di corridoi e bivi; i rami di ogni bivio (2 o 3) si ricongiungono all'inizio del corridoio successivo. La rete è aciclica, ogni cella è raggiungibile dalla partenza e raggiunge l'uscita. Il ramo più corto ha domande difficili, il più lungo facili, l'eventuale intermedio medie. La lunghezza relativa si basa sulla minima distanza residua verso l'uscita dopo la scelta, come indicato dalla specifica. Le lunghezze di due rami dello stesso bivio differiscono di almeno due caselle.
@@ -134,4 +147,4 @@ La specifica (§3, §10) lascia aperte queste decisioni. Le scelte seguenti serv
 
 ## Non ancora realizzato
 
-Nella fase 2: ripresa della partita salvata nella pagina di prova, caricamento per settori. Nelle fasi successive: kit modulare, direzione artistica, personaggi, Bafometto, durata definitiva del timer e selezione delle domande dalle banche esistenti. Il motore riceve solo l'esito della risposta.
+Caricamento e scaricamento per settori (§8 e criteri di accettazione del §9): non ancora fatto. Proposta, da confermare: affrontarlo quando le città con il kit modulare saranno abbastanza pesanti da renderlo misurabile. Nelle fasi successive: kit modulare, direzione artistica, personaggi, Bafometto, durata definitiva del timer e selezione delle domande dalle banche esistenti. Il motore riceve solo l'esito della risposta.

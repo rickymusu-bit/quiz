@@ -2,8 +2,9 @@
  * Pagina di prova della fase 2, non pubblicata: graybox, regia e interfaccia
  * provvisoria con domande fittizie.
  *
- * Parametri: ?seed=… (città), ?steps=N (azioni automatiche iniziali, senza
- * regia), ?timer=S (secondi per domanda), ?view=overview, ?motion=reduced,
+ * Senza parametri riprende la partita salvata nel browser, se esiste.
+ * Parametri: ?seed=… (città: partita nuova), ?steps=N (azioni automatiche
+ * iniziali, senza regia: partita nuova), ?new=1 (partita nuova), ?timer=S (secondi per domanda), ?view=overview, ?motion=reduced,
  * ?intro=off (senza l'apertura di Bafometto),
  * ?reveal=all (SOLO SVILUPPO: città intera), ?occlusion=off (SOLO SVILUPPO:
  * ostacoli opachi, per confronto), ?test=1 (espone ai test la risposta corretta).
@@ -12,7 +13,7 @@
  * un'azione automatica (sviluppo).
  */
 import { CameraDirector, type Frame } from "./director/director.ts";
-import { applyAction, createGame, publicView, rngFromSeed, type GameAction, type GameState } from "./logic/index.ts";
+import { applyAction, createGame, publicView, rngFromSeed, saveToStorage, type Game, type GameAction, type GameState, type KeyValueStorage } from "./logic/index.ts";
 import { buildCityLayout } from "./layout/layout.ts";
 import { GrayboxRenderer, type CameraMode } from "./render/graybox.ts";
 import { buildSceneModel, presentedView, revealAllView, type SceneModel } from "./scene/model.ts";
@@ -21,9 +22,25 @@ import { Hud, type ForkChoice, type HudState, type Panel } from "./ui/hud.ts";
 import { minimapShapes } from "./ui/minimap.ts";
 import { fakeQuestion, type FakeQuestion } from "./ui/questions.ts";
 import { DEFAULT_QUESTION_SECONDS, QuestionTimer } from "./ui/timer.ts";
+import { decideStart, loadQuestionClock, memoryStorage, questionKey, saveQuestionClock } from "./session.ts";
 
 const params = new URLSearchParams(location.search);
-const seed = params.get("seed") ?? "graybox-1";
+
+/** Salvataggio nel browser; senza `localStorage` la partita funziona ma non si riprende. */
+let storageNotice: string | null = null;
+const storage: KeyValueStorage = (() => {
+  try {
+    const probe = "hellscape3d-prova";
+    window.localStorage.setItem(probe, "1");
+    window.localStorage.removeItem(probe);
+    return window.localStorage;
+  } catch {
+    storageNotice = "Salvataggio non disponibile in questo browser: la partita non potrà essere ripresa.";
+    return memoryStorage();
+  }
+})();
+const start = decideStart(params, storage, "graybox-1");
+const resumed = start.kind === "resume";
 const revealAll = params.get("reveal") === "all";
 const testHooks = params.get("test") === "1";
 /** SOLO SVILUPPO: ?occlusion=off disattiva la trasparenza degli ostacoli, per confronto. */
@@ -33,13 +50,17 @@ const questionSeconds = Math.max(1, Number(params.get("timer")) || DEFAULT_QUEST
 let mode: CameraMode = params.get("view") === "overview" ? "overview" : "player";
 let speed = 1;
 
-const { game } = createGame({
-  seed,
-  players: [
-    { id: "p1", name: "Dannato 1" },
-    { id: "p2", name: "Dannato 2" },
-  ],
-});
+const game: Game =
+  start.kind === "resume"
+    ? start.game
+    : createGame({
+        seed: start.seed,
+        players: [
+          { id: "p1", name: "Dannato 1" },
+          { id: "p2", name: "Dannato 2" },
+        ],
+      }).game;
+const seed = game.map.seed;
 const layout = buildCityLayout(game.map);
 const answers = rngFromSeed(seed, "dev:answers");
 let state: GameState = game.state;
@@ -58,8 +79,18 @@ function autoAction(s: GameState): GameAction {
   }
 }
 
-const steps = Math.max(0, Math.min(2000, Number.parseInt(params.get("steps") ?? "0", 10) || 0));
+const steps = resumed ? 0 : Math.max(0, Math.min(2000, Number.parseInt(params.get("steps") ?? "0", 10) || 0));
 for (let i = 0; i < steps && state.phase !== "ended"; i++) state = applyAction(game.map, state, autoAction(state)).state;
+
+/** Lo stato del motore si salva subito, prima e indipendentemente dalla regia. */
+function persist(): void {
+  try {
+    saveToStorage(storage, { map: game.map, state });
+  } catch {
+    storageNotice = "Salvataggio non riuscito: la partita potrebbe non essere ripresa.";
+  }
+}
+if (!resumed) persist();
 
 const canvas = document.querySelector<HTMLCanvasElement>("#scene")!;
 const fade = document.querySelector<HTMLElement>("#fade")!;
@@ -67,14 +98,19 @@ const renderer = new GrayboxRenderer(canvas);
 const director = new CameraDirector(game.map, layout, state, { reducedMotion });
 renderer.setSeat(director.seatPosition);
 // Intervento d'apertura di Bafometto, solo per una partita nuova.
-if (steps === 0 && !revealAll && params.get("intro") !== "off") director.intro();
+if (!resumed && steps === 0 && !revealAll && params.get("intro") !== "off") director.intro();
 let frame: Frame = director.getFrame();
 let builtKey = "";
 let model: SceneModel = buildModel();
 
 let question: { key: string; data: FakeQuestion; timer: QuestionTimer } | null = null;
 let die: { value: number; hideAt: number | null } | null = null;
-let toast: { text: string; until: number } | null = null;
+let toast: { text: string; until: number } | null = resumed
+  ? { text: "Partita ripresa", until: 2.5 }
+  : start.notice || storageNotice
+    ? { text: (start.kind === "new" ? start.notice : null) ?? storageNotice!, until: 6 }
+    : null;
+let lastClockSave = 0;
 /** Battuta di Bafometto visibile, con il tempo di lettura (anche con il movimento ridotto). */
 let speech: { text: string; until: number } | null = null;
 const spoken: string[] = [];
@@ -85,6 +121,7 @@ const hud = new Hud(document.querySelector<HTMLElement>("#hud")!, {
   roll: () => perform({ type: "roll" }),
   choose: (to) => perform({ type: "chooseBranch", to }),
   restart: () => {
+    // Un seme esplicito avvia una partita nuova, che sostituisce il salvataggio.
     const next = new URLSearchParams({ seed: `${seed}+` });
     location.search = next.toString();
   },
@@ -100,6 +137,7 @@ function perform(action: GameAction): void {
   if (director.busy || state.phase === "ended") return;
   const result = applyAction(game.map, state, action);
   state = result.state;
+  persist();
   for (const event of result.events) if (event.type === "diceRolled") die = { value: event.value, hideAt: null };
   director.enqueue(result.events, state);
   // Le clip istantanee (movimento ridotto) si completano subito; quelle animate partono soltanto.
@@ -122,9 +160,11 @@ function currentPanel(): Panel | null {
   const active = state.players[state.activeIndex]!;
   switch (state.phase) {
     case "question": {
-      const key = `q:${state.turn}:${active.id}`;
+      const key = questionKey(seed, state.turn, active.id);
       if (!question || question.key !== key) {
-        question = { key, data: fakeQuestion(seed, state.turn, active.id, state.questionDifficulty!), timer: new QuestionTimer(questionSeconds) };
+        // Dopo un ricaricamento la domanda riprende con il tempo residuo salvato, non con quello pieno.
+        const remaining = loadQuestionClock(storage, key) ?? questionSeconds;
+        question = { key, data: fakeQuestion(seed, state.turn, active.id, state.questionDifficulty!), timer: new QuestionTimer(questionSeconds, remaining) };
       }
       return { kind: "question", key, question: question.data, remaining: question.timer.remaining, total: question.timer.duration };
     }
@@ -206,6 +246,10 @@ function drawFrame(seconds: number): void {
   const panel = currentPanel();
   // Il timer scorre solo con la domanda visibile, a regia ferma e pagina in primo piano.
   if (question && panel?.kind === "question" && question.timer.tick(seconds, !document.hidden)) answer("timeout");
+  if (question && clock - lastClockSave >= 0.5) {
+    saveQuestionClock(storage, question.key, question.timer.remaining);
+    lastClockSave = clock;
+  }
   if (die) {
     if (!director.busy) die.hideAt ??= clock + 1.2;
     if (die.hideAt !== null && clock >= die.hideAt) die = null;
@@ -249,6 +293,8 @@ function drawFrame(seconds: number): void {
       occluders: { tiles: occluders.tiles.length, pillars: occluders.pillars.length, walkways: occluders.walkways.length, masses: occluders.masses.length },
       occluderIds: [...occluders.tiles, ...occluders.pillars],
       bafometto: frame.bafometto,
+      resumed,
+      timerRemaining: question?.timer.remaining ?? null,
       spoken: [...spoken],
       speech: speech?.text ?? null,
       seat: director.seatPosition,
@@ -269,6 +315,11 @@ function hudMinimapSize(): { width: number; height: number } {
   const element = document.querySelector<HTMLElement>(".hud-minimap")!;
   return { width: element.clientWidth, height: element.clientHeight };
 }
+
+// Alla chiusura o al ricaricamento si salva subito il tempo residuo della domanda in corso.
+window.addEventListener("pagehide", () => {
+  if (question) saveQuestionClock(storage, question.key, question.timer.remaining);
+});
 
 window.addEventListener("keydown", (event) => {
   if (event.repeat) return;
