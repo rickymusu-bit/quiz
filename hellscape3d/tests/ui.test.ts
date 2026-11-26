@@ -1,30 +1,11 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { applyAction, publicView, DIFFICULTIES } from "../src/logic/index.ts";
+import { applyAction, publicView } from "../src/logic/index.ts";
 import { buildCityLayout, VIEW_DIRECTION } from "../src/layout/layout.ts";
 import { buildSceneModel } from "../src/scene/model.ts";
 import { minimapShapes, toMinimapPlane } from "../src/ui/minimap.ts";
-import { fakeQuestion } from "../src/ui/questions.ts";
 import { QuestionTimer } from "../src/ui/timer.ts";
 import { autoAction, newGame } from "./helpers.ts";
-
-test("domande fittizie: deterministiche, etichettate, quattro opzioni distinte con una sola corretta", () => {
-  for (const difficulty of DIFFICULTIES) {
-    for (let turn = 1; turn <= 60; turn++) {
-      const q = fakeQuestion("seme", turn, "p1", difficulty);
-      assert.deepEqual(q, fakeQuestion("seme", turn, "p1", difficulty));
-      assert.match(q.text, /^Domanda fittizia/);
-      assert.equal(q.options.length, 4);
-      assert.equal(new Set(q.options).size, 4);
-      // Ricalcola il risultato dal testo e verifica l'indice corretto.
-      const expr = /quanto fa (.+)\?$/.exec(q.text)![1]!.replaceAll("×", "*").replaceAll("−", "-");
-      const value = Function(`"use strict"; return (${expr});`)() as number;
-      assert.equal(q.options[q.correctIndex], String(value));
-      assert.ok(q.options.every((o) => Number(o) > 0));
-    }
-  }
-  assert.notDeepEqual(fakeQuestion("seme", 1, "p1", "media"), fakeQuestion("seme", 1, "p2", "media"));
-});
 
 test("timer: scorre solo quando può, scade una sola volta", () => {
   const timer = new QuestionTimer(3);

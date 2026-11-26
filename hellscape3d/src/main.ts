@@ -1,9 +1,10 @@
 /**
- * Pagina di prova della fase 2, non pubblicata: graybox, regia e interfaccia
- * provvisoria con domande fittizie.
+ * Pagina di prova, non pubblicata: graybox, regia e interfaccia provvisoria con
+ * le domande delle banche della versione precedente.
  *
  * Senza parametri riprende la partita salvata nel browser, se esiste.
- * Parametri: ?seed=… (città: partita nuova), ?steps=N (azioni automatiche
+ * Parametri: ?seed=… (città: partita nuova), ?bank=ID (banca di domande del
+ * catalogo per una partita nuova; predefinita la prima), ?steps=N (azioni automatiche
  * iniziali, senza regia: partita nuova), ?new=1 (partita nuova), ?timer=S (secondi per domanda), ?view=overview, ?motion=reduced,
  * ?intro=off (senza l'apertura di Bafometto),
  * ?reveal=all (SOLO SVILUPPO: città intera), ?occlusion=off (SOLO SVILUPPO:
@@ -24,7 +25,8 @@ import { NO_OCCLUDERS, type Occluders } from "./scene/occlusion.ts";
 import { citySlab, visibleRadius, type Focus } from "./scene/sectors.ts";
 import { Hud, type ForkChoice, type HudState, type Panel } from "./ui/hud.ts";
 import { minimapShapes } from "./ui/minimap.ts";
-import { fakeQuestion, type FakeQuestion } from "./ui/questions.ts";
+import { CATALOG, loadBank } from "./questions/catalog.ts";
+import { ask, loadLog, newLog, outcomeOf, present, recordAnswer, saveLog, type GivenAnswer, type PresentedQuestion, type QuestionLog } from "./questions/deck.ts";
 import { DEFAULT_QUESTION_SECONDS, QuestionTimer } from "./ui/timer.ts";
 import { decideStart, loadQuestionClock, memoryStorage, questionKey, saveQuestionClock } from "./session.ts";
 
@@ -69,6 +71,29 @@ const game: Game =
         ],
       }).game;
 const seed = game.map.seed;
+
+/**
+ * Banca di domande: per una partita ripresa quella registrata con la partita,
+ * per una nuova quella indicata da ?bank= o la prima del catalogo.
+ */
+const savedLog = resumed ? loadLog(storage, seed) : null;
+const requestedBank = savedLog?.bankId ?? params.get("bank") ?? CATALOG[0]!.id;
+const bankEntry = CATALOG.find((entry) => entry.id === requestedBank) ?? CATALOG[0]!;
+const bankNotice = bankEntry.id === requestedBank ? null : `Banca «${requestedBank}» non disponibile: si usa «${bankEntry.name}».`;
+const bank = await loadBank(bankEntry).catch((error: unknown) => {
+  document.querySelector("#hud")!.textContent = `Domande non disponibili: ${(error as Error).message}`;
+  throw error;
+});
+/** Registro delle domande: se manca o non appartiene a questa partita se ne apre uno nuovo. */
+let questionLog: QuestionLog = (savedLog && savedLog.bankId === bank.id ? loadLog(storage, seed, bank) : null) ?? newLog(seed, bank.id);
+function storeLog(): void {
+  try {
+    saveLog(storage, questionLog);
+  } catch {
+    storageNotice = "Salvataggio non riuscito: la partita potrebbe non essere ripresa.";
+  }
+}
+storeLog();
 const layout = buildCityLayout(game.map);
 const slab = citySlab(layout);
 const answers = rngFromSeed(seed, "dev:answers");
@@ -113,12 +138,13 @@ let builtKey = "";
 let builtSize = "";
 let model: SceneModel = buildModel();
 
-let question: { key: string; data: FakeQuestion; timer: QuestionTimer } | null = null;
+/** Timer della domanda visibile (la domanda stessa è nel registro). */
+let question: { key: string; timer: QuestionTimer } | null = null;
 let die: { value: number; hideAt: number | null } | null = null;
 let toast: { text: string; until: number } | null = resumed
   ? { text: "Partita ripresa", until: 2.5 }
-  : start.notice || storageNotice
-    ? { text: (start.kind === "new" ? start.notice : null) ?? storageNotice!, until: 6 }
+  : start.notice || storageNotice || bankNotice
+    ? { text: (start.kind === "new" ? start.notice : null) ?? storageNotice ?? bankNotice!, until: 6 }
     : null;
 let lastClockSave = 0;
 /** Battuta di Bafometto visibile, con il tempo di lettura (anche con il movimento ridotto). */
@@ -128,11 +154,12 @@ let clock = 0;
 
 const hud = new Hud(document.querySelector<HTMLElement>("#hud")!, {
   answer: (index) => answer(index),
+  proceed: () => proceed(),
   roll: () => perform({ type: "roll" }),
   choose: (to) => perform({ type: "chooseBranch", to }),
   restart: () => {
     // Un seme esplicito avvia una partita nuova, che sostituisce il salvataggio.
-    const next = new URLSearchParams({ seed: `${seed}+` });
+    const next = new URLSearchParams({ seed: `${seed}+`, bank: bank.id });
     location.search = next.toString();
   },
 });
@@ -156,12 +183,34 @@ function perform(action: GameAction): void {
   if (!drawing) draw(0);
 }
 
-function answer(index: number | "timeout"): void {
+/** Domanda del giocatore attivo: assegnata e registrata alla prima richiesta, poi sempre la stessa. */
+function activeQuestion(): PresentedQuestion {
+  const key = questionKey(seed, state.turn, state.players[state.activeIndex]!.id);
+  const result = ask(questionLog, bank, key, state.questionDifficulty!);
+  if (result.log !== questionLog) {
+    questionLog = result.log;
+    storeLog();
+  }
+  return present(bank, result.asked);
+}
+
+/**
+ * La risposta si registra subito (un ricaricamento non permette di
+ * rispondere di nuovo) e si mostra l'esito; il motore la riceve con «Continua».
+ */
+function answer(given: GivenAnswer): void {
   if (!question || state.phase !== "question" || director.busy) return;
-  const outcome = index === "timeout" ? "timeout" : index === question.data.correctIndex ? "correct" : "wrong";
-  toast = { text: outcome === "correct" ? "Risposta corretta" : outcome === "wrong" ? "Risposta errata: il turno passa" : "Tempo scaduto: il turno passa", until: clock + 1.6 };
+  questionLog = recordAnswer(questionLog, question.key, given);
+  storeLog();
   question = null;
-  perform({ type: "answer", outcome });
+  if (!drawing) draw(0);
+}
+
+function proceed(): void {
+  if (state.phase !== "question" || director.busy) return;
+  const current = activeQuestion();
+  if (current.answer === null) return;
+  perform({ type: "answer", outcome: outcomeOf(current) });
 }
 
 /** Pannello da mostrare: solo a regia ferma, quando la presentazione coincide con lo stato. */
@@ -170,13 +219,14 @@ function currentPanel(): Panel | null {
   const active = state.players[state.activeIndex]!;
   switch (state.phase) {
     case "question": {
-      const key = questionKey(seed, state.turn, active.id);
-      if (!question || question.key !== key) {
+      const current = activeQuestion();
+      if (current.answer !== null) return { kind: "feedback", key: `e:${current.key}`, question: current };
+      if (!question || question.key !== current.key) {
         // Dopo un ricaricamento la domanda riprende con il tempo residuo salvato, non con quello pieno.
-        const remaining = loadQuestionClock(storage, key) ?? questionSeconds;
-        question = { key, data: fakeQuestion(seed, state.turn, active.id, state.questionDifficulty!), timer: new QuestionTimer(questionSeconds, remaining) };
+        const remaining = loadQuestionClock(storage, current.key) ?? questionSeconds;
+        question = { key: current.key, timer: new QuestionTimer(questionSeconds, remaining) };
       }
-      return { kind: "question", key, question: question.data, remaining: question.timer.remaining, total: question.timer.duration };
+      return { kind: "question", key: current.key, question: current, remaining: question.timer.remaining, total: question.timer.duration };
     }
     case "roll":
       return { kind: "roll", key: `r:${state.turn}` };
@@ -297,7 +347,7 @@ function drawFrame(seconds: number): void {
     die: die?.value ?? null,
     toast: toast?.text ?? null,
     speech: speech?.text ?? null,
-    dev: `Prova non pubblicata · seme ${seed}${revealAll ? " · CITTÀ RIVELATA" : ""}${reducedMotion ? " · movimento ridotto" : ""}${forcedSectorRadius ? ` · SETTORI r=${forcedSectorRadius}` : ""} · velocità ×${speed} · A automatico · V vista`,
+    dev: `Prova non pubblicata · seme ${seed} · ${bank.title}${revealAll ? " · CITTÀ RIVELATA" : ""}${reducedMotion ? " · movimento ridotto" : ""}${forcedSectorRadius ? ` · SETTORI r=${forcedSectorRadius}` : ""} · velocità ×${speed} · A automatico · V vista`,
   };
   hud.update(hudState);
   const minimapSize = hudMinimapSize();
@@ -315,7 +365,12 @@ function drawFrame(seconds: number): void {
       busy: director.busy,
       panel: lastPanel?.kind ?? null,
       timer: question ? { remaining: question.timer.remaining, total: question.timer.duration } : null,
-      correctIndex: testHooks && question ? question.data.correctIndex : undefined,
+      correctIndex: testHooks && lastPanel?.kind === "question" ? lastPanel.question.correctIndex : undefined,
+      bankId: bank.id,
+      questionId: lastPanel?.kind === "question" || lastPanel?.kind === "feedback" ? lastPanel.question.id : null,
+      questionText: lastPanel?.kind === "question" || lastPanel?.kind === "feedback" ? lastPanel.question.text : null,
+      outcome: lastPanel?.kind === "feedback" ? outcomeOf(lastPanel.question) : null,
+      askedCount: questionLog.asked.length,
       forkChoices: lastPanel?.kind === "fork" ? lastPanel.choices.map((c) => ({ number: c.number, to: c.to, anchored: c.anchor !== null })) : [],
       activePlayerId: frame.activePlayerId,
       stateActivePlayerId: state.players[state.activeIndex]!.id,
@@ -362,6 +417,10 @@ window.addEventListener("keydown", (event) => {
   if (event.repeat) return;
   const digit = /^Digit([1-4])$/.exec(event.code)?.[1] ?? /^Numpad([1-4])$/.exec(event.code)?.[1];
   if (digit && lastPanel?.kind === "question") answer(Number(digit) - 1);
+  else if ((event.code === "Enter" || event.code === "NumpadEnter") && lastPanel?.kind === "feedback") {
+    proceed();
+    event.preventDefault();
+  }
   else if (digit && lastPanel?.kind === "fork") {
     const choice = lastPanel.choices[Number(digit) - 1];
     if (choice) perform({ type: "chooseBranch", to: choice.to });
@@ -377,12 +436,15 @@ window.addEventListener("keydown", (event) => {
   } else if (event.code === "KeyF") speed = speed === 1 ? 3 : 1;
   else if (event.code === "KeyV") mode = mode === "player" ? "overview" : "player";
   else if (event.code === "KeyA" && !director.busy && state.phase !== "ended") {
-    const action = autoAction(state);
-    if (action.type === "answer") {
-      toast = { text: action.outcome === "correct" ? "Risposta corretta (automatica)" : "Risposta errata (automatica)", until: clock + 1.6 };
-      question = null;
-    }
-    perform(action);
+    // Sviluppo: risposta simulata secondo il profilo, registrata come le altre, senza fermarsi sull'esito.
+    if (lastPanel?.kind === "question") {
+      const action = autoAction(state);
+      const correct = action.type === "answer" && action.outcome === "correct";
+      toast = { text: correct ? "Risposta corretta (automatica)" : "Risposta errata (automatica)", until: clock + 1.6 };
+      answer(correct ? lastPanel.question.correctIndex : (lastPanel.question.correctIndex + 1) % 4);
+      proceed();
+    } else if (lastPanel?.kind === "feedback") proceed();
+    else if (state.phase !== "question") perform(autoAction(state));
   }
 });
 

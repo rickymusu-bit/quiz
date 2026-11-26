@@ -1,12 +1,12 @@
 /**
- * Interfaccia PROVVISORIA (HTML/CSS sopra la scena): turno, domanda fittizia,
- * dado, scelta al bivio, fine partita e minimappa. Mostra la presentazione,
+ * Interfaccia PROVVISORIA (HTML/CSS sopra la scena): turno, domanda con esito
+ * e spiegazione, dado, scelta al bivio, fine partita e minimappa. Mostra la presentazione,
  * non lo stato anticipato del motore: i pannelli compaiono solo a regia ferma.
  */
 import type { Difficulty, RelativeLength } from "../logic/types.ts";
 import type { MinimapShapes } from "./minimap.ts";
 import { cssColor, playerColor } from "./palette.ts";
-import type { FakeQuestion } from "./questions.ts";
+import { outcomeOf, type PresentedQuestion } from "../questions/deck.ts";
 
 export interface HudPlayer {
   id: string;
@@ -26,7 +26,9 @@ export interface ForkChoice {
 }
 
 export type Panel =
-  | { kind: "question"; key: string; question: FakeQuestion; remaining: number; total: number }
+  | { kind: "question"; key: string; question: PresentedQuestion; remaining: number; total: number }
+  /** Esito della risposta, con la spiegazione: il turno prosegue con «Continua». */
+  | { kind: "feedback"; key: string; question: PresentedQuestion }
   | { kind: "roll"; key: string }
   | { kind: "fork"; key: string; choices: ForkChoice[] }
   | { kind: "ended"; key: string; winnerName: string };
@@ -44,6 +46,8 @@ export interface HudState {
 
 export interface HudActions {
   answer(index: number): void;
+  /** Chiude l'esito della risposta e applica la risposta al motore. */
+  proceed(): void;
   roll(): void;
   choose(to: string): void;
   restart(): void;
@@ -197,7 +201,7 @@ export class Hud {
     if (panel.kind === "question") {
       this.panel.setAttribute("aria-label", "Domanda");
       const head = element("div", "hud-question-head");
-      head.append(element("span", `hud-difficulty is-${panel.question.difficulty}`, panel.question.difficulty));
+      head.append(element("span", `hud-difficulty is-${panel.question.difficulty}`, `${panel.question.difficulty} · ${panel.question.topicName}`));
       this.timerText = head.appendChild(element("span", "hud-timer-text"));
       const track = element("div", "hud-timer");
       this.timerBar = track.appendChild(element("div", "hud-timer-bar"));
@@ -210,12 +214,28 @@ export class Hud {
       });
       this.panel.append(head, track, element("p", "hud-question-text", panel.question.text), options);
       options.querySelector("button")?.focus({ preventScroll: true });
+    } else if (panel.kind === "feedback") {
+      const q = panel.question;
+      const outcome = outcomeOf(q);
+      this.panel.setAttribute("aria-label", "Esito della risposta");
+      const title = outcome === "correct" ? "Risposta corretta" : outcome === "wrong" ? "Risposta errata: il turno passa" : "Tempo scaduto: il turno passa";
+      const heading = element("p", `hud-outcome is-${outcome}`, title);
+      heading.setAttribute("role", "status");
+      const details = element("div", "hud-solution");
+      if (outcome === "wrong") details.append(element("p", "hud-answer is-chosen", `Hai risposto: ${q.options[q.answer as number]}`));
+      if (outcome !== "correct") details.append(element("p", "hud-answer is-correct", `Risposta corretta: ${q.options[q.correctIndex]}`));
+      if (q.explanation) details.append(element("p", "hud-explanation", q.explanation));
+      const button = element("button", "hud-primary", "Continua (Invio)");
+      button.type = "button";
+      button.addEventListener("click", () => this.actions.proceed());
+      this.panel.append(heading, details, button);
+      button.focus({ preventScroll: true });
     } else if (panel.kind === "roll") {
       this.panel.setAttribute("aria-label", "Lancio del dado");
       const button = element("button", "hud-primary", "Lancia il dado (Invio)");
       button.type = "button";
       button.addEventListener("click", () => this.actions.roll());
-      this.panel.append(element("p", "hud-question-text", "Risposta corretta: puoi avanzare."), button);
+      this.panel.append(element("p", "hud-question-text", "Puoi avanzare."), button);
       button.focus({ preventScroll: true });
     } else if (panel.kind === "fork") {
       this.panel.setAttribute("aria-label", "Scelta al bivio");

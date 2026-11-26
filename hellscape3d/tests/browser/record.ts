@@ -72,6 +72,9 @@ for (let i = 0; i < Number(values.actions); i++) {
     await page.waitForTimeout(1300);
     const index = i % 4 === 3 ? ((d.correctIndex ?? 0) + 1) % 4 : (d.correctIndex ?? 0);
     await page.keyboard.press(`Digit${index + 1}`);
+  } else if (d.panel === "feedback") {
+    await page.waitForTimeout(2600);
+    await page.keyboard.press("Enter");
   } else if (d.panel === "roll") {
     await page.waitForTimeout(600);
     await page.keyboard.press("Enter");

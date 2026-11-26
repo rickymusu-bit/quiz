@@ -36,7 +36,12 @@ interface DebugInfo {
   rendered: string[];
   pawns: Record<string, Point>;
   cellPositions: Record<string, Point>;
-  panel: "question" | "roll" | "fork" | "ended" | null;
+  panel: "question" | "feedback" | "roll" | "fork" | "ended" | null;
+  bankId: string;
+  questionId: string | null;
+  questionText: string | null;
+  outcome: "correct" | "wrong" | "timeout" | null;
+  askedCount: number;
   timer: { remaining: number; total: number } | null;
   correctIndex?: number;
   forkChoices: { number: number; to: string; anchored: boolean }[];
@@ -215,10 +220,28 @@ try {
       await page.waitForTimeout(1200);
       debug = await info(page);
       assert.ok(before - debug.timer!.remaining >= 0.8, "il timer non scorre con la domanda visibile");
+      // Domanda vera dalla banca della versione precedente, con argomento.
+      assert.ok(debug.questionId && !/fittizia/i.test(debug.questionText ?? ""), "domanda non presa dalla banca");
+      assert.match((await page.locator(".hud-difficulty").textContent()) ?? "", / · \S/);
+      const asked = debug.questionId;
       await page.keyboard.press(`Digit${debug.correctIndex! + 1}`);
       await page.waitForTimeout(100);
       debug = await info(page);
-      assert.equal(debug.panel, "roll", "dopo la risposta corretta non compare il dado");
+      assert.equal(debug.panel, "feedback", "dopo la risposta non compare l'esito");
+      assert.equal(debug.outcome, "correct");
+      assert.equal(debug.questionId, asked);
+      assert.match((await page.locator(".hud-outcome").textContent()) ?? "", /Risposta corretta/);
+      assert.ok(await page.locator(".hud-explanation").isVisible(), "spiegazione non visibile");
+      // L'esito sopravvive al ricaricamento: niente seconda risposta alla stessa domanda.
+      await page.goto(url);
+      await waitReady(page, false);
+      debug = await info(page);
+      assert.equal(debug.panel, "feedback", "dopo il ricaricamento si può rispondere di nuovo");
+      assert.equal(debug.questionId, asked);
+      await page.keyboard.press("Enter");
+      await page.waitForTimeout(100);
+      debug = await info(page);
+      assert.equal(debug.panel, "roll", "dopo l'esito non compare il dado");
       await page.locator(".hud-panel .hud-primary").click();
       await page.waitForTimeout(150);
       debug = await info(page);
@@ -228,7 +251,7 @@ try {
       debug = await info(page);
       assertSettled(debug);
       if (debug.panel === "question") assert.ok(debug.timer!.total - debug.timer!.remaining < 0.5, "il timer è scorso durante la regia");
-      console.log(`ok   ${device.name} · domanda, dado e timer fermo durante la regia`);
+      console.log(`ok   ${device.name} · domanda della banca, esito con spiegazione anche dopo il ricaricamento, dado e timer fermo durante la regia`);
 
       // Risposta errata con il mouse: il turno passa all'altro giocatore.
       await page.goto(`${url}?seed=graybox-1&steps=15&test=1`);
@@ -237,6 +260,12 @@ try {
       const wrong = (debug.correctIndex! + 1) % 4;
       const player = debug.stateActivePlayerId;
       await page.locator(".hud-panel .hud-option").nth(wrong).click();
+      await page.waitForTimeout(100);
+      debug = await info(page);
+      assert.equal(debug.outcome, "wrong");
+      assert.equal(debug.stateActivePlayerId, player, "il turno passa prima di aver letto l'esito");
+      assert.match((await page.locator(".hud-solution").textContent()) ?? "", /Risposta corretta: /);
+      await page.locator(".hud-panel .hud-primary").click();
       await waitIdle();
       debug = await info(page);
       assert.notEqual(debug.stateActivePlayerId, player, "la risposta errata non passa il turno");
@@ -253,6 +282,8 @@ try {
       assert.equal(debug.panel, "question");
       assert.equal(debug.timer!.total, 3);
       assert.equal(debug.stateActivePlayerId, player);
+      await page.waitForFunction(() => (window as unknown as { __hellscape3d: DebugInfo }).__hellscape3d.outcome === "timeout", null, { timeout: 15_000 });
+      await page.keyboard.press("Enter");
       await page.waitForFunction(
         (before) => {
           const d = (window as unknown as { __hellscape3d: DebugInfo }).__hellscape3d;
@@ -458,13 +489,17 @@ try {
       // Tempo residuo della domanda conservato attraverso il ricaricamento.
       await page.goto(`${url}?seed=graybox-1&steps=15`);
       await waitReady(page);
-      await page.waitForFunction(() => ((window as unknown as { __hellscape3d: DebugInfo }).__hellscape3d.timerRemaining ?? 30) <= 27, null, { timeout: 15_000 });
+      // Si attende che siano trascorsi 3 s, qualunque sia la durata della domanda.
+      await page.waitForFunction(() => {
+        const d = (window as unknown as { __hellscape3d: DebugInfo }).__hellscape3d;
+        return d.timer !== null && d.timer.total - d.timer.remaining >= 3;
+      }, null, { timeout: 15_000 });
       const left = (await info(page)).timerRemaining!;
       await page.goto(url);
       await waitReady(page, false);
       const resumedLeft = (await info(page)).timerRemaining!;
       assert.equal((await info(page)).panel, "question");
-      assert.ok(resumedLeft <= left + 0.6 && resumedLeft < 29, `tempo restituito dal ricaricamento (${left.toFixed(2)} → ${resumedLeft.toFixed(2)})`);
+      assert.ok(resumedLeft <= left + 0.6 && resumedLeft < (await info(page)).timer!.total - 1, `tempo restituito dal ricaricamento (${left.toFixed(2)} → ${resumedLeft.toFixed(2)})`);
 
       // Salvataggio incompatibile: conservato a parte, partita nuova con avviso.
       await page.evaluate(() => localStorage.setItem("hellscape3d-save", '{"format":"hellscape3d-save","saveVersion":99}'));
