@@ -2,7 +2,9 @@
  * MapGenerator: rete logica deterministica a partire da seed, tema e configurazione.
  *
  * La rete è una sequenza di corridoi e bivi; i rami di ogni bivio si
- * ricongiungono all'inizio del corridoio successivo. Viene costruita
+ * ricongiungono all'inizio del corridoio successivo. Il bivio non è una
+ * casella: l'ultima casella di un corridoio ha come successive le prime
+ * caselle dei rami. Viene costruita
  * all'indietro dall'uscita, così che per ogni bivio i turni attesi a valle
  * siano già noti e le lunghezze dei rami possano essere scelte in modo che le
  * alternative restino competitive (ramo più corto = domande più difficili).
@@ -10,7 +12,7 @@
 import { cellValue, type AnswerProfile, type BalanceGraph } from "./balance.ts";
 import { canonicalJson } from "./canonical.ts";
 import { GENERATOR_VERSION, resolveGeneratorConfig } from "./config.ts";
-import { distancesToExit } from "./graph.ts";
+import { distancesToExit, hasJunction } from "./graph.ts";
 import { hashString, rngFromSeed, type Rng } from "./rng.ts";
 import { DEFAULT_THEME_ID, getTheme, type CityThemeLogic } from "./themes/index.ts";
 import { difficultiesByLength, relativeLabels } from "./labels.ts";
@@ -127,15 +129,18 @@ function buildDraft(theme: CityThemeLogic, config: GeneratorConfig, choices: Cho
   graph.exitId = exitId;
   values.set(exitId, 0);
   let head = exitId;
+  /** Prime caselle dei rami del bivio appena costruito: diventano le successive dell'ultima casella del corridoio a monte. */
+  let branchHeads: string[] | null = null;
 
   for (let group = forkCount; group >= 0; group--) {
     const district = group === forkCount ? theme.exitDistrict : districtOf(group);
     for (let i = 0; i < corridors[group]!; i++) {
-      head = create({ kind: "path", next: [head], difficulty: config.corridorDifficulty, district, special: null });
+      head = create({ kind: "path", next: branchHeads ?? [head], difficulty: config.corridorDifficulty, district, special: null });
+      branchHeads = null;
     }
     if (group === 0) break;
 
-    // Bivio fra il corridoio group-1 e il corridoio group (il cui primo tratto è la casella di ricongiungimento).
+    // Bivio fra il corridoio group-1 e il corridoio group (la cui prima casella è quella di ricongiungimento).
     const merge = head;
     const branchDistrict = districtOf(group - 1);
     const count = choices.branchCount();
@@ -150,13 +155,13 @@ function buildDraft(theme: CityThemeLogic, config: GeneratorConfig, choices: Cho
       }
       chains.set(difficulty, chain);
     }
-    // Valore di un ramo imposto, misurato da un tratto virtuale a monte: chi arriva attraversando il
-    // bivio a metà movimento entra nel ramo con passi già guadagnati (vedi forkBalance).
+    // Valore di un ramo imposto, misurato da un tratto virtuale a monte del bivio: chi lo attraversa
+    // avanzando entra nel ramo con i passi residui del dado (vedi forkBalance).
     const cache = new Map<string, number>();
     const valueOf = (difficulty: Difficulty, length: number): number => {
       const key = `${difficulty}:${length}`;
       if (!cache.has(key)) {
-        const temporary = [create({ kind: "fork", next: [chains.get(difficulty)![length]!], difficulty: config.corridorDifficulty, district: branchDistrict, special: null })];
+        const temporary = [create({ kind: "path", next: [chains.get(difficulty)![length]!], difficulty: config.corridorDifficulty, district: branchDistrict, special: null })];
         for (let i = 0; i < UPSTREAM_FACTOR * faces; i++) {
           temporary.push(create({ kind: "path", next: [temporary[temporary.length - 1]!], difficulty: config.corridorDifficulty, district: branchDistrict, special: null }));
         }
@@ -187,7 +192,7 @@ function buildDraft(theme: CityThemeLogic, config: GeneratorConfig, choices: Cho
       const used = combo.lengths[difficulties.indexOf(difficulty)]!;
       for (let j = chain.length - 1; j > used; j--) remove(chain[j]!);
     }
-    head = create({ kind: "fork", next: choices.rng.shuffle(heads), difficulty: config.corridorDifficulty, district: branchDistrict, special: null });
+    branchHeads = choices.rng.shuffle(heads);
   }
 
   const startId = create({ kind: "start", next: [head], difficulty: config.corridorDifficulty, district: districtOf(0), special: null });
@@ -261,7 +266,7 @@ function finalize(
   const distanceToExit = distancesToExit(cells, exitId);
   const options: Record<string, ForkOption[]> = {};
   for (const cell of Object.values(cells)) {
-    if (cell.kind !== "fork") continue;
+    if (!hasJunction(cell)) continue;
     const ranked = [...cell.next].sort((a, b) => distanceToExit[a]! - distanceToExit[b]!);
     const labels = relativeLabels(ranked.length);
     options[cell.id] = cell.next.map((to) => ({

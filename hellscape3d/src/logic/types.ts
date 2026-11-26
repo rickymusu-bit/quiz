@@ -3,7 +3,12 @@
 export type Difficulty = "facile" | "media" | "difficile";
 export const DIFFICULTIES: readonly Difficulty[] = ["facile", "media", "difficile"];
 
-export type CellKind = "start" | "path" | "fork" | "exit";
+/**
+ * Il bivio non è una casella: è il punto di passaggio dopo una casella con più
+ * successive. Lo si attraversa soltanto avanzando, scegliendo il ramo senza
+ * domanda; non conta come passo.
+ */
+export type CellKind = "start" | "path" | "exit";
 
 /** Lunghezza relativa del cammino residuo verso l'uscita, l'unica esposta ai giocatori. */
 export type RelativeLength = "piu-breve" | "intermedio" | "piu-lungo";
@@ -11,7 +16,7 @@ export type RelativeLength = "piu-breve" | "intermedio" | "piu-lungo";
 export interface Cell {
   id: string;
   kind: CellKind;
-  /** Celle successive. Un bivio ne ha almeno due, l'uscita nessuna, le altre una. */
+  /** Celle successive: due o tre se dopo la casella c'è un bivio, nessuna per l'uscita, altrimenti una. */
   next: string[];
   /** Difficoltà delle domande poste a chi inizia il turno su questa casella. */
   difficulty: Difficulty;
@@ -62,7 +67,7 @@ export interface CityMap {
   startId: string;
   exitId: string;
   cells: Record<string, Cell>;
-  /** Alternative dei bivi, nell'ordine di `next`. */
+  /** Alternative dei bivi, indicizzate dalla casella che precede il bivio, nell'ordine di `next`. */
   options: Record<string, ForkOption[]>;
   /** Uso interno: distanza minima in passi verso l'uscita. Mai esposta all'interfaccia. */
   distanceToExit: Record<string, number>;

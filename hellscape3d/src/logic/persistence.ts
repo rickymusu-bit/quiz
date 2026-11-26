@@ -15,7 +15,8 @@ import { DIFFICULTIES, type CityMap, type GeneratorConfig } from "./types.ts";
 
 export const SAVE_KEY = "hellscape3d-save";
 export const SAVE_FORMAT = "hellscape3d-save";
-export const SAVE_VERSION = 1;
+/** 2: bivio come punto di passaggio (stato senza `forkContext`). I salvataggi precedenti vengono rifiutati. */
+export const SAVE_VERSION = 2;
 
 export interface SaveFile {
   format: typeof SAVE_FORMAT;
@@ -113,19 +114,20 @@ export function validateState(map: CityMap, value: unknown): string[] {
   const active = state.players[state.activeIndex]!;
   const cell = map.cells[active.cellId];
   const options = map.options[active.cellId] ?? [];
-  const committedOk = state.committedBranch === null || options.some((o) => o.to === state.committedBranch);
+  // Il ramo scelto si imbocca subito: fra un'azione e l'altra non resta mai in sospeso.
+  const committedOk = state.committedBranch === null;
   const difficultyOk = state.questionDifficulty === null || DIFFICULTIES.includes(state.questionDifficulty);
   if (!committedOk) issues.push("ramo impegnato non valido");
   if (!difficultyOk) issues.push("difficoltà non valida");
   switch (state.phase) {
     case "fork":
-      if (cell?.kind !== "fork" || (state.forkContext !== "turn-start" && state.forkContext !== "movement")) issues.push("fase di scelta incoerente");
-      if (state.forkContext === "movement" && !(Number.isInteger(state.stepsLeft) && state.stepsLeft > 0)) issues.push("passi residui non validi");
+      // Avanzamento sospeso al bivio: casella prima del bivio e passi ancora da fare.
+      if (options.length < 2) issues.push("fase di scelta fuori da un bivio");
+      if (!(Number.isInteger(state.stepsLeft) && state.stepsLeft > 0)) issues.push("passi residui non validi");
       break;
     case "question":
     case "roll":
-      if (state.questionDifficulty === null || state.forkContext !== null) issues.push("fase della domanda incoerente");
-      if (cell?.kind === "fork" && state.committedBranch === null) issues.push("bivio senza ramo scelto");
+      if (state.questionDifficulty === null || state.questionDifficulty !== cell?.difficulty) issues.push("fase della domanda incoerente");
       break;
     case "ended":
       if (state.winnerId === null || !state.players.some((p) => p.id === state.winnerId && p.escaped)) issues.push("vincitore non valido");

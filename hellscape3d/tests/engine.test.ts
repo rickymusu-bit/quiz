@@ -17,13 +17,12 @@ function predecessor(game: Game, id: string): string {
 }
 
 /** Stato in cui il giocatore attivo sta per lanciare il dado da `cellId`. */
-function readyToRoll(game: Game, cellId: string, value: number, committedBranch: string | null = null): GameState {
+function readyToRoll(game: Game, cellId: string, value: number): GameState {
   const state = structuredClone(game.state);
   state.players[state.activeIndex]!.cellId = cellId;
   if (!state.explored.includes(cellId)) state.explored = [...state.explored, cellId].sort();
   state.phase = "roll";
-  state.questionDifficulty = "media";
-  state.committedBranch = committedBranch;
+  state.questionDifficulty = game.map.cells[cellId]!.difficulty;
   state.dice = diceFor(value);
   return state;
 }
@@ -82,63 +81,64 @@ test("azioni fuori fase rifiutate: nessuna doppia risoluzione", () => {
   assert.throws(() => applyAction(game.map, game.state, { type: "answer", outcome: "boh" as never }), GameRuleError);
 });
 
-test("bivio attraversato durante l'avanzamento: sospensione, scelta e passi residui", () => {
+test("bivio attraversato avanzando: sospensione, scelta senza domanda, il bivio non conta come passo", () => {
   const { game } = newGame();
-  const [forkId, options] = Object.entries(game.map.options)[0]!;
-  const start = readyToRoll(game, predecessor(game, forkId), 4);
+  // Le alternative sono indicizzate dalla casella che precede il bivio.
+  const [beforeFork, options] = Object.entries(game.map.options)[0]!;
+  const start = readyToRoll(game, predecessor(game, beforeFork), 4);
   const first = applyAction(game.map, start, { type: "roll" });
   assert.deepEqual(types(first.events).filter((t) => t !== "explored"), ["diceRolled", "moved", "branchChoiceRequested"]);
+  assert.deepEqual(first.events.at(-1), { type: "branchChoiceRequested", playerId: "a", cellId: beforeFork, stepsLeft: 3 });
   assert.equal(first.state.phase, "fork");
-  assert.equal(first.state.forkContext, "movement");
   assert.equal(first.state.stepsLeft, 3);
-  assert.equal(first.state.players[0]!.cellId, forkId);
+  assert.equal(first.state.players[0]!.cellId, beforeFork, "un passo: dalla casella precedente a quella prima del bivio");
   for (const option of options) assert.ok(first.state.explored.includes(option.to), "alternative visibili al bivio");
 
   assert.throws(() => applyAction(game.map, first.state, { type: "chooseBranch", to: "inesistente" }), GameRuleError);
-  const chosen = options[0]!.to;
-  const second = applyAction(game.map, first.state, { type: "chooseBranch", to: chosen });
-  const path = second.events.filter((e) => e.type === "moved").flatMap((e) => e.path);
-  assert.equal(path[0], chosen);
-  assert.equal(path.length, 3);
-  assert.equal(second.state.activeIndex, 1);
+  assert.throws(() => applyAction(game.map, first.state, { type: "roll" }), GameRuleError);
+  for (const option of options) {
+    const second = applyAction(game.map, first.state, { type: "chooseBranch", to: option.to });
+    assert.ok(!second.events.some((e) => e.type === "questionRequested" && e.playerId === "a"), "scelta senza domanda");
+    const path = second.events.filter((e) => e.type === "moved").flatMap((e) => e.path);
+    // Con il dado 4: un passo fino alla casella prima del bivio, tre sul ramo scelto.
+    assert.equal(path[0], option.to);
+    assert.equal(path.length, 3);
+    assert.equal(second.state.committedBranch, null);
+    assert.equal(second.state.activeIndex, 1);
+  }
 });
 
-test("arrivo esatto sul bivio: scelta a inizio turno, poi domanda della difficoltà del ramo", () => {
+test("avanzamento che termina prima del bivio: nessuna scelta fino all'avanzamento successivo", () => {
   const { game } = newGame();
-  const [forkId, options] = Object.entries(game.map.options)[0]!;
-  const landed = applyAction(game.map, readyToRoll(game, predecessor(game, forkId), 1), { type: "roll" });
-  assert.equal(landed.state.players[0]!.cellId, forkId);
+  const [beforeFork, options] = Object.entries(game.map.options)[0]!;
+  const landed = applyAction(game.map, readyToRoll(game, predecessor(game, beforeFork), 1), { type: "roll" });
+  assert.equal(landed.state.players[0]!.cellId, beforeFork);
+  assert.ok(!landed.events.some((e) => e.type === "branchChoiceRequested"));
   assert.equal(landed.state.activeIndex, 1);
 
-  // Il secondo giocatore sbaglia: torna il turno al primo, fermo sul bivio.
+  // Al turno successivo: domanda della difficoltà della casella, poi scelta al primo passo.
   const back = applyAction(game.map, landed.state, { type: "answer", outcome: "wrong" });
-  assert.equal(back.state.phase, "fork");
-  assert.equal(back.state.forkContext, "turn-start");
-  assert.deepEqual(back.events.at(-1), { type: "branchChoiceRequested", playerId: "a", cellId: forkId, context: "turn-start" });
-
-  for (const option of options) {
-    const chose = applyAction(game.map, back.state, { type: "chooseBranch", to: option.to });
-    assert.equal(chose.state.phase, "question");
-    assert.equal(chose.state.questionDifficulty, option.difficulty);
-    const moved = play({ map: game.map, state: chose.state }, [{ type: "answer", outcome: "correct" }, { type: "roll" }]);
-    assert.equal(moved.events.find((e) => e.type === "moved")!.path[0], option.to);
-  }
-
-  // Errore dopo la scelta: il giocatore resta sul bivio e al turno successivo può cambiare ramo.
-  const wrong = play({ map: game.map, state: back.state }, [
-    { type: "chooseBranch", to: options[0]!.to },
-    { type: "answer", outcome: "wrong" },
-    { type: "answer", outcome: "wrong" },
-  ]);
-  assert.equal(wrong.state.players[0]!.cellId, forkId);
-  assert.equal(wrong.state.committedBranch, null);
-  assert.equal(applyAction(game.map, wrong.state, { type: "chooseBranch", to: options[1]!.to }).state.questionDifficulty, options[1]!.difficulty);
+  assert.equal(back.state.phase, "question");
+  assert.equal(back.state.questionDifficulty, game.map.cells[beforeFork]!.difficulty);
+  const wrong = applyAction(game.map, back.state, { type: "answer", outcome: "wrong" });
+  assert.equal(wrong.state.players[0]!.cellId, beforeFork, "dopo un errore resta sulla casella, senza scelta in sospeso");
+  const rolled = play({ map: game.map, state: back.state }, [{ type: "answer", outcome: "correct" }, { type: "roll" }]);
+  assert.equal(rolled.state.phase, "fork");
+  assert.equal(rolled.state.players[0]!.cellId, beforeFork);
+  assert.equal(rolled.state.stepsLeft, rolled.events.find((e) => e.type === "diceRolled")!.value, "il bivio non consuma passi");
+  const chose = applyAction(game.map, rolled.state, { type: "chooseBranch", to: options[1]!.to });
+  assert.equal(chose.events.find((e) => e.type === "moved")!.path[0], options[1]!.to);
 });
 
 test("effetti soltanto sulla casella d'arrivo, non su quelle attraversate", () => {
   const { game } = newGame("speciali");
   const special = Object.values(game.map.cells).find(
-    (c) => c.special !== null && game.map.cells[c.next[0]!]!.kind === "path" && game.map.cells[predecessor(game, c.id)]!.kind === "path",
+    (c) =>
+      c.special !== null &&
+      c.next.length === 1 &&
+      game.map.cells[c.next[0]!]!.kind === "path" &&
+      game.map.cells[predecessor(game, c.id)]!.kind === "path" &&
+      game.map.cells[predecessor(game, c.id)]!.next.length === 1,
   )!;
   const from = predecessor(game, special.id);
   const exact = applyAction(game.map, readyToRoll(game, from, 1), { type: "roll" });
@@ -166,7 +166,7 @@ test("uscita: il primo che esce vince, i passi in eccesso si perdono, la partita
   }
 });
 
-test("partite complete deterministiche, con domande della difficoltà della casella", () => {
+test("partite complete deterministiche, con domande della difficoltà della casella e scelte solo avanzando", () => {
   const run = (branch: "piu-breve" | "piu-lungo") => {
     const { game, events } = newGame("completa");
     let state = game.state;
@@ -178,9 +178,11 @@ test("partite complete deterministiche, con domande della difficoltà della case
         if (event.type === "questionRequested") {
           const player = result.state.players.find((p) => p.id === event.playerId)!;
           const cell = game.map.cells[player.cellId]!;
-          const expected = cell.kind === "fork" ? game.map.cells[result.state.committedBranch!]!.difficulty : cell.difficulty;
-          assert.equal(event.difficulty, expected);
+          assert.equal(event.difficulty, cell.difficulty);
         }
+      }
+      for (const event of result.events) {
+        if (event.type === "branchChoiceRequested") assert.ok(event.stepsLeft > 0 && game.map.options[event.cellId], "scelta fuori da un avanzamento");
       }
       log.push(...result.events);
       state = result.state;

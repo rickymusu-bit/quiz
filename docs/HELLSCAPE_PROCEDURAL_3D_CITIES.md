@@ -163,8 +163,8 @@ Aperte dalla revisione del 26 novembre:
 
 ### Stato del prototipo rispetto alla revisione del 26 novembre
 
-Il prototipo in `hellscape3d/` implementa ancora la versione precedente. Mostra la città a tre quarti con tutti i giocatori, una minimappa delle zone esplorate (comprese due caselle oltre i giocatori e i tratti verso la nebbia) e il bivio come casella su cui ci si può fermare, con scelta a inizio turno e domanda. Le modifiche vanno fatte per passi giudicabili:
-1. bivio come punto di passaggio nel generatore e nel motore (non conta come passo, scelta durante l'avanzamento), salvataggi del formato precedente conservati a parte come già avviene per quelli incompatibili, bilanciamento rifatto;
+Il prototipo in `hellscape3d/` implementa la regola dei bivi di questa revisione: bivio come punto di passaggio nel generatore e nel motore, salvataggi del formato precedente conservati a parte, bilanciamento rifatto. Per il resto implementa ancora la versione precedente: mostra la città a tre quarti con tutti i giocatori, una minimappa delle zone esplorate (comprese due caselle oltre i giocatori e i tratti verso la nebbia) e le alternative del bivio con lunghezza relativa e difficoltà esplicite. Le modifiche vanno fatte per passi giudicabili:
+1. bivio come punto di passaggio nel generatore e nel motore (fatto);
 2. minimappa delle sole caselle percorse con l'uscita simbolica;
 3. scena di corsa in graybox: scenario ciclico per casella, giocatori nella stessa casella, bivio con imbocchi ed etichette, movimento ridotto;
 4. indizi dell'uscita provvisori.

@@ -15,7 +15,7 @@ export const ABYSS_Y = DEFAULT_LAYOUT_CONFIG.abyssY;
 export const PAWN_SIGHT_HEIGHTS: readonly number[] = [0.4, 1.6];
 
 export function tileScale(kind: CellKind): number {
-  return kind === "fork" ? 1.4 : kind === "start" || kind === "exit" ? 1.6 : 1;
+  return kind === "start" || kind === "exit" ? 1.6 : 1;
 }
 
 /** Posizione della camera della vista a tre quarti: direzione fissa, distanza e inclinazione variabili. */

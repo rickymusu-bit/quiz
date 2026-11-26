@@ -25,9 +25,7 @@ export interface GameState {
   /** Turni iniziati dall'avvio della partita, per tutti i giocatori. */
   turn: number;
   phase: GamePhase;
-  /** Bivio a inizio turno (scelta prima della domanda) o durante l'avanzamento. */
-  forkContext: "turn-start" | "movement" | null;
-  /** Ramo scelto a inizio turno, da imboccare al primo passo dopo il dado. */
+  /** Ramo appena scelto al bivio, da imboccare con il passo successivo dell'avanzamento in corso. */
   committedBranch: string | null;
   questionDifficulty: Difficulty | null;
   stepsLeft: number;
@@ -47,7 +45,8 @@ export type GameAction =
 /** Eventi per regia, HUD e audio. Non contengono informazioni nascoste. */
 export type GameEvent =
   | { type: "turnStarted"; turn: number; playerId: string; cellId: string }
-  | { type: "branchChoiceRequested"; playerId: string; cellId: string; context: "turn-start" | "movement" }
+  /** Avanzamento sospeso al bivio dopo `cellId`, con `stepsLeft` passi ancora da fare. */
+  | { type: "branchChoiceRequested"; playerId: string; cellId: string; stepsLeft: number }
   | { type: "branchChosen"; playerId: string; cellId: string; to: string }
   | { type: "questionRequested"; playerId: string; difficulty: Difficulty }
   | { type: "answerResolved"; playerId: string; outcome: AnswerOutcome }

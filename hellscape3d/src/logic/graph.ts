@@ -4,6 +4,11 @@ interface Linked {
   next: readonly string[];
 }
 
+/** Dopo la casella c'è un bivio: per lasciarla avanzando bisogna scegliere il ramo. */
+export function hasJunction(cell: Linked): boolean {
+  return cell.next.length > 1;
+}
+
 /** Ordine topologico (algoritmo di Kahn); null se il grafo contiene cicli o archi verso celle inesistenti. */
 export function topologicalOrder(cells: Readonly<Record<string, Linked>>): string[] | null {
   const indegree = new Map<string, number>();

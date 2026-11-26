@@ -3,16 +3,16 @@
  * programmazione dinamica sul grafo aciclico.
  *
  * Modello del turno: domanda con probabilità di successo p (dipendente dalla
- * difficoltà della casella di partenza o del ramo scelto al bivio); se corretta,
- * dado uniforme da 1 a `faces` e avanzamento; ai bivi attraversati il giocatore
- * sceglie l'alternativa migliore. Gli effetti delle caselle speciali non sono
- * ancora definiti e non entrano nel calcolo.
+ * difficoltà della casella di partenza); se corretta, dado uniforme da 1 a
+ * `faces` e avanzamento. Ai bivi, attraversati soltanto avanzando e senza
+ * contare come passo, il giocatore conosce già il dado e sceglie il ramo
+ * migliore. Gli effetti delle caselle speciali non sono ancora definiti e non
+ * entrano nel calcolo.
  */
-import type { CellKind, Difficulty } from "./types.ts";
-import { topologicalOrder } from "./graph.ts";
+import type { Difficulty } from "./types.ts";
+import { hasJunction, topologicalOrder } from "./graph.ts";
 
 export interface BalanceCell {
-  kind: CellKind;
   next: readonly string[];
   difficulty: Difficulty;
 }
@@ -65,21 +65,6 @@ export function turnValue(
   return (1 + p * (sum / faces)) / p;
 }
 
-/** Valori di ogni alternativa di un bivio (scelta impegnata a inizio turno). */
-export function forkOptionValues(
-  graph: BalanceGraph,
-  values: ReadonlyMap<string, number>,
-  forkId: string,
-  profile: AnswerProfile,
-  faces: number,
-): Map<string, number> {
-  const out = new Map<string, number>();
-  for (const to of graph.cells[forkId]!.next) {
-    out.set(to, turnValue(graph, values, forkId, profile[graph.cells[to]!.difficulty], faces, to));
-  }
-  return out;
-}
-
 export function cellValue(
   graph: BalanceGraph,
   values: ReadonlyMap<string, number>,
@@ -88,35 +73,20 @@ export function cellValue(
   faces: number,
 ): number {
   if (id === graph.exitId) return 0;
-  const cell = graph.cells[id]!;
-  if (cell.kind === "fork") return Math.min(...forkOptionValues(graph, values, id, profile, faces).values());
-  return turnValue(graph, values, id, profile[cell.difficulty], faces);
+  return turnValue(graph, values, id, profile[graph.cells[id]!.difficulty], faces);
 }
 
-export interface ExpectedTurns {
-  cells: Map<string, number>;
-  forks: Map<string, Map<string, number>>;
-}
-
-export function expectedTurns(graph: BalanceGraph, profile: AnswerProfile, faces: number): ExpectedTurns {
+/** Turni attesi da ogni casella, con la scelta migliore a ogni bivio. */
+export function expectedTurns(graph: BalanceGraph, profile: AnswerProfile, faces: number): Map<string, number> {
   const order = topologicalOrder(graph.cells);
   if (!order) throw new Error("Il grafo non è aciclico");
   const cells = new Map<string, number>();
-  const forks = new Map<string, Map<string, number>>();
-  for (let i = order.length - 1; i >= 0; i--) {
-    const id = order[i]!;
-    if (graph.cells[id]!.kind === "fork") {
-      const options = forkOptionValues(graph, cells, id, profile, faces);
-      forks.set(id, options);
-      cells.set(id, Math.min(...options.values()));
-    } else {
-      cells.set(id, cellValue(graph, cells, id, profile, faces));
-    }
-  }
-  return { cells, forks };
+  for (let i = order.length - 1; i >= 0; i--) cells.set(order[i]!, cellValue(graph, cells, order[i]!, profile, faces));
+  return cells;
 }
 
 export interface ForkBalance {
+  /** Casella dopo la quale si trova il bivio. */
   forkId: string;
   /** Turni attesi dalla partenza imponendo ciascun ramo a questo bivio (scelta ottimale agli altri). */
   values: Map<string, number>;
@@ -125,19 +95,18 @@ export interface ForkBalance {
 }
 
 /**
- * Competitività delle alternative di ogni bivio. Il ramo viene imposto sia a
- * chi inizia il turno sul bivio sia a chi lo attraversa durante l'avanzamento:
- * è il secondo caso, il più frequente, a favorire i rami difficili se le
- * lunghezze vengono bilanciate considerando soltanto il primo.
+ * Competitività delle alternative di ogni bivio: turni attesi dalla partenza
+ * imponendo ciascun ramo a chiunque attraversi quel bivio, con la scelta
+ * migliore agli altri.
  */
 export function forkBalance(graph: BalanceGraph, startId: string, profile: AnswerProfile, faces: number): ForkBalance[] {
   const out: ForkBalance[] = [];
   for (const [forkId, cell] of Object.entries(graph.cells)) {
-    if (cell.kind !== "fork") continue;
+    if (!hasJunction(cell)) continue;
     const values = new Map<string, number>();
     for (const to of cell.next) {
       const restricted: BalanceGraph = { exitId: graph.exitId, cells: { ...graph.cells, [forkId]: { ...cell, next: [to] } } };
-      values.set(to, expectedTurns(restricted, profile, faces).cells.get(startId)!);
+      values.set(to, expectedTurns(restricted, profile, faces).get(startId)!);
     }
     const all = [...values.values()];
     out.push({ forkId, values, gap: Math.max(...all) - Math.min(...all) });

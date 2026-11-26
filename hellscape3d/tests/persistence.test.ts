@@ -35,6 +35,17 @@ test("il ricaricamento conserva mondo, progressi e sequenza dei dadi", () => {
   assert.deepEqual(advance(restored, 40), advance(mid, 40));
 });
 
+test("il ricaricamento conserva una scelta al bivio in attesa, con i passi residui", () => {
+  const { game } = newGame("ripresa-bivio");
+  let state = game.state;
+  while (state.phase !== "fork") state = applyAction(game.map, state, autoAction(game, state)).state;
+  const restored = deserializeGame(serializeGame({ map: game.map, state }));
+  assert.deepEqual(restored.state, state);
+  assert.ok(restored.state.stepsLeft > 0);
+  const option = game.map.options[state.players[state.activeIndex]!.cellId]![0]!;
+  assert.deepEqual(applyAction(restored.map, restored.state, { type: "chooseBranch", to: option.to }), applyAction(game.map, state, { type: "chooseBranch", to: option.to }));
+});
+
 test("salvataggio in una chiave dedicata, senza toccare i salvataggi del runner", () => {
   const legacy = JSON.stringify({ version: "3.0.0", players: [{ name: "x", score: 10 }] });
   const storage = memoryStorage({ "fool-v1": legacy, "fool-settings-v1": "{}" });
@@ -58,7 +69,9 @@ test("salvataggi incompatibili o manomessi rifiutati esplicitamente", () => {
   const cases: [string, string | RegExp][] = [
     ["{", /illeggibile/],
     [JSON.stringify({ version: "3.0.0", players: [] }), /Non è un salvataggio/],
-    [variant((s) => (s.saveVersion = 2)), /Versione del salvataggio/],
+    // Formato precedente, con il bivio come casella e `forkContext` nello stato.
+    [variant((s) => ((s.saveVersion = 1), (s.generatorVersion = "1.0.0"), (s.state.forkContext = null))), /Versione del salvataggio/],
+    [variant((s) => (s.saveVersion = 3)), /Versione del salvataggio/],
     [variant((s) => (s.generatorVersion = "0.9.0")), /generatore/],
     [variant((s) => (s.seed = "altro")), /non corrisponde/],
     [variant((s) => (s.generatorConfig.dieFaces = 8)), /non corrisponde/],
@@ -68,6 +81,8 @@ test("salvataggi incompatibili o manomessi rifiutati esplicitamente", () => {
     [variant((s) => (s.state.activeIndex = 5)), /giocatore attivo/],
     [variant((s) => (s.state.dice = [1, 2])), /dado/],
     [variant((s) => (s.state.winnerId = "a")), /conclusa/],
+    [variant((s) => (s.state.committedBranch = s.state.players[0].cellId)), /ramo impegnato/],
+    [variant((s) => ((s.state.phase = "fork"), (s.state.stepsLeft = 2))), /fuori da un bivio/],
   ];
   for (const [json, message] of cases) {
     assert.throws(() => deserializeGame(json), (error: unknown) => error instanceof SaveError && (typeof message === "string" ? error.message.includes(message) : message.test(error.message)), json.slice(0, 80));

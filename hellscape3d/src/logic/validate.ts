@@ -3,7 +3,7 @@
  * dalle sole celle, senza fidarsi dei valori memorizzati.
  */
 import { forkBalance } from "./balance.ts";
-import { distancesToExit, reachableFrom, topologicalOrder } from "./graph.ts";
+import { distancesToExit, hasJunction, reachableFrom, topologicalOrder } from "./graph.ts";
 import { DIFFICULTY_RANK, relativeLabels } from "./labels.ts";
 import type { CityThemeLogic } from "./themes/index.ts";
 import type { CityMap } from "./types.ts";
@@ -22,8 +22,8 @@ export function validateStructure(map: CityMap, theme: CityThemeLogic): string[]
       if (!Object.hasOwn(cells, to)) issues.push(`${id}: arco verso cella inesistente ${to}`);
       if (to === id) issues.push(`${id}: arco verso sé stessa`);
     }
-    const expected =
-      cell.kind === "exit" ? cell.next.length === 0 : cell.kind === "fork" ? cell.next.length >= 2 && cell.next.length <= 3 : cell.next.length === 1;
+    // Il bivio segue una casella ordinaria; la partita non comincia su un bivio.
+    const expected = cell.kind === "exit" ? cell.next.length === 0 : cell.kind === "start" ? cell.next.length === 1 : cell.next.length >= 1 && cell.next.length <= 3;
     if (!expected) issues.push(`${id}: ${cell.kind} con ${cell.next.length} uscite`);
     if (!theme.districts.some((d) => d.id === cell.district)) issues.push(`${id}: distretto sconosciuto ${cell.district}`);
     if (cell.special !== null) {
@@ -50,7 +50,7 @@ export function validateStructure(map: CityMap, theme: CityThemeLogic): string[]
   if (Object.keys(map.distanceToExit).length !== ids.length) issues.push("distanze memorizzate incomplete");
   if (issues.length > 0) return issues;
 
-  const forks = ids.filter((id) => cells[id]!.kind === "fork");
+  const forks = ids.filter((id) => hasJunction(cells[id]!));
   if (Object.keys(map.options).sort().join() !== forks.sort().join()) issues.push("alternative non allineate ai bivi");
   for (const forkId of forks) {
     const options = map.options[forkId] ?? [];

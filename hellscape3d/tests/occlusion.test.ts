@@ -57,7 +57,7 @@ test("ostacoli: trovati solo i volumi fra camera e pedina", () => {
 });
 
 test("caso reale: la passerella sopraelevata nasconde la pedina sul ramo inferiore", () => {
-  const seed = "graybox-16";
+  const seed = "graybox-38";
   const { game } = createGame({ seed, players: [{ id: "p1", name: "a" }, { id: "p2", name: "b" }] });
   const layout = buildCityLayout(game.map);
   const answers = rngFromSeed(seed, "dev:answers");
@@ -68,7 +68,7 @@ test("caso reale: la passerella sopraelevata nasconde la pedina sul ramo inferio
       : s.phase === "question"
         ? { type: "answer", outcome: answers.chance(game.map.config.answerProfile[s.questionDifficulty!]) ? "correct" : "wrong" }
         : { type: "roll" };
-  for (let i = 0; i < 14; i++) state = applyAction(game.map, state, pick(state)).state;
+  for (let i = 0; i < 9; i++) state = applyAction(game.map, state, pick(state)).state;
   const view = publicView(game.map, state);
   const model = buildSceneModel(game.map, layout, view);
   const pawn = layout.positions[state.players[state.activeIndex]!.cellId]!;
