@@ -33,3 +33,13 @@ Data: 30 ottobre 2026. Fonte di riferimento: workflow GitHub Actions eseguito su
 ## Ripristino
 
 Ripristinare `.github/workflows/refactoring.yml` e gli script test dal commit base di questa PR se le partizioni presentano regressioni o il nuovo controllo `verify` perde affidabilità. Non cancellare gli scenari per compensare un errore di test.
+
+## Aggiornamento del 26 novembre 2026 — ambito `hellscape3d`
+
+Il job `impact` produce ora l'output `scope`, che sostituisce `full`, con tre valori:
+
+- `docs`: soltanto `docs/**`, `README.md`, `AGENTS.md`, `.gitignore`. Nessun job di test, come prima.
+- `hellscape3d`: soltanto file in `hellscape3d/`, eventualmente insieme a file documentali. Si esegue il solo job `hellscape3d` (`npm run test:hellscape3d`: controllo dei tipi e test del modello logico). Le 23 suite del runner vengono saltate perché il modello 3D non è importato dal sito pubblicato né incluso nella build.
+- `full`: ogni altro caso, comprese le modifiche a `package.json`, `package-lock.json` e ai workflow, gli elenchi vuoti e gli errori dell'API. Si eseguono le 23 suite; i test del modello 3D restano nella suite `core` tramite `npm test`.
+
+`verify` controlla che, per l'ambito dichiarato, siano stati eseguiti e superati esattamente i job previsti e saltati gli altri; un ambito sconosciuto fa fallire il controllo. La categoria `hellscape3d` va rivista quando il sito pubblicato inizierà a servire codice di quella cartella.
