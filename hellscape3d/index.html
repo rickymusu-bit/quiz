@@ -19,6 +19,13 @@
         width: 100vw;
         height: 100vh;
       }
+      #fade {
+        position: fixed;
+        inset: 0;
+        background: #000;
+        opacity: 0;
+        pointer-events: none;
+      }
       #hud {
         position: fixed;
         top: 12px;
@@ -36,7 +43,8 @@
   </head>
   <body>
     <canvas id="scene" aria-label="Città di Hellscape, vista graybox"></canvas>
-    <pre id="hud" aria-live="polite"></pre>
+    <div id="fade" aria-hidden="true"></div>
+    <pre id="hud"></pre>
     <script type="module" src="./src/main.ts"></script>
   </body>
 </html>

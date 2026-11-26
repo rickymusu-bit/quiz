@@ -92,3 +92,23 @@ export function revealAllView(map: CityMap, view: PublicView): PublicView {
       .sort((a, b) => (a.id < b.id ? -1 : 1)),
   };
 }
+
+/**
+ * Vista limitata alle celle già mostrate dalla regia (sottoinsieme di quelle
+ * esplorate): archi e indicazione di nebbia vengono ricalcolati su quel
+ * sottoinsieme, così che le caselle compaiano quando la pedina le vede.
+ */
+export function presentedView(map: CityMap, view: PublicView, shown: readonly string[]): PublicView {
+  const allowed = new Set(view.cells.map((c) => c.id));
+  const visible = new Set(shown.filter((id) => allowed.has(id)));
+  return {
+    ...view,
+    cells: view.cells
+      .filter((cell) => visible.has(cell.id))
+      .map((cell) => ({
+        ...cell,
+        next: cell.next.filter((to) => visible.has(to)),
+        continuesIntoFog: map.cells[cell.id]!.next.some((to) => !visible.has(to)),
+      })),
+  };
+}

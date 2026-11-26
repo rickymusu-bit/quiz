@@ -9,6 +9,7 @@
     "test:hellscape3d:browser": "node hellscape3d/tests/browser/graybox.ts",
     "dev:hellscape3d": "vite hellscape3d",
     "build:hellscape3d": "vite build hellscape3d",
+    "record:hellscape3d": "node hellscape3d/tests/browser/record.ts",
     "test:browser": "npm run test:browser:main && npm run test:browser:secondary",
     "test:browser:main": "node tests/hellscape.cjs && node tests/infernal_assets.cjs && python3 tests/hell_race.py && python3 tests/start.py && python3 tests/experience.py && python3 tests/keyboard.py",
     "test:browser:secondary": "python3 tests/options.py && python3 tests/configurable.py && python3 tests/topic_capacity.py && python3 tests/ammo.py && python3 tests/cinematic_ui.py && node tests/ux_regressions.cjs",

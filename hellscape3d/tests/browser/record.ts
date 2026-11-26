@@ -1,0 +1,76 @@
+/**
+ * Registrazione reale della pagina di prova per le evidenze (AGENTS.md):
+ * video del browser registrato da Playwright in tempo reale e convertito in
+ * GIF con ffmpeg. Non fa parte della CI.
+ *
+ * Uso: node hellscape3d/tests/browser/record.ts --seed graybox-9 --steps 12 --actions 10 \
+ *        [--width 960 --height 540] [--name regia] [--query motion=reduced]
+ * Richiede ffmpeg nel PATH. Output in artifacts/hellscape3d/.
+ */
+import { execFileSync } from "node:child_process";
+import { existsSync, mkdirSync, renameSync, rmSync } from "node:fs";
+import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+import { parseArgs } from "node:util";
+import { chromium } from "playwright";
+import { build, preview } from "vite";
+
+const { values } = parseArgs({
+  options: {
+    seed: { type: "string", default: "graybox-9" },
+    steps: { type: "string", default: "12" },
+    actions: { type: "string", default: "10" },
+    width: { type: "string", default: "960" },
+    height: { type: "string", default: "540" },
+    name: { type: "string", default: "regia" },
+    query: { type: "string", default: "" },
+    fps: { type: "string", default: "10" },
+  },
+});
+const width = Number(values.width),
+  height = Number(values.height);
+const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
+const out = resolve(root, "../artifacts/hellscape3d");
+const work = join(out, `video-${values.name}`);
+rmSync(work, { recursive: true, force: true });
+mkdirSync(work, { recursive: true });
+
+const revision = execFileSync("git", ["rev-parse", "--short", "HEAD"], { cwd: root, encoding: "utf8" }).trim();
+const dirty = execFileSync("git", ["status", "--porcelain", "--", "."], { cwd: root, encoding: "utf8" }).trim() !== "";
+
+await build({ root, logLevel: "warn" });
+const server = await preview({ root, logLevel: "warn", preview: { port: 0, host: "127.0.0.1" } });
+const url = server.resolvedUrls!.local[0]!;
+const executablePath = [process.env.CHROMIUM_PATH, "/usr/bin/chromium", "/opt/pw-browsers/chromium"].find((p) => p && existsSync(p));
+const browser = await chromium.launch({
+  ...(executablePath ? { executablePath } : {}),
+  args: ["--no-sandbox", "--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader"],
+});
+const context = await browser.newContext({ viewport: { width, height }, deviceScaleFactor: 1, recordVideo: { dir: work, size: { width, height } } });
+const page = await context.newPage();
+const started = Date.now();
+await page.goto(`${url}?seed=${values.seed}&steps=${values.steps}${values.query ? `&${values.query}` : ""}`);
+await page.waitForFunction(() => (window as unknown as { __hellscape3d?: { ready: boolean } }).__hellscape3d?.ready === true);
+await page.waitForTimeout(800);
+for (let i = 0; i < Number(values.actions); i++) {
+  await page.keyboard.press("Space");
+  await page.waitForTimeout(100);
+  await page.waitForFunction(() => !(window as unknown as { __hellscape3d: { busy: boolean } }).__hellscape3d.busy, null, { timeout: 20_000 });
+  await page.waitForTimeout(450);
+}
+await page.waitForTimeout(600);
+const seconds = (Date.now() - started) / 1000;
+const video = page.video()!;
+await context.close();
+await browser.close();
+await new Promise<void>((done) => server.httpServer.close(() => done()));
+
+const webm = join(work, "registrazione.webm");
+renameSync(await video.path(), webm);
+const gif = join(out, `${values.name}-${values.seed}-${width}x${height}-${revision}${dirty ? "-modificata" : ""}.gif`);
+execFileSync("ffmpeg", [
+  "-y", "-loglevel", "error", "-i", webm,
+  "-vf", `fps=${values.fps},split[a][b];[a]palettegen=max_colors=96[p];[b][p]paletteuse=dither=bayer:bayer_scale=4`,
+  gif,
+]);
+console.log(JSON.stringify({ gif, webm, viewport: `${width}x${height}`, seconds: Math.round(seconds * 10) / 10, revision, workingTreeModified: dirty }));

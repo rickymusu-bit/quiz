@@ -5,6 +5,7 @@
 import * as THREE from "three";
 import { DEFAULT_LAYOUT_CONFIG, VIEW_DIRECTION } from "../layout/layout.ts";
 import type { Vec3 } from "../layout/types.ts";
+import type { CameraPose } from "../director/director.ts";
 import type { SceneModel, SceneSegment } from "../scene/model.ts";
 
 export type CameraMode = "player" | "overview";
@@ -20,8 +21,8 @@ const DISTRICT_TINT: Readonly<Record<string, number>> = {
 const PLAYER_COLORS = [0xd8452b, 0x2b8fd8, 0xe0b400, 0x8a3ad8, 0x2bd88a, 0xd82b9a];
 const TILE = { size: 2.6, thickness: 0.5 };
 const WALKWAY = { width: 1.3, thickness: 0.25 };
-const PITCH = THREE.MathUtils.degToRad(50);
-const PLAYER_DISTANCE = 38;
+const OVERVIEW_PITCH = THREE.MathUtils.degToRad(50);
+const OVERVIEW_MIN_DISTANCE = 24;
 
 export interface RenderStats {
   tiles: number;
@@ -38,6 +39,7 @@ export class GrayboxRenderer {
   private content = new THREE.Group();
   private sun = new THREE.DirectionalLight(0xffe2c0, 2.4);
   private stats: RenderStats = { tiles: 0, walkways: 0, stubs: 0, masses: 0, players: 0 };
+  private pawns = new Map<string, THREE.Group>();
   private readonly unitBox = new THREE.BoxGeometry(1, 1, 1);
   private readonly materials = {
     tile: new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.85, metalness: 0.05 }),
@@ -79,7 +81,8 @@ export class GrayboxRenderer {
     this.camera.updateProjectionMatrix();
   }
 
-  setModel(model: SceneModel, mode: CameraMode): void {
+  /** Ricostruisce la scena statica (caselle, passerelle, masse) e le pedine. */
+  setModel(model: SceneModel): void {
     this.clearContent();
     const tiles = model.tiles;
     const tileMesh = new THREE.InstancedMesh(this.unitBox, this.materials.tile, Math.max(1, tiles.length));
@@ -112,15 +115,40 @@ export class GrayboxRenderer {
     massMesh.count = model.masses.length;
     this.addShadowed(massMesh);
 
+    this.pawns.clear();
+    for (const player of model.players) this.pawns.set(player.id, this.addPlayer(player.index, player.active));
+    this.setPawnPositions(Object.fromEntries(model.players.map((p) => [p.id, p.position])));
+    this.stats = { tiles: tiles.length, walkways: model.walkways.length, stubs: model.stubs.length, masses: model.masses.length, players: model.players.length };
+  }
+
+  /** Posizioni delle pedine; quelle sulla stessa casella vengono affiancate. */
+  setPawnPositions(positions: Readonly<Record<string, Vec3>>): void {
     const perCell = new Map<string, number>();
-    for (const player of model.players) {
-      const key = `${player.position.x},${player.position.z}`;
+    for (const [id, group] of this.pawns) {
+      const p = positions[id];
+      if (!p) continue;
+      const key = `${p.x.toFixed(2)},${p.y.toFixed(2)},${p.z.toFixed(2)}`;
       const slot = perCell.get(key) ?? 0;
       perCell.set(key, slot + 1);
-      this.addPlayer(player.position, player.index, player.active, slot);
+      const offset = slot === 0 ? 0 : (slot % 2 === 1 ? 1 : -1) * 0.7 * Math.ceil(slot / 2);
+      group.position.set(p.x + offset, p.y, p.z + offset);
     }
-    this.stats = { tiles: tiles.length, walkways: model.walkways.length, stubs: model.stubs.length, masses: model.masses.length, players: model.players.length };
-    this.frame(model, mode);
+  }
+
+  /** Posa della camera decisa dal CameraDirector; la direzione resta quella della vista a tre quarti. */
+  setCameraPose(pose: CameraPose): void {
+    this.placeCamera(new THREE.Vector3(pose.target.x, pose.target.y, pose.target.z), pose.distance, pose.pitch);
+  }
+
+  /** Panoramica sulle sole caselle visibili. */
+  frameOverview(model: SceneModel): void {
+    const box = new THREE.Box3();
+    for (const tile of model.tiles) box.expandByPoint(new THREE.Vector3(tile.position.x, tile.position.y, tile.position.z));
+    const sphere = box.getBoundingSphere(new THREE.Sphere());
+    const vertical = THREE.MathUtils.degToRad(this.camera.fov) / 2;
+    const horizontal = Math.atan(Math.tan(vertical) * this.camera.aspect);
+    const distance = Math.max(OVERVIEW_MIN_DISTANCE, (sphere.radius + 4) / Math.sin(Math.min(vertical, horizontal)));
+    this.placeCamera(sphere.center, distance, OVERVIEW_PITCH);
   }
 
   render(): void {
@@ -174,10 +202,9 @@ export class GrayboxRenderer {
     this.addShadowed(lintel);
   }
 
-  private addPlayer(p: Vec3, index: number, active: boolean, slot: number): void {
+  private addPlayer(index: number, active: boolean): THREE.Group {
     const colour = PLAYER_COLORS[index % PLAYER_COLORS.length]!;
     const material = new THREE.MeshStandardMaterial({ color: colour, roughness: 0.5, emissive: colour, emissiveIntensity: active ? 0.35 : 0.05 });
-    const offset = slot === 0 ? 0 : (slot % 2 === 1 ? 1 : -1) * 0.7 * Math.ceil(slot / 2);
     const group = new THREE.Group();
     const body = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.45, 1.3, 16), material);
     body.position.y = 0.65;
@@ -190,32 +217,22 @@ export class GrayboxRenderer {
       ring.position.y = 0.05;
       group.add(ring);
     }
-    group.position.set(p.x + offset, p.y, p.z + offset);
     group.traverse((object) => {
       if (object instanceof THREE.Mesh) object.castShadow = true;
     });
     this.content.add(group);
+    return group;
   }
 
-  /** Vista a tre quarti sul giocatore attivo, oppure panoramica sulle sole caselle visibili. */
-  private frame(model: SceneModel, mode: CameraMode): void {
-    let target = new THREE.Vector3(model.focus.x, model.focus.y, model.focus.z);
-    let distance = PLAYER_DISTANCE;
-    if (mode === "overview" && model.tiles.length > 0) {
-      const box = new THREE.Box3();
-      for (const tile of model.tiles) box.expandByPoint(new THREE.Vector3(tile.position.x, tile.position.y, tile.position.z));
-      const sphere = box.getBoundingSphere(new THREE.Sphere());
-      target = sphere.center;
-      const vertical = THREE.MathUtils.degToRad(this.camera.fov) / 2;
-      const horizontal = Math.atan(Math.tan(vertical) * this.camera.aspect);
-      distance = Math.max(PLAYER_DISTANCE * 0.6, (sphere.radius + 4) / Math.sin(Math.min(vertical, horizontal)));
-    }
-    const offset = new THREE.Vector3(VIEW_DIRECTION.x * Math.cos(PITCH), Math.sin(PITCH), VIEW_DIRECTION.z * Math.cos(PITCH)).multiplyScalar(distance);
+  private placeCamera(target: THREE.Vector3, distance: number, pitch: number): void {
+    const offset = new THREE.Vector3(VIEW_DIRECTION.x * Math.cos(pitch), Math.sin(pitch), VIEW_DIRECTION.z * Math.cos(pitch)).multiplyScalar(distance);
     this.camera.position.copy(target).add(offset);
     this.camera.lookAt(target);
     this.camera.far = distance + 250;
     this.camera.updateProjectionMatrix();
-    this.scene.fog = new THREE.Fog(BACKGROUND, distance * 0.9, distance + 90);
+    const fog = this.scene.fog as THREE.Fog;
+    fog.near = distance * 0.9;
+    fog.far = distance + 90;
     this.sun.position.set(target.x - 30, target.y + 60, target.z - 15);
     this.sun.target.position.copy(target);
     const extent = Math.max(45, distance);
