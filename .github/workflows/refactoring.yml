@@ -14,7 +14,7 @@ jobs:
     name: Determina i controlli necessari
     runs-on: ubuntu-latest
     outputs:
-      full: ${{ steps.scope.outputs.full }}
+      scope: ${{ steps.scope.outputs.scope }}
     steps:
       - name: Classifica i file cambiati (in caso di incertezza, test completi)
         id: scope
@@ -32,7 +32,7 @@ jobs:
               } else if (context.eventName === 'push') {
                 const before = context.payload.before;
                 if (!before || /^0+$/.test(before)) {
-                  core.setOutput('full', 'true');
+                  core.setOutput('scope', 'full');
                   return;
                 }
                 const result = await github.rest.repos.compareCommitsWithBasehead({
@@ -40,30 +40,36 @@ jobs:
                 });
                 paths = (result.data.files ?? []).map(file => file.filename);
                 if (paths.length >= 300 || result.data.total_commits >= 250) {
-                  core.setOutput('full', 'true');
+                  core.setOutput('scope', 'full');
                   return;
                 }
               } else {
-                core.setOutput('full', 'true');
+                core.setOutput('scope', 'full');
                 return;
               }
             } catch (error) {
               core.warning(`Impact check unavailable: ${error.message}; running full CI`);
-              core.setOutput('full', 'true');
+              core.setOutput('scope', 'full');
               return;
             }
-            const docsOnly = paths.length > 0 && paths.every(path =>
+            const isDoc = path =>
               path.startsWith('docs/') ||
               path === 'README.md' ||
               path === 'AGENTS.md' ||
-              path === '.gitignore'
-            );
-            core.setOutput('full', String(!docsOnly));
-            core.info(`${paths.length} changed files; full CI: ${!docsOnly}`);
+              path === '.gitignore';
+            // Il modello logico 3D non è importato dal sito pubblicato né incluso nella build:
+            // le suite del runner non lo esercitano. package.json, lockfile e workflow restano
+            // fuori da questa categoria perché condivisi. Rivedere quando il sito servirà il 3D.
+            const isHellscape3d = path => path.startsWith('hellscape3d/');
+            let scope = 'full';
+            if (paths.length > 0 && paths.every(isDoc)) scope = 'docs';
+            else if (paths.length > 0 && paths.every(path => isDoc(path) || isHellscape3d(path))) scope = 'hellscape3d';
+            core.setOutput('scope', scope);
+            core.info(`${paths.length} changed files; scope: ${scope}`);
   checks:
     name: ${{ matrix.suite }}
     needs: impact
-    if: needs.impact.outputs.full == 'true'
+    if: needs.impact.outputs.scope == 'full'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -158,22 +164,45 @@ jobs:
             artifacts/chase/
             artifacts/portal/
             artifacts/orientation/
+  hellscape3d:
+    name: hellscape3d
+    needs: impact
+    if: needs.impact.outputs.scope == 'hellscape3d'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Controllo dei tipi e test del modello logico 3D
+        run: npm run test:hellscape3d
   verify:
     name: Tutte le verifiche richieste
     if: always()
-    needs: [impact, checks]
+    needs: [impact, checks, hellscape3d]
     runs-on: ubuntu-latest
     steps:
       - name: Verifica risultato della CI applicabile
         env:
           IMPACT_RESULT: ${{ needs.impact.result }}
-          FULL: ${{ needs.impact.outputs.full }}
+          SCOPE: ${{ needs.impact.outputs.scope }}
           CHECKS_RESULT: ${{ needs.checks.result }}
+          HELLSCAPE3D_RESULT: ${{ needs.hellscape3d.result }}
         run: |
           test "$IMPACT_RESULT" = success
-          if [ "$FULL" = true ]; then
-            test "$CHECKS_RESULT" = success
-          else
-            test "$FULL" = false
-            test "$CHECKS_RESULT" = skipped
-          fi
+          case "$SCOPE" in
+            full)
+              test "$CHECKS_RESULT" = success
+              test "$HELLSCAPE3D_RESULT" = skipped ;;
+            hellscape3d)
+              test "$CHECKS_RESULT" = skipped
+              test "$HELLSCAPE3D_RESULT" = success ;;
+            docs)
+              test "$CHECKS_RESULT" = skipped
+              test "$HELLSCAPE3D_RESULT" = skipped ;;
+            *)
+              echo "Ambito sconosciuto: '$SCOPE'"
+              exit 1 ;;
+          esac
