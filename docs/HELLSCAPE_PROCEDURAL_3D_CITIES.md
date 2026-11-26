@@ -1,12 +1,12 @@
 # Hellscape — città procedurali 3D e regia di gioco
 
 **Data:** 2026-11-25, aggiornata il 2026-11-26  
-**Stato:** specifica di redesign approvata nella conversazione del 25 novembre 2026; la revisione del 26 novembre (rappresentazione in corsa, minimappa, bivi) è approvata nella conversazione del 26 novembre 2026 e proposta per integrazione documentale.  
+**Stato:** specifica di redesign approvata nella conversazione del 25 novembre 2026; la revisione del 26 novembre (rappresentazione in corsa, radar, bivi) è approvata nella conversazione del 26 novembre 2026 e proposta per integrazione documentale.  
 **Ambito:** nuovo gioco da tavolo digitale a turni su schermo condiviso; nessuna modifica al runtime pubblicato né al prototipo in questa PR.
 
 ## 1. Obiettivo e precedenza
 
-La gara consiste nell'uscire da una città infernale controllata da Bafometto biomeccanico. Il mondo è tridimensionale, stilizzato e generato proceduralmente per ogni nuova partita. Il gioco non è un open world: i personaggi si spostano lungo percorsi discreti. Nessuno conosce il percorso né quanto manca alla fine: la schermata mostra un giocatore alla volta, sempre in corsa nel tratto di città in cui si trova (§6), e la minimappa soltanto le caselle già percorse (§3).
+La gara consiste nell'uscire da una città infernale controllata da Bafometto biomeccanico. Il mondo è tridimensionale, stilizzato e generato proceduralmente per ogni nuova partita. Il gioco non è un open world: i personaggi si spostano lungo percorsi discreti. Nessuno conosce il percorso né quanto manca alla fine: la schermata mostra un giocatore alla volta, sempre in corsa nel tratto di città in cui si trova (§6), e il radar soltanto i giocatori attorno a quello di turno (§3).
 
 Questa specifica aggiorna per il redesign le indicazioni relative al runner, alla sequenza obbligatoria dei sei quartieri e alla rappresentazione grafica 2D/2.5D. Il runtime pubblicato, i salvataggi e gli asset storici non vengono modificati da questa PR. Le specifiche precedenti rimangono valide per gli aspetti non in conflitto; eventuali incompatibilità di regolamento non trattate qui devono essere risolte prima dell'implementazione. Riferimenti: [direzione cinematica precedente](HELLSCAPE_BAFOMETTO_DIREZIONE_CINEMATICA_v1.2.0_20261031.md), [regole di progetto precedenti](HELLSCAPE_PROJECT_RULES_v1.0.1_20261031.md), [README del runtime](../README.md).
 
@@ -23,9 +23,9 @@ Il solo tema da implementare nella prima fase è **Megastrutture**. Non è richi
 - A ogni bivio le alternative si presentano con etichette generiche e tematiche, per esempio «scorciatoia pericolosa» e «strada sicura», non con lunghezze o difficoltà esplicite. L'etichetta corrisponde alla posizione del ramo nell'ordine delle lunghezze **relative** verso l'uscita (più breve, intermedio se pertinente, più lungo), che resta legata alla difficoltà delle domande. Il confronto si riferisce al cammino residuo verso l'uscita, non soltanto al prossimo incrocio. In caso di successive diramazioni, usare un criterio coerente e dichiarato internamente, per esempio la minima distanza residua raggiungibile dopo aver scelto il ramo; non promettere una lunghezza esatta del percorso effettivamente seguito. Le etichette appartengono al tema della città; quella del ramo intermedio è da definire.
 - I percorsi più brevi comportano domande più difficili; quelli più lunghi domande più facili. Verificare mediante simulazioni che le alternative siano plausibilmente competitive, tenendo conto di probabilità di risposta corretta, dado ed eventi. Le soglie numeriche e i profili di bilanciamento non sono ancora fissati.
 - Non esporre numero di caselle residue, distanza esatta, posizione dell'uscita, né eventi futuri. Si vede soltanto la casella in cui si trova il giocatore mostrato; al bivio, l'imbocco dei rami, non il loro seguito.
-- **Minimappa.** Mostra soltanto le caselle già percorse da almeno un giocatore e i tratti fra caselle consecutive percorse, senza caselle viste in anticipo né tratti verso l'ignoto. Indica la posizione di tutti i giocatori e quello attivo. Un bivio percorso compare come punto di diramazione, distinto dalle caselle, con i soli rami già imboccati. L'uscita è un nodo con un'icona propria, staccato dal grafo e in posizione simbolica fissa (per esempio sul bordo): la sua collocazione non deve suggerire direzione o distanza. Diventa una casella del grafo solo quando qualcuno la raggiunge.
+- **Radar.** Sostituisce la minimappa e non disegna caselle né percorsi. Al centro sta il giocatore di turno; gli altri giocatori sono punti nella loro posizione relativa, in linea d'aria e con orientamento fisso. La portata è limitata: chi è più lontano compare come tacca sul bordo, nella propria direzione. L'uscita compare sul radar solo quando entra nella portata, quindi fa da indizio di avvicinamento e prima non rivela né direzione né distanza. La portata va tarata insieme agli indizi ambientali.
 - **Indizi dell'uscita.** L'avvicinamento all'uscita si avverte da segni ambientali nella scena di corsa: luce naturale, uccelli in volo, vegetazione. L'intensità dipende dalla minima distanza residua dalla casella corrente, per soglie grossolane (indicativamente: nessun indizio, poi luce, poi uccelli e vegetazione nelle ultime caselle) e non in modo continuo, così che non si possano contare le caselle. Prima della scelta a un bivio gli indizi non distinguono i rami. Valori delle soglie e aspetto degli indizi sono da definire con il bilanciamento e la direzione artistica.
-- La nebbia di guerra è uno stato esplicito, non soltanto un effetto estetico. Scena di corsa, transizioni, HUD, minimappa e inquadrature speciali devono rispettarla.
+- La nebbia di guerra è uno stato esplicito, non soltanto un effetto estetico. Scena di corsa, transizioni, HUD, radar e inquadrature speciali devono rispettarla.
 - La logica interna conserva le distanze esatte necessarie al generatore; non esporle nell'interfaccia. Non si promette segretezza anti-manomissione rispetto agli strumenti di sviluppo di un browser locale.
 
 ### Turno e stato di gioco
@@ -133,7 +133,7 @@ Realizzare esclusivamente Megastrutture:
 - un modello giocatore provvisorio con ciclo di corsa, con almeno due istanze giocabili per provare cambi turno e giocatori nella stessa casella;
 - la scena di corsa con scenario ciclico per casella, cambio di scenario durante l'avanzamento e indizi dell'uscita provvisori;
 - una scena/interfaccia provvisoria di Bafometto;
-- domanda, dado, avanzamento, scelta al bivio, arrivo, cambio turno, nebbia di guerra e minimappa delle caselle percorse;
+- domanda, dado, avanzamento, scelta al bivio, arrivo, cambio turno, nebbia di guerra e radar dei giocatori;
 - ripresa della partita con lo stesso mondo.
 
 Fasi suggerite: (1) modello logico e test; (2) graybox 3D modulare con camera; (3) kit e direzione artistica; (4) personaggi, Bafometto, atmosfera e ottimizzazione. Non sviluppare altre città prima di convalidare il primo tema. Non avviare un rifacimento totale del runtime in questa PR.
@@ -142,7 +142,7 @@ Fasi suggerite: (1) modello logico e test; (2) graybox 3D modulare con camera; (
 
 - Seed uguale, tema/configurazione/versione uguali: stessa mappa; seed diversi producono varietà effettiva. Test su una pluralità di seed, includendo casi limite e fallback.
 - Tutti i rami offerti sono raggiungibili e coerenti con la lunghezza relativa e la difficoltà; nessuna geometria impedisce il movimento. Le alternative non sono manifestamente dominate nelle simulazioni.
-- Il giocatore vede soltanto i dati autorizzati: la casella corrente, gli imbocchi del bivio e gli indizi a soglie. HUD, minimappa, scena di corsa e transizioni non svelano la mappa sconosciuta; la minimappa contiene soltanto caselle percorse e l'uscita in posizione simbolica.
+- Il giocatore vede soltanto i dati autorizzati: la casella corrente, gli imbocchi del bivio e gli indizi a soglie. HUD, radar, scena di corsa e transizioni non svelano la mappa sconosciuta; il radar mostra soltanto i giocatori e, entro la portata, l'uscita.
 - Il bivio si attraversa solo avanzando: la scelta non comporta domande, il bivio non conta come passo e nessun avanzamento vi termina; i passi residui proseguono sul ramo scelto.
 - Lo scenario di ogni casella si ripete senza giunture visibili e cambia a ogni casella attraversata; la schermata mostra il solo giocatore attivo, più chi si trova nella sua casella.
 - Transizioni funzionanti fra giocatori in caselle diverse e nella stessa casella e fra Bafometto e giocatore; nessuna perdita dello stato, doppia risoluzione, consumo di timer durante blocchi o modifica dell'esito saltando un'animazione.
@@ -158,21 +158,22 @@ Aperte dalla revisione del 26 novembre:
 - soglie degli indizi dell'uscita e loro aspetto;
 - angolo della camera nella scena di corsa: laterale, come la cornice compositiva del runner precedente nelle [regole di progetto](HELLSCAPE_PROJECT_RULES_v1.0.1_20261031.md), alle spalle o a tre quarti; va scelto prima dei modelli e delle animazioni definitive dei personaggi;
 - lunghezza del ciclo dello scenario e velocità di corsa nelle varie fasi, compreso il rallentamento durante la domanda;
-- forma della minimappa (disposizione reale o schematica delle caselle percorse) e posizione del nodo dell'uscita;
+- portata del radar, oggi provvisoria (6 caselle in linea d'aria: l'uscita compare a 6–9 caselle di percorso, in casi rari fino a 16);
 - bilanciamento con la nuova regola dei bivi: va rifatto con simulazioni, perché oggi il bivio è una casella e il calcolo tiene conto della scelta a inizio turno.
 
 ### Stato del prototipo rispetto alla revisione del 26 novembre
 
-Il prototipo in `hellscape3d/` implementa la regola dei bivi di questa revisione: bivio come punto di passaggio nel generatore e nel motore, salvataggi del formato precedente conservati a parte, bilanciamento rifatto. Per il resto implementa ancora la versione precedente: mostra la città a tre quarti con tutti i giocatori, una minimappa delle zone esplorate (comprese due caselle oltre i giocatori e i tratti verso la nebbia) e le alternative del bivio con lunghezza relativa e difficoltà esplicite. Le modifiche vanno fatte per passi giudicabili:
+Il prototipo in `hellscape3d/` implementa la regola dei bivi di questa revisione: bivio come punto di passaggio nel generatore e nel motore, salvataggi del formato precedente conservati a parte, bilanciamento rifatto; inoltre il radar al posto della minimappa. Per il resto implementa ancora la versione precedente: mostra la città a tre quarti con tutti i giocatori e le alternative del bivio con lunghezza relativa e difficoltà esplicite. Le modifiche vanno fatte per passi giudicabili:
 1. bivio come punto di passaggio nel generatore e nel motore (fatto);
-2. minimappa delle sole caselle percorse con l'uscita simbolica;
+2. radar al posto della minimappa (fatto);
 3. scena di corsa in graybox: scenario ciclico per casella, giocatori nella stessa casella, bivio con imbocchi ed etichette, movimento ridotto;
 4. indizi dell'uscita provvisori.
 
-Restano utili generatore, motore, salvataggi, domande, kit modulare e minimappa. La vista della città a tre quarti resta come strumento di sviluppo per giudicare le mappe. Transizioni di camera nella città, ostacoli trasparenti e caricamento per settori perdono il loro scopo nel gioco: si rimuovono, dopo aver verificato le dipendenze, quando la scena di corsa li avrà sostituiti.
+Restano utili generatore, motore, salvataggi, domande, kit modulare e radar. La vista della città a tre quarti resta come strumento di sviluppo per giudicare le mappe. Transizioni di camera nella città, ostacoli trasparenti e caricamento per settori perdono il loro scopo nel gioco: si rimuovono, dopo aver verificato le dipendenze, quando la scena di corsa li avrà sostituiti.
 
 ## Registro delle variazioni
 
 - 2026-11-25: consolidamento delle decisioni approvate nella conversazione sul redesign: mappe procedurali, informazione parziale, 3D stilizzato, una città per gara, Megastrutture come primo tema, generazione modulare e regia dinamica.
 - 2026-11-26: rappresentazione in corsa al posto della vista a tre quarti come schermata di gioco (un giocatore alla volta, insieme se nella stessa casella, scenario ciclico per casella); minimappa delle sole caselle percorse con l'uscita come nodo simbolico staccato; indizi dell'uscita a soglie; bivi raggiunti solo avanzando, con scelta all'arrivo, senza domanda e con etichette generiche; stato del prototipo e passi di adeguamento.
 - 2026-11-26, correzione: il bivio non è una casella ma un punto di passaggio fra due caselle. Si sceglie durante l'avanzamento, senza domanda; non conta come passo, non vi si termina l'avanzamento e i passi residui proseguono sul ramo scelto. Sostituisce la regola della voce precedente, che permetteva di fermarsi sul bivio e conservare la scelta fra un turno e l'altro.
+- 2026-11-26, minimappa: sostituita da un radar centrato sul giocatore di turno, con gli altri giocatori come punti e l'uscita visibile solo entro la portata. Non si disegnano caselle né percorsi.

@@ -1,10 +1,10 @@
 /**
  * Interfaccia PROVVISORIA (HTML/CSS sopra la scena): turno, domanda con esito
- * e spiegazione, dado, scelta al bivio, fine partita e minimappa. Mostra la presentazione,
+ * e spiegazione, dado, scelta al bivio, fine partita e radar. Mostra la presentazione,
  * non lo stato anticipato del motore: i pannelli compaiono solo a regia ferma.
  */
 import type { Difficulty, RelativeLength } from "../logic/types.ts";
-import type { MinimapShapes } from "./minimap.ts";
+import type { RadarShapes } from "./radar.ts";
 import { cssColor, playerColor } from "./palette.ts";
 import { outcomeOf, type PresentedQuestion } from "../questions/deck.ts";
 
@@ -71,7 +71,7 @@ export class Hud {
   private readonly speech: HTMLElement;
   private readonly dev: HTMLElement;
   private readonly badges: HTMLElement;
-  private readonly minimap: HTMLCanvasElement;
+  private readonly radar: HTMLCanvasElement;
   private readonly actions: HudActions;
   /** Valore iniziale diverso da qualunque chiave, così il primo aggiornamento nasconde anche un pannello vuoto. */
   private panelKey: string | null = null;
@@ -83,9 +83,9 @@ export class Hud {
     this.actions = actions;
     this.turn = root.appendChild(element("section", "hud-turn"));
     this.turn.setAttribute("aria-live", "polite");
-    this.minimap = root.appendChild(element("canvas", "hud-minimap"));
-    this.minimap.setAttribute("role", "img");
-    this.minimap.setAttribute("aria-label", "Minimappa delle zone esplorate");
+    this.radar = root.appendChild(element("canvas", "hud-radar"));
+    this.radar.setAttribute("role", "img");
+    this.radar.setAttribute("aria-label", "Radar: gli altri giocatori attorno a quello di turno; l'uscita compare quando è vicina");
     this.die = root.appendChild(element("div", "hud-die"));
     this.die.setAttribute("aria-live", "polite");
     this.toast = root.appendChild(element("div", "hud-toast"));
@@ -123,9 +123,9 @@ export class Hud {
     }
   }
 
-  /** Disegna la minimappa; restituisce le celle disegnate (per i test). */
-  drawMinimap(shapes: MinimapShapes): string[] {
-    const canvas = this.minimap;
+  /** Disegna il radar; restituisce i punti disegnati (per i test). */
+  drawRadar(shapes: RadarShapes): RadarShapes {
+    const canvas = this.radar;
     const ratio = Math.min(window.devicePixelRatio || 1, 2);
     const width = canvas.clientWidth,
       height = canvas.clientHeight;
@@ -134,42 +134,67 @@ export class Hud {
     const g = canvas.getContext("2d")!;
     g.setTransform(ratio, 0, 0, ratio, 0, 0);
     g.clearRect(0, 0, width, height);
-    g.lineCap = "round";
-    g.strokeStyle = "rgba(200, 200, 205, 0.75)";
-    g.lineWidth = Math.max(1.5, shapes.scale * 0.6);
-    for (const [a, b] of shapes.edges) {
+    const { center: c, radius: r } = shapes;
+    // Quadrante: disco, anello a metà portata e mirino.
+    g.beginPath();
+    g.arc(c.x, c.y, r, 0, Math.PI * 2);
+    g.fillStyle = "rgba(14, 22, 18, 0.9)";
+    g.fill();
+    g.lineWidth = 1.5;
+    g.strokeStyle = "rgba(120, 200, 150, 0.55)";
+    g.stroke();
+    g.lineWidth = 1;
+    g.strokeStyle = "rgba(120, 200, 150, 0.22)";
+    g.beginPath();
+    g.arc(c.x, c.y, r / 2, 0, Math.PI * 2);
+    g.moveTo(c.x - r, c.y);
+    g.lineTo(c.x + r, c.y);
+    g.moveTo(c.x, c.y - r);
+    g.lineTo(c.x, c.y + r);
+    g.stroke();
+    // Uscita entro la portata: portale stilizzato.
+    if (shapes.exit) {
+      const { x, y } = shapes.exit;
+      g.strokeStyle = "#39ff88";
+      g.lineWidth = 1.5;
       g.beginPath();
-      g.moveTo(a.x, a.y);
-      g.lineTo(b.x, b.y);
+      g.moveTo(x - 5, y + 6);
+      g.lineTo(x - 5, y - 1);
+      g.arc(x, y - 1, 5, Math.PI, 0);
+      g.lineTo(x + 5, y + 6);
       g.stroke();
-    }
-    g.strokeStyle = "rgba(200, 200, 205, 0.3)";
-    g.setLineDash([2, 3]);
-    for (const [a, b] of shapes.stubs) {
-      g.beginPath();
-      g.moveTo(a.x, a.y);
-      g.lineTo(b.x, b.y);
-      g.stroke();
-    }
-    g.setLineDash([]);
-    const size = Math.max(3, shapes.scale * 1.6);
-    for (const cell of shapes.cells) {
-      g.fillStyle = cell.kind === "exit" ? "#39ff88" : "#9a9ca3";
-      const s = cell.kind === "exit" ? size * 1.3 : size;
-      g.fillRect(cell.x - s / 2, cell.y - s / 2, s, s);
-    }
-    for (const player of shapes.players) {
-      g.beginPath();
-      g.arc(player.x, player.y, player.active ? 5 : 3.5, 0, Math.PI * 2);
-      g.fillStyle = cssColor(playerColor(player.index));
+      g.fillStyle = "rgba(57, 255, 136, 0.35)";
       g.fill();
-      if (player.active) {
-        g.lineWidth = 2;
-        g.strokeStyle = "#fff1c2";
-        g.stroke();
-      }
     }
-    return shapes.cells.map((c) => c.id);
+    // Altri giocatori: punti, o tacche sul bordo se fuori portata; chi è nella stessa casella del giocatore di turno si affianca.
+    let beside = 0;
+    for (const p of shapes.players) {
+      if (p.active) continue;
+      g.fillStyle = cssColor(playerColor(p.index));
+      if (p.onEdge) {
+        const angle = Math.atan2(p.y - c.y, p.x - c.x);
+        g.beginPath();
+        g.moveTo(c.x + Math.cos(angle) * (r + 1), c.y + Math.sin(angle) * (r + 1));
+        g.lineTo(c.x + Math.cos(angle + 0.12) * (r - 9), c.y + Math.sin(angle + 0.12) * (r - 9));
+        g.lineTo(c.x + Math.cos(angle - 0.12) * (r - 9), c.y + Math.sin(angle - 0.12) * (r - 9));
+        g.closePath();
+        g.fill();
+        continue;
+      }
+      const shift = Math.hypot(p.x - c.x, p.y - c.y) < 4 ? 7 * ++beside : 0;
+      g.beginPath();
+      g.arc(p.x + shift, p.y, 4, 0, Math.PI * 2);
+      g.fill();
+    }
+    const active = shapes.players.find((p) => p.active)!;
+    g.beginPath();
+    g.arc(active.x, active.y, 5, 0, Math.PI * 2);
+    g.fillStyle = cssColor(playerColor(active.index));
+    g.fill();
+    g.lineWidth = 2;
+    g.strokeStyle = "#fff1c2";
+    g.stroke();
+    return shapes;
   }
 
   private renderTurn(state: HudState): void {

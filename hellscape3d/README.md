@@ -27,7 +27,7 @@ npm test                           # suite core completa, che comprende i test N
 | `validate.ts` | validazione strutturale e di bilanciamento, ricalcolata dalle sole celle |
 | `balance.ts` | turni attesi esatti (programmazione dinamica sul grafo aciclico) |
 | `engine.ts`, `state.ts` | GameState, azioni, eventi e macchina a stati del turno |
-| `exploration.ts` | nebbia di guerra collettiva e vista pubblica per HUD, minimappa e regia |
+| `exploration.ts` | nebbia di guerra collettiva e vista pubblica per HUD e regia |
 | `persistence.ts` | salvataggio nella chiave `hellscape3d-save`, ripresa e rifiuto dei salvataggi incompatibili |
 | `simulate.ts` | simulazioni Monte Carlo sul motore reale |
 | `themes/` | parte logica dei temi; per ora soltanto Megastrutture (distretti e caselle speciali) |
@@ -67,7 +67,7 @@ Le transizioni fra giocatori dipendono dalla distanza calcolata sulla sola rete 
 
 Durante la camminata le celle compaiono quando la pedina le raggiunge con lo sguardo, nello stesso ordine del motore, e non al momento del lancio. Con `?motion=reduced`, o con la preferenza di sistema per il movimento ridotto, la regia è istantanea. La direzione di vista resta sempre la stessa: la camera cambia distanza e inclinazione, mai orientamento.
 
-## Interfaccia provvisoria e minimappa (fase 2, terzo passo)
+## Interfaccia provvisoria e radar (fase 2, terzo passo; radar dal 26 novembre)
 
 `ui/` contiene un'interfaccia HTML/CSS sopra la scena, provvisoria. I pannelli compaiono solo a regia ferma, quindi mostrano sempre la presentazione e non lo stato anticipato del motore. Sono pulsanti reali, raggiungibili da tastiera, con il primo elemento già selezionato.
 
@@ -77,9 +77,9 @@ Durante la camminata le celle compaiono quando la pedina le raggiunge con lo sgu
 - **Dado:** pulsante (o Invio) dopo la risposta corretta; il risultato resta visibile durante la camminata.
 - **Bivio:** alternative ordinate dalla più breve alla più lunga, con lunghezza relativa e difficoltà (tasti 1–3). Gli stessi numeri compaiono nella scena sugli imbocchi dei rami, con il colore della difficoltà.
 - **Fine partita:** nome di chi è uscito e pulsante per una nuova città.
-- **Minimappa** (`ui/minimap.ts`): vista dall'alto delle sole celle mostrate, dei tratti verso la nebbia e dei giocatori, con il giocatore attivo evidenziato. È orientata come la camera (in alto ciò che sta davanti alla vista) e si adatta alle sole zone esplorate, quindi non suggerisce l'estensione della città.
+- **Radar** (`ui/radar.ts`, specifica §3): sostituisce la minimappa e non disegna caselle né percorsi. Al centro c'è il giocatore di turno, contornato di chiaro; gli altri giocatori sono punti nella loro posizione relativa. Le distanze sono in linea d'aria sul piano orizzontale e l'orientamento è fisso, come la camera della vista a tre quarti. La portata è di 24 unità, cioè 6 caselle in linea d'aria, valore provvisorio. Chi è più lontano compare come tacca sul bordo nella propria direzione, chi è nella stessa casella si affianca al centro. L'uscita, un portale verde, compare solo quando entra nella portata. Su 200 città compare quando mancano in mediana 7 caselle di percorso, nel 90% dei casi al massimo 9, al massimo 16 dove un ramo passa vicino all'uscita. Il radar riceve solo le posizioni delle pedine e dell'uscita.
 
-Su schermi bassi (mobile orizzontale) pannelli e minimappa si riducono. Il tasto A esegue un'azione automatica, solo per lo sviluppo.
+Su schermi bassi (mobile orizzontale) pannelli e radar si riducono. Il tasto A esegue un'azione automatica, solo per lo sviluppo.
 
 ## Ostacoli davanti alla camera (fase 2, quarto passo)
 
@@ -144,13 +144,13 @@ Le domande vengono dalle banche del sito, le stesse della versione precedente: i
 
 ## Caricamento per settori (§8)
 
-`scene/sectors.ts` divide il piano in settori di 16 unità. La scena grafica contiene solo gli elementi dei settori caricati, attorno al punto inquadrato e a ogni pedina, che è una possibile destinazione di un cambio di turno. Il kit si costruisce sull'intera vista presentata e poi si filtra, quindi un elemento ricaricato riappare identico. Scaricare toglie solo la grafica: mappa, stato, esplorazione, salvataggio e minimappa non leggono i settori. Le pedine non vengono mai scaricate. I settori si aggiornano prima di ogni disegno, quindi nessun fotogramma mostra un settore mancante, nemmeno alla fine di una dissolvenza. Con l'isteresi un settore entra entro il raggio e si scarica solo oltre il raggio più 16 unità.
+`scene/sectors.ts` divide il piano in settori di 16 unità. La scena grafica contiene solo gli elementi dei settori caricati, attorno al punto inquadrato e a ogni pedina, che è una possibile destinazione di un cambio di turno. Il kit si costruisce sull'intera vista presentata e poi si filtra, quindi un elemento ricaricato riappare identico. Scaricare toglie solo la grafica: mappa, stato, esplorazione, salvataggio e radar non leggono i settori. Le pedine non vengono mai scaricate. I settori si aggiornano prima di ogni disegno, quindi nessun fotogramma mostra un settore mancante, nemmeno alla fine di una dissolvenza. Con l'isteresi un settore entra entro il raggio e si scarica solo oltre il raggio più 16 unità.
 
 **Raggio calcolato, non scelto a mano.** Per il punto inquadrato il raggio è la massima distanza orizzontale dei volumi che possono comparire nell'immagine o proiettarvi un'ombra. Sono il tronco di piramide della camera, fino alla profondità in cui la nebbia copre tutto, e la camera d'ombra del sole, entrambi tagliati alla fascia di quote della città. Per le pedine vale il raggio della più ampia delle inquadrature ordinarie. Ottica, nebbia e ombra vengono da `scene/dimensions.ts`, la stessa fonte del renderer. I test confrontano il calcolo con i volumi di three.js e verificano, fotogramma per fotogramma, che il solo fuoco della camera tenga caricato tutto ciò che può comparire.
 
 **Effetto attuale: nessuno scaricamento.** Con la nebbia attuale il raggio va da circa 80 unità (bivio) a 150 (sede di Bafometto), mentre la diagonale delle caselle di una città non supera 115 unità (40 semi). Nei test resta caricato il 100% dei settori occupati. Il meccanismo diventerà efficace da solo quando la nebbia sarà più corta o le città più grandi: la distanza della nebbia è una scelta di atmosfera, rinviata con le altre decisioni artistiche. Per verificarlo oggi, `?sectors=R` (solo sviluppo) forza un raggio più corto, e allora si vedono comparire i settori. `?sectors=off` carica sempre la città intera, per confronto.
 
-Verifiche nel browser: con il raggio calcolato l'immagine del canvas coincide pixel per pixel con quella della città intera. Con `sectors=4` una partita avanzata scarica davvero parte della città, ma esplorazione, posizioni, turno e minimappa restano identici a quelli della stessa partita senza settori, e le caselle delle pedine restano sempre disegnate. Ogni cambio dei settori caricati ricostruisce l'intera scena statica: in quella prova circa 44 ricostruzioni in 24 azioni, la più lenta sotto 7 ms in WebGL software. Per le dimensioni attuali basta. Se una città più grande lo rendesse lento, si passerà a gruppi separati per settore.
+Verifiche nel browser: con il raggio calcolato l'immagine del canvas coincide pixel per pixel con quella della città intera. Con `sectors=4` una partita avanzata scarica davvero parte della città, ma esplorazione, posizioni, turno e radar restano identici a quelli della stessa partita senza settori, e le caselle delle pedine restano sempre disegnate. Ogni cambio dei settori caricati ricostruisce l'intera scena statica: in quella prova circa 44 ricostruzioni in 24 azioni, la più lenta sotto 7 ms in WebGL software. Per le dimensioni attuali basta. Se una città più grande lo rendesse lento, si passerà a gruppi separati per settore.
 
 ## Rete generata
 

@@ -2,7 +2,7 @@
  * Nebbia di guerra ed esplorazione collettiva.
  *
  * Le aree esplorate sono uno stato esplicito e condiviso. La vista pubblica è
- * l'unica fonte per HUD, minimappa e regia: non contiene distanze, seed,
+ * l'unica fonte per HUD e regia: non contiene distanze, seed,
  * posizione dell'uscita non ancora vista né celle inesplorate.
  */
 import { forwardWithin } from "./graph.ts";

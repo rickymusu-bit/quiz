@@ -1,7 +1,7 @@
 /**
  * Caricamento per settori (§8): il piano XZ è diviso in quadrati e la scena
  * grafica contiene solo gli elementi dei settori caricati. Scaricare un
- * settore toglie soltanto la grafica: mappa, stato, esplorazione e minimappa
+ * settore toglie soltanto la grafica: mappa, stato, esplorazione e radar
  * non lo leggono. Il kit si costruisce sull'intera vista presentata e poi si
  * filtra, quindi un elemento ricaricato riappare identico.
  *
