@@ -92,6 +92,8 @@ function perform(action: GameAction): void {
   state = result.state;
   for (const event of result.events) if (event.type === "diceRolled") die = { value: event.value, hideAt: null };
   director.enqueue(result.events, state);
+  // Aggiornamento immediato di scena, interfaccia e dati di debug, salvo azioni nate durante il disegno (scadenza del timer).
+  if (!drawing) draw(0);
 }
 
 function answer(index: number | "timeout"): void {
@@ -137,7 +139,17 @@ const ORDER = { "piu-breve": 0, intermedio: 1, "piu-lungo": 2 } as const;
 let lastPanel: Panel | null = null;
 let minimapCells: string[] = [];
 
+let drawing = false;
 function draw(seconds: number): void {
+  drawing = true;
+  try {
+    drawFrame(seconds);
+  } finally {
+    drawing = false;
+  }
+}
+
+function drawFrame(seconds: number): void {
   clock += seconds;
   const width = canvas.clientWidth,
     height = canvas.clientHeight;
@@ -221,7 +233,10 @@ window.addEventListener("keydown", (event) => {
     perform({ type: "roll" });
     event.preventDefault();
   } else if (event.code === "Space" || event.code === "KeyS") {
-    if (director.busy) frame = director.skip();
+    if (director.busy) {
+      frame = director.skip();
+      draw(0);
+    }
     if (event.code === "Space") event.preventDefault();
   } else if (event.code === "KeyF") speed = speed === 1 ? 3 : 1;
   else if (event.code === "KeyV") mode = mode === "player" ? "overview" : "player";
@@ -235,12 +250,18 @@ window.addEventListener("keydown", (event) => {
   }
 });
 
+/**
+ * Tempo reale fra un fotogramma e l'altro. La regia lo segue fino a 0,25 s per
+ * fotogramma, così su un dispositivo lento le transizioni restano vicine alla
+ * durata prevista; il timer della domanda fino a 1 s, così il ritorno su una
+ * pagina rimasta in secondo piano non consuma il tempo.
+ */
 let last = performance.now();
 function loop(now: number): void {
-  const seconds = Math.min(0.1, (now - last) / 1000);
+  const elapsed = Math.max(0, (now - last) / 1000);
   last = now;
-  frame = director.update(seconds * speed);
-  draw(seconds);
+  frame = director.update(Math.min(0.25, elapsed) * speed);
+  draw(Math.min(1, elapsed));
   requestAnimationFrame(loop);
 }
 draw(0);

@@ -5,6 +5,7 @@
  * Screenshot in artifacts/hellscape3d/ (cartella ignorata da git).
  *
  * Uso: npm run test:hellscape3d:browser
+ * (HELLSCAPE3D_CPU_THROTTLE=N per simulare una CPU N volte più lenta)
  */
 import assert from "node:assert/strict";
 import { existsSync, mkdirSync } from "node:fs";
@@ -112,6 +113,9 @@ try {
   for (const device of VIEWPORTS) {
     const context = await browser.newContext({ viewport: device.viewport, deviceScaleFactor: 1, isMobile: device.isMobile, hasTouch: device.isMobile });
     const page = await context.newPage();
+    // HELLSCAPE3D_CPU_THROTTLE=N rallenta la CPU di N volte, per riprodurre i runner lenti della CI.
+    const throttle = Number(process.env.HELLSCAPE3D_CPU_THROTTLE ?? 0);
+    if (throttle > 1) await (await context.newCDPSession(page)).send("Emulation.setCPUThrottlingRate", { rate: throttle });
     const errors: string[] = [];
     page.on("console", (message) => message.type() === "error" && errors.push(message.text()));
     page.on("pageerror", (error) => errors.push(String(error)));
