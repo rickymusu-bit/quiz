@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "python3 -m http.server 8000 --bind 127.0.0.1",
-    "test": "node --test tests/*.test.js && python3 tests/verify_datasets.py",
+    "test": "node --test tests/*.test.js && npm run test:hellscape3d && python3 tests/verify_datasets.py",
+    "test:hellscape3d": "tsc -p hellscape3d && node --test \"hellscape3d/tests/*.test.ts\"",
     "test:browser": "npm run test:browser:main && npm run test:browser:secondary",
     "test:browser:main": "node tests/hellscape.cjs && node tests/infernal_assets.cjs && python3 tests/hell_race.py && python3 tests/start.py && python3 tests/experience.py && python3 tests/keyboard.py",
     "test:browser:secondary": "python3 tests/options.py && python3 tests/configurable.py && python3 tests/topic_capacity.py && python3 tests/ammo.py && python3 tests/cinematic_ui.py && node tests/ux_regressions.cjs",
@@ -28,6 +29,8 @@
   },
   "devDependencies": {
     "@napi-rs/canvas": "0.1.100",
-    "playwright": "1.62.1"
+    "@types/node": "22.20.7",
+    "playwright": "1.62.1",
+    "typescript": "7.0.2"
   }
 }

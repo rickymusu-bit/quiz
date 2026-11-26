@@ -1,3 +1,7 @@
+## Redesign 3D in sviluppo
+
+Il nuovo gioco a città procedurali ([specifica](docs/HELLSCAPE_PROCEDURAL_3D_CITIES.md)) si sviluppa in `hellscape3d/`, separato dal sito pubblicato. Fase corrente: modello logico e test, senza rendering. Dettagli e regole provvisorie in [hellscape3d/README.md](hellscape3d/README.md).
+
 ## Modalità di esecuzione richiesta — sito online (30/10/2026)
 
 La distribuzione supportata di Hellscape è il **sito web pubblicato**: https://rickymusu-bit.github.io/quiz/. Non è più richiesto che il gioco funzioni senza connessione Internet o che sia esportabile come HTML autonomo. La capacità offline già presente può rimanere temporaneamente nel codice come funzionalità legacy, ma **non è un criterio di accettazione, di test obbligatorio o di consegna**. Le partite e le impostazioni salvate nello stesso browser devono continuare a funzionare. Le suite che usano un documento HTML incorporato per controllare le animazioni restano strumenti interni di test e non rappresentano una promessa di utilizzo offline.
