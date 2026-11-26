@@ -32,11 +32,6 @@ export interface GameState {
   lastRoll: number | null;
   /** Celle esplorate collettivamente, ordinate. */
   explored: string[];
-  /**
-   * Tratti percorsi da almeno un giocatore, come `da>a`, ordinati. Le caselle
-   * percorse sono la partenza e gli arrivi di questi tratti (minimappa, §3).
-   */
-  traversed: string[];
   /** Stato del flusso pseudocasuale del dado. */
   dice: RngState;
   winnerId: string | null;

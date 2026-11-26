@@ -17,7 +17,7 @@
  * un'azione automatica (sviluppo).
  */
 import { CameraDirector, SHOTS, type Frame } from "./director/director.ts";
-import { applyAction, createGame, publicView, rngFromSeed, saveToStorage, visitedCells, type Game, type GameAction, type GameState, type KeyValueStorage } from "./logic/index.ts";
+import { applyAction, createGame, publicView, rngFromSeed, saveToStorage, type Game, type GameAction, type GameState, type KeyValueStorage } from "./logic/index.ts";
 import { buildCityLayout } from "./layout/layout.ts";
 import { GrayboxRenderer, type CameraMode } from "./render/graybox.ts";
 import { buildSceneModel, presentedView, revealAllView, type SceneModel } from "./scene/model.ts";
@@ -276,8 +276,6 @@ function panelInset(): number {
   return Math.max(0, window.innerHeight - panel.getBoundingClientRect().top);
 }
 let minimapCells: string[] = [];
-let minimapJunctions = 0;
-let minimapExit = true;
 
 let drawing = false;
 function draw(seconds: number): void {
@@ -353,14 +351,7 @@ function drawFrame(seconds: number): void {
   };
   hud.update(hudState);
   const minimapSize = hudMinimapSize();
-  const shapes = minimapShapes(
-    { map: game.map, positions: layout.positions, traversed: frame.traversed, players: state.players.map((p, index) => ({ id: p.id, index })), pawns: frame.pawns, activePlayerId: frame.activePlayerId },
-    minimapSize.width,
-    minimapSize.height,
-  );
-  minimapCells = hud.drawMinimap(shapes);
-  minimapJunctions = shapes.junctions.length;
-  minimapExit = shapes.exit !== null;
+  minimapCells = hud.drawMinimap(minimapShapes(model, frame.pawns, frame.activePlayerId, minimapSize.width, minimapSize.height));
 
   Object.assign(window, {
     __hellscape3d: {
@@ -390,10 +381,6 @@ function drawFrame(seconds: number): void {
       loadedSectors: renderer.loadedSectors(),
       sectors: sectorsEnabled ? (forcedSectorRadius ?? "calcolato") : "off",
       minimap: minimapCells,
-      minimapJunctions,
-      minimapExit,
-      visited: visitedCells(game.map.startId, state.traversed),
-      shownVisited: visitedCells(game.map.startId, frame.traversed),
       occluders: { tiles: occluders.tiles.length, pillars: occluders.pillars.length, walkways: occluders.walkways.length, masses: occluders.masses.length },
       occluderIds: [...occluders.tiles, ...occluders.pillars],
       bafometto: frame.bafometto,

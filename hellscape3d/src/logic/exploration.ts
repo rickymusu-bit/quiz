@@ -18,17 +18,6 @@ export function reveal(map: CityMap, explored: string[], fromId: string, sightRa
   return added;
 }
 
-/** Tratto percorso `da>a` scomposto. */
-export function splitEdge(edge: string): [string, string] {
-  const i = edge.indexOf(">");
-  return [edge.slice(0, i), edge.slice(i + 1)];
-}
-
-/** Caselle percorse da almeno un giocatore: la partenza e gli arrivi dei tratti percorsi, ordinate. */
-export function visitedCells(startId: string, traversed: readonly string[]): string[] {
-  return [...new Set([startId, ...traversed.map((edge) => splitEdge(edge)[1])])].sort();
-}
-
 export interface PublicCell {
   id: string;
   kind: CellKind;

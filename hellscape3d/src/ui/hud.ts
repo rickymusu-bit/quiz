@@ -85,7 +85,7 @@ export class Hud {
     this.turn.setAttribute("aria-live", "polite");
     this.minimap = root.appendChild(element("canvas", "hud-minimap"));
     this.minimap.setAttribute("role", "img");
-    this.minimap.setAttribute("aria-label", "Minimappa delle caselle percorse; l'uscita è un simbolo che non ne indica la posizione");
+    this.minimap.setAttribute("aria-label", "Minimappa delle zone esplorate");
     this.die = root.appendChild(element("div", "hud-die"));
     this.die.setAttribute("aria-live", "polite");
     this.toast = root.appendChild(element("div", "hud-toast"));
@@ -143,35 +143,15 @@ export class Hud {
       g.lineTo(b.x, b.y);
       g.stroke();
     }
-    // Punti di diramazione: rombi vuoti, distinti dalle caselle.
-    g.lineWidth = 1.5;
-    g.strokeStyle = "#d9d9de";
-    for (const junction of shapes.junctions) {
-      const r = Math.max(3, shapes.scale * 1.1);
+    g.strokeStyle = "rgba(200, 200, 205, 0.3)";
+    g.setLineDash([2, 3]);
+    for (const [a, b] of shapes.stubs) {
       g.beginPath();
-      g.moveTo(junction.x, junction.y - r);
-      g.lineTo(junction.x + r, junction.y);
-      g.lineTo(junction.x, junction.y + r);
-      g.lineTo(junction.x - r, junction.y);
-      g.closePath();
-      g.fillStyle = "#17181c";
-      g.fill();
+      g.moveTo(a.x, a.y);
+      g.lineTo(b.x, b.y);
       g.stroke();
     }
-    // Uscita non ancora raggiunta: portale stilizzato in posizione fissa, staccato dal grafo.
-    if (shapes.exit) {
-      const { x, y } = shapes.exit;
-      g.strokeStyle = "#39ff88";
-      g.lineWidth = 1.5;
-      g.beginPath();
-      g.moveTo(x - 5, y + 7);
-      g.lineTo(x - 5, y - 1);
-      g.arc(x, y - 1, 5, Math.PI, 0);
-      g.lineTo(x + 5, y + 7);
-      g.stroke();
-      g.fillStyle = "rgba(57, 255, 136, 0.35)";
-      g.fill();
-    }
+    g.setLineDash([]);
     const size = Math.max(3, shapes.scale * 1.6);
     for (const cell of shapes.cells) {
       g.fillStyle = cell.kind === "exit" ? "#39ff88" : "#9a9ca3";

@@ -31,8 +31,6 @@ export interface Frame {
   fade: number;
   /** Celle esplorate già mostrate, ordinate: sempre un sottoinsieme di quelle dello stato. */
   explored: string[];
-  /** Tratti percorsi già mostrati (`da>a`), ordinati: sempre un sottoinsieme di quelli dello stato. */
-  traversed: string[];
   /** Giocatore attivo secondo la presentazione (può seguire di qualche istante lo stato). */
   activePlayerId: string;
   /** Manifestazione di Bafometto in corso: nella sede o su un terminale locale. */
@@ -135,14 +133,9 @@ const cloneFrame = (frame: Frame): Frame => ({
   camera: clonePose(frame.camera),
   fade: frame.fade,
   explored: [...frame.explored],
-  traversed: [...frame.traversed],
   activePlayerId: frame.activePlayerId,
   bafometto: frame.bafometto ? { ...frame.bafometto } : null,
 });
-
-function addTraversed(frame: Frame, edge: string): void {
-  if (!frame.traversed.includes(edge)) frame.traversed = [...frame.traversed, edge].sort();
-}
 
 function addExplored(frame: Frame, ids: readonly string[]): void {
   if (ids.length === 0) return;
@@ -178,7 +171,6 @@ export class CameraDirector {
       camera: { target: { ...this.at(active.cellId) }, ...SHOTS.ordinary },
       fade: 0,
       explored: [...state.explored],
-      traversed: [...state.traversed],
       activePlayerId: active.id,
       bafometto: null,
     };
@@ -436,15 +428,12 @@ export class CameraDirector {
     if (pending.size > 0 && revealAt.length > 0) revealAt[revealAt.length - 1]!.push(...pending);
     const points: Vec3[] = [];
     let cameraFrom: CameraPose;
-    let edges: string[] = [];
     return {
       duration: this.time(TIMING.step * path.length),
       begin: (frame) => {
         points.length = 0;
         points.push({ ...frame.pawns[playerId]! }, ...path.map((id) => this.at(id)));
         cameraFrom = clonePose(frame.camera);
-        const from = this.cellAt(points[0]!);
-        edges = path.map((to, k) => `${k === 0 ? from : path[k - 1]!}>${to}`);
       },
       apply: (frame, u) => {
         const progress = u * path.length;
@@ -452,13 +441,7 @@ export class CameraDirector {
         const position = u >= 1 ? points[points.length - 1]! : lerpVec(points[index]!, points[index + 1]!, progress - index);
         frame.pawns[playerId] = position;
         // Ogni casella è rivelata quando la pedina ha percorso metà del tratto che vi conduce.
-        // Lo stesso vale per il tratto percorso, che compare nella minimappa.
-        for (let k = 0; k < path.length; k++) {
-          if (progress >= k + 0.5 || u >= 1) {
-            addExplored(frame, revealAt[k]!);
-            addTraversed(frame, edges[k]!);
-          }
-        }
+        for (let k = 0; k < path.length; k++) if (progress >= k + 0.5 || u >= 1) addExplored(frame, revealAt[k]!);
         const blend = ease(Math.min(1, progress / 0.6));
         frame.camera = {
           target: lerpVec(cameraFrom.target, position, blend),

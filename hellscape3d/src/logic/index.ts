@@ -7,7 +7,7 @@ export { validateMap, validateStructure, validateBalance } from "./validate.ts";
 export { expectedTurns, forkBalance, type AnswerProfile, type ForkBalance } from "./balance.ts";
 export { applyAction, createGame, startGame, resolveRules, GameRuleError, DEFAULT_RULES, MAX_PLAYERS } from "./engine.ts";
 export type { Game, PlayerSetup, Transition } from "./engine.ts";
-export { publicView, splitEdge, visitedCells, type PublicView, type PublicCell, type PublicForkOption } from "./exploration.ts";
+export { publicView, type PublicView, type PublicCell, type PublicForkOption } from "./exploration.ts";
 export {
   SAVE_KEY,
   SAVE_VERSION,

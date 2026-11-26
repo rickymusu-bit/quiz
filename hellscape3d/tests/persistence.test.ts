@@ -71,7 +71,7 @@ test("salvataggi incompatibili o manomessi rifiutati esplicitamente", () => {
     [JSON.stringify({ version: "3.0.0", players: [] }), /Non è un salvataggio/],
     // Formato precedente, con il bivio come casella e `forkContext` nello stato.
     [variant((s) => ((s.saveVersion = 1), (s.generatorVersion = "1.0.0"), (s.state.forkContext = null))), /Versione del salvataggio/],
-    [variant((s) => (s.saveVersion = 4)), /Versione del salvataggio/],
+    [variant((s) => (s.saveVersion = 3)), /Versione del salvataggio/],
     [variant((s) => (s.generatorVersion = "0.9.0")), /generatore/],
     [variant((s) => (s.seed = "altro")), /non corrisponde/],
     [variant((s) => (s.generatorConfig.dieFaces = 8)), /non corrisponde/],
@@ -83,10 +83,6 @@ test("salvataggi incompatibili o manomessi rifiutati esplicitamente", () => {
     [variant((s) => (s.state.winnerId = "a")), /conclusa/],
     [variant((s) => (s.state.committedBranch = s.state.players[0].cellId)), /ramo impegnato/],
     [variant((s) => ((s.state.phase = "fork"), (s.state.stepsLeft = 2))), /fuori da un bivio/],
-    [variant((s) => (s.saveVersion = 2)), /Versione del salvataggio/],
-    [variant((s) => delete s.state.traversed), /tratti percorsi/],
-    [variant((s) => (s.state.traversed = [`${s.state.players[0].cellId}>zz`])), /tratti percorsi/],
-    [variant((s) => (s.state.players[1].cellId = s.state.explored.find((id: string) => id !== s.state.players[1].cellId))), /non percorsa/],
   ];
   for (const [json, message] of cases) {
     assert.throws(() => deserializeGame(json), (error: unknown) => error instanceof SaveError && (typeof message === "string" ? error.message.includes(message) : message.test(error.message)), json.slice(0, 80));

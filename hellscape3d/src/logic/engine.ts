@@ -80,7 +80,6 @@ export function startGame(
     stepsLeft: 0,
     lastRoll: null,
     explored: [],
-    traversed: [],
     dice: rngFromSeed(map.seed, options.diceStream ?? "dice").snapshot(),
     winnerId: null,
   };
@@ -206,7 +205,6 @@ function move(map: CityMap, state: GameState, player: PlayerState, events: GameE
     } else {
       to = cell.next[0]!;
     }
-    addTraversed(state, `${player.cellId}>${to}`);
     player.cellId = to;
     state.stepsLeft -= 1;
     path.push(to);
@@ -224,11 +222,6 @@ function move(map: CityMap, state: GameState, player: PlayerState, events: GameE
     return;
   }
   endTurn(map, state, player, events);
-}
-
-function addTraversed(state: GameState, edge: string): void {
-  if (state.traversed.includes(edge)) return;
-  state.traversed = [...state.traversed, edge].sort();
 }
 
 function endTurn(map: CityMap, state: GameState, player: PlayerState, events: GameEvent[]): void {
