@@ -52,7 +52,22 @@ interface DebugInfo {
   resumed: boolean;
   timerRemaining: number | null;
   totalCells: number;
-  stats: { primitives: number; tiles: number; walkways: number; stubs: number; masses: number; players: number };
+  loadedTiles: string[];
+  playerCells: Record<string, string>;
+  loadedSectors: string[];
+  stats: {
+    primitives: number;
+    totalPrimitives: number;
+    tiles: number;
+    walkways: number;
+    stubs: number;
+    masses: number;
+    players: number;
+    loadedSectors: number;
+    occupiedSectors: number;
+    builds: number;
+    lastBuildMs: number;
+  };
 }
 
 const VIEWPORTS = [
@@ -141,7 +156,8 @@ try {
         const debug = await info(page);
         if (debug.revealAll) assert.equal(debug.rendered.length, debug.totalCells, "città rivelata incompleta");
         else assertSettled(debug);
-        assert.equal(debug.stats.tiles, debug.rendered.length);
+        assert.equal(debug.stats.tiles, debug.loadedTiles.length);
+        assert.ok(debug.loadedTiles.every((id) => debug.rendered.includes(id)), "casella caricata fuori dalla vista presentata");
         assert.ok(debug.stats.primitives > debug.stats.tiles * 8, `kit modulare non disegnato (${debug.stats.primitives} primitive)`);
         assert.equal(debug.stats.players, 2);
         const png = await page.screenshot({ path: join(artifacts, `${testCase.name}-${device.name}.png`) });
@@ -286,6 +302,82 @@ try {
     } catch (error) {
       failures++;
       console.log(`FAIL ${device.name} · ostacoli: ${(error as Error).message}`);
+    }
+    // Settori: con il raggio calcolato l'immagine coincide con la città intera; con un raggio forzato
+    // molto più corto si scarica davvero, ma stato, minimappa e caselle delle pedine restano intatti.
+    try {
+      const canvasPixels = async (query: string): Promise<{ png: Buffer; debug: DebugInfo }> => {
+        await page.goto(`${url}?${query}`);
+        await waitReady(page);
+        // Inquadratura ferma: il margine riservato al pannello ha raggiunto il valore finale.
+        await page.waitForFunction(() => {
+          const d = (window as unknown as { __hellscape3d: DebugInfo & { inset: number } }).__hellscape3d;
+          return d.panelTop === null ? d.inset === 0 : Math.abs(window.innerHeight - d.panelTop - d.inset) < 0.5;
+        }, null, { timeout: 10_000 });
+        await page.waitForTimeout(300);
+        // Pixel del solo canvas WebGL: lo screenshot dell'elemento includerebbe l'interfaccia sovrapposta (timer).
+        const data = await page.evaluate(() => document.querySelector<HTMLCanvasElement>("#scene")!.toDataURL("image/png"));
+        return { png: Buffer.from(data.split(",")[1]!, "base64"), debug: await info(page) };
+      };
+      let detected = 0;
+      for (const query of ["seed=graybox-9&steps=20", "seed=graybox-1&steps=30", "seed=graybox-1&steps=36"]) {
+        const sectored = await canvasPixels(query);
+        const whole = await canvasPixels(`${query}&sectors=off`);
+        assert.ok(sectored.png.equals(whole.png), `${query}: immagine diversa dalla città intera`);
+        assert.equal(sectored.debug.stats.primitives, whole.debug.stats.primitives);
+        // Controllo di sensibilità: con un raggio troppo corto almeno un'inquadratura perde pezzi visibili.
+        // (Gli elementi scaricati fuori dall'inquadratura non cambiano l'immagine.)
+        const short = await canvasPixels(`${query}&sectors=4`);
+        assert.ok(short.debug.stats.primitives < whole.debug.stats.primitives, `${query}: il raggio forzato non scarica (${short.debug.stats.primitives})`);
+        if (!short.png.equals(whole.png)) detected++;
+      }
+      assert.ok(detected > 0, "il confronto delle immagini non rileva i settori mancanti");
+
+      const play = async (query: string) => {
+        await page.goto(`${url}?seed=graybox-9&intro=off${query}`);
+        await waitReady(page);
+        let unloaded = 0,
+          samples = 0,
+          slowestBuild = 0;
+        for (let action = 0; action < 24; action++) {
+          await page.keyboard.press("KeyA");
+          for (let k = 0; k < 6; k++) {
+            await page.waitForTimeout(90);
+            const d = await info(page);
+            samples++;
+            if (d.stats.primitives < d.stats.totalPrimitives) unloaded++;
+            slowestBuild = Math.max(slowestBuild, d.stats.lastBuildMs);
+            assert.deepEqual(d.rendered, d.shown, "vista presentata alterata dai settori");
+            assert.deepEqual(d.minimap, d.shown, "minimappa alterata dai settori");
+            // Le caselle su cui si trovano le pedine nello stato restano disegnate, anche durante la regia.
+            // (una casella non ancora mostrata dalla regia non fa parte della vista presentata).
+            for (const cell of Object.values(d.playerCells)) {
+              if (d.shown.includes(cell)) assert.ok(d.loadedTiles.includes(cell), `casella ${cell} di una pedina scaricata`);
+            }
+            if (!d.busy) break;
+          }
+          await page.waitForFunction(() => (window as unknown as { __hellscape3d: DebugInfo }).__hellscape3d.busy === false, null, { timeout: 15_000 });
+        }
+        const end = await info(page);
+        assertSettled(end);
+        return { end, unloaded, samples, slowestBuild };
+      };
+      const forced = await play("&steps=20&sectors=4");
+      const whole = await play("&steps=20&sectors=off");
+      assert.ok(forced.unloaded > 0, "il raggio forzato non scarica nulla");
+      assert.equal(whole.unloaded, 0);
+      assert.equal(forced.end.turn, whole.end.turn);
+      assert.deepEqual(forced.end.explored, whole.end.explored, "esplorazione diversa con i settori");
+      assert.deepEqual(forced.end.cellPositions, whole.end.cellPositions, "posizioni dei giocatori diverse con i settori");
+      assert.deepEqual(forced.end.minimap, whole.end.minimap);
+      await page.screenshot({ path: join(artifacts, `settori-forzati-${device.name}.png`) });
+      console.log(
+        `ok   ${device.name} · settori: immagine identica alla città intera (raggio corto rilevato in ${detected}/3); raggio forzato ${forced.unloaded}/${forced.samples} campioni con scaricamento, ` +
+          `ricostruzioni ${forced.end.stats.builds} (la più lenta ${forced.slowestBuild.toFixed(1)} ms), stato e minimappa invariati`,
+      );
+    } catch (error) {
+      failures++;
+      console.log(`FAIL ${device.name} · settori: ${(error as Error).message}`);
     }
     // Bafometto: apertura dalla sede, terminale locale, intervento finale, movimento ridotto.
     try {

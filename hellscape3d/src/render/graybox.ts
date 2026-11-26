@@ -6,8 +6,9 @@ import * as THREE from "three";
 import type { Vec3 } from "../layout/types.ts";
 import type { CameraPose } from "../director/director.ts";
 import { buildKit, massKey, tileKey, walkwayKey, type KitResult, type Primitive } from "../kit/kit.ts";
-import { ABYSS_Y, cameraPosition, WALKWAY } from "../scene/dimensions.ts";
+import { ABYSS_Y, CAMERA_OPTICS, cameraPosition, fogRange, shadowExtent, SUN, WALKWAY } from "../scene/dimensions.ts";
 import type { SceneModel, SceneSegment } from "../scene/model.ts";
+import { elementKey, indexSectors, isLoaded, updateLoadedSectors, type Focus, type SectorIndex } from "../scene/sectors.ts";
 import { findOccluders, NO_OCCLUDERS, occludersKey, type Occluders } from "../scene/occlusion.ts";
 import { playerColor } from "../ui/palette.ts";
 
@@ -22,20 +23,35 @@ const OVERVIEW_MIN_DISTANCE = 24;
 export interface RenderStats {
   /** Primitive del kit modulare disegnate. */
   primitives: number;
+  /** Primitive del kit della vista presentata, caricate o no. */
+  totalPrimitives: number;
   tiles: number;
   walkways: number;
   stubs: number;
   masses: number;
   players: number;
+  loadedSectors: number;
+  occupiedSectors: number;
+  /** Ricostruzioni della scena statica dall'avvio e durata dell'ultima. */
+  builds: number;
+  lastBuildMs: number;
 }
 
 export class GrayboxRenderer {
   readonly renderer: THREE.WebGLRenderer;
   readonly scene = new THREE.Scene();
-  readonly camera = new THREE.PerspectiveCamera(40, 1, 0.5, 400);
+  readonly camera = new THREE.PerspectiveCamera(CAMERA_OPTICS.fov, 1, CAMERA_OPTICS.near, 400);
   private content = new THREE.Group();
   private sun = new THREE.DirectionalLight(0xffe2c0, 2.4);
-  private stats: RenderStats = { primitives: 0, tiles: 0, walkways: 0, stubs: 0, masses: 0, players: 0 };
+  private stats: RenderStats = { primitives: 0, totalPrimitives: 0, tiles: 0, walkways: 0, stubs: 0, masses: 0, players: 0, loadedSectors: 0, occupiedSectors: 0, builds: 0, lastBuildMs: 0 };
+  /** Pedine: sempre presenti, fuori dal caricamento per settori. */
+  private pawnLayer = new THREE.Group();
+  private sectorIndex: SectorIndex | null = null;
+  /** Settori caricati; `null` = vista presentata per intera. */
+  private loaded: ReadonlySet<string> | null = null;
+  private loadedKey = "*";
+  private staticDirty = false;
+  private presence: { kind: "seat" } | { kind: "terminal"; position: Vec3 } | null = null;
   private pawns = new Map<string, THREE.Group>();
   private model: SceneModel | null = null;
   /** Volumi che possono nascondere la pedina: ricostruiti quando cambiano gli ostacoli. */
@@ -52,7 +68,6 @@ export class GrayboxRenderer {
     dark: new THREE.MeshStandardMaterial({ color: 0x2f3136, roughness: 0.9, metalness: 0.1 }),
   };
   private kit: KitResult | null = null;
-  private seed = "";
   private primitiveCount = 0;
   private seatGroup: THREE.Group | null = null;
   private readonly unitBox = new THREE.BoxGeometry(1, 1, 1);
@@ -77,8 +92,8 @@ export class GrayboxRenderer {
     this.scene.add(new THREE.HemisphereLight(0xb8c0cc, 0x2a2018, 1.1));
     this.sun.castShadow = true;
     this.sun.shadow.mapSize.set(2048, 2048);
-    Object.assign(this.sun.shadow.camera, { left: -45, right: 45, top: 45, bottom: -45, near: 1, far: 200 });
-    this.scene.add(this.sun, this.sun.target, this.content);
+    Object.assign(this.sun.shadow.camera, { left: -45, right: 45, top: 45, bottom: -45, near: SUN.shadowNear, far: SUN.shadowFar });
+    this.scene.add(this.sun, this.sun.target, this.content, this.pawnLayer);
     const abyss = new THREE.Mesh(new THREE.PlaneGeometry(2000, 2000), this.materials.abyss);
     abyss.rotation.x = -Math.PI / 2;
     abyss.position.y = ABYSS_Y;
@@ -95,26 +110,87 @@ export class GrayboxRenderer {
     this.camera.updateProjectionMatrix();
   }
 
-  /** Ricostruisce la scena statica (caselle, passerelle, masse) e le pedine. */
+  /**
+   * Nuova vista presentata: kit costruito sull'intera vista (poi filtrato per
+   * settore) e pedine. La scena statica si ricostruisce al prossimo
+   * `updateSectors` o `render`.
+   */
   setModel(model: SceneModel, seed: string): void {
-    this.clearContent();
-    this.terminals.clear();
     this.model = model;
-    this.seed = seed;
-    this.kit = null;
-    this.content.add(this.occludable);
-    for (const tile of model.tiles) {
-      if (tile.special) this.addSpecialMarker(tile.special, tile.position);
-      if (tile.kind === "exit") this.addGate(tile.position);
-    }
-    this.addStubs(model.stubs);
+    this.kit = buildKit(model, seed);
+    this.sectorIndex = indexSectors(model, this.kit.primitives);
     this.occlusion = NO_OCCLUDERS;
     this.occlusionKey = "";
-    this.buildOccludable();
+    this.disposeChildren(this.pawnLayer);
     this.pawns.clear();
     for (const player of model.players) this.pawns.set(player.id, this.addPlayer(player.index, player.active));
     this.setPawnPositions(Object.fromEntries(model.players.map((p) => [p.id, p.position])));
-    this.stats = { primitives: this.primitiveCount, tiles: model.tiles.length, walkways: model.walkways.length, stubs: model.stubs.length, masses: model.masses.length, players: model.players.length };
+    this.staticDirty = true;
+  }
+
+  /**
+   * Settori da tenere caricati attorno ai fuochi; `null` carica la città
+   * presentata per intero. Ricostruisce la scena statica solo se l'insieme cambia.
+   */
+  updateSectors(foci: readonly Focus[] | null): void {
+    if (!this.sectorIndex) return;
+    const next = foci === null ? null : updateLoadedSectors(this.loaded ?? this.sectorIndex.occupied, this.sectorIndex.occupied, foci);
+    const key = next === null ? "*" : [...next].sort().join(";");
+    if (key !== this.loadedKey) {
+      this.loaded = next;
+      this.loadedKey = key;
+      this.staticDirty = true;
+    }
+    this.ensureBuilt();
+  }
+
+  /** Caselle della vista presentata attualmente disegnate. */
+  loadedTiles(): string[] {
+    if (!this.model || !this.sectorIndex) return [];
+    return this.model.tiles.filter((t) => isLoaded(this.sectorIndex!.elements.get(`tile:${tileKey(t.id)}`), this.loaded)).map((t) => t.id);
+  }
+
+  /** Settori caricati (tutti quelli occupati se il caricamento per settori è disattivato). */
+  loadedSectors(): string[] {
+    return [...(this.loaded ?? this.sectorIndex?.occupied ?? [])].sort();
+  }
+
+  private ensureBuilt(): void {
+    if (this.staticDirty) this.rebuildStatic();
+  }
+
+  /** Segnali, portale, monconi e kit dei soli settori caricati. */
+  private rebuildStatic(): void {
+    const model = this.model!,
+      index = this.sectorIndex!;
+    const started = performance.now();
+    this.clearContent();
+    this.terminals.clear();
+    this.content.add(this.occludable);
+    for (const tile of model.tiles) {
+      if (!isLoaded(index.tiles.get(tile.id), this.loaded)) continue;
+      if (tile.special) this.addSpecialMarker(tile.special, tile.position);
+      if (tile.kind === "exit") this.addGate(tile.position);
+    }
+    const stubs = model.stubs.filter((_, i) => isLoaded(index.stubs[i], this.loaded));
+    this.addStubs(stubs);
+    this.buildOccludable();
+    this.applyPresence();
+    this.staticDirty = false;
+    const loadedElement = (key: string): boolean => isLoaded(index.elements.get(key), this.loaded);
+    this.stats = {
+      primitives: this.primitiveCount,
+      totalPrimitives: this.kit!.primitives.length,
+      tiles: model.tiles.filter((t) => loadedElement(`tile:${tileKey(t.id)}`)).length,
+      walkways: model.walkways.filter((w) => loadedElement(`walkway:${walkwayKey(w)}`)).length,
+      stubs: stubs.length,
+      masses: model.masses.filter((m) => loadedElement(`mass:${massKey(m)}`)).length,
+      players: model.players.length,
+      loadedSectors: this.loaded?.size ?? index.occupied.size,
+      occupiedSectors: index.occupied.size,
+      builds: this.stats.builds + 1,
+      lastBuildMs: performance.now() - started,
+    };
   }
 
   /**
@@ -129,7 +205,7 @@ export class GrayboxRenderer {
     if (key !== this.occlusionKey) {
       this.occlusion = occlusion;
       this.occlusionKey = key;
-      this.buildOccludable();
+      if (!this.staticDirty) this.buildOccludable();
     }
     return this.occlusion;
   }
@@ -139,7 +215,7 @@ export class GrayboxRenderer {
     if (this.occlusionKey !== "") {
       this.occlusion = NO_OCCLUDERS;
       this.occlusionKey = "";
-      if (this.model) this.buildOccludable();
+      if (this.model && !this.staticDirty) this.buildOccludable();
     }
     return this.occlusion;
   }
@@ -152,7 +228,7 @@ export class GrayboxRenderer {
   private buildOccludable(): void {
     const model = this.model!;
     this.disposeChildren(this.occludable);
-    this.kit ??= buildKit(model, this.seed);
+    const index = this.sectorIndex!;
     const faded = new Set<string>([
       ...this.occlusion.tiles.map((id) => `tile:${tileKey(id)}`),
       ...this.occlusion.pillars.map((id) => `pillar:${tileKey(id)}`),
@@ -160,7 +236,10 @@ export class GrayboxRenderer {
       ...this.occlusion.masses.map((i) => `mass:${massKey(model.masses[i]!)}`),
     ]);
     const groups = new Map<string, Primitive[]>();
-    for (const primitive of this.kit.primitives) {
+    let drawn = 0;
+    for (const primitive of this.kit!.primitives) {
+      if (!isLoaded(index.elements.get(elementKey(primitive.ref)), this.loaded)) continue;
+      drawn++;
       const isFaded = faded.has(`${primitive.ref.kind}:${primitive.ref.key}`);
       const key = `${primitive.shape}|${primitive.material}|${isFaded}`;
       (groups.get(key) ?? groups.set(key, []).get(key)!).push(primitive);
@@ -185,7 +264,7 @@ export class GrayboxRenderer {
       mesh.userData.faded = isFaded === "true";
       this.occludable.add(mesh);
     }
-    this.primitiveCount = this.kit.primitives.length;
+    this.primitiveCount = drawn;
   }
 
   private fadedMaterial(material: THREE.Material): THREE.Material {
@@ -232,6 +311,12 @@ export class GrayboxRenderer {
 
   /** Accende gli occhi della sede o il terminale su cui Bafometto si manifesta. */
   setBafometto(presence: { kind: "seat" } | { kind: "terminal"; position: Vec3 } | null): void {
+    this.presence = presence;
+    this.applyPresence();
+  }
+
+  private applyPresence(): void {
+    const presence = this.presence;
     this.materials.seatEyes.emissiveIntensity = presence?.kind === "seat" ? 3 : 0.5;
     const key = presence?.kind === "terminal" ? `${presence.position.x},${presence.position.y},${presence.position.z}` : null;
     for (const [position, mesh] of this.terminals) mesh.material = position === key ? this.materials.terminaleActive : this.materials.terminale;
@@ -295,6 +380,7 @@ export class GrayboxRenderer {
   }
 
   render(): void {
+    if (this.model) this.ensureBuilt();
     this.renderer.render(this.scene, this.camera);
   }
 
@@ -365,7 +451,7 @@ export class GrayboxRenderer {
     group.traverse((object) => {
       if (object instanceof THREE.Mesh) object.castShadow = true;
     });
-    this.content.add(group);
+    this.pawnLayer.add(group);
     return group;
   }
 
@@ -375,13 +461,11 @@ export class GrayboxRenderer {
     this.camera.lookAt(target);
     this.camera.far = distance + 250;
     this.camera.updateProjectionMatrix();
-    const fog = this.scene.fog as THREE.Fog;
-    fog.near = distance * 0.9;
-    fog.far = distance + 90;
-    this.sun.position.set(target.x - 30, target.y + 60, target.z - 15);
+    Object.assign(this.scene.fog as THREE.Fog, fogRange(distance));
+    this.sun.position.set(target.x + SUN.offset.x, target.y + SUN.offset.y, target.z + SUN.offset.z);
     this.sun.target.position.copy(target);
-    const extent = Math.max(45, distance);
-    Object.assign(this.sun.shadow.camera, { left: -extent, right: extent, top: extent, bottom: -extent, far: 300 });
+    const extent = shadowExtent(distance);
+    Object.assign(this.sun.shadow.camera, { left: -extent, right: extent, top: extent, bottom: -extent, near: SUN.shadowNear, far: SUN.shadowFar });
     this.sun.shadow.camera.updateProjectionMatrix();
   }
 
@@ -403,6 +487,7 @@ export class GrayboxRenderer {
 
   dispose(): void {
     this.clearContent();
+    this.disposeChildren(this.pawnLayer);
     this.unitBox.dispose();
     for (const material of [...Object.values(this.materials), ...Object.values(this.kitMaterials), ...this.faded.values()]) material.dispose();
     this.unitCylinder.dispose();

@@ -63,3 +63,22 @@ export function massBox(mass: Mass): Box {
     max: { x: mass.x + mass.width / 2, y: mass.top, z: mass.z + mass.depth / 2 },
   };
 }
+
+/**
+ * Ottica della camera, nebbia e ombra del sole: usati dal renderer e dal
+ * calcolo dei settori da tenere caricati, che deve coprire tutto ciò che può
+ * comparire nell'inquadratura o proiettarvi un'ombra.
+ */
+export const CAMERA_OPTICS = Object.freeze({ fov: 40, near: 0.5 });
+
+/** Nebbia lineare: oltre `far` (profondità nella vista) un volume coincide con lo sfondo. */
+export function fogRange(distance: number): { near: number; far: number } {
+  return { near: distance * 0.9, far: distance + 90 };
+}
+
+/** Il sole segue il punto inquadrato; la sua camera d'ombra è ortografica. */
+export const SUN = Object.freeze({ offset: Object.freeze({ x: -30, y: 60, z: -15 }), shadowNear: 1, shadowFar: 300 });
+
+export function shadowExtent(distance: number): number {
+  return Math.max(45, distance);
+}

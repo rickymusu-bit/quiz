@@ -7,17 +7,21 @@
  * iniziali, senza regia: partita nuova), ?new=1 (partita nuova), ?timer=S (secondi per domanda), ?view=overview, ?motion=reduced,
  * ?intro=off (senza l'apertura di Bafometto),
  * ?reveal=all (SOLO SVILUPPO: città intera), ?occlusion=off (SOLO SVILUPPO:
- * ostacoli opachi, per confronto), ?test=1 (espone ai test la risposta corretta).
+ * ostacoli opachi, per confronto), ?sectors=off (SOLO SVILUPPO: città presentata
+ * sempre intera), ?sectors=R (SOLO SVILUPPO: raggio di caricamento forzato a R,
+ * più corto di quello sicuro: si vedono comparire i settori), ?test=1 (espone ai
+ * test la risposta corretta).
  * Tasti: 1–4 risposte e alternative, Invio lancia il dado, Spazio o S
  * saltano la regia, F accelera ×3, V cambia inquadratura, A esegue
  * un'azione automatica (sviluppo).
  */
-import { CameraDirector, type Frame } from "./director/director.ts";
+import { CameraDirector, SHOTS, type Frame } from "./director/director.ts";
 import { applyAction, createGame, publicView, rngFromSeed, saveToStorage, type Game, type GameAction, type GameState, type KeyValueStorage } from "./logic/index.ts";
 import { buildCityLayout } from "./layout/layout.ts";
 import { GrayboxRenderer, type CameraMode } from "./render/graybox.ts";
 import { buildSceneModel, presentedView, revealAllView, type SceneModel } from "./scene/model.ts";
 import { NO_OCCLUDERS, type Occluders } from "./scene/occlusion.ts";
+import { citySlab, visibleRadius, type Focus } from "./scene/sectors.ts";
 import { Hud, type ForkChoice, type HudState, type Panel } from "./ui/hud.ts";
 import { minimapShapes } from "./ui/minimap.ts";
 import { fakeQuestion, type FakeQuestion } from "./ui/questions.ts";
@@ -45,6 +49,10 @@ const revealAll = params.get("reveal") === "all";
 const testHooks = params.get("test") === "1";
 /** SOLO SVILUPPO: ?occlusion=off disattiva la trasparenza degli ostacoli, per confronto. */
 const occlusionEnabled = params.get("occlusion") !== "off";
+/** Caricamento per settori: raggio calcolato (predefinito), disattivato o forzato (sviluppo). */
+const sectorsParam = params.get("sectors");
+const forcedSectorRadius = sectorsParam && sectorsParam !== "off" && Number(sectorsParam) > 0 ? Number(sectorsParam) : null;
+const sectorsEnabled = sectorsParam !== "off";
 const reducedMotion = params.get("motion") === "reduced" || matchMedia("(prefers-reduced-motion: reduce)").matches;
 const questionSeconds = Math.max(1, Number(params.get("timer")) || DEFAULT_QUESTION_SECONDS);
 let mode: CameraMode = params.get("view") === "overview" ? "overview" : "player";
@@ -62,6 +70,7 @@ const game: Game =
       }).game;
 const seed = game.map.seed;
 const layout = buildCityLayout(game.map);
+const slab = citySlab(layout);
 const answers = rngFromSeed(seed, "dev:answers");
 let state: GameState = game.state;
 
@@ -101,6 +110,7 @@ renderer.setSeat(director.seatPosition);
 if (!resumed && steps === 0 && !revealAll && params.get("intro") !== "off") director.intro();
 let frame: Frame = director.getFrame();
 let builtKey = "";
+let builtSize = "";
 let model: SceneModel = buildModel();
 
 let question: { key: string; data: FakeQuestion; timer: QuestionTimer } | null = null;
@@ -188,6 +198,23 @@ function currentPanel(): Panel | null {
 
 const ORDER = { "piu-breve": 0, intermedio: 1, "piu-lungo": 2 } as const;
 
+/**
+ * Fuochi del caricamento per settori: il punto inquadrato, con il raggio che
+ * la sua inquadratura può mostrare o ombreggiare, e ogni pedina, destinazione
+ * possibile di un cambio di turno, con il raggio della più ampia delle
+ * inquadrature ordinarie. In panoramica e con la città rivelata si carica tutto.
+ */
+function sectorFoci(aspect: number): Focus[] | null {
+  if (!sectorsEnabled || revealAll || mode === "overview") return null;
+  const target = frame.camera.target;
+  const foci: Focus[] = [{ x: target.x, z: target.z, radius: forcedSectorRadius ?? visibleRadius(frame.camera, aspect, slab) }];
+  for (const pawn of Object.values(frame.pawns)) {
+    const radius = forcedSectorRadius ?? Math.max(...Object.values(SHOTS).map((shot) => visibleRadius({ target: pawn, ...shot }, aspect, slab)));
+    foci.push({ x: pawn.x, z: pawn.z, radius });
+  }
+  return foci;
+}
+
 let lastPanel: Panel | null = null;
 let inset = 0;
 let occluders: Occluders = NO_OCCLUDERS;
@@ -214,9 +241,13 @@ function drawFrame(seconds: number): void {
   clock += seconds;
   const width = canvas.clientWidth,
     height = canvas.clientHeight;
-  const key = `${width}x${height}|${frame.explored.join()}|${frame.activePlayerId}|${revealAll}`;
-  if (key !== builtKey) {
+  const size = `${width}x${height}`;
+  if (size !== builtSize) {
     renderer.resize(width, height);
+    builtSize = size;
+  }
+  const key = `${frame.explored.join()}|${frame.activePlayerId}|${revealAll}`;
+  if (key !== builtKey) {
     model = buildModel();
     renderer.setModel(model, seed);
     builtKey = key;
@@ -224,6 +255,8 @@ function drawFrame(seconds: number): void {
   renderer.setPawnPositions(frame.pawns);
   if (mode === "overview") renderer.frameOverview(model);
   else renderer.setCameraPose(frame.camera);
+  // Settori caricati: si aggiornano prima del disegno, quindi un fotogramma non mostra mai un settore mancante.
+  renderer.updateSectors(sectorFoci(width / Math.max(1, height)));
   // Il pannello in basso non copre il giocatore: l'inquadratura si centra nell'area libera.
   const target = mode === "player" ? panelInset() : 0;
   inset = reducedMotion ? target : inset + (target - inset) * Math.min(1, seconds * 8);
@@ -264,11 +297,11 @@ function drawFrame(seconds: number): void {
     die: die?.value ?? null,
     toast: toast?.text ?? null,
     speech: speech?.text ?? null,
-    dev: `Prova non pubblicata · seme ${seed}${revealAll ? " · CITTÀ RIVELATA" : ""}${reducedMotion ? " · movimento ridotto" : ""} · velocità ×${speed} · A automatico · V vista`,
+    dev: `Prova non pubblicata · seme ${seed}${revealAll ? " · CITTÀ RIVELATA" : ""}${reducedMotion ? " · movimento ridotto" : ""}${forcedSectorRadius ? ` · SETTORI r=${forcedSectorRadius}` : ""} · velocità ×${speed} · A automatico · V vista`,
   };
   hud.update(hudState);
-  const size = hudMinimapSize();
-  minimapCells = hud.drawMinimap(minimapShapes(model, frame.pawns, frame.activePlayerId, size.width, size.height));
+  const minimapSize = hudMinimapSize();
+  minimapCells = hud.drawMinimap(minimapShapes(model, frame.pawns, frame.activePlayerId, minimapSize.width, minimapSize.height));
 
   Object.assign(window, {
     __hellscape3d: {
@@ -289,6 +322,9 @@ function drawFrame(seconds: number): void {
       explored: [...state.explored],
       shown: [...frame.explored],
       rendered: model.tiles.map((t) => t.id),
+      loadedTiles: renderer.loadedTiles(),
+      loadedSectors: renderer.loadedSectors(),
+      sectors: sectorsEnabled ? (forcedSectorRadius ?? "calcolato") : "off",
       minimap: minimapCells,
       occluders: { tiles: occluders.tiles.length, pillars: occluders.pillars.length, walkways: occluders.walkways.length, masses: occluders.masses.length },
       occluderIds: [...occluders.tiles, ...occluders.pillars],
@@ -304,6 +340,7 @@ function drawFrame(seconds: number): void {
       panelTop: panelInset() > 0 ? window.innerHeight - panelInset() : null,
       pawns: frame.pawns,
       cellPositions: Object.fromEntries(state.players.map((p) => [p.id, layout.positions[p.cellId]])),
+      playerCells: Object.fromEntries(state.players.map((p) => [p.id, p.cellId])),
       fade: frame.fade,
       totalCells: Object.keys(game.map.cells).length,
       stats: renderer.getStats(),
