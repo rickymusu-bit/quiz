@@ -7,6 +7,8 @@
  *        [--width 960 --height 540] [--name regia] [--query motion=reduced]
  * Scena di corsa: --page corsa.html (stessa partita, vista di gioco); con --actions 0 si registra per
  * --duration secondi senza azioni (per esempio un'anteprima: --query anteprima=ID).
+ * Con --setup si parte dalla schermata di avvio (senza seme: città casuale), compilata
+ * dall'interfaccia con giocatori, nomi, argomenti e durata, poi si gioca per --actions azioni.
  * Richiede ffmpeg nel PATH. Output in artifacts/hellscape3d/.
  */
 import { execFileSync } from "node:child_process";
@@ -32,6 +34,7 @@ const { values } = parseArgs({
     /** Pagina diversa dalla città: si registra per `duration` secondi senza azioni. */
     page: { type: "string", default: "" },
     duration: { type: "string", default: "10" },
+    setup: { type: "boolean", default: false },
   },
 });
 const width = Number(values.width),
@@ -61,7 +64,30 @@ if (Number(values.actions) === 0) {
   await page.waitForFunction(() => (window as unknown as { __hellscape3d?: { ready: boolean } }).__hellscape3d?.ready === true);
   await page.waitForTimeout(Number(values.duration) * 1000);
 } else {
-  await page.goto(`${url}${values.page}?seed=${values.seed}&steps=${values.steps}&test=1${values.query ? `&${values.query}` : ""}`);
+  if (values.setup) {
+    // Schermata di avvio compilata dall'interfaccia, a velocità leggibile.
+    await page.goto(`${url}${values.page}?test=1${values.query ? `&${values.query}` : ""}`);
+    await page.locator("#setup-topics input").first().waitFor();
+    await page.waitForTimeout(1200);
+    await page.locator("#setup-players").selectOption("3");
+    await page.waitForTimeout(600);
+    for (const [i, name] of ["Ada", "Bruno", "Cleo"].entries()) {
+      await page.locator(".setup-name").nth(i).fill("");
+      await page.locator(".setup-name").nth(i).pressSequentially(name, { delay: 90 });
+    }
+    await page.waitForTimeout(500);
+    await page.getByRole("button", { name: "Nessuno" }).click();
+    await page.waitForTimeout(900);
+    const boxes = page.locator("#setup-topics input");
+    for (let i = 0; i < (await boxes.count()) && (await page.locator("#setup-start").isDisabled()); i++) {
+      await boxes.nth(i).check();
+      await page.waitForTimeout(600);
+    }
+    await page.locator("#setup-seconds").fill("");
+    await page.locator("#setup-seconds").pressSequentially("20", { delay: 120 });
+    await page.waitForTimeout(1200);
+    await page.locator("#setup-start").click();
+  } else await page.goto(`${url}${values.page}?seed=${values.seed}&steps=${values.steps}&test=1${values.query ? `&${values.query}` : ""}`);
   await page.waitForFunction(() => (window as unknown as { __hellscape3d?: { ready: boolean } }).__hellscape3d?.ready === true);
   await page.waitForTimeout(800);
   // Si gioca dall'interfaccia, con pause leggibili; una risposta su quattro è volutamente errata.
@@ -105,7 +131,7 @@ await new Promise<void>((done) => server.httpServer.close(() => done()));
 
 const webm = join(work, "registrazione.webm");
 renameSync(await video.path(), webm);
-const gif = join(out, `${values.name}-${values.seed}-${width}x${height}-${revision}${dirty ? "-modificata" : ""}.gif`);
+const gif = join(out, `${values.name}-${values.setup ? "avvio" : values.seed}-${width}x${height}-${revision}${dirty ? "-modificata" : ""}.gif`);
 execFileSync("ffmpeg", [
   "-y", "-loglevel", "error", "-i", webm,
   "-vf", `fps=${values.fps},split[a][b];[a]palettegen=max_colors=96[p];[b][p]paletteuse=dither=bayer:bayer_scale=4`,

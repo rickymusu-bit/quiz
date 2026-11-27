@@ -1,32 +1,91 @@
 /**
  * Avvio e ripresa della partita nella pagina di prova (specifica §7, §9).
  *
- * Senza parametri si riprende la partita salvata; `?seed=`, `?steps=` o
- * `?new=1` avviano esplicitamente una partita nuova, che sostituisce il
- * salvataggio. Un salvataggio incompatibile non viene perso: lo si sposta in
- * una chiave di riserva prima di cominciare una partita nuova.
+ * Senza parametri si riprende la partita salvata; se non c'è, si apre la
+ * schermata di avvio. `?new=1` apre la schermata di avvio anche se esiste un
+ * salvataggio. `?seed=` e `?steps=` (sviluppo e test) avviano subito una
+ * partita nuova con le impostazioni predefinite. Una partita nuova sostituisce
+ * il salvataggio; un salvataggio incompatibile non viene perso: lo si sposta in
+ * una chiave di riserva e si apre la schermata di avvio con un avviso.
  */
 import type { Game } from "./logic/engine.ts";
+import { MAX_PLAYERS } from "./logic/engine.ts";
+import type { Difficulty } from "./logic/types.ts";
+import type { QuestionBank } from "./questions/bank.ts";
 import { loadFromStorage, SaveError, SAVE_KEY, type KeyValueStorage } from "./logic/persistence.ts";
 
 export const DISCARDED_SAVE_KEY = "hellscape3d-save-scartato";
 export const QUESTION_CLOCK_KEY = "hellscape3d-domanda";
 
-export type StartDecision = { kind: "resume"; game: Game } | { kind: "new"; seed: string; notice: string | null };
+export type StartDecision =
+  | { kind: "resume"; game: Game }
+  /** Sviluppo e test: partita nuova subito, con le impostazioni predefinite. */
+  | { kind: "new"; seed: string; notice: string | null }
+  /** Schermata di avvio; `saved` indica che esiste una partita da riprendere. */
+  | { kind: "setup"; notice: string | null; saved: boolean };
 
 export function decideStart(params: URLSearchParams, storage: KeyValueStorage, defaultSeed: string): StartDecision {
-  const explicit = params.has("seed") || params.has("steps") || params.get("new") === "1";
-  const seed = params.get("seed") ?? defaultSeed;
-  if (explicit) return { kind: "new", seed, notice: null };
+  if (params.has("seed") || params.has("steps")) return { kind: "new", seed: params.get("seed") ?? defaultSeed, notice: null };
   try {
     const game = loadFromStorage(storage);
-    return game ? { kind: "resume", game } : { kind: "new", seed, notice: null };
+    if (params.get("new") === "1") return { kind: "setup", notice: null, saved: game !== null };
+    return game ? { kind: "resume", game } : { kind: "setup", notice: null, saved: false };
   } catch (error) {
     if (!(error instanceof SaveError)) throw error;
     const raw = storage.getItem(SAVE_KEY);
     if (raw !== null) storage.setItem(DISCARDED_SAVE_KEY, raw);
-    return { kind: "new", seed, notice: `Salvataggio non utilizzabile (${error.message}): conservato a parte, nuova partita.` };
+    return { kind: "setup", notice: `Salvataggio non utilizzabile (${error.message}): conservato a parte. Imposta una nuova partita.`, saved: false };
   }
+}
+
+/** Impostazioni scelte nella schermata di avvio. */
+export interface GameSettings {
+  bankId: string;
+  /** Argomenti in gioco; vuoto = tutti. */
+  topics: string[];
+  /** Nomi dei giocatori, nell'ordine di gioco. */
+  players: string[];
+  /** Durata della domanda, in secondi. */
+  seconds: number;
+}
+
+export const SETTINGS_KEY = "hellscape3d-impostazioni";
+export const SECONDS_RANGE: readonly [number, number] = [10, 300];
+export const NAME_MAX = 24;
+
+export const defaultName = (index: number): string => `Dannato ${index + 1}`;
+
+/** Livelli di domanda assenti dagli argomenti scelti: la partita non può cominciare. */
+export function missingDifficulties(bank: QuestionBank, topics: readonly string[]): Difficulty[] {
+  const pool = topics.length === 0 ? bank.questions : bank.questions.filter((q) => topics.includes(q.topic));
+  return (["facile", "media", "difficile"] as const).filter((d) => !pool.some((q) => q.difficulty === d));
+}
+
+/** Problemi delle impostazioni rispetto alla banca scelta; vuoto se si può cominciare. */
+export function settingsIssues(settings: GameSettings, bank: QuestionBank): string[] {
+  const issues: string[] = [];
+  if (settings.bankId !== bank.id) issues.push("banca diversa da quella caricata");
+  if (settings.players.length < 1 || settings.players.length > MAX_PLAYERS) issues.push(`da 1 a ${MAX_PLAYERS} giocatori`);
+  if (settings.players.some((name) => name.trim() === "" || name.length > NAME_MAX)) issues.push(`nomi da 1 a ${NAME_MAX} caratteri`);
+  if (!Number.isInteger(settings.seconds) || settings.seconds < SECONDS_RANGE[0] || settings.seconds > SECONDS_RANGE[1]) issues.push(`durata da ${SECONDS_RANGE[0]} a ${SECONDS_RANGE[1]} secondi`);
+  const missing = missingDifficulties(bank, settings.topics);
+  if (missing.length > 0) issues.push(`agli argomenti scelti mancano domande ${missing.join(", ")}`);
+  return issues;
+}
+
+/** Ultime impostazioni usate, per precompilare la schermata; null se assenti o illeggibili. */
+export function loadLastSettings(storage: KeyValueStorage): GameSettings | null {
+  try {
+    const data = JSON.parse(storage.getItem(SETTINGS_KEY) ?? "null") as Partial<GameSettings> | null;
+    if (!data || typeof data.bankId !== "string" || !Array.isArray(data.topics) || !Array.isArray(data.players) || typeof data.seconds !== "number") return null;
+    return { bankId: data.bankId, topics: data.topics.filter((t) => typeof t === "string"), players: data.players.filter((p) => typeof p === "string").slice(0, MAX_PLAYERS), seconds: data.seconds };
+  } catch {
+    return null;
+  }
+}
+
+export function saveLastSettings(storage: KeyValueStorage, settings: GameSettings): void {
+  storage.setItem(SETTINGS_KEY, JSON.stringify(settings));
 }
 
 /** Chiave della domanda in corso: partita, turno e giocatore. */

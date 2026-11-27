@@ -6,7 +6,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { applyAction, rngFromSeed } from "../src/logic/index.ts";
 import { BankError, DIFFICULTIES, parseBank, parseCatalog, type QuestionBank } from "../src/questions/bank.ts";
-import { ask, loadLog, newLog, outcomeOf, present, QUESTION_LOG_KEY, recordAnswer, saveLog, type QuestionLog } from "../src/questions/deck.ts";
+import { ask, inPlay, loadLog, newLog, outcomeOf, present, QUESTION_LOG_KEY, recordAnswer, saveLog, type QuestionLog } from "../src/questions/deck.ts";
 import { memoryStorage, questionKey } from "../src/session.ts";
 import { autoAction, newGame } from "./helpers.ts";
 
@@ -119,10 +119,31 @@ test("registro salvato: riletto solo per la stessa partita e se coerente con la 
   assert.equal(loadLog(storage, "altra-citta", bank), null);
   const other: QuestionBank = { ...bank, questions: bank.questions.slice(0, 3) };
   assert.equal(loadLog(storage, "salvata", other), null, "domande assenti dalla banca");
-  for (const bad of ["{", "null", JSON.stringify({ ...log, version: 2 }), JSON.stringify({ ...log, asked: [{ ...log.asked[0], order: [0, 0, 1, 2] }] }), JSON.stringify({ ...log, asked: [{ ...log.asked[0], answer: 7 }] })]) {
+  // Formato precedente (senza argomenti né durata), versione futura, argomenti estranei alla banca, durata non valida.
+  const { topics: _t, seconds: _s, ...v1 } = log;
+  for (const bad of ["{", "null", JSON.stringify({ ...v1, version: 1 }), JSON.stringify({ ...log, version: 3 }), JSON.stringify({ ...log, topics: ["inesistente"] }), JSON.stringify({ ...log, seconds: 0 }), JSON.stringify({ ...log, asked: [{ ...log.asked[0], order: [0, 0, 1, 2] }] }), JSON.stringify({ ...log, asked: [{ ...log.asked[0], answer: 7 }] })]) {
     storage.setItem(QUESTION_LOG_KEY, bad);
     assert.equal(loadLog(storage, "salvata", bank), null, bad.slice(0, 40));
   }
+});
+
+test("argomenti scelti: domande solo da quelli, con ripiego sull'intera banca se manca un livello", () => {
+  const bank = banks[0]!;
+  const topics = [...new Set(bank.questions.map((q) => q.topic))].slice(0, 2);
+  let log = newLog("argomenti", bank.id, { topics, seconds: 20 });
+  assert.equal(log.seconds, 20);
+  for (const difficulty of DIFFICULTIES) {
+    for (let i = 0; i < 6; i++) {
+      const r = ask(log, bank, `${difficulty}${i}`, difficulty);
+      log = r.log;
+      const q = bank.questions.find((b) => b.id === r.asked.questionId)!;
+      const available = inPlay(bank, topics).some((b) => b.difficulty === difficulty);
+      assert.ok(!available || topics.includes(q.topic), `${difficulty}: domanda fuori dagli argomenti scelti`);
+    }
+  }
+  // Un argomento senza domande difficili: la scelta ricade sull'intera banca invece di fermarsi.
+  const single = bank.questions.find((q) => !bank.questions.some((b) => b.topic === q.topic && b.difficulty === "difficile"));
+  if (single) assert.ok(ask(newLog("ripiego", bank.id, { topics: [single.topic] }), bank, "k", "difficile").asked.questionId);
 });
 
 test("partita intera: una domanda per ogni momento, mai ripetuta finché ce ne sono", () => {

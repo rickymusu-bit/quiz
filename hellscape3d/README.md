@@ -47,7 +47,7 @@ Ogni disposizione viene verificata: distanza minima fra caselle, passerelle che 
 
 **Nebbia di guerra nella scena.** Il renderer disegna solo il modello della scena, costruito dalla vista pubblica: caselle esplorate, passerelle fra caselle esplorate, masse entro 16 unità da esse e, per ogni tratto che prosegue nella nebbia, un moncone pari al 40% della passerella. La direzione del moncone è l'unico dato non pubblico usato, ed è visibile solo per quel 40%. Un test verifica che nessun identificativo di cella nascosta compaia nel modello in alcun momento della partita.
 
-**Pagina di prova.** Senza parametri riprende la partita salvata. Parametri: `?seed=…` e `?steps=N` (azioni automatiche iniziali), che avviano una partita nuova, `?view=overview` (panoramica delle zone esplorate) e `?reveal=all`, che mostra l'intera città **solo per lo sviluppo**, per giudicare il layout. Tasti: 1–4 risposte e alternative, Invio chiude l'esito della risposta e lancia il dado, Spazio o S saltano la regia, F accelera ×3, V cambia inquadratura, A esegue un'azione automatica (sviluppo). `?motion=reduced` attiva il movimento ridotto, `?timer=S` cambia la durata della domanda, `?bank=ID` sceglie la banca di domande di una partita nuova, `?test=1` espone ai test la risposta corretta. Le azioni automatiche simulano le risposte con il profilo provvisorio.
+**Pagina di prova.** Senza parametri riprende la partita salvata; se non c'è, apre la schermata di avvio, che `?new=1` apre comunque. Parametri **solo per sviluppo e test**, che saltano la schermata: `?seed=…` e `?steps=N` (azioni automatiche iniziali), che avviano una partita nuova, `?view=overview` (panoramica delle zone esplorate) e `?reveal=all`, che mostra l'intera città **solo per lo sviluppo**, per giudicare il layout. Tasti: 1–4 risposte e alternative, Invio chiude l'esito della risposta e lancia il dado, Spazio o S saltano la regia, F accelera ×3, V cambia inquadratura, A esegue un'azione automatica (sviluppo). `?motion=reduced` attiva il movimento ridotto, `?timer=S` impone la durata della domanda al posto di quella della partita, `?bank=ID` sceglie la banca di domande di una partita avviata con `?seed=`, `?test=1` espone ai test la risposta corretta. Le azioni automatiche simulano le risposte con il profilo provvisorio.
 
 ## Pedine animate e regia (fase 2, secondo passo)
 
@@ -105,9 +105,10 @@ Quando un pannello occupa la parte bassa dello schermo, l'inquadratura si decent
 `session.ts` decide all'avvio fra ripresa e partita nuova, usando il salvataggio della fase 1 (`logic/persistence.ts`, chiave `hellscape3d-save`):
 
 - **Ripresa:** senza parametri la pagina riprende la partita salvata. Il mondo viene ricostruito da seme, configurazione e versione del generatore e confrontato con l'impronta salvata; lo stato è quello del motore. L'apertura di Bafometto non si ripete e compare l'avviso «Partita ripresa».
-- **Partita nuova:** `?seed=`, `?steps=` o `?new=1` avviano esplicitamente una partita nuova, che sostituisce il salvataggio; «Nuova città» fa lo stesso.
+- **Schermata di avvio** (`ui/setup.ts`, provvisoria): si apre senza salvataggio, con `?new=1` e con «Nuova città» a fine partita. Si scelgono banca di domande, argomenti (tutti, per impostazione), da uno a sei giocatori con i nomi (un nome vuoto diventa «Dannato N») e durata della domanda, da 10 a 300 secondi. Non si comincia se gli argomenti scelti non hanno domande di tutti e tre i livelli. Il seme della città è casuale. Le scelte si salvano con la partita, nel registro delle domande, così una ripresa usa la stessa durata e gli stessi argomenti; le ultime usate (`hellscape3d-impostazioni`) precompilano la schermata successiva. Se esiste una partita salvata, la schermata propone di riprenderla.
+- **Partita nuova:** «Inizia la partita» nella schermata di avvio; per sviluppo e test `?seed=` o `?steps=` la avviano subito. Sostituisce il salvataggio.
 - **Quando si salva:** all'avvio di una partita nuova e dopo ogni azione, prima e indipendentemente dalla regia.
-- **Salvataggio incompatibile** (versione, generatore o impronta diversi, dati non validi): non si perde. Viene copiato in `hellscape3d-save-scartato`, parte una partita nuova e compare un avviso. I salvataggi del gioco pubblicato (`fool-v1`, `fool-settings-v1`) non vengono toccati. È il caso dei salvataggi fatti prima del bivio come punto di passaggio (formato 1, generatore 1.0.0): il formato attuale è il 2.
+- **Salvataggio incompatibile** (versione, generatore o impronta diversi, dati non validi): non si perde. Viene copiato in `hellscape3d-save-scartato` e si apre la schermata di avvio con un avviso. I salvataggi del gioco pubblicato (`fool-v1`, `fool-settings-v1`) non vengono toccati. È il caso dei salvataggi fatti prima del bivio come punto di passaggio (formato 1, generatore 1.0.0): il formato attuale è il 2.
 - **Timer della domanda:** il tempo residuo si salva ogni mezzo secondo e alla chiusura della pagina (`hellscape3d-domanda`), legato a partita, turno e giocatore. Ricaricare non restituisce tempo; una domanda già scaduta scade al primo fotogramma.
 - **Senza `localStorage`:** la partita funziona, con l'avviso che non potrà essere ripresa.
 
@@ -163,19 +164,19 @@ Verifiche: test Node su stanze, geometria, inquadrature (per tipo, dal lato del 
 - in una partita giocata, a regia ferma la scena è sempre nella stanza del giocatore di turno, oppure nella stanza del bivio con le porte segnalate;
 - con il movimento ridotto la stanza resta ferma.
 
-**Non ancora:** stanze di partenza e d'uscita disegnate, varietà e regole di generazione definitive delle stanze, distanze e altezza minima tarate su dispositivi reali, modelli e animazioni dei personaggi, indizi dell'uscita, direzione artistica.
+**Non ancora:** stanze di partenza e d'uscita disegnate, varietà e regole di generazione definitive delle stanze, distanze e altezza minima tarate su dispositivi reali, modelli e animazioni dei personaggi, direzione artistica.
 
 ## Domande (banche della versione precedente)
 
 Le domande vengono dalle banche del sito, le stesse della versione precedente: il catalogo `datasets.json` e i file `dataset/*.json` alla radice del repository, oggi Termologia e Introduzione alla fisica e alla misura, 100 domande ciascuna. La build di Vite le include come testo, una banca per blocco, caricato solo quando serve. Nessun file delle banche viene modificato.
 
 - **Lettura** (`questions/bank.ts`): stesse regole di `assets/js/datasets.js`, comprese quattro alternative distinte, lettera A–D, tre difficoltà presenti e ID non ripetuti. Un test carica il vecchio lettore e verifica che i due producano la stessa banca. Unica differenza: le formule LaTeX non sono ancora rese dal prototipo 3D, quindi una banca che le contiene viene rifiutata con un messaggio. Le banche attuali non ne contengono.
-- **Scelta** (`questions/deck.ts`, provvisoria): la difficoltà è quella decisa dal motore, cioè dal ramo. Fra le domande di quel livello se ne sceglie a caso, con un flusso derivato dal seme, una non ancora uscita nella partita; esaurite quelle, la meno recente. Le alternative vengono rimescolate, come nella versione precedente. Tutti gli argomenti della banca sono in gioco.
+- **Scelta** (`questions/deck.ts`, provvisoria): la difficoltà è quella decisa dal motore, cioè dal ramo. Fra le domande di quel livello se ne sceglie a caso, con un flusso derivato dal seme, una non ancora uscita nella partita; esaurite quelle, la meno recente. Le alternative vengono rimescolate, come nella versione precedente. Sono in gioco gli argomenti scelti nella schermata di avvio; se a quelli mancasse un livello, cosa che la schermata impedisce, si attinge all'intera banca.
 - **Esito:** dopo la risposta compaiono esito, risposta data, risposta corretta e spiegazione. Il motore riceve l'esito con «Continua» (Invio), quindi il turno non passa prima che si sia letta la soluzione.
-- **Registro** (`hellscape3d-domande`): per ogni momento di domanda (turno e giocatore) registra la domanda assegnata, l'ordine delle alternative e la risposta, con banca e seme della partita. Si salva a ogni cambiamento. Un ricaricamento ripropone la stessa domanda, o il suo esito se si era già risposto, e non permette una seconda risposta. Una partita nuova apre un registro nuovo; una ripresa usa la banca con cui la partita era cominciata.
-- **Banca:** `?bank=ID` per una partita nuova, altrimenti la prima del catalogo. «Nuova città» conserva la banca.
+- **Registro** (`hellscape3d-domande`): per ogni momento di domanda (turno e giocatore) registra la domanda assegnata, l'ordine delle alternative e la risposta, con banca, argomenti, durata della domanda e seme della partita. Si salva a ogni cambiamento. Un ricaricamento ripropone la stessa domanda, o il suo esito se si era già risposto, e non permette una seconda risposta. Una partita nuova apre un registro nuovo; una ripresa usa la banca con cui la partita era cominciata. Un registro del formato precedente, senza argomenti né durata, non viene riletto: la partita ripresa prosegue con un registro nuovo, tutti gli argomenti e la durata predefinita.
+- **Banca:** scelta nella schermata di avvio; con `?seed=` (sviluppo) `?bank=ID`, altrimenti la prima del catalogo.
 
-**Non ancora:** schermata di avvio con banca, argomenti, giocatori e durata; rendering delle formule (KaTeX nella versione precedente); riepilogo delle domande a fine partita. La durata del timer resta da fissare nel regolamento.
+**Non ancora:** rendering delle formule (KaTeX nella versione precedente); riepilogo delle domande a fine partita. La durata del timer resta da fissare nel regolamento.
 
 ## Caricamento per settori (§8)
 
@@ -224,4 +225,4 @@ La specifica (§3, §10) lascia aperte queste decisioni. Le scelte seguenti serv
 
 ## Non ancora realizzato
 
-Budget misurabili di memoria, tempi e frame rate (§8): da fissare con misure su dispositivi reali, perché il rendering WebGL software della CI non è rappresentativo. Nelle fasi successive: direzione artistica, personaggi, Bafometto, schermata di avvio e durata definitiva del timer. Il motore riceve solo l'esito della risposta.
+Budget misurabili di memoria, tempi e frame rate (§8): da fissare con misure su dispositivi reali, perché il rendering WebGL software della CI non è rappresentativo. Nelle fasi successive: direzione artistica, personaggi, Bafometto e durata definitiva del timer. Il motore riceve solo l'esito della risposta.

@@ -29,6 +29,7 @@ interface Point {
 
 interface DebugInfo {
   ready: boolean;
+  seed: string;
   turn: number;
   phase: string;
   revealAll: boolean;
@@ -44,6 +45,9 @@ interface DebugInfo {
   questionText: string | null;
   outcome: "correct" | "wrong" | "timeout" | null;
   askedCount: number;
+  questionTopic: string | null;
+  topics: string[];
+  playerNames: string[];
   timer: { remaining: number; total: number } | null;
   correctIndex?: number;
   forkChoices: { number: number; to: string; anchored: boolean }[];
@@ -478,6 +482,10 @@ try {
       assert.equal(debug.panel, "ended");
       assert.equal(debug.radar.exit, true, "all'uscita il radar non la mostra");
       assert.ok(debug.spoken.includes("end"));
+      // «Nuova città» riapre la schermata di avvio, con la partita salvata da riprendere.
+      await page.locator(".hud-panel .hud-primary").click();
+      await page.locator("#setup").waitFor({ timeout: 15_000 });
+      assert.ok(new URL(page.url()).searchParams.get("new") === "1", "«Nuova città» non apre la schermata di avvio");
 
       await page.goto(`${url}?seed=graybox-1&motion=reduced`);
       await waitReady(page, false);
@@ -530,18 +538,99 @@ try {
       assert.equal((await info(page)).panel, "question");
       assert.ok(resumedLeft <= left + 0.6 && resumedLeft < (await info(page)).timer!.total - 1, `tempo restituito dal ricaricamento (${left.toFixed(2)} → ${resumedLeft.toFixed(2)})`);
 
-      // Salvataggio incompatibile: conservato a parte, partita nuova con avviso.
+      // Salvataggio incompatibile: conservato a parte, schermata di avvio con avviso.
       await page.evaluate(() => localStorage.setItem("hellscape3d-save", '{"format":"hellscape3d-save","saveVersion":99}'));
       await page.goto(url);
+      await page.locator("#setup").waitFor({ timeout: 15_000 });
+      assert.match((await page.locator(".setup-notice").textContent()) ?? "", /non utilizzabile/);
+      assert.equal(await page.locator("#setup-resume").count(), 0, "ripresa proposta senza salvataggio utilizzabile");
+      assert.equal(await page.evaluate(() => localStorage.getItem("hellscape3d-save-scartato")), '{"format":"hellscape3d-save","saveVersion":99}');
+      await page.locator("#setup-start:not([disabled])").click();
       await waitReady(page);
       assert.equal((await info(page)).resumed, false);
-      assert.equal(await page.evaluate(() => localStorage.getItem("hellscape3d-save-scartato")), '{"format":"hellscape3d-save","saveVersion":99}');
-      assert.match((await page.locator(".hud-toast").textContent()) ?? "", /non utilizzabile/);
       assert.equal(await page.evaluate(() => localStorage.getItem("fool-v1")), "runner-intatto", "salvataggio del runner modificato");
       console.log(`ok   ${device.name} · ripresa della partita, timer conservato, salvataggio incompatibile`);
     } catch (error) {
       failures++;
       console.log(`FAIL ${device.name} · ripresa: ${(error as Error).message}`);
+    }
+    // Schermata di avvio: banca, argomenti, giocatori, durata; impostazioni salvate con la partita e ricordate.
+    try {
+      await page.evaluate(() => localStorage.clear());
+      await page.goto(url);
+      await page.locator("#setup").waitFor({ timeout: 15_000 });
+      await page.locator("#setup-topics input").first().waitFor();
+      assert.equal(await page.locator("#setup-resume").count(), 0);
+      assert.equal(await page.evaluate(() => "__hellscape3d" in window), false, "partita avviata prima della schermata");
+      await page.screenshot({ path: join(artifacts, `avvio-${device.name}.png`) });
+      const banks = await page.locator("#setup-bank option").evaluateAll((o) => o.map((x) => (x as HTMLOptionElement).value));
+      await page.locator("#setup-bank").selectOption(banks.at(-1)!);
+      await page.locator("#setup-topics input").first().waitFor();
+      await page.locator("#setup-players").selectOption("3");
+      const names = page.locator(".setup-name");
+      assert.equal(await names.count(), 3);
+      await names.nth(0).fill("Ada");
+      await names.nth(1).fill("");
+      await names.nth(2).fill("Cleo");
+      await page.locator("#setup-seconds").fill("20");
+      // Nessun argomento: non si comincia.
+      await page.getByRole("button", { name: "Nessuno" }).click();
+      assert.equal(await page.locator("#setup-start").isDisabled(), true, "si comincia senza argomenti");
+      assert.match((await page.locator("#setup-issues").textContent()) ?? "", /almeno un argomento/);
+      // Argomenti scelti finché coprono tutti i livelli.
+      const boxes = page.locator("#setup-topics input");
+      const chosen: string[] = [];
+      for (let i = 0; i < (await boxes.count()) && (await page.locator("#setup-start").isDisabled()); i++) {
+        await boxes.nth(i).check();
+        chosen.push(await boxes.nth(i).inputValue());
+      }
+      assert.equal(await page.locator("#setup-start").isDisabled(), false, "argomenti che coprono i livelli rifiutati");
+      await page.locator("#setup-seconds").fill("5");
+      assert.equal(await page.locator("#setup-start").isDisabled(), true, "durata fuori intervallo accettata");
+      await page.locator("#setup-seconds").fill("20");
+      const topicCount = await boxes.count();
+      await page.screenshot({ path: join(artifacts, `avvio-compilata-${device.name}.png`) });
+      await page.locator("#setup-start").click();
+      await waitReady(page);
+      let debug = await info(page);
+      assert.equal(await page.locator("#setup").count(), 0);
+      assert.deepEqual(debug.playerNames, ["Ada", "Dannato 2", "Cleo"]);
+      assert.equal(debug.bankId, banks.at(-1));
+      // Tutti gli argomenti scelti equivalgono all'intera banca (elenco vuoto).
+      const allTopics = chosen.length === topicCount ? [] : chosen;
+      assert.deepEqual(debug.topics, allTopics);
+      assert.equal(debug.panel, "question");
+      assert.equal(debug.timer!.total, 20);
+      assert.ok(chosen.includes(debug.questionTopic!), `domanda fuori dagli argomenti scelti (${debug.questionTopic})`);
+      const seedA = debug.seed;
+      // Ripresa: stessa durata e stessi argomenti.
+      await page.goto(url);
+      await waitReady(page, false);
+      debug = await info(page);
+      assert.equal(debug.resumed, true);
+      assert.equal(debug.timer!.total, 20);
+      assert.deepEqual(debug.topics, allTopics);
+      // Nuova partita: schermata precompilata, ripresa proposta; seme diverso.
+      await page.goto(`${url}?new=1`);
+      await page.locator("#setup-topics input").first().waitFor();
+      assert.equal(await page.locator("#setup-bank").inputValue(), banks.at(-1));
+      assert.equal(await page.locator("#setup-players").inputValue(), "3");
+      assert.deepEqual(await page.locator(".setup-name").evaluateAll((i) => i.map((x) => (x as HTMLInputElement).value)), ["Ada", "Dannato 2", "Cleo"]);
+      assert.equal(await page.locator("#setup-seconds").inputValue(), "20");
+      assert.deepEqual(await page.locator("#setup-topics input:checked").evaluateAll((i) => i.map((x) => (x as HTMLInputElement).value)), chosen);
+      assert.equal(await page.locator("#setup-resume").count(), 1);
+      await page.locator("#setup-players").selectOption("1");
+      await page.getByRole("button", { name: "Tutti" }).click();
+      await page.locator("#setup-start").click();
+      await waitReady(page);
+      debug = await info(page);
+      assert.deepEqual(debug.playerNames, ["Ada"]);
+      assert.deepEqual(debug.topics, []);
+      assert.notEqual(debug.seed, seedA, "stessa città nella partita nuova");
+      console.log(`ok   ${device.name} · schermata di avvio: scelte, validazione, ripresa, impostazioni ricordate`);
+    } catch (error) {
+      failures++;
+      console.log(`FAIL ${device.name} · schermata di avvio: ${(error as Error).message}`);
     }
     // Scena di corsa (corsa.html): stanze senza giunture per tipo, partita con la regia della corsa, movimento ridotto.
     try {
