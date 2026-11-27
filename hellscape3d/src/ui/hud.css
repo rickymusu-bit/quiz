@@ -441,3 +441,129 @@ body {
     font-size: 18px;
   }
 }
+
+/* Riepilogo a fine partita (provvisorio). */
+.summary {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  margin: auto;
+  width: min(760px, calc(100vw - 24px));
+  max-height: calc(100dvh - 24px);
+  height: fit-content;
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: rgb(10 10 12 / 0.94);
+  border: 1px solid rgb(255 255 255 / 0.2);
+  border-radius: 8px;
+}
+.summary-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  position: sticky;
+  top: -16px;
+  margin: -16px -20px 0;
+  padding: 12px 20px;
+  background: rgb(10 10 12 / 0.98);
+}
+.summary h1 {
+  margin: 0;
+  font-size: 22px;
+}
+.summary h1:focus {
+  outline: none;
+}
+.summary-close {
+  font: inherit;
+  color: inherit;
+  min-height: 40px;
+  padding: 4px 16px;
+  background: rgb(255 255 255 / 0.08);
+  border: 1px solid rgb(255 255 255 / 0.25);
+  border-radius: 6px;
+  cursor: pointer;
+}
+.summary-close:focus-visible {
+  outline: 2px solid #fff1c2;
+  outline-offset: 1px;
+}
+.summary-table {
+  border-collapse: collapse;
+  font-size: 15px;
+}
+.summary-table caption {
+  text-align: left;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.summary-table th,
+.summary-table td {
+  padding: 4px 12px 4px 0;
+  text-align: left;
+  border-bottom: 1px solid rgb(255 255 255 / 0.12);
+}
+.summary-table td {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.summary-table thead th {
+  color: #b9b9c0;
+  font-weight: 400;
+}
+.summary-items {
+  margin: 0;
+  padding-left: 1.6em;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.summary-item {
+  padding: 8px 10px;
+  border-left: 3px solid #d9d9de;
+  background: rgb(255 255 255 / 0.04);
+}
+.summary-item.is-correct {
+  border-left-color: #8fd18f;
+}
+.summary-item.is-wrong {
+  border-left-color: #f07a5a;
+}
+.summary-item.is-timeout {
+  border-left-color: #e6c35c;
+}
+.summary-item p {
+  margin: 2px 0;
+}
+.summary-meta {
+  font-size: 13px;
+  color: #b9b9c0;
+}
+.summary-question {
+  font-weight: 600;
+}
+.summary-explanation {
+  font-size: 14px;
+  color: #cfcfd4;
+}
+@media (max-height: 480px) {
+  .summary {
+    padding: 10px 14px;
+  }
+  .summary-head {
+    top: -10px;
+    margin: -10px -14px 0;
+    padding: 8px 14px;
+  }
+  .summary h1 {
+    font-size: 18px;
+  }
+}
+.hud-restart {
+  text-align: center;
+}

@@ -57,6 +57,7 @@ interface DebugInfo {
   questionTopic: string | null;
   topics: string[];
   playerNames: string[];
+  summaryOpen: boolean;
   timer: { remaining: number; total: number } | null;
   correctIndex?: number;
   forkChoices: { number: number; to: string; anchored: boolean }[];
@@ -585,6 +586,39 @@ try {
     } catch (error) {
       failures++;
       console.log(`FAIL ${device.name} · schermata di avvio: ${(error as Error).message}`);
+    }
+    // Riepilogo a fine partita: conteggi coerenti con le domande giocate, schermata che scorre, chiusura con Esc.
+    try {
+      await page.goto(`${url}?seed=graybox-1&steps=30&intro=off&test=1`);
+      await waitReady(page);
+      for (let i = 0; i < 40 && (await info(page)).phase !== "ended"; i++) {
+        await page.keyboard.press("KeyA");
+        await page.waitForFunction(() => (window as unknown as { __hellscape3d: DebugInfo }).__hellscape3d.busy === false, null, { timeout: 20_000 });
+      }
+      let debug = await info(page);
+      assert.equal(debug.phase, "ended");
+      assert.ok(debug.askedCount > 0, "nessuna domanda giocata prima della fine");
+      await page.getByRole("button", { name: "Riepilogo della partita" }).click();
+      const dialog = page.getByRole("dialog", { name: "Riepilogo della partita" });
+      await dialog.waitFor();
+      assert.equal(await dialog.locator(".summary-item").count(), debug.askedCount, "domande del riepilogo diverse da quelle giocate");
+      const rows = await dialog.locator("table").first().locator("tbody tr").count();
+      assert.equal(rows, debug.playerNames.length);
+      const totals = await dialog.locator("table").first().locator("tbody tr td:last-child").allTextContents();
+      assert.equal(totals.reduce((t, v) => t + Number(v), 0), debug.askedCount);
+      const box = (await dialog.boundingBox())!;
+      const viewport = page.viewportSize()!;
+      assert.ok(box.y >= 0 && box.y + box.height <= viewport.height + 1, "riepilogo fuori dallo schermo");
+      await page.screenshot({ path: join(artifacts, `riepilogo-${device.name}.png`) });
+      await page.keyboard.press("Escape");
+      await page.waitForFunction(() => !document.querySelector("#summary"));
+      debug = await info(page);
+      assert.equal(debug.summaryOpen, false);
+      assert.equal(await page.evaluate(() => document.activeElement?.textContent), "Riepilogo della partita", "fuoco non restituito");
+      console.log(`ok   ${device.name} · riepilogo a fine partita: ${debug.askedCount} domande, ${rows} giocatori`);
+    } catch (error) {
+      failures++;
+      console.log(`FAIL ${device.name} · riepilogo: ${(error as Error).message}`);
     }
     // Scena di corsa (index.html): stanze senza giunture per tipo, partita con la regia della corsa, movimento ridotto.
     try {

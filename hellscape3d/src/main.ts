@@ -33,6 +33,8 @@ import { ask, loadLog, newLog, outcomeOf, present, recordAnswer, saveLog, type G
 import { DEFAULT_QUESTION_SECONDS, QuestionTimer } from "./ui/timer.ts";
 import { decideStart, defaultName, loadLastSettings, loadQuestionClock, memoryStorage, questionKey, saveLastSettings, saveQuestionClock, type GameSettings } from "./session.ts";
 import { showSetup } from "./ui/setup.ts";
+import { showSummary } from "./ui/summary.ts";
+import { summarize } from "./questions/summary.ts";
 
 const params = new URLSearchParams(location.search);
 
@@ -172,6 +174,9 @@ let speech: { text: string; until: number } | null = null;
 const spoken: string[] = [];
 let clock = 0;
 
+/** Riepilogo a fine partita aperto. */
+let summaryOpen = false;
+
 const hud = new Hud(document.querySelector<HTMLElement>("#hud")!, {
   answer: (index) => answer(index),
   proceed: () => proceed(),
@@ -180,6 +185,15 @@ const hud = new Hud(document.querySelector<HTMLElement>("#hud")!, {
   restart: () => {
     // Schermata di avvio, precompilata con le impostazioni di questa partita.
     location.search = "?new=1";
+  },
+  summary: () => {
+    if (summaryOpen) return;
+    summaryOpen = true;
+    showSummary(document.body, summarize(questionLog, bank, state.players), () => {
+      summaryOpen = false;
+      draw(0);
+    });
+    draw(0);
   },
 });
 
@@ -345,6 +359,7 @@ function drawFrame(seconds: number): void {
       questionTopic: lastPanel?.kind === "question" || lastPanel?.kind === "feedback" ? lastPanel.question.topic : null,
       topics: questionLog.topics,
       playerNames: state.players.map((p) => p.name),
+      summaryOpen,
       outcome: lastPanel?.kind === "feedback" ? outcomeOf(lastPanel.question) : null,
       askedCount: questionLog.asked.length,
       forkChoices: lastPanel?.kind === "fork" ? lastPanel.choices.map((c) => ({ number: c.number, to: c.to, anchored: c.anchor !== null })) : [],
