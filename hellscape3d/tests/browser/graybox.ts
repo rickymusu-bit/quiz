@@ -45,7 +45,7 @@ interface DebugInfo {
   timer: { remaining: number; total: number } | null;
   correctIndex?: number;
   forkChoices: { number: number; to: string; anchored: boolean }[];
-  minimap: string[];
+  radar: { players: { id: string; active: boolean; onEdge: boolean; x: number; y: number }[]; exit: boolean; center: { x: number; y: number } };
   activePlayerId: string;
   stateActivePlayerId: string;
   occluders: { tiles: number; pillars: number; walkways: number; masses: number };
@@ -97,12 +97,21 @@ async function waitReady(page: Page, skipIntro = true): Promise<void> {
   }
 }
 
+/** Radar: un punto per giocatore, quello di turno al centro; nessuna casella disegnata. */
+function assertRadar(debug: DebugInfo): void {
+  assert.equal(debug.radar.players.length, Object.keys(debug.pawns).length);
+  const active = debug.radar.players.filter((p) => p.active);
+  assert.equal(active.length, 1);
+  assert.equal(active[0]!.id, debug.activePlayerId);
+  assert.ok(Math.hypot(active[0]!.x - debug.radar.center.x, active[0]!.y - debug.radar.center.y) < 1e-6, "giocatore di turno fuori dal centro");
+}
+
 /** A regia ferma: celle mostrate = esplorate = disegnate, pedine sulle caselle dello stato. */
 function assertSettled(debug: DebugInfo): void {
   assert.equal(debug.busy, false);
   assert.deepEqual(debug.shown, debug.explored);
   assert.deepEqual(debug.rendered, debug.explored);
-  assert.deepEqual(debug.minimap, debug.explored, "minimappa diversa dalle celle esplorate");
+  assertRadar(debug);
   assert.equal(debug.activePlayerId, debug.stateActivePlayerId);
   for (const [id, p] of Object.entries(debug.pawns)) {
     const q = debug.cellPositions[id]!;
@@ -162,6 +171,7 @@ try {
         const debug = await info(page);
         if (debug.revealAll) assert.equal(debug.rendered.length, debug.totalCells, "città rivelata incompleta");
         else assertSettled(debug);
+        if (testCase.name === "inizio") assert.equal(debug.radar.exit, false, "uscita sul radar già alla partenza");
         assert.equal(debug.stats.tiles, debug.loadedTiles.length);
         assert.ok(debug.loadedTiles.every((id) => debug.rendered.includes(id)), "casella caricata fuori dalla vista presentata");
         assert.ok(debug.stats.primitives > debug.stats.tiles * 8, `kit modulare non disegnato (${debug.stats.primitives} primitive)`);
@@ -189,7 +199,7 @@ try {
         animated++;
         assert.ok(during.shown.every((id) => during.explored.includes(id)), "celle mostrate prima di essere esplorate");
         assert.deepEqual(during.rendered, during.shown, "celle disegnate diverse da quelle mostrate dalla regia");
-        assert.deepEqual(during.minimap, during.shown, "minimappa diversa dalle celle mostrate");
+        assertRadar(during);
         assert.equal(during.panel, null, "pannello visibile durante la regia");
         if (animated === 2) {
           await page.keyboard.press("KeyS");
@@ -217,10 +227,14 @@ try {
       let debug = await info(page);
       assert.equal(debug.panel, "question");
       assert.ok(await page.locator(".hud-panel .hud-option").first().isVisible(), "risposte non visibili");
+      // Si attende la condizione, non un tempo fisso: i dati di debug si aggiornano a ogni fotogramma, e sul
+      // runner della CI (WebGL software) un fotogramma dopo il caricamento può durare più di un secondo.
       const before = debug.timer!.remaining;
-      await page.waitForTimeout(1200);
+      await page
+        .waitForFunction((start) => ((window as unknown as { __hellscape3d: DebugInfo }).__hellscape3d.timer?.remaining ?? start) <= start - 0.8, before, { timeout: 10_000 })
+        .catch(() => assert.fail("il timer non scorre con la domanda visibile"));
       debug = await info(page);
-      assert.ok(before - debug.timer!.remaining >= 0.8, "il timer non scorre con la domanda visibile");
+      assert.equal(debug.panel, "question");
       // Domanda vera dalla banca della versione precedente, con argomento.
       assert.ok(debug.questionId && !/fittizia/i.test(debug.questionText ?? ""), "domanda non presa dalla banca");
       assert.match((await page.locator(".hud-difficulty").textContent()) ?? "", / · \S/);
@@ -314,6 +328,7 @@ try {
       assertSettled(debug);
       assert.ok(debug.explored.includes(chosen));
       assert.notEqual(debug.playerCells[mover], beforeFork, "dopo la scelta il giocatore resta prima del bivio");
+      await page.locator(".hud-radar").screenshot({ path: join(artifacts, `radar-${device.name}.png`) });
       console.log(`ok   ${device.name} · scelta al bivio durante l'avanzamento, passi residui sul ramo scelto`);
     } catch (error) {
       failures++;
@@ -340,7 +355,7 @@ try {
       console.log(`FAIL ${device.name} · ostacoli: ${(error as Error).message}`);
     }
     // Settori: con il raggio calcolato l'immagine coincide con la città intera; con un raggio forzato
-    // molto più corto si scarica davvero, ma stato, minimappa e caselle delle pedine restano intatti.
+    // molto più corto si scarica davvero, ma stato, radar e caselle delle pedine restano intatti.
     try {
       const canvasPixels = async (query: string): Promise<{ png: Buffer; debug: DebugInfo }> => {
         await page.goto(`${url}?${query}`);
@@ -384,7 +399,7 @@ try {
             if (d.stats.primitives < d.stats.totalPrimitives) unloaded++;
             slowestBuild = Math.max(slowestBuild, d.stats.lastBuildMs);
             assert.deepEqual(d.rendered, d.shown, "vista presentata alterata dai settori");
-            assert.deepEqual(d.minimap, d.shown, "minimappa alterata dai settori");
+            assertRadar(d);
             // Le caselle su cui si trovano le pedine nello stato restano disegnate, anche durante la regia.
             // (una casella non ancora mostrata dalla regia non fa parte della vista presentata).
             for (const cell of Object.values(d.playerCells)) {
@@ -405,11 +420,11 @@ try {
       assert.equal(forced.end.turn, whole.end.turn);
       assert.deepEqual(forced.end.explored, whole.end.explored, "esplorazione diversa con i settori");
       assert.deepEqual(forced.end.cellPositions, whole.end.cellPositions, "posizioni dei giocatori diverse con i settori");
-      assert.deepEqual(forced.end.minimap, whole.end.minimap);
+      assert.deepEqual(forced.end.radar, whole.end.radar);
       await page.screenshot({ path: join(artifacts, `settori-forzati-${device.name}.png`) });
       console.log(
         `ok   ${device.name} · settori: immagine identica alla città intera (raggio corto rilevato in ${detected}/3); raggio forzato ${forced.unloaded}/${forced.samples} campioni con scaricamento, ` +
-          `ricostruzioni ${forced.end.stats.builds} (la più lenta ${forced.slowestBuild.toFixed(1)} ms), stato e minimappa invariati`,
+          `ricostruzioni ${forced.end.stats.builds} (la più lenta ${forced.slowestBuild.toFixed(1)} ms), stato e radar invariati`,
       );
     } catch (error) {
       failures++;
@@ -453,6 +468,7 @@ try {
       debug = await info(page);
       assert.equal(debug.phase, "ended");
       assert.equal(debug.panel, "ended");
+      assert.equal(debug.radar.exit, true, "all'uscita il radar non la mostra");
       assert.ok(debug.spoken.includes("end"));
 
       await page.goto(`${url}?seed=graybox-1&motion=reduced`);

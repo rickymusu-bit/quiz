@@ -24,7 +24,7 @@ import { buildSceneModel, presentedView, revealAllView, type SceneModel } from "
 import { NO_OCCLUDERS, type Occluders } from "./scene/occlusion.ts";
 import { citySlab, visibleRadius, type Focus } from "./scene/sectors.ts";
 import { Hud, type ForkChoice, type HudState, type Panel } from "./ui/hud.ts";
-import { minimapShapes } from "./ui/minimap.ts";
+import { radarShapes, type RadarShapes } from "./ui/radar.ts";
 import { CATALOG, loadBank } from "./questions/catalog.ts";
 import { ask, loadLog, newLog, outcomeOf, present, recordAnswer, saveLog, type GivenAnswer, type PresentedQuestion, type QuestionLog } from "./questions/deck.ts";
 import { DEFAULT_QUESTION_SECONDS, QuestionTimer } from "./ui/timer.ts";
@@ -275,7 +275,7 @@ function panelInset(): number {
   if (!panel || panel.hidden) return 0;
   return Math.max(0, window.innerHeight - panel.getBoundingClientRect().top);
 }
-let minimapCells: string[] = [];
+let radar: RadarShapes | null = null;
 
 let drawing = false;
 function draw(seconds: number): void {
@@ -350,8 +350,12 @@ function drawFrame(seconds: number): void {
     dev: `Prova non pubblicata · seme ${seed} · ${bank.title}${revealAll ? " · CITTÀ RIVELATA" : ""}${reducedMotion ? " · movimento ridotto" : ""}${forcedSectorRadius ? ` · SETTORI r=${forcedSectorRadius}` : ""} · velocità ×${speed} · A automatico · V vista`,
   };
   hud.update(hudState);
-  const minimapSize = hudMinimapSize();
-  minimapCells = hud.drawMinimap(minimapShapes(model, frame.pawns, frame.activePlayerId, minimapSize.width, minimapSize.height));
+  radar = hud.drawRadar(
+    radarShapes(
+      { pawns: frame.pawns, players: state.players.map((p, index) => ({ id: p.id, index })), activePlayerId: frame.activePlayerId, exit: layout.positions[game.map.exitId]! },
+      hudRadarSize(),
+    ),
+  );
 
   Object.assign(window, {
     __hellscape3d: {
@@ -380,7 +384,11 @@ function drawFrame(seconds: number): void {
       loadedTiles: renderer.loadedTiles(),
       loadedSectors: renderer.loadedSectors(),
       sectors: sectorsEnabled ? (forcedSectorRadius ?? "calcolato") : "off",
-      minimap: minimapCells,
+      radar: radar && {
+        players: radar.players.map((p) => ({ id: p.id, active: p.active, onEdge: p.onEdge, x: p.x, y: p.y })),
+        exit: radar.exit !== null,
+        center: radar.center,
+      },
       occluders: { tiles: occluders.tiles.length, pillars: occluders.pillars.length, walkways: occluders.walkways.length, masses: occluders.masses.length },
       occluderIds: [...occluders.tiles, ...occluders.pillars],
       bafometto: frame.bafometto,
@@ -404,9 +412,9 @@ function drawFrame(seconds: number): void {
   });
 }
 
-function hudMinimapSize(): { width: number; height: number } {
-  const element = document.querySelector<HTMLElement>(".hud-minimap")!;
-  return { width: element.clientWidth, height: element.clientHeight };
+function hudRadarSize(): number {
+  const element = document.querySelector<HTMLElement>(".hud-radar")!;
+  return Math.min(element.clientWidth, element.clientHeight);
 }
 
 // Alla chiusura o al ricaricamento si salva subito il tempo residuo della domanda in corso.
