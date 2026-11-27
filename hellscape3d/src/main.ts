@@ -260,6 +260,8 @@ function currentPanel(): Panel | null {
 const ORDER = { "piu-breve": 0, intermedio: 1, "piu-lungo": 2 } as const;
 
 let lastPanel: Panel | null = null;
+/** Secondi trascorsi con la domanda corrente visibile (verifica del timer). */
+let questionVisibleFor = 0;
 let inset = 0;
 
 let radar: RadarShapes | null = null;
@@ -290,8 +292,11 @@ function drawFrame(seconds: number): void {
   view.draw(seconds, state, inset);
 
   const panel = currentPanel();
-  // Il timer scorre solo con la domanda visibile, a regia ferma e pagina in primo piano.
-  if (question && panel?.kind === "question" && question.timer.tick(seconds, !document.hidden)) answer("timeout");
+  // Il timer scorre solo con la domanda visibile, a regia ferma e pagina in primo piano, e solo dal fotogramma
+  // successivo alla sua comparsa: il tempo di questo fotogramma è trascorso prima che la domanda si vedesse.
+  const shownBefore = lastPanel?.kind === "question" && panel?.kind === "question" && lastPanel.key === panel.key;
+  questionVisibleFor = panel?.kind === "question" ? (shownBefore ? questionVisibleFor + seconds : 0) : 0;
+  if (question && panel?.kind === "question" && shownBefore && question.timer.tick(seconds, !document.hidden)) answer("timeout");
   if (question && clock - lastClockSave >= 0.5) {
     saveQuestionClock(storage, question.key, question.timer.remaining);
     lastClockSave = clock;
@@ -347,6 +352,7 @@ function drawFrame(seconds: number): void {
       },
       resumed,
       timerRemaining: question?.timer.remaining ?? null,
+      questionVisibleFor,
       spoken: [...spoken],
       speech: speech?.text ?? null,
       inset,

@@ -58,6 +58,7 @@ interface DebugInfo {
   speech: string | null;
   resumed: boolean;
   timerRemaining: number | null;
+  questionVisibleFor: number;
   totalCells: number;
   loadedTiles: string[];
   playerCells: Record<string, string>;
@@ -268,7 +269,11 @@ try {
       await waitIdle();
       debug = await info(page);
       assertSettled(debug);
-      if (debug.panel === "question") assert.ok(debug.timer!.total - debug.timer!.remaining < 0.5, "il timer è scorso durante la regia");
+      // Il tempo consumato non supera quello in cui la domanda è stata visibile: durante la regia il timer è fermo.
+      if (debug.panel === "question") {
+        const used = debug.timer!.total - debug.timer!.remaining;
+        assert.ok(used <= debug.questionVisibleFor + 1e-6, `il timer è scorso durante la regia (${used.toFixed(2)} s su ${debug.questionVisibleFor.toFixed(2)} s visibili)`);
+      }
       console.log(`ok   ${device.name} · domanda della banca, esito con spiegazione anche dopo il ricaricamento, dado e timer fermo durante la regia`);
 
       // Risposta errata con il mouse: il turno passa all'altro giocatore.
