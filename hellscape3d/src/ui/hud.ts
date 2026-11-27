@@ -297,6 +297,40 @@ export class Hud {
       badge.style.top = `${choice.anchor.y}px`;
       badge.setAttribute("aria-hidden", "true");
       this.badges.append(badge);
+      this.clearOfHud(badge);
+    }
+  }
+
+  /**
+   * Sposta l'etichetta di una porta fuori dagli altri elementi dell'interfaccia
+   * (dado, turno, radar, avvisi, pannello), con lo spostamento più breve fra le
+   * quattro direzioni che la lascia dentro lo schermo, per non allontanarla
+   * dalla sua porta più del necessario.
+   */
+  private clearOfHud(badge: HTMLElement): void {
+    const GAP = 6;
+    const obstacles = [this.turn, this.die, this.radar, this.toast, this.speech, this.panel]
+      .filter((e) => !e.hidden && e.getClientRects().length > 0)
+      .map((e) => e.getBoundingClientRect())
+      .filter((r) => r.width > 0 && r.height > 0);
+    let left = parseFloat(badge.style.left),
+      top = parseFloat(badge.style.top);
+    for (let pass = 0; pass < obstacles.length; pass++) {
+      const r = badge.getBoundingClientRect();
+      const hit = obstacles.find((o) => r.left < o.right && r.right > o.left && r.top < o.bottom && r.bottom > o.top);
+      if (!hit) return;
+      const moves = [
+        { dx: hit.right + GAP - r.left, dy: 0 },
+        { dx: -(r.right - hit.left + GAP), dy: 0 },
+        { dx: 0, dy: hit.bottom + GAP - r.top },
+        { dx: 0, dy: -(r.bottom - hit.top + GAP) },
+      ].filter((m) => r.left + m.dx >= 0 && r.right + m.dx <= window.innerWidth && r.top + m.dy >= 0 && r.bottom + m.dy <= window.innerHeight);
+      const best = moves.sort((a, b) => Math.abs(a.dx) + Math.abs(a.dy) - (Math.abs(b.dx) + Math.abs(b.dy)))[0];
+      if (!best) return;
+      left += best.dx;
+      top += best.dy;
+      badge.style.left = `${left}px`;
+      badge.style.top = `${top}px`;
     }
   }
 }

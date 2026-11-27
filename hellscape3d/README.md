@@ -140,7 +140,7 @@ Lo script di registrazione accetta `--reload-after N` per ricaricare la pagina d
 - **Regia** (`run/runDirector.ts`):
   - risposta errata: si continua a correre nella stessa stanza;
   - dado: il personaggio accelera ed esce dalla stanza, e la stanza d'arrivo resta nascosta;
-  - bivio attraversato: stanza del bivio con camera posteriore, arresto davanti alle porte, scelta con i numeri sulle porte, ingresso nella porta scelta;
+  - bivio attraversato: stanza del bivio con camera posteriore, arresto davanti alle porte, scelta con i numeri sulle porte (a metà del vano; se un numero cadrebbe su dado, turno, radar o pannello, si sposta del minimo necessario), ingresso nella porta scelta;
   - casella speciale all'arrivo: stanza d'arrivo e risoluzione, con la battuta di Bafometto per il terminale;
   - uscita: avvicinamento al varco e fine della partita;
   - turno successivo: cambio di stanza con dissolvenza, ma nessun cambio se il giocatore di turno è nella stanza già mostrata;

@@ -168,9 +168,14 @@ export class RunScene {
     return { x: ((v.x + 1) / 2) * canvas.clientWidth, y: ((1 - v.y) / 2) * canvas.clientHeight };
   }
 
-  /** Posizione delle porte della stanza (bivio), per agganciarvi i numeri delle alternative. */
+  /**
+   * Punti delle porte della stanza (bivio) a cui agganciare i numeri delle
+   * alternative: dentro il vano, sul filo della parete. L'etichetta compare
+   * poco sopra il punto, quindi a metà della porta (alta 3,6), non sopra
+   * l'architrave, che nell'inquadratura da dietro sta vicino al bordo alto.
+   */
   doors(): Vec3[] {
-    return this.build?.doors.map((d) => ({ x: d.x, y: 3.8, z: d.z })) ?? [];
+    return this.build?.doors.map((d) => ({ x: d.x - 1.6, y: 1.4, z: d.z })) ?? [];
   }
 
   render(): void {
