@@ -4,7 +4,7 @@ Redesign descritto in [Città procedurali 3D e regia di gioco](../docs/HELLSCAPE
 
 Stato (§9 della specifica):
 - **fase 1, modello logico e test:** completata;
-- **fase 2, graybox 3D modulare con camera:** completata nel flusso di gioco (layout, nebbia, regia, interfaccia provvisoria, ostacoli, Bafometto provvisorio, ripresa, caricamento per settori);
+- **fase 2, graybox 3D modulare con camera:** completata (layout, nebbia, interfaccia provvisoria, Bafometto provvisorio, ripresa). Dal 27 novembre la schermata di gioco è la scena di corsa (`index.html`); la vista della città è uno strumento di sviluppo, senza regia, ostacoli trasparenti né settori;
 - **fase 3, kit e direzione artistica:** in corso. Primo passo consegnato: kit modulare procedurale con agganci e regole di assemblaggio, a tinte neutre. Restano palette, materiali e dettagli definitivi, che dipendono da decisioni di direzione artistica.
 
 Il codice è TypeScript con sola sintassi cancellabile. Il modello logico e il layout girano direttamente in Node (≥ 22.18) senza compilazione; la pagina di prova usa Vite e Three.js.
@@ -51,23 +51,11 @@ Ogni disposizione viene verificata: distanza minima fra caselle, passerelle che 
 
 **Pagine.** `index.html` è il gioco, `citta.html` la vista della città (solo sviluppo); condividono partita e salvataggio. Senza parametri la pagina riprende la partita salvata; se non c'è, apre la schermata di avvio, che `?new=1` apre comunque. Parametri **solo per sviluppo e test**, che saltano la schermata: `?seed=…` e `?steps=N` (azioni automatiche iniziali), che avviano una partita nuova, nella vista della città `?view=overview` (panoramica delle zone esplorate) e `?reveal=all`, che mostra l'intera città, per giudicare il layout. Tasti: 1–4 risposte e alternative, Invio chiude l'esito della risposta e lancia il dado, Spazio o S saltano la regia, F accelera ×3, V cambia inquadratura, A esegue un'azione automatica (sviluppo). `?motion=reduced` attiva il movimento ridotto, `?timer=S` impone la durata della domanda al posto di quella della partita, `?bank=ID` sceglie la banca di domande di una partita avviata con `?seed=`, `?test=1` espone ai test la risposta corretta. Le azioni automatiche simulano le risposte con il profilo provvisorio.
 
-## Pedine animate e regia (fase 2, secondo passo)
+## Vista della città (strumento di sviluppo)
 
-`director/director.ts` contiene il CameraDirector, puro e indipendente da Three.js. Riceve gli eventi prodotti dal motore e li trasforma in clip di presentazione. Lo stato è già deciso quando le clip vengono accodate: accelerare (F, ×3) o saltare la regia (S, oppure Spazio mentre è in corso) cambia solo ciò che si vede. A regia conclusa pedine, celle mostrate e giocatore attivo coincidono sempre con lo stato.
+`citta.html` mostra la partita nella città a tre quarti (`views/cityView.ts`), per giudicare mappe, layout e kit; non è la schermata di gioco. Non ha regia: pedine sulle loro caselle, celle esplorate e giocatore di turno coincidono sempre con lo stato, con la camera fissa su di lui (distanza 38, inclinazione 50°). Con un pannello aperto l'inquadratura si centra nell'area libera sopra il pannello. `V` alterna la panoramica delle zone esplorate; `?view=overview` la apre subito, `?reveal=all` mostra l'intera città. La direzione di vista è sempre la stessa, quella a cui si orienta anche il radar.
 
-| Evento del motore | Presentazione |
-| --- | --- |
-| inizio turno di un altro giocatore | transizione verso la sua pedina (vedi sotto) |
-| domanda | avvicinamento al personaggio, 0,6 s |
-| dado | inquadratura di inseguimento, 0,4 s |
-| avanzamento | camminata lungo le passerelle, 0,32 s per casella, con la camera che segue |
-| bivio | inquadratura del bivio e delle sole alternative locali, 0,7 s |
-| arrivo su casella speciale | breve pausa, 0,5 s |
-| fine partita | inquadratura della porta d'uscita, 1,2 s |
-
-Le transizioni fra giocatori dipendono dalla distanza calcolata sulla sola rete già mostrata. Fino a 4 passi è una traslazione (0,7 s). Fino a 12 passi nello stesso distretto la camera si allontana, trasla e si riavvicina (1,25 s). Negli altri casi, compresi i giocatori non collegati da zone esplorate, c'è una dissolvenza a nero: la camera cambia posizione solo a schermo oscurato (0,8 s), senza sorvolare la città. I tempi stanno negli intervalli indicativi della specifica e restano obiettivi di prototipazione.
-
-Durante la camminata le celle compaiono quando la pedina le raggiunge con lo sguardo, nello stesso ordine del motore, e non al momento del lancio. Con `?motion=reduced`, o con la preferenza di sistema per il movimento ridotto, la regia è istantanea. La direzione di vista resta sempre la stessa: la camera cambia distanza e inclinazione, mai orientamento.
+Fino al 27 novembre la vista aveva una regia (camminata delle pedine, transizioni fra giocatori, sede di Bafometto), volumi trasparenti davanti alla pedina e caricamento per settori. Sono stati rimossi quando la scena di corsa è diventata la schermata di gioco (specifica §10): restano nella storia del repository.
 
 ## Interfaccia provvisoria e radar (fase 2, terzo passo; radar dal 26 novembre)
 
@@ -76,29 +64,16 @@ Durante la camminata le celle compaiono quando la pedina le raggiunge con lo sgu
 - **Turno:** numero del turno, giocatore attivo secondo la presentazione e elenco dei giocatori con i colori delle pedine.
 - **Domanda:** presa dalle banche della versione precedente (vedi «Domande»), con difficoltà e argomento; risposta con clic o tasti 1–4, poi esito con spiegazione.
 - **Timer** (`ui/timer.ts`): 45 secondi, il valore predefinito della versione precedente, ancora provvisorio. Scorre solo con la domanda visibile, a regia ferma e con la pagina in primo piano; alla scadenza la risposta vale come tempo scaduto. La domanda viene creata solo quando diventa visibile, quindi la regia non può consumarne il tempo.
-- **Dado:** pulsante (o Invio) dopo la risposta corretta; il risultato resta visibile durante la camminata.
+- **Dado:** pulsante (o Invio) dopo la risposta corretta; il risultato resta visibile durante l'avanzamento.
 - **Bivio:** alternative ordinate dalla più breve alla più lunga, con lunghezza relativa e difficoltà (tasti 1–3). Gli stessi numeri compaiono nella scena sugli imbocchi dei rami, con il colore della difficoltà.
 - **Fine partita:** nome di chi è uscito e pulsante per una nuova città.
 - **Radar** (`ui/radar.ts`, specifica §3): sostituisce la minimappa e non disegna caselle né percorsi. Al centro c'è il giocatore di turno, contornato di chiaro; gli altri giocatori sono punti nella loro posizione relativa. Le distanze sono in linea d'aria sul piano orizzontale e l'orientamento è fisso, come la camera della vista a tre quarti. La portata è di 24 unità, cioè 6 caselle in linea d'aria, valore provvisorio. Chi è più lontano compare come tacca sul bordo nella propria direzione, chi è nella stessa casella si affianca al centro. L'uscita, un portale verde, compare solo quando entra nella portata. Su 200 città compare quando mancano in mediana 7 caselle di percorso, nel 90% dei casi al massimo 9, al massimo 16 dove un ramo passa vicino all'uscita. Il radar riceve solo le posizioni delle pedine e dell'uscita.
 
-Su schermi bassi (mobile orizzontale) pannelli e radar si riducono. Il tasto A esegue un'azione automatica, solo per lo sviluppo.
-
-## Ostacoli davanti alla camera (fase 2, quarto passo)
-
-`scene/occlusion.ts` individua i volumi disegnati (caselle, piloni, passerelle, masse) attraversati dal segmento fra la camera e la pedina attiva, ai piedi o alla testa. Il renderer li sposta in istanze con materiale semitrasparente (opacità 0,18) e ricostruisce questa parte della scena solo quando l'insieme degli ostacoli cambia. Poiché si disegnano solo zone già mostrate, guardare attraverso un ostacolo non rivela nulla di inesplorato. Dimensioni dei volumi e posizione della camera stanno in `scene/dimensions.ts`, condiviso da renderer e calcolo.
-
-Su 20 città, in oltre 14 000 fotogrammi di partita simulata, la pedina attiva risulta coperta nell'1,5% dei casi, sempre da elementi del percorso e mai da masse edilizie: la regola che le tiene basse dal lato della camera funziona. Il caso tipico è la passerella sopraelevata del ramo breve che passa davanti a una pedina sul ramo laterale più basso.
-
-Quando un pannello occupa la parte bassa dello schermo, l'inquadratura si decentra (`setViewOffset`) in modo che il punto inquadrato resti al centro dell'area libera, senza spostare la camera né deformare l'immagine. Il passaggio è graduale, istantaneo con il movimento ridotto. `?occlusion=off` disattiva le trasparenze, solo per confronto.
+Quando un pannello occupa la parte bassa dello schermo, l'inquadratura si decentra (`render/viewOffset.ts`) in modo che il punto inquadrato resti al centro dell'area libera, senza spostare la camera né deformare l'immagine. Su schermi bassi (mobile orizzontale) pannelli e radar si riducono. Il tasto A esegue un'azione automatica, solo per lo sviluppo.
 
 ## Bafometto provvisorio (fase 2, quinto passo)
 
-`director/bafometto.ts` e il regista danno a Bafometto una presenza provvisoria, secondo la specifica (§6):
-
-- **Sede:** una macchina monumentale in graybox su un pilone che sale dall'abisso, con occhi verdi che si accendono quando parla. Sta a distanza fissa dalla partenza (−46, −4, +8), dal lato −X dove il percorso non va mai. La posizione dipende solo dalla partenza, quindi non rivela uscita né topologia. Un test verifica su 80 città che resti lontana da percorso e masse.
-- **Interventi significativi** (apertura di una partita nuova, fine partita): dissolvenza, inquadratura della sede, battuta, dissolvenza e ritorno al giocatore o all'uscita. Nessun tragitto della camera fra sede e giocatore e nessuna cella rivelata.
-- **Scambi frequenti** (arrivo su una casella «Terminale di Bafometto»): manifestazione locale, senza passare dalla sede. Il terminale si illumina, la camera si avvicina e compare la battuta.
-- **Battute:** testi segnaposto in un riquadro dichiarato «testo provvisorio», mostrati per 3,5 s anche con il movimento ridotto, che invece rende istantanee le inquadrature. Gli effetti di Bafometto sul gioco (Omen, crediti, salute) non sono ancora definiti dal regolamento.
+`bafometto.ts` contiene le battute di Bafometto, provvisorie (specifica §6). La scena di corsa le pronuncia all'apertura di una partita nuova, all'arrivo su una casella «Terminale di Bafometto» e a fine partita. Sono testi segnaposto in un riquadro dichiarato «testo provvisorio», mostrati per 3,5 s anche con il movimento ridotto. Gli effetti di Bafometto sul gioco (Omen, crediti, salute) non sono ancora definiti dal regolamento, e una sua rappresentazione nella scena di corsa resta da progettare.
 
 `?intro=off` disattiva l'apertura.
 
@@ -118,7 +93,7 @@ Lo script di registrazione accetta `--reload-after N` per ricaricare la pagina d
 
 ## Kit modulare (fase 3, primo passo)
 
-`kit/kit.ts` trasforma il modello della scena in primitive (parallelepipedi e cilindri) raggruppate per elemento, secondo il kit minimo della specifica (§5). È puro e indipendente da Three.js; il renderer le disegna con istanze, tre materiali neutri (calcestruzzo, metallo, scuro) e le rende trasparenti per intero quando il loro elemento nasconde la pedina.
+`kit/kit.ts` trasforma il modello della scena in primitive (parallelepipedi e cilindri) raggruppate per elemento, secondo il kit minimo della specifica (§5). È puro e indipendente da Three.js; il renderer della città le disegna con istanze e tre materiali neutri (calcestruzzo, metallo, scuro); la scena di corsa usa gli stessi pezzi in scala da megastruttura.
 
 | Elemento | Moduli |
 | --- | --- |
@@ -179,16 +154,6 @@ Le domande vengono dalle banche del sito, le stesse della versione precedente: i
 - **Banca:** scelta nella schermata di avvio; con `?seed=` (sviluppo) `?bank=ID`, altrimenti la prima del catalogo.
 
 **Non ancora:** rendering delle formule (KaTeX nella versione precedente); riepilogo delle domande a fine partita. La durata del timer resta da fissare nel regolamento.
-
-## Caricamento per settori (§8)
-
-`scene/sectors.ts` divide il piano in settori di 16 unità. La scena grafica contiene solo gli elementi dei settori caricati, attorno al punto inquadrato e a ogni pedina, che è una possibile destinazione di un cambio di turno. Il kit si costruisce sull'intera vista presentata e poi si filtra, quindi un elemento ricaricato riappare identico. Scaricare toglie solo la grafica: mappa, stato, esplorazione, salvataggio e radar non leggono i settori. Le pedine non vengono mai scaricate. I settori si aggiornano prima di ogni disegno, quindi nessun fotogramma mostra un settore mancante, nemmeno alla fine di una dissolvenza. Con l'isteresi un settore entra entro il raggio e si scarica solo oltre il raggio più 16 unità.
-
-**Raggio calcolato, non scelto a mano.** Per il punto inquadrato il raggio è la massima distanza orizzontale dei volumi che possono comparire nell'immagine o proiettarvi un'ombra. Sono il tronco di piramide della camera, fino alla profondità in cui la nebbia copre tutto, e la camera d'ombra del sole, entrambi tagliati alla fascia di quote della città. Per le pedine vale il raggio della più ampia delle inquadrature ordinarie. Ottica, nebbia e ombra vengono da `scene/dimensions.ts`, la stessa fonte del renderer. I test confrontano il calcolo con i volumi di three.js e verificano, fotogramma per fotogramma, che il solo fuoco della camera tenga caricato tutto ciò che può comparire.
-
-**Effetto attuale: nessuno scaricamento.** Con la nebbia attuale il raggio va da circa 80 unità (bivio) a 150 (sede di Bafometto), mentre la diagonale delle caselle di una città non supera 115 unità (40 semi). Nei test resta caricato il 100% dei settori occupati. Il meccanismo diventerà efficace da solo quando la nebbia sarà più corta o le città più grandi: la distanza della nebbia è una scelta di atmosfera, rinviata con le altre decisioni artistiche. Per verificarlo oggi, `?sectors=R` (solo sviluppo) forza un raggio più corto, e allora si vedono comparire i settori. `?sectors=off` carica sempre la città intera, per confronto.
-
-Verifiche nel browser: con il raggio calcolato l'immagine del canvas coincide pixel per pixel con quella della città intera. Con `sectors=4` una partita avanzata scarica davvero parte della città, ma esplorazione, posizioni, turno e radar restano identici a quelli della stessa partita senza settori, e le caselle delle pedine restano sempre disegnate. Ogni cambio dei settori caricati ricostruisce l'intera scena statica: in quella prova circa 44 ricostruzioni in 24 azioni, la più lenta sotto 7 ms in WebGL software. Per le dimensioni attuali basta. Se una città più grande lo rendesse lento, si passerà a gruppi separati per settore.
 
 ## Rete generata
 

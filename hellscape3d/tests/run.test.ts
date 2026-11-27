@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import * as THREE from "three";
 import { test } from "node:test";
 import { applyAction, type Game, type GameEvent, type GameState } from "../src/logic/index.ts";
+import { BAFOMETTO_LINES } from "../src/bafometto.ts";
 import { buildCityLayout } from "../src/layout/layout.ts";
 import { maxDistance, MIN_SCREEN_FRACTION, poseFor, RUNNER_HEIGHT } from "../src/run/camera.ts";
 import { junctionRoomOf, roomOf, slopeOf, type Room } from "../src/run/rooms.ts";
@@ -242,4 +243,33 @@ test("regia della corsa: una partita aperta (o ripresa) in attesa del bivio part
     assert.deepEqual([opened.room.key, opened.runners, opened.activePlayerId, opened.running], [reference.room.key, reference.runners, reference.activePlayerId, reference.running]);
   }
   assert.ok(checked >= 2, `bivi esercitati: ${checked}`);
+});
+
+test("regia della corsa: battute di Bafometto all'apertura, sui terminali e a fine partita, anche con il movimento ridotto", () => {
+  for (const reducedMotion of [false, true]) {
+    let terminals = 0;
+    for (const seed of ["battute-1", "battute-2", "battute-3", "battute-4"]) {
+      const { game, layout } = city(seed);
+      const director = new RunDirector(game.map, layout, game.state, { reducedMotion });
+      director.intro();
+      while (director.busy) director.update(1 / 30);
+      const spoken = director.takeAnnouncements().map((a) => a.moment);
+      assert.deepEqual(spoken, ["intro"], "apertura senza battuta");
+      let state = game.state;
+      for (let i = 0; i < 400 && state.phase !== "ended"; i++) {
+        const result = applyAction(game.map, state, autoAction(game, state));
+        director.enqueue(result.events, result.state);
+        while (director.busy) director.update(1 / 30);
+        const said = director.takeAnnouncements();
+        const terminal = result.events.some((e) => e.type === "arrived" && e.special === "terminale");
+        assert.equal(said.some((a) => a.moment === "terminal"), terminal, "battuta del terminale fuori posto");
+        if (terminal) terminals++;
+        assert.equal(said.some((a) => a.moment === "end"), result.state.phase === "ended", "battuta finale fuori posto");
+        for (const a of said) assert.equal(a.text, BAFOMETTO_LINES[a.moment]);
+        state = result.state;
+      }
+      assert.equal(state.phase, "ended");
+    }
+    assert.ok(terminals > 0, "nessun terminale nelle partite di prova");
+  }
 });

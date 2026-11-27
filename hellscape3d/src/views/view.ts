@@ -4,7 +4,7 @@
  * timer, salvataggi e interfaccia; la vista riceve gli eventi del motore e
  * disegna. Nessuna vista modifica lo stato.
  */
-import type { Announcement } from "../director/director.ts";
+import type { Announcement } from "../bafometto.ts";
 import type { Vec3 } from "../layout/types.ts";
 import type { GameEvent, GameState } from "../logic/state.ts";
 

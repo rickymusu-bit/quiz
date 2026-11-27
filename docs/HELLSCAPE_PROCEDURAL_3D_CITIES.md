@@ -179,7 +179,7 @@ Gli indizi ambientali dell'uscita, previsti come quarto passo, sono stati abband
 
 Il prototipo ha inoltre una schermata di avvio provvisoria (banca di domande, argomenti, da uno a sei giocatori con i nomi, durata della domanda), le cui scelte si salvano con la partita.
 
-Restano utili generatore, motore, salvataggi, domande, kit modulare e radar. La vista della città a tre quarti resta come strumento di sviluppo per giudicare le mappe. Transizioni di camera nella città, ostacoli trasparenti e caricamento per settori perdono il loro scopo nel gioco: si rimuovono, dopo aver verificato le dipendenze, quando la scena di corsa li avrà sostituiti.
+Restano utili generatore, motore, salvataggi, domande, kit modulare e radar. La vista della città a tre quarti resta come strumento di sviluppo per giudicare le mappe. Transizioni di camera nella città, ostacoli trasparenti e caricamento per settori, che avevano perso il loro scopo nel gioco, sono stati rimossi il 27 novembre, quando la scena di corsa è diventata la pagina principale.
 
 ## Registro delle variazioni
 
