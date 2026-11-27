@@ -105,6 +105,21 @@ async function waitReady(page: Page, skipIntro = true): Promise<void> {
   }
 }
 
+/** Etichette delle porte al bivio: nessuna sovrapposizione con dado, turno, radar, avvisi e pannello. */
+async function assertBadgesClear(page: Page): Promise<void> {
+  const overlaps = await page.evaluate(() => {
+    const rects = (selector: string): DOMRect[] =>
+      [...document.querySelectorAll<HTMLElement>(selector)].filter((e) => !e.hidden && e.getClientRects().length > 0).map((e) => e.getBoundingClientRect());
+    const hud = [".hud-turn", ".hud-die", ".hud-radar", ".hud-toast", ".hud-speech", ".hud-panel"].flatMap((s) => rects(s).map((r) => ({ s, r })));
+    const found: string[] = [];
+    rects(".hud-badge").forEach((b, i) => {
+      for (const { s, r } of hud) if (b.left < r.right && b.right > r.left && b.top < r.bottom && b.bottom > r.top) found.push(`etichetta ${i + 1} su ${s}`);
+    });
+    return found;
+  });
+  assert.deepEqual(overlaps, [], "etichette delle porte sovrapposte all'interfaccia");
+}
+
 /** Radar: un punto per giocatore, quello di turno al centro; nessuna casella disegnata. */
 function assertRadar(debug: DebugInfo): void {
   assert.equal(debug.radar.players.length, Object.keys(debug.pawns).length);
@@ -332,6 +347,7 @@ try {
       const beforeFork = debug.playerCells[mover]!;
       assert.ok(debug.forkChoices.length >= 2 && debug.forkChoices.every((c) => c.anchored), "alternative non segnalate nella scena");
       assert.equal(await page.locator(".hud-badge").count(), debug.forkChoices.length);
+      await assertBadgesClear(page);
       const chosen = debug.forkChoices[1]!.to;
       await page.keyboard.press("Digit2");
       await page.waitForTimeout(100);
@@ -686,6 +702,7 @@ try {
           assert.equal(d.room.key, `bivio:${active}`);
           assert.ok(!d.running && d.approach === 0, "non fermo davanti alle porte");
           assert.ok(d.forkChoices.length >= 2 && d.forkChoices.every((c) => c.anchored), "porte non segnalate");
+          await assertBadgesClear(page);
           if (forks === 1) await page.screenshot({ path: join(artifacts, `corsa-bivio-${device.name}.png`) });
         } else {
           assert.equal(d.room.key, active, "scena fuori dalla stanza del giocatore di turno");
