@@ -1,24 +1,32 @@
 /**
- * Inquadratura secondo la stanza (specifica §6): laterale in salita, a tre
- * quarti in piano e in discesa, posteriore nella stanza del bivio. La distanza
- * segue la grandezza della stanza, si accorcia mentre la domanda è aperta e
- * non lascia scendere il personaggio sotto un'altezza minima sullo schermo.
- * La camera resta dallo stesso lato del percorso: il corridore va sempre verso
- * destra o dentro lo schermo.
+ * Inquadratura della scena di corsa (specifica §6). È scelta quando la stanza
+ * viene generata, in base alle sue caratteristiche (tipo e grandezza):
+ * angolazione, inclinazione, distanza e campo visivo, variati dal seme entro
+ * intervalli per tipo. Nella stanza del bivio la camera sta alle spalle del
+ * personaggio, verso le porte.
+ *
+ * Vincoli comuni: il personaggio non scende sotto un'altezza minima
+ * sull'immagine; la camera resta dallo stesso lato del percorso (il corridore
+ * va sempre verso destra o dentro lo schermo); con la domanda aperta si
+ * avvicina.
  */
-import type { Room } from "./rooms.ts";
+import type { Rng } from "../logic/rng.ts";
 
 type V3 = [number, number, number];
 
-export type ShotKind = "laterale" | "angolata" | "trequarti" | "spalle";
-
-/** Inquadrature di riferimento rispetto al corridore all'origine (le stesse del confronto). */
-export const SHOTS: Readonly<Record<ShotKind, { position: V3; target: V3; fov: number }>> = {
-  laterale: { position: [1.5, 1.5, 11], target: [1.5, 1.1, 0], fov: 40 },
-  angolata: { position: [5.6, 2.6, 10.2], target: [1.6, 1.0, 0], fov: 40 },
-  trequarti: { position: [8.4, 4.6, 9.0], target: [1.6, 1.4, 0], fov: 46 },
-  spalle: { position: [-6.5, 3.0, 1.2], target: [6, 1.3, 0], fov: 55 },
-};
+/**
+ * Inquadratura di una stanza, rispetto al corridore all'origine che corre verso +X.
+ * `yaw`: 0 di profilo (camera sul lato +Z), positivo ruotando verso il davanti,
+ * negativo verso le spalle; `pitch`: positivo dall'alto, negativo dal basso.
+ */
+export interface RoomShot {
+  yaw: number;
+  pitch: number;
+  distance: number;
+  fov: number;
+  /** Punto guardato davanti al corridore, lungo X. */
+  lookAhead: number;
+}
 
 export interface CameraPose {
   position: V3;
@@ -28,13 +36,48 @@ export interface CameraPose {
 
 /** Altezza del corridore e frazione minima dell'altezza dell'immagine che deve occupare (provvisoria). */
 export const RUNNER_HEIGHT = 1.9;
-export const MIN_SCREEN_FRACTION = 0.14;
+export const MIN_SCREEN_FRACTION = 0.05;
 /** Riduzione della distanza mentre la domanda è aperta. */
 export const QUESTION_ZOOM = 0.8;
 
-export function shotKindFor(room: Room): ShotKind {
-  if (room.kind === "bivio") return "spalle";
-  return room.slope === "salita" ? "laterale" : "trequarti";
+type Range = readonly [number, number];
+interface ShotRule {
+  yaw: Range;
+  pitch: Range | readonly Range[];
+  /** Distanza in unità di scena per grandezza 1 della stanza. */
+  distance: Range;
+  fov: number;
+  lookAhead: number;
+}
+
+/**
+ * Regole PROVVISORIE per tipo di stanza: corridoio di profilo, vicino alla
+ * parete; sala larga e a tre quarti, per le file di pilastri; ponte dall'alto,
+ * per il vuoto; pozzo dal basso o dall'alto; bivio alle spalle, verso le porte.
+ */
+const RULES: Readonly<Record<string, ShotRule>> = {
+  corridoio: { yaw: [0, 20], pitch: [4, 12], distance: [11, 16], fov: 42, lookAhead: 1.5 },
+  sala: { yaw: [25, 45], pitch: [6, 16], distance: [16, 24], fov: 50, lookAhead: 2 },
+  ponte: { yaw: [10, 35], pitch: [18, 32], distance: [16, 24], fov: 50, lookAhead: 2 },
+  pozzo: { yaw: [15, 30], pitch: [[-18, -8], [42, 58]], distance: [14, 20], fov: 56, lookAhead: 1 },
+  partenza: { yaw: [15, 25], pitch: [8, 12], distance: [12, 14], fov: 46, lookAhead: 1.5 },
+  uscita: { yaw: [25, 35], pitch: [6, 10], distance: [13, 15], fov: 46, lookAhead: 4 },
+  bivio: { yaw: [-80, -76], pitch: [14, 18], distance: [7, 8], fov: 55, lookAhead: 7 },
+};
+
+const pickIn = (rng: Rng, [a, b]: Range): number => a + rng.next() * (b - a);
+
+/** Inquadratura generata con la stanza. */
+export function generateShot(kind: string, size: number, rng: Rng): RoomShot {
+  const rule = RULES[kind] ?? RULES.corridoio!;
+  const pitchRange = Array.isArray(rule.pitch[0]) ? rng.pick(rule.pitch as readonly Range[]) : (rule.pitch as Range);
+  return {
+    yaw: pickIn(rng, rule.yaw),
+    pitch: pickIn(rng, pitchRange),
+    distance: Math.min(pickIn(rng, rule.distance) * size, maxDistance(rule.fov)),
+    fov: rule.fov,
+    lookAhead: rule.lookAhead,
+  };
 }
 
 /** Distanza massima perché il corridore occupi almeno MIN_SCREEN_FRACTION dell'altezza dell'immagine. */
@@ -42,18 +85,23 @@ export function maxDistance(fov: number): number {
   return RUNNER_HEIGHT / (2 * Math.tan(((fov / 2) * Math.PI) / 180) * MIN_SCREEN_FRACTION);
 }
 
-export function poseFor(room: Room, options: { question?: boolean; kind?: ShotKind } = {}): CameraPose {
-  const shot = SHOTS[options.kind ?? shotKindFor(room)];
-  const offset: V3 = [shot.position[0] - shot.target[0], shot.position[1] - shot.target[1], shot.position[2] - shot.target[2]];
-  const base = Math.hypot(...offset);
-  // Stanze più grandi: camera più lontana, per mostrare la megastruttura oltre al personaggio.
-  let distance = base * (0.7 + 0.4 * room.size);
-  if (options.question) distance *= QUESTION_ZOOM;
-  distance = Math.min(distance, maxDistance(shot.fov));
-  const k = distance / base;
+/** Inquadrature fisse, SOLO SVILUPPO (?camera=), le stesse del primo confronto. */
+export const PRESETS: Readonly<Record<"laterale" | "angolata" | "trequarti" | "spalle", RoomShot>> = {
+  laterale: { yaw: 0, pitch: 2, distance: 11, fov: 40, lookAhead: 1.5 },
+  angolata: { yaw: 21, pitch: 8, distance: 10.5, fov: 40, lookAhead: 1.6 },
+  trequarti: { yaw: 37, pitch: 18, distance: 11.5, fov: 46, lookAhead: 1.6 },
+  spalle: { yaw: -79, pitch: 14, distance: 7, fov: 55, lookAhead: 6 },
+};
+export type PresetKind = keyof typeof PRESETS;
+
+export function poseFor(shot: RoomShot, options: { question?: boolean } = {}): CameraPose {
+  const distance = shot.distance * (options.question ? QUESTION_ZOOM : 1);
+  const yaw = (shot.yaw * Math.PI) / 180,
+    pitch = (shot.pitch * Math.PI) / 180;
+  const target: V3 = [shot.lookAhead, 1.2, 0];
   return {
-    position: [shot.target[0] + offset[0] * k, shot.target[1] + offset[1] * k, shot.target[2] + offset[2] * k],
-    target: [...shot.target],
+    position: [target[0] + distance * Math.sin(yaw) * Math.cos(pitch), target[1] + distance * Math.sin(pitch), target[2] + distance * Math.cos(yaw) * Math.cos(pitch)],
+    target,
     fov: shot.fov,
   };
 }

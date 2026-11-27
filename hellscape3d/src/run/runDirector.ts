@@ -11,7 +11,7 @@
  *   - uscita raggiunta: stanza d'uscita e fine della partita.
  * - Turno successivo: la scena passa alla stanza del giocatore di turno; se è
  *   la stessa stanza mostrata, non cambia.
- * - Inquadratura secondo la stanza, più vicina con la domanda aperta; cambi
+ * - Inquadratura scelta con la stanza, più vicina con la domanda aperta; cambi
  *   morbidi, e per stacco con il movimento ridotto.
  */
 import { BAFOMETTO_LINES, type BafomettoMoment } from "../director/bafometto.ts";
@@ -19,7 +19,7 @@ import type { Announcement } from "../director/director.ts";
 import type { CityLayout } from "../layout/types.ts";
 import type { GameEvent, GameState } from "../logic/state.ts";
 import type { CityMap } from "../logic/types.ts";
-import { blendPose, poseFor, type CameraPose, type ShotKind } from "./camera.ts";
+import { blendPose, poseFor, PRESETS, type CameraPose, type PresetKind } from "./camera.ts";
 import { junctionRoomOf, roomOf, type Room } from "./rooms.ts";
 
 /** Velocità di corsa (unità/s): ordinaria, con la domanda aperta, in uscita dalla stanza. */
@@ -71,7 +71,7 @@ interface Clip {
 export interface RunDirectorOptions {
   reducedMotion?: boolean;
   /** Solo sviluppo: inquadratura fissa, per confronto. */
-  shot?: ShotKind;
+  shot?: PresetKind;
 }
 
 const ease = (t: number): number => t * t * (3 - 2 * t);
@@ -80,7 +80,7 @@ export class RunDirector {
   private readonly map: CityMap;
   private readonly layout: CityLayout;
   private readonly reducedMotion: boolean;
-  private readonly shot: ShotKind | undefined;
+  private readonly shot: PresetKind | undefined;
   private readonly frame: RunFrame;
   private readonly queue: Clip[] = [];
   private current: Clip | null = null;
@@ -218,7 +218,7 @@ export class RunDirector {
   }
 
   private pose(room: Room, question = false): CameraPose {
-    return poseFor(room, this.shot ? { question, kind: this.shot } : { question });
+    return poseFor(this.shot ? PRESETS[this.shot] : room.shot, { question });
   }
 
   private time(seconds: number): number {

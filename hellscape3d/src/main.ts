@@ -25,7 +25,7 @@ import "./ui/hud.css";
 import { applyAction, createGame, rngFromSeed, saveToStorage, type Game, type GameAction, type GameState, type KeyValueStorage } from "./logic/index.ts";
 import { buildCityLayout } from "./layout/layout.ts";
 import { panelInset } from "./render/viewOffset.ts";
-import { SHOTS as RUN_SHOTS, type ShotKind } from "./run/camera.ts";
+import { PRESETS, type PresetKind } from "./run/camera.ts";
 import { CityView } from "./views/cityView.ts";
 import { RunView } from "./views/runView.ts";
 import type { GameView } from "./views/view.ts";
@@ -134,13 +134,13 @@ if (!resumed) persist();
 
 const canvas = document.querySelector<HTMLCanvasElement>("#scene")!;
 const fade = document.querySelector<HTMLElement>("#fade")!;
-const shotParam = params.get("camera") as ShotKind | null;
+const shotParam = params.get("camera") as PresetKind | null;
 const fixedTime = params.has("t") ? Number(params.get("t")) : undefined;
 const view: GameView =
   sceneKind === "corsa"
     ? new RunView(canvas, game.map, layout, state, {
         reducedMotion,
-        ...(shotParam && shotParam in RUN_SHOTS ? { shot: shotParam } : {}),
+        ...(shotParam && shotParam in PRESETS ? { shot: shotParam } : {}),
         ...(params.get("anteprima") ? { preview: params.get("anteprima")! } : {}),
         ...(fixedTime !== undefined && Number.isFinite(fixedTime) ? { fixedTime } : {}),
       })

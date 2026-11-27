@@ -87,9 +87,9 @@ I personaggi sono modelli 3D animati, non pedine statiche; corrono, reagiscono a
   - **evento legato al personaggio:** un effetto della casella d'arrivo, come il terminale di Bafometto o un evento, oppure il raggiungimento dell'uscita, si mostra e si gestisce subito, nella stanza d'arrivo.
 
   Poi la scena passa al giocatore del turno successivo. Se si trova nella stessa stanza del precedente, la scena non cambia.
-- **Inquadratura secondo la stanza:**
-  - camera laterale in salita, a tre quarti in piano e in discesa, posteriore nella stanza del bivio;
-  - distanza secondo la grandezza della stanza, con un'altezza minima del personaggio sullo schermo, anche su mobile, e una camera più vicina mentre la domanda è aperta;
+- **Inquadratura scelta con la stanza:**
+  - quando la stanza viene generata, se ne sceglie anche l'inquadratura in base alle sue caratteristiche, cioè tipo e grandezza: angolazione, inclinazione, distanza e campo visivo, variati dal seme entro intervalli per tipo. La pendenza non decide l'inquadratura. Nella stanza del bivio la camera sta alle spalle del personaggio, verso le porte;
+  - il personaggio non scende sotto un'altezza minima sullo schermo, anche su mobile: oggi il 5% dell'altezza dell'immagine, valore provvisorio. La camera si avvicina mentre la domanda è aperta;
   - la camera resta sempre dallo stesso lato del percorso: il personaggio corre verso destra o dentro lo schermo, mai verso sinistra;
   - i cambi di inquadratura sono morbidi, indicativamente 0,5 s; con il movimento ridotto avvengono per stacco.
 - **Leggibilità.** Durante la domanda lo scorrimento è lento o attenuato e il pannello ha uno sfondo pieno. Con il movimento ridotto la stanza non scorre: si mostra un'immagine ferma e i cambi di scena avvengono per stacco.
@@ -100,7 +100,7 @@ I personaggi sono modelli 3D animati, non pedine statiche; corrono, reagiscono a
 | Domanda | Corsa rallentata, camera più vicina, domanda sovrapposta in HTML/CSS |
 | Dado | Animazione dedicata, esito leggibile |
 | Avanzamento | Corsa accelerata fino all'uscita dalla stanza; la stanza d'arrivo resta nascosta |
-| Bivio | Stanza di passaggio, camera posteriore: arresto davanti agli imbocchi, scelta fra etichette generiche, imbocco della strada scelta |
+| Bivio | Stanza di passaggio, camera alle spalle: arresto davanti agli imbocchi, scelta fra etichette generiche, imbocco della strada scelta |
 | Evento | Stanza d'arrivo mostrata e risoluzione immediata dell'evento; all'uscita, fine della partita |
 | Fine turno | Scena del giocatore successivo, o nessun cambio se è nella stessa stanza |
 
@@ -153,7 +153,7 @@ Fasi suggerite: (1) modello logico e test; (2) graybox 3D modulare con camera; (
 - Tutti i rami offerti sono raggiungibili e coerenti con la lunghezza relativa e la difficoltà; nessuna geometria impedisce il movimento. Le alternative non sono manifestamente dominate nelle simulazioni.
 - Il giocatore vede soltanto i dati autorizzati: la stanza corrente, la stanza del bivio con i suoi imbocchi, la stanza d'arrivo solo quando c'è un evento, gli indizi a soglie. HUD, radar, scena di corsa e transizioni non svelano la mappa sconosciuta; il radar mostra soltanto i giocatori e, entro la portata, l'uscita.
 - Il bivio si attraversa solo avanzando: la scelta non comporta domande, il bivio non conta come passo e nessun avanzamento vi termina; i passi residui proseguono sul ramo scelto.
-- Ogni stanza si ripete senza giunture visibili; l'avanzamento mostra l'uscita dalla stanza, le stanze dei bivi attraversati e gli eventi all'arrivo, mai la stanza d'arrivo senza evento; la schermata mostra il solo giocatore di turno, più chi si trova nella sua stanza; l'inquadratura segue il tipo di stanza e il personaggio non scende sotto l'altezza minima sullo schermo.
+- Ogni stanza si ripete senza giunture visibili; l'avanzamento mostra l'uscita dalla stanza, le stanze dei bivi attraversati e gli eventi all'arrivo, mai la stanza d'arrivo senza evento; la schermata mostra il solo giocatore di turno, più chi si trova nella sua stanza; l'inquadratura è quella scelta con la stanza e il personaggio non scende sotto l'altezza minima sullo schermo.
 - Transizioni funzionanti fra giocatori in caselle diverse e nella stessa casella e fra Bafometto e giocatore; nessuna perdita dello stato, doppia risoluzione, consumo di timer durante blocchi o modifica dell'esito saltando un'animazione.
 - Ricaricamento conserva mondo e progressi, compresa una scelta al bivio in attesa durante un avanzamento, con i passi residui; caricamento e scaricamento degli scenari non alterano topologia e posizione dei giocatori.
 - Verificare compatibilità desktop/mobile e qualità con registrazioni reali del browser, viewport e revisione secondo AGENTS.md. Nessuna evidenza di runtime è richiesta o dichiarata per la presente PR esclusivamente documentale.
@@ -165,14 +165,14 @@ Prima delle relative implementazioni, definire lunghezza/durata delle gare, nume
 Aperte dalla revisione del 26 novembre:
 - etichetta del ramo intermedio ed eventuali varianti delle etichette per tema;
 - soglie degli indizi dell'uscita e loro aspetto;
-- tipi di stanza, regole con cui vengono generati, grandezze e distanze della camera, altezza minima del personaggio sullo schermo; stanze di partenza e d'uscita disegnate;
+- tipi di stanza, regole con cui vengono generati e con cui se ne sceglie l'inquadratura, grandezze; stanze di partenza e d'uscita disegnate;
 - lunghezza del ciclo dello scenario e velocità di corsa nelle varie fasi, compreso il rallentamento durante la domanda;
 - portata del radar, oggi provvisoria (6 caselle in linea d'aria: l'uscita compare a 6–9 caselle di percorso, in casi rari fino a 16);
 - bilanciamento con la nuova regola dei bivi: va rifatto con simulazioni, perché oggi il bivio è una casella e il calcolo tiene conto della scelta a inizio turno.
 
 ### Stato del prototipo rispetto alla revisione del 26 novembre
 
-Il prototipo in `hellscape3d/` implementa la regola dei bivi di questa revisione: bivio come punto di passaggio nel generatore e nel motore, salvataggi del formato precedente conservati a parte, bilanciamento rifatto; inoltre il radar al posto della minimappa. La pagina `corsa.html` implementa in graybox la scena di corsa con le stanze: stanze generate con inquadratura secondo la stanza, uscita dalla stanza, stanze dei bivi, eventi all'arrivo, etichette generiche al bivio. La pagina `index.html` mostra la stessa partita nella vista della città, come strumento di sviluppo. Le modifiche vanno fatte per passi giudicabili:
+Il prototipo in `hellscape3d/` implementa la regola dei bivi di questa revisione: bivio come punto di passaggio nel generatore e nel motore, salvataggi del formato precedente conservati a parte, bilanciamento rifatto; inoltre il radar al posto della minimappa. La pagina `corsa.html` implementa in graybox la scena di corsa con le stanze: stanze generate con l'inquadratura scelta insieme alla stanza, uscita dalla stanza, stanze dei bivi, eventi all'arrivo, etichette generiche al bivio. La pagina `index.html` mostra la stessa partita nella vista della città, come strumento di sviluppo. Le modifiche vanno fatte per passi giudicabili:
 1. bivio come punto di passaggio nel generatore e nel motore (fatto);
 2. radar al posto della minimappa (fatto);
 3. scena di corsa in graybox: stanze cicliche generate per casella con inquadratura secondo la stanza, giocatori nella stessa stanza, uscita dalla stanza, stanze dei bivi con imbocchi ed etichette, eventi all'arrivo, movimento ridotto (fatto in graybox nella pagina `corsa.html`, con stanze di partenza e d'uscita provvisorie);
@@ -187,3 +187,4 @@ Restano utili generatore, motore, salvataggi, domande, kit modulare e radar. La 
 - 2026-11-26, correzione: il bivio non è una casella ma un punto di passaggio fra due caselle. Si sceglie durante l'avanzamento, senza domanda; non conta come passo, non vi si termina l'avanzamento e i passi residui proseguono sul ramo scelto. Sostituisce la regola della voce precedente, che permetteva di fermarsi sul bivio e conservare la scelta fra un turno e l'altro.
 - 2026-11-26, minimappa: sostituita da un radar centrato sul giocatore di turno, con gli altri giocatori come punti e l'uscita visibile solo entro la portata. Non si disegnano caselle né percorsi.
 - 2026-11-27, stanze: ogni casella è una stanza enorme e apparentemente infinita, con *Blame!* come riferimento di atmosfera, generata proceduralmente tranne partenza e uscita. Chi risponde giusto esce dalla stanza e la stanza d'arrivo resta nascosta; si mostrano invece le stanze dei bivi attraversati, stanze di passaggio che non sono caselle, e gli eventi all'arrivo, gestiti subito. Poi la scena passa al giocatore successivo, e non cambia se è nella stessa stanza. Inquadratura secondo la stanza: laterale in salita, a tre quarti in piano e in discesa, posteriore al bivio, con distanza secondo la grandezza e altezza minima del personaggio sullo schermo.
+- 2026-11-27, inquadratura: scelta quando la stanza viene generata, in base alle sue caratteristiche (tipo e grandezza), al posto delle regole su salita, piano e discesa; camera alle spalle nella stanza del bivio; altezza minima del personaggio portata al 5% dell'immagine.

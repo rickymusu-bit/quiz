@@ -144,18 +144,21 @@ Lo script di registrazione accetta `--reload-after N` per ricaricare la pagina d
   - uscita: avvicinamento al varco e fine della partita;
   - turno successivo: cambio di stanza con dissolvenza, ma nessun cambio se il giocatore di turno è nella stanza già mostrata;
   - movimento ridotto: stanza ferma e cambi per stacco.
-- **Inquadratura** (`run/camera.ts`):
-  - laterale in salita, a tre quarti in piano e in discesa, posteriore al bivio;
-  - distanza proporzionale alla grandezza della stanza, più vicina con la domanda aperta, dove anche la corsa rallenta;
-  - il personaggio non scende sotto il 14% dell'altezza dell'immagine (valore provvisorio);
-  - la camera resta dal lato +Z del percorso e i cambi sono morbidi (0,5 s).
+- **Inquadratura** (`run/camera.ts`): scelta quando la stanza viene generata, in base a tipo e grandezza. Angolazione, inclinazione, distanza e campo visivo sono estratti dal seme entro intervalli per tipo, provvisori:
+  - corridoio di profilo e vicino alla parete;
+  - sala larga e a tre quarti;
+  - ponte dall'alto, per il vuoto;
+  - pozzo dal basso o dall'alto;
+  - bivio alle spalle, verso le porte.
+
+  La pendenza non decide l'inquadratura. Il personaggio non scende sotto il 5% dell'altezza dell'immagine, valore provvisorio. Con la domanda aperta la camera si avvicina e la corsa rallenta. La camera resta dal lato +Z del percorso e i cambi sono morbidi (0,5 s).
 - **Etichette del bivio** (tutte le viste): «Scorciatoia pericolosa», «Via incerta» (provvisoria), «Strada sicura», senza lunghezze né difficoltà esplicite.
 - **Parametri solo di sviluppo** in `corsa.html`:
   - `?camera=laterale|angolata|trequarti|spalle` fissa l'inquadratura, per confronto;
   - `?anteprima=ID` o `bivio:ID` mostra una stanza;
   - `?t=S` fissa l'istante, per i test.
 
-Verifiche: test Node su stanze, geometria, inquadrature e regia (stanza d'arrivo mai mostrata senza evento, nessuna dissolvenza se la stanza non cambia, movimento ridotto, salto equivalente). Nel browser, desktop e mobile:
+Verifiche: test Node su stanze, geometria, inquadrature (per tipo, dal lato del percorso, altezza minima) e regia (stanza d'arrivo mai mostrata senza evento, nessuna dissolvenza se la stanza non cambia, movimento ridotto, salto equivalente). Nel browser, desktop e mobile:
 - per ogni tipo di stanza incontrato l'immagine si ripete identica dopo un periodo ed è diversa a metà;
 - in una partita giocata, a regia ferma la scena è sempre nella stanza del giocatore di turno, oppure nella stanza del bivio con le porte segnalate;
 - con il movimento ridotto la stanza resta ferma.

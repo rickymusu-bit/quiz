@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { applyAction, type Game, type GameEvent, type GameState } from "../src/logic/index.ts";
 import { buildCityLayout } from "../src/layout/layout.ts";
-import { maxDistance, MIN_SCREEN_FRACTION, poseFor, RUNNER_HEIGHT, SHOTS, shotKindFor } from "../src/run/camera.ts";
+import { maxDistance, MIN_SCREEN_FRACTION, poseFor, RUNNER_HEIGHT } from "../src/run/camera.ts";
 import { junctionRoomOf, roomOf, slopeOf, type Room } from "../src/run/rooms.ts";
 import { RUN_TIMING, RunDirector, type RunFrame } from "../src/run/runDirector.ts";
 import { STRIDE } from "../src/run/runScene.ts";
@@ -70,27 +70,33 @@ test("geometria delle stanze: periodica per le ripetute, con porte per bivio e u
   assert.ok(Number.isInteger(STRIP.period / STRIDE), "il passo divide il periodo");
 });
 
-const room = (kind: Room["kind"], slope: Room["slope"], size: number): Room => ({ key: "x", cellId: "x", kind, slope, size, district: "abitativo", doors: kind === "bivio" ? 2 : 0 });
-
-test("inquadratura secondo la stanza: laterale in salita, tre quarti in piano e discesa, posteriore al bivio", () => {
-  assert.equal(shotKindFor(room("corridoio", "salita", 1)), "laterale");
-  assert.equal(shotKindFor(room("sala", "piano", 1)), "trequarti");
-  assert.equal(shotKindFor(room("ponte", "discesa", 1)), "trequarti");
-  assert.equal(shotKindFor(room("bivio", "piano", 1)), "spalle");
-  for (const kind of ["laterale", "trequarti", "spalle"] as const) {
-    const near = poseFor(room("corridoio", kind === "laterale" ? "salita" : "piano", 0.8), kind === "spalle" ? { kind } : {});
-    const far = poseFor(room("pozzo", kind === "laterale" ? "salita" : "piano", 2.2), kind === "spalle" ? { kind } : {});
-    const d = (p: typeof near) => Math.hypot(p.position[0] - p.target[0], p.position[1] - p.target[1], p.position[2] - p.target[2]);
-    assert.ok(d(far) >= d(near), `${kind}: stanza più grande, camera non più lontana`);
-    // Altezza minima del personaggio sullo schermo, anche nella stanza più grande.
-    assert.ok(d(far) <= maxDistance(SHOTS[kind].fov) + 1e-9);
-    const fraction = RUNNER_HEIGHT / (2 * d(far) * Math.tan(((SHOTS[kind].fov / 2) * Math.PI) / 180));
-    assert.ok(fraction >= MIN_SCREEN_FRACTION - 1e-9, `${kind}: personaggio troppo piccolo (${fraction.toFixed(3)})`);
-    // Con la domanda aperta la camera si avvicina.
-    assert.ok(d(poseFor(room("corridoio", "piano", 1), { question: true })) < d(poseFor(room("corridoio", "piano", 1))));
-    // Lato fisso: la camera non passa mai dall'altra parte del percorso (z ≥ 0) né davanti al corridore che va verso +X.
-    assert.ok(near.position[2] >= 0 && far.position[2] >= 0);
+test("inquadratura scelta con la stanza: deterministica, per tipo, dal lato del percorso, personaggio visibile", () => {
+  const byKind = new Map<string, Room[]>();
+  for (const seed of ["inquadrature-1", "inquadrature-2", "inquadrature-3", "inquadrature-4"]) {
+    const { game, layout } = city(seed);
+    const rooms = [...Object.keys(game.map.cells).map((id) => roomOf(game.map, layout, id)), ...Object.keys(game.map.options).map((id) => junctionRoomOf(game.map, id))];
+    for (const r of rooms) {
+      (byKind.get(r.kind) ?? byKind.set(r.kind, []).get(r.kind)!).push(r);
+      const pose = poseFor(r.shot);
+      const d = Math.hypot(pose.position[0] - pose.target[0], pose.position[1] - pose.target[1], pose.position[2] - pose.target[2]);
+      // Altezza minima del personaggio sull'immagine.
+      const fraction = RUNNER_HEIGHT / (2 * d * Math.tan(((r.shot.fov / 2) * Math.PI) / 180));
+      assert.ok(fraction >= MIN_SCREEN_FRACTION - 1e-9, `${r.kind}: personaggio al ${(100 * fraction).toFixed(1)}%`);
+      assert.ok(d <= maxDistance(r.shot.fov) + 1e-9);
+      // Lato fisso: la camera resta dal lato +Z del percorso.
+      assert.ok(pose.position[2] >= 0, `${r.kind}: camera dall'altra parte del percorso`);
+      // Con la domanda aperta si avvicina.
+      const near = poseFor(r.shot, { question: true });
+      assert.ok(Math.hypot(near.position[0] - near.target[0], near.position[1] - near.target[1], near.position[2] - near.target[2]) < d);
+    }
   }
+  // Bivio sempre alle spalle, verso le porte; nelle altre stanze di lato o di tre quarti.
+  for (const r of byKind.get("bivio")!) assert.ok(r.shot.yaw < -60 && r.shot.lookAhead > 3);
+  for (const [kind, rooms] of byKind) if (kind !== "bivio") assert.ok(rooms.every((r) => r.shot.yaw >= 0 && r.shot.yaw <= 45), kind);
+  // L'inquadratura dipende dalla stanza, non dalla pendenza: stanze dello stesso tipo variano.
+  const corridors = byKind.get("corridoio") ?? [];
+  assert.ok(new Set(corridors.map((r) => r.shot.yaw.toFixed(2))).size > 1, "nessuna variazione fra stanze dello stesso tipo");
+  assert.equal(MIN_SCREEN_FRACTION, 0.05);
 });
 
 /** Partita automatica con la regia della corsa: ogni fotogramma registrato. */

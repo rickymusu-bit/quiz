@@ -7,7 +7,7 @@ import type { Announcement } from "../director/director.ts";
 import type { CityLayout, Vec3 } from "../layout/types.ts";
 import type { GameEvent, GameState } from "../logic/state.ts";
 import type { CityMap } from "../logic/types.ts";
-import { poseFor, type ShotKind } from "../run/camera.ts";
+import { poseFor, PRESETS, type PresetKind } from "../run/camera.ts";
 import { junctionRoomOf, roomOf, type Room } from "../run/rooms.ts";
 import { RUN_SPEED, RunDirector, type RunFrame } from "../run/runDirector.ts";
 import { RunScene } from "../run/runScene.ts";
@@ -17,7 +17,7 @@ import type { GameView } from "./view.ts";
 export interface RunViewOptions {
   reducedMotion: boolean;
   /** SOLO SVILUPPO: inquadratura fissa, per confronto. */
-  shot?: ShotKind;
+  shot?: PresetKind;
   /** SOLO SVILUPPO: stanza mostrata al posto di quella della regia (`ID` o `bivio:ID`), per le anteprime. */
   preview?: string;
   /** SOLO TEST: istante fisso della corsa (s), inquadratura senza interpolazione. */
@@ -122,7 +122,7 @@ export class RunView implements GameView {
     const still = fixed !== undefined || this.previewRoom !== null;
     // Anteprima o istante fisso: inquadratura esatta della stanza, senza interpolazione.
     const question = this.questionOpen && !this.director.busy;
-    this.scene.setCameraPose(still ? poseFor(room, this.options.shot ? { question, kind: this.options.shot } : { question }) : this.frame.camera);
+    this.scene.setCameraPose(still ? poseFor(this.options.shot ? PRESETS[this.options.shot] : room.shot, { question }) : this.frame.camera);
     this.scene.setBottomInset(inset);
     const presented = fixed !== undefined ? { ...this.frame, distance: fixed * RUN_SPEED.normal, approach: 0, advance: 0, door: null, running: true } : this.frame;
     this.scene.apply(this.previewRoom ? { ...presented, approach: 0, advance: 0, door: null } : presented);
