@@ -4,10 +4,11 @@
  * `corsa.html` mostra la scena di corsa (la schermata di gioco, specifica §6);
  * `index.html` la città a tre quarti, strumento di sviluppo.
  *
- * Senza parametri riprende la partita salvata nel browser, se esiste.
- * Parametri: ?seed=… (città: partita nuova), ?bank=ID (banca di domande del
- * catalogo per una partita nuova; predefinita la prima), ?steps=N (azioni automatiche
- * iniziali, senza regia: partita nuova), ?new=1 (partita nuova), ?timer=S (secondi per domanda), ?view=overview, ?motion=reduced,
+ * Senza parametri riprende la partita salvata nel browser; se non c'è, apre la
+ * schermata di avvio (banca, argomenti, giocatori, durata). ?new=1 apre la
+ * schermata di avvio anche se esiste un salvataggio.
+ * Parametri di sviluppo e test, che saltano la schermata: ?seed=… (città),
+ * ?bank=ID, ?steps=N (azioni automatiche iniziali, senza regia), ?timer=S (secondi per domanda), ?view=overview, ?motion=reduced,
  * ?intro=off (senza l'apertura di Bafometto),
  * ?reveal=all (SOLO SVILUPPO: città intera), ?occlusion=off (SOLO SVILUPPO:
  * ostacoli opachi, per confronto), ?sectors=off (SOLO SVILUPPO: città presentata
@@ -34,7 +35,8 @@ import { radarShapes, type RadarShapes } from "./ui/radar.ts";
 import { CATALOG, loadBank } from "./questions/catalog.ts";
 import { ask, loadLog, newLog, outcomeOf, present, recordAnswer, saveLog, type GivenAnswer, type PresentedQuestion, type QuestionLog } from "./questions/deck.ts";
 import { DEFAULT_QUESTION_SECONDS, QuestionTimer } from "./ui/timer.ts";
-import { decideStart, loadQuestionClock, memoryStorage, questionKey, saveQuestionClock } from "./session.ts";
+import { decideStart, defaultName, loadLastSettings, loadQuestionClock, memoryStorage, questionKey, saveLastSettings, saveQuestionClock, type GameSettings } from "./session.ts";
+import { showSetup } from "./ui/setup.ts";
 
 const params = new URLSearchParams(location.search);
 
@@ -62,21 +64,35 @@ const sectorsParam = params.get("sectors");
 const forcedSectorRadius = sectorsParam && sectorsParam !== "off" && Number(sectorsParam) > 0 ? Number(sectorsParam) : null;
 const sectorsEnabled = sectorsParam !== "off";
 const reducedMotion = params.get("motion") === "reduced" || matchMedia("(prefers-reduced-motion: reduce)").matches;
-const questionSeconds = Math.max(1, Number(params.get("timer")) || DEFAULT_QUESTION_SECONDS);
+/** SOLO SVILUPPO E TEST: durata della domanda imposta dall'indirizzo, al posto di quella della partita. */
+const timerParam = Number(params.get("timer")) > 0 ? Math.max(1, Number(params.get("timer"))) : null;
 /** Vista della pagina: scena di corsa (corsa.html) o città (index.html). */
 const sceneKind = document.body.dataset.scena === "corsa" ? "corsa" : "citta";
 let speed = 1;
 
-const game: Game =
-  start.kind === "resume"
-    ? start.game
-    : createGame({
-        seed: start.seed,
-        players: [
-          { id: "p1", name: "Dannato 1" },
-          { id: "p2", name: "Dannato 2" },
-        ],
-      }).game;
+/** Schermata di avvio: impostazioni della partita nuova, ricordate per la volta successiva. */
+const settings: GameSettings | null =
+  start.kind === "setup"
+    ? await showSetup(document.body, {
+        catalog: CATALOG,
+        loadBank,
+        initial: loadLastSettings(storage),
+        notice: start.notice ?? storageNotice,
+        saved: start.saved,
+        defaultSeconds: DEFAULT_QUESTION_SECONDS,
+      })
+    : null;
+if (settings) {
+  try {
+    saveLastSettings(storage, settings);
+  } catch {
+    // Senza salvataggio la schermata non sarà precompilata la prossima volta: nessun altro effetto.
+  }
+}
+
+const players = settings ? settings.players.map((name, i) => ({ id: `p${i + 1}`, name })) : [defaultName(0), defaultName(1)].map((name, i) => ({ id: `p${i + 1}`, name }));
+// Partita nuova dalla schermata: seme casuale. Con ?seed= (sviluppo e test) il seme indicato.
+const game: Game = start.kind === "resume" ? start.game : createGame(start.kind === "new" ? { seed: start.seed, players } : { players }).game;
 const seed = game.map.seed;
 
 /**
@@ -84,7 +100,7 @@ const seed = game.map.seed;
  * per una nuova quella indicata da ?bank= o la prima del catalogo.
  */
 const savedLog = resumed ? loadLog(storage, seed) : null;
-const requestedBank = savedLog?.bankId ?? params.get("bank") ?? CATALOG[0]!.id;
+const requestedBank = settings?.bankId ?? savedLog?.bankId ?? params.get("bank") ?? CATALOG[0]!.id;
 const bankEntry = CATALOG.find((entry) => entry.id === requestedBank) ?? CATALOG[0]!;
 const bankNotice = bankEntry.id === requestedBank ? null : `Banca «${requestedBank}» non disponibile: si usa «${bankEntry.name}».`;
 const bank = await loadBank(bankEntry).catch((error: unknown) => {
@@ -92,7 +108,11 @@ const bank = await loadBank(bankEntry).catch((error: unknown) => {
   throw error;
 });
 /** Registro delle domande: se manca o non appartiene a questa partita se ne apre uno nuovo. */
-let questionLog: QuestionLog = (savedLog && savedLog.bankId === bank.id ? loadLog(storage, seed, bank) : null) ?? newLog(seed, bank.id);
+let questionLog: QuestionLog =
+  (savedLog && savedLog.bankId === bank.id ? loadLog(storage, seed, bank) : null) ??
+  newLog(seed, bank.id, { topics: settings?.topics ?? [], seconds: settings?.seconds ?? DEFAULT_QUESTION_SECONDS });
+/** Durata della domanda: quella impostata con la partita (o imposta dall'indirizzo, solo sviluppo). */
+const questionSeconds = timerParam ?? questionLog.seconds;
 function storeLog(): void {
   try {
     saveLog(storage, questionLog);
@@ -159,8 +179,8 @@ let question: { key: string; timer: QuestionTimer } | null = null;
 let die: { value: number; hideAt: number | null } | null = null;
 let toast: { text: string; until: number } | null = resumed
   ? { text: "Partita ripresa", until: 2.5 }
-  : start.notice || storageNotice || bankNotice
-    ? { text: (start.kind === "new" ? start.notice : null) ?? storageNotice ?? bankNotice!, until: 6 }
+  : storageNotice || bankNotice
+    ? { text: storageNotice ?? bankNotice!, until: 6 }
     : null;
 let lastClockSave = 0;
 /** Battuta di Bafometto visibile, con il tempo di lettura (anche con il movimento ridotto). */
@@ -174,9 +194,8 @@ const hud = new Hud(document.querySelector<HTMLElement>("#hud")!, {
   roll: () => perform({ type: "roll" }),
   choose: (to) => perform({ type: "chooseBranch", to }),
   restart: () => {
-    // Un seme esplicito avvia una partita nuova, che sostituisce il salvataggio.
-    const next = new URLSearchParams({ seed: `${seed}+`, bank: bank.id });
-    location.search = next.toString();
+    // Schermata di avvio, precompilata con le impostazioni di questa partita.
+    location.search = "?new=1";
   },
 });
 
@@ -339,6 +358,9 @@ function drawFrame(seconds: number): void {
       bankId: bank.id,
       questionId: lastPanel?.kind === "question" || lastPanel?.kind === "feedback" ? lastPanel.question.id : null,
       questionText: lastPanel?.kind === "question" || lastPanel?.kind === "feedback" ? lastPanel.question.text : null,
+      questionTopic: lastPanel?.kind === "question" || lastPanel?.kind === "feedback" ? lastPanel.question.topic : null,
+      topics: questionLog.topics,
+      playerNames: state.players.map((p) => p.name),
       outcome: lastPanel?.kind === "feedback" ? outcomeOf(lastPanel.question) : null,
       askedCount: questionLog.asked.length,
       forkChoices: lastPanel?.kind === "fork" ? lastPanel.choices.map((c) => ({ number: c.number, to: c.to, anchored: c.anchor !== null })) : [],

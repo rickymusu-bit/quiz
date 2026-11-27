@@ -13,11 +13,13 @@
 import { rngFromSeed } from "../logic/rng.ts";
 import type { KeyValueStorage } from "../logic/persistence.ts";
 import type { Difficulty } from "../logic/types.ts";
+import { DEFAULT_QUESTION_SECONDS } from "../ui/timer.ts";
 import type { BankQuestion, QuestionBank } from "./bank.ts";
 
 export const QUESTION_LOG_KEY = "hellscape3d-domande";
 const LOG_FORMAT = "hellscape3d-domande";
-const LOG_VERSION = 1;
+/** 2: argomenti scelti e durata del timer, impostati con la partita (schermata di avvio). */
+const LOG_VERSION = 2;
 
 /** Risposta data: indice dell'alternativa nell'ordine mostrato, oppure tempo scaduto. */
 export type GivenAnswer = number | "timeout";
@@ -36,6 +38,10 @@ export interface QuestionLog {
   /** Seme della città: lega il registro alla partita salvata. */
   seed: string;
   bankId: string;
+  /** Argomenti in gioco; vuoto = tutti quelli della banca. */
+  topics: string[];
+  /** Durata della domanda, in secondi. */
+  seconds: number;
   asked: AskedQuestion[];
 }
 
@@ -44,6 +50,7 @@ export interface PresentedQuestion {
   key: string;
   id: string;
   difficulty: Difficulty;
+  topic: string;
   topicName: string;
   text: string;
   options: string[];
@@ -54,15 +61,22 @@ export interface PresentedQuestion {
 
 export type AnswerOutcome = "correct" | "wrong" | "timeout";
 
-export function newLog(seed: string, bankId: string): QuestionLog {
-  return { format: LOG_FORMAT, version: LOG_VERSION, seed, bankId, asked: [] };
+export function newLog(seed: string, bankId: string, options: { topics?: readonly string[]; seconds?: number } = {}): QuestionLog {
+  return { format: LOG_FORMAT, version: LOG_VERSION, seed, bankId, topics: [...(options.topics ?? [])], seconds: options.seconds ?? DEFAULT_QUESTION_SECONDS, asked: [] };
+}
+
+/** Domande della banca negli argomenti in gioco. */
+export function inPlay(bank: QuestionBank, topics: readonly string[]): BankQuestion[] {
+  return topics.length === 0 ? bank.questions : bank.questions.filter((q) => topics.includes(q.topic));
 }
 
 /** Domanda già assegnata a `key`, oppure assegnazione di una nuova (il registro restituito la contiene). */
 export function ask(log: QuestionLog, bank: QuestionBank, key: string, difficulty: Difficulty): { log: QuestionLog; asked: AskedQuestion } {
   const existing = log.asked.find((a) => a.key === key);
   if (existing) return { log, asked: existing };
-  const candidates = bank.questions.filter((q) => q.difficulty === difficulty);
+  // Argomenti scelti; se non hanno domande di questo livello (la schermata di avvio lo impedisce) si usa tutta la banca.
+  const chosen = inPlay(bank, log.topics).filter((q) => q.difficulty === difficulty);
+  const candidates = chosen.length > 0 ? chosen : bank.questions.filter((q) => q.difficulty === difficulty);
   if (candidates.length === 0) throw new Error(`Nessuna domanda ${difficulty} nella banca ${bank.id}`);
   const rng = rngFromSeed(log.seed, `domanda:${bank.id}:${key}`);
   const lastAsked = new Map<string, number>();
@@ -85,6 +99,7 @@ export function present(bank: QuestionBank, asked: AskedQuestion): PresentedQues
     key: asked.key,
     id: question.id,
     difficulty: question.difficulty,
+    topic: question.topic,
     topicName: question.topicName,
     text: question.text,
     options: asked.order.map((i) => question.options[i]!),
@@ -122,6 +137,8 @@ export function loadLog(storage: KeyValueStorage, seed: string, bank?: QuestionB
   }
   const log = data as Partial<QuestionLog> | null;
   if (!log || log.format !== LOG_FORMAT || log.version !== LOG_VERSION || log.seed !== seed || typeof log.bankId !== "string" || !Array.isArray(log.asked)) return null;
+  if (!Array.isArray(log.topics) || !log.topics.every((t) => typeof t === "string") || !(Number.isFinite(log.seconds) && log.seconds! >= 1)) return null;
+  if (bank && !log.topics.every((t) => bank.questions.some((q) => q.topic === t))) return null;
   const ids = bank ? new Set(bank.questions.map((q) => q.id)) : null;
   const keys = new Set<string>();
   for (const a of log.asked as unknown[]) {

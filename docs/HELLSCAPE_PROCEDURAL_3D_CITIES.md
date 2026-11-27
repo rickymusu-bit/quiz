@@ -177,6 +177,8 @@ Il prototipo in `hellscape3d/` implementa la regola dei bivi di questa revisione
 
 Gli indizi ambientali dell'uscita, previsti come quarto passo, sono stati abbandonati il 27 novembre: il radar basta.
 
+Il prototipo ha inoltre una schermata di avvio provvisoria (banca di domande, argomenti, da uno a sei giocatori con i nomi, durata della domanda), le cui scelte si salvano con la partita.
+
 Restano utili generatore, motore, salvataggi, domande, kit modulare e radar. La vista della città a tre quarti resta come strumento di sviluppo per giudicare le mappe. Transizioni di camera nella città, ostacoli trasparenti e caricamento per settori perdono il loro scopo nel gioco: si rimuovono, dopo aver verificato le dipendenze, quando la scena di corsa li avrà sostituiti.
 
 ## Registro delle variazioni
