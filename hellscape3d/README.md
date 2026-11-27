@@ -12,7 +12,7 @@ Il codice è TypeScript con sola sintassi cancellabile. Il modello logico e il l
 ```sh
 npm run test:hellscape3d           # controllo dei tipi e test Node (logica, layout, scena)
 npm run test:hellscape3d:browser   # build Vite e verifica in Chromium, desktop e mobile orizzontale
-npm run dev:hellscape3d            # pagina di prova su http://127.0.0.1:5173
+npm run dev:hellscape3d            # http://127.0.0.1:5173/corsa.html (scena di corsa) e / (vista città, sviluppo)
 npm run record:hellscape3d -- --seed graybox-1 --steps 3 --actions 14   # GIF reale in artifacts/hellscape3d/ (richiede ffmpeg)
 npm test                           # suite core completa, che comprende i test Node
 ```
@@ -129,6 +129,41 @@ Lo script di registrazione accetta `--reload-after N` per ricaricare la pagina d
 **Stabilità.** Le varianti dipendono dal seme e dall'identità di ogni elemento, non da quante celle sono visibili, quindi un elemento non cambia aspetto esplorando. I monconi verso la nebbia aprono la ringhiera come farebbe la passerella completa. L'unica eccezione è voluta: dove arriva un ramo ancora nascosto la ringhiera resta chiusa, altrimenti l'apertura rivelerebbe il ramo, e si apre quando il ramo viene esplorato. La città intera di `graybox-1` conta circa 1 700 primitive, assemblate in pochi millisecondi.
 
 **Non ancora:** sagome lontane (con la nebbia attuale non sarebbero visibili), palette, materiali e texture, illuminazione, macchinari animati. Sono decisioni di direzione artistica.
+
+## Scena di corsa e stanze (specifica §6, passo 3)
+
+`corsa.html` è la partita con la scena di corsa, cioè la schermata di gioco prevista dalla specifica. `index.html` mostra la stessa partita nella vista della città a tre quarti, che resta uno strumento di sviluppo. Le due pagine condividono motore, domande, timer, salvataggio e interfaccia (`main.ts`) e differiscono solo per la vista (`views/runView.ts`, `views/cityView.ts`): nessuna delle due modifica lo stato.
+
+- **Stanze** (`run/rooms.ts`). Ogni casella è una stanza con un tipo (corridoio, sala, ponte sul vuoto, pozzo), una grandezza e una pendenza (salita, piano, discesa). Il tipo è estratto con pesi provvisori per distretto, da un flusso decorativo del seme. La pendenza viene dalla quota della casella successiva nella città generata. Partenza e uscita hanno stanze proprie, provvisorie in attesa di quelle disegnate. La stanza del bivio è una stanza di passaggio, non una casella, con una porta per ramo.
+- **Geometria** (`run/strip.ts`). Usa i pezzi e le tinte neutre del kit, in scala da megastruttura: pareti, pilastri colossali, torri e pozzi che scendono fino a −160 e si perdono nella nebbia. Le stanze ripetute sono strisce periodiche di 48 unità; in pendenza restano periodiche, con le strutture verticali sempre verticali. Bivio e uscita hanno una parete di fondo con le porte: stipiti chiari al bivio, varco luminoso all'uscita.
+- **Regia** (`run/runDirector.ts`):
+  - risposta errata: si continua a correre nella stessa stanza;
+  - dado: il personaggio accelera ed esce dalla stanza, e la stanza d'arrivo resta nascosta;
+  - bivio attraversato: stanza del bivio con camera posteriore, arresto davanti alle porte, scelta con i numeri sulle porte, ingresso nella porta scelta;
+  - casella speciale all'arrivo: stanza d'arrivo e risoluzione, con la battuta di Bafometto per il terminale;
+  - uscita: avvicinamento al varco e fine della partita;
+  - turno successivo: cambio di stanza con dissolvenza, ma nessun cambio se il giocatore di turno è nella stanza già mostrata;
+  - movimento ridotto: stanza ferma e cambi per stacco.
+- **Inquadratura** (`run/camera.ts`): scelta quando la stanza viene generata, in base a tipo e grandezza. Angolazione, inclinazione, distanza e campo visivo sono estratti dal seme entro intervalli per tipo, provvisori:
+  - corridoio di profilo e vicino alla parete;
+  - sala larga e a tre quarti;
+  - ponte dall'alto, per il vuoto;
+  - pozzo dal basso o dall'alto;
+  - bivio alle spalle, verso le porte.
+
+  La pendenza non decide l'inquadratura. Il personaggio non scende sotto il 5% dell'altezza dell'immagine, valore provvisorio. Con la domanda aperta la camera si avvicina e la corsa rallenta. La camera resta dal lato +Z del percorso e i cambi sono morbidi (0,5 s).
+- **Etichette del bivio** (tutte le viste): «Scorciatoia pericolosa», «Via incerta» (provvisoria), «Strada sicura», senza lunghezze né difficoltà esplicite.
+- **Parametri solo di sviluppo** in `corsa.html`:
+  - `?camera=laterale|angolata|trequarti|spalle` fissa l'inquadratura, per confronto;
+  - `?anteprima=ID` o `bivio:ID` mostra una stanza;
+  - `?t=S` fissa l'istante, per i test.
+
+Verifiche: test Node su stanze, geometria, inquadrature (per tipo, dal lato del percorso, altezza minima) e regia (stanza d'arrivo mai mostrata senza evento, nessuna dissolvenza se la stanza non cambia, movimento ridotto, salto equivalente). Nel browser, desktop e mobile:
+- per ogni tipo di stanza incontrato l'immagine si ripete identica dopo un periodo ed è diversa a metà;
+- in una partita giocata, a regia ferma la scena è sempre nella stanza del giocatore di turno, oppure nella stanza del bivio con le porte segnalate;
+- con il movimento ridotto la stanza resta ferma.
+
+**Non ancora:** stanze di partenza e d'uscita disegnate, varietà e regole di generazione definitive delle stanze, distanze e altezza minima tarate su dispositivi reali, modelli e animazioni dei personaggi, indizi dell'uscita, direzione artistica.
 
 ## Domande (banche della versione precedente)
 

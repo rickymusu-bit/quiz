@@ -5,6 +5,8 @@
  *
  * Uso: node hellscape3d/tests/browser/record.ts --seed graybox-9 --steps 12 --actions 14 \
  *        [--width 960 --height 540] [--name regia] [--query motion=reduced]
+ * Scena di corsa: --page corsa.html (stessa partita, vista di gioco); con --actions 0 si registra per
+ * --duration secondi senza azioni (per esempio un'anteprima: --query anteprima=ID).
  * Richiede ffmpeg nel PATH. Output in artifacts/hellscape3d/.
  */
 import { execFileSync } from "node:child_process";
@@ -27,6 +29,9 @@ const { values } = parseArgs({
     fps: { type: "string", default: "10" },
     /** Dopo N azioni ricarica la pagina senza parametri, per registrare la ripresa della partita. */
     "reload-after": { type: "string", default: "" },
+    /** Pagina diversa dalla città: si registra per `duration` secondi senza azioni. */
+    page: { type: "string", default: "" },
+    duration: { type: "string", default: "10" },
   },
 });
 const width = Number(values.width),
@@ -51,41 +56,47 @@ const browser = await chromium.launch({
 const context = await browser.newContext({ viewport: { width, height }, deviceScaleFactor: 1, recordVideo: { dir: work, size: { width, height } } });
 const page = await context.newPage();
 const started = Date.now();
-await page.goto(`${url}?seed=${values.seed}&steps=${values.steps}&test=1${values.query ? `&${values.query}` : ""}`);
-await page.waitForFunction(() => (window as unknown as { __hellscape3d?: { ready: boolean } }).__hellscape3d?.ready === true);
-await page.waitForTimeout(800);
-// Si gioca dall'interfaccia, con pause leggibili; una risposta su quattro è volutamente errata.
-type Debug = { busy: boolean; panel: string | null; correctIndex?: number; forkChoices: { number: number }[] };
-const debug = (): Promise<Debug> => page.evaluate(() => (window as unknown as { __hellscape3d: Debug }).__hellscape3d);
-const reloadAfter = values["reload-after"] === "" ? -1 : Number(values["reload-after"]);
-for (let i = 0; i < Number(values.actions); i++) {
-  await page.waitForFunction(() => !(window as unknown as { __hellscape3d: { busy: boolean } }).__hellscape3d.busy, null, { timeout: 20_000 });
-  if (i === reloadAfter) {
-    await page.waitForTimeout(700);
-    // Senza seme né mosse: la pagina riprende la partita salvata (test=1 serve solo a conoscere la risposta corretta).
-    await page.goto(`${url}?test=1`);
-    await page.waitForFunction(() => (window as unknown as { __hellscape3d?: { ready: boolean } }).__hellscape3d?.ready === true);
-    await page.waitForTimeout(1500);
+if (Number(values.actions) === 0) {
+  await page.goto(`${url}${values.page}?seed=${values.seed}&steps=${values.steps}${values.query ? `&${values.query}` : ""}`);
+  await page.waitForFunction(() => (window as unknown as { __hellscape3d?: { ready: boolean } }).__hellscape3d?.ready === true);
+  await page.waitForTimeout(Number(values.duration) * 1000);
+} else {
+  await page.goto(`${url}${values.page}?seed=${values.seed}&steps=${values.steps}&test=1${values.query ? `&${values.query}` : ""}`);
+  await page.waitForFunction(() => (window as unknown as { __hellscape3d?: { ready: boolean } }).__hellscape3d?.ready === true);
+  await page.waitForTimeout(800);
+  // Si gioca dall'interfaccia, con pause leggibili; una risposta su quattro è volutamente errata.
+  type Debug = { busy: boolean; panel: string | null; correctIndex?: number; forkChoices: { number: number }[] };
+  const debug = (): Promise<Debug> => page.evaluate(() => (window as unknown as { __hellscape3d: Debug }).__hellscape3d);
+  const reloadAfter = values["reload-after"] === "" ? -1 : Number(values["reload-after"]);
+  for (let i = 0; i < Number(values.actions); i++) {
+    await page.waitForFunction(() => !(window as unknown as { __hellscape3d: { busy: boolean } }).__hellscape3d.busy, null, { timeout: 20_000 });
+    if (i === reloadAfter) {
+      await page.waitForTimeout(700);
+      // Senza seme né mosse: la pagina riprende la partita salvata (test=1 serve solo a conoscere la risposta corretta).
+      await page.goto(`${url}${values.page}?test=1`);
+      await page.waitForFunction(() => (window as unknown as { __hellscape3d?: { ready: boolean } }).__hellscape3d?.ready === true);
+      await page.waitForTimeout(1500);
+    }
+    const d = await debug();
+    if (d.panel === "question") {
+      await page.waitForTimeout(1300);
+      const index = i % 4 === 3 ? ((d.correctIndex ?? 0) + 1) % 4 : (d.correctIndex ?? 0);
+      await page.keyboard.press(`Digit${index + 1}`);
+    } else if (d.panel === "feedback") {
+      await page.waitForTimeout(2600);
+      await page.keyboard.press("Enter");
+    } else if (d.panel === "roll") {
+      await page.waitForTimeout(600);
+      await page.keyboard.press("Enter");
+    } else if (d.panel === "fork") {
+      await page.waitForTimeout(1300);
+      await page.keyboard.press(`Digit${(i % d.forkChoices.length) + 1}`);
+    } else break;
+    await page.waitForTimeout(150);
   }
-  const d = await debug();
-  if (d.panel === "question") {
-    await page.waitForTimeout(1300);
-    const index = i % 4 === 3 ? ((d.correctIndex ?? 0) + 1) % 4 : (d.correctIndex ?? 0);
-    await page.keyboard.press(`Digit${index + 1}`);
-  } else if (d.panel === "feedback") {
-    await page.waitForTimeout(2600);
-    await page.keyboard.press("Enter");
-  } else if (d.panel === "roll") {
-    await page.waitForTimeout(600);
-    await page.keyboard.press("Enter");
-  } else if (d.panel === "fork") {
-    await page.waitForTimeout(1300);
-    await page.keyboard.press(`Digit${(i % d.forkChoices.length) + 1}`);
-  } else break;
-  await page.waitForTimeout(150);
+  await page.waitForFunction(() => !(window as unknown as { __hellscape3d: { busy: boolean } }).__hellscape3d.busy, null, { timeout: 20_000 });
+  await page.waitForTimeout(600);
 }
-await page.waitForFunction(() => !(window as unknown as { __hellscape3d: { busy: boolean } }).__hellscape3d.busy, null, { timeout: 20_000 });
-await page.waitForTimeout(600);
 const seconds = (Date.now() - started) / 1000;
 const video = page.video()!;
 await context.close();

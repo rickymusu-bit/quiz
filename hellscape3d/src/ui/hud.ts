@@ -53,8 +53,12 @@ export interface HudActions {
   restart(): void;
 }
 
-const RELATIVE_LABELS: Readonly<Record<RelativeLength, string>> = { "piu-breve": "Più breve", intermedio: "Intermedio", "piu-lungo": "Più lungo" };
-const DIFFICULTY_TEXT: Readonly<Record<Difficulty, string>> = { facile: "domande facili", media: "domande medie", difficile: "domande difficili" };
+/**
+ * Etichette generiche delle alternative al bivio (specifica §3): dicono solo
+ * la posizione del ramo nell'ordine delle lunghezze relative, senza lunghezze
+ * né difficoltà esplicite. Quella del ramo intermedio è PROVVISORIA.
+ */
+export const BRANCH_LABELS: Readonly<Record<RelativeLength, string>> = { "piu-breve": "Scorciatoia pericolosa", intermedio: "Via incerta", "piu-lungo": "Strada sicura" };
 
 function element<K extends keyof HTMLElementTagNameMap>(tag: K, className: string, text?: string): HTMLElementTagNameMap[K] {
   const node = document.createElement(tag);
@@ -266,12 +270,12 @@ export class Hud {
       this.panel.setAttribute("aria-label", "Scelta al bivio");
       const options = element("div", "hud-options");
       for (const choice of panel.choices) {
-        const button = element("button", `hud-option is-${choice.difficulty}`, `${choice.number}. ${RELATIVE_LABELS[choice.relative]} · ${DIFFICULTY_TEXT[choice.difficulty]}`);
+        const button = element("button", `hud-option is-${choice.difficulty}`, `${choice.number}. ${BRANCH_LABELS[choice.relative]}`);
         button.type = "button";
         button.addEventListener("click", () => this.actions.choose(choice.to));
         options.append(button);
       }
-      this.panel.append(element("p", "hud-question-text", "Bivio: scegli il percorso. La lunghezza è indicata solo in modo relativo."), options);
+      this.panel.append(element("p", "hud-question-text", "Bivio: scegli la strada."), options);
       options.querySelector("button")?.focus({ preventScroll: true });
     } else {
       this.panel.setAttribute("aria-label", "Fine partita");

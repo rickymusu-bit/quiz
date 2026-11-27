@@ -1,6 +1,8 @@
 /**
- * Pagina di prova, non pubblicata: graybox, regia e interfaccia provvisoria con
- * le domande delle banche della versione precedente.
+ * Pagine di prova, non pubblicate: partita con le domande delle banche della
+ * versione precedente, interfaccia provvisoria e una vista intercambiabile.
+ * `corsa.html` mostra la scena di corsa (la schermata di gioco, specifica §6);
+ * `index.html` la città a tre quarti, strumento di sviluppo.
  *
  * Senza parametri riprende la partita salvata nel browser, se esiste.
  * Parametri: ?seed=… (città: partita nuova), ?bank=ID (banca di domande del
@@ -12,17 +14,21 @@
  * sempre intera), ?sectors=R (SOLO SVILUPPO: raggio di caricamento forzato a R,
  * più corto di quello sicuro: si vedono comparire i settori), ?test=1 (espone ai
  * test la risposta corretta).
+ * Solo nella scena di corsa: ?camera=laterale|angolata|trequarti|spalle
+ * (SOLO SVILUPPO: inquadratura fissa), ?anteprima=ID o bivio:ID (SOLO
+ * SVILUPPO: mostra quella stanza), ?t=S (SOLO TEST: istante fisso).
  * Tasti: 1–4 risposte e alternative, Invio lancia il dado, Spazio o S
  * saltano la regia, F accelera ×3, V cambia inquadratura, A esegue
  * un'azione automatica (sviluppo).
  */
-import { CameraDirector, SHOTS, type Frame } from "./director/director.ts";
-import { applyAction, createGame, publicView, rngFromSeed, saveToStorage, type Game, type GameAction, type GameState, type KeyValueStorage } from "./logic/index.ts";
+import "./ui/hud.css";
+import { applyAction, createGame, rngFromSeed, saveToStorage, type Game, type GameAction, type GameState, type KeyValueStorage } from "./logic/index.ts";
 import { buildCityLayout } from "./layout/layout.ts";
-import { GrayboxRenderer, type CameraMode } from "./render/graybox.ts";
-import { buildSceneModel, presentedView, revealAllView, type SceneModel } from "./scene/model.ts";
-import { NO_OCCLUDERS, type Occluders } from "./scene/occlusion.ts";
-import { citySlab, visibleRadius, type Focus } from "./scene/sectors.ts";
+import { panelInset } from "./render/viewOffset.ts";
+import { PRESETS, type PresetKind } from "./run/camera.ts";
+import { CityView } from "./views/cityView.ts";
+import { RunView } from "./views/runView.ts";
+import type { GameView } from "./views/view.ts";
 import { Hud, type ForkChoice, type HudState, type Panel } from "./ui/hud.ts";
 import { radarShapes, type RadarShapes } from "./ui/radar.ts";
 import { CATALOG, loadBank } from "./questions/catalog.ts";
@@ -57,7 +63,8 @@ const forcedSectorRadius = sectorsParam && sectorsParam !== "off" && Number(sect
 const sectorsEnabled = sectorsParam !== "off";
 const reducedMotion = params.get("motion") === "reduced" || matchMedia("(prefers-reduced-motion: reduce)").matches;
 const questionSeconds = Math.max(1, Number(params.get("timer")) || DEFAULT_QUESTION_SECONDS);
-let mode: CameraMode = params.get("view") === "overview" ? "overview" : "player";
+/** Vista della pagina: scena di corsa (corsa.html) o città (index.html). */
+const sceneKind = document.body.dataset.scena === "corsa" ? "corsa" : "citta";
 let speed = 1;
 
 const game: Game =
@@ -95,7 +102,6 @@ function storeLog(): void {
 }
 storeLog();
 const layout = buildCityLayout(game.map);
-const slab = citySlab(layout);
 const answers = rngFromSeed(seed, "dev:answers");
 let state: GameState = game.state;
 
@@ -128,15 +134,25 @@ if (!resumed) persist();
 
 const canvas = document.querySelector<HTMLCanvasElement>("#scene")!;
 const fade = document.querySelector<HTMLElement>("#fade")!;
-const renderer = new GrayboxRenderer(canvas);
-const director = new CameraDirector(game.map, layout, state, { reducedMotion });
-renderer.setSeat(director.seatPosition);
+const shotParam = params.get("camera") as PresetKind | null;
+const fixedTime = params.has("t") ? Number(params.get("t")) : undefined;
+const view: GameView =
+  sceneKind === "corsa"
+    ? new RunView(canvas, game.map, layout, state, {
+        reducedMotion,
+        ...(shotParam && shotParam in PRESETS ? { shot: shotParam } : {}),
+        ...(params.get("anteprima") ? { preview: params.get("anteprima")! } : {}),
+        ...(fixedTime !== undefined && Number.isFinite(fixedTime) ? { fixedTime } : {}),
+      })
+    : new CityView(canvas, game.map, layout, state, {
+        reducedMotion,
+        revealAll,
+        occlusion: occlusionEnabled,
+        sectors: sectorsEnabled ? (forcedSectorRadius ?? "calcolato") : "off",
+        overview: params.get("view") === "overview",
+      });
 // Intervento d'apertura di Bafometto, solo per una partita nuova.
-if (!resumed && steps === 0 && !revealAll && params.get("intro") !== "off") director.intro();
-let frame: Frame = director.getFrame();
-let builtKey = "";
-let builtSize = "";
-let model: SceneModel = buildModel();
+if (!resumed && steps === 0 && !revealAll && params.get("intro") !== "off") view.intro();
 
 /** Timer della domanda visibile (la domanda stessa è nel registro). */
 let question: { key: string; timer: QuestionTimer } | null = null;
@@ -164,21 +180,16 @@ const hud = new Hud(document.querySelector<HTMLElement>("#hud")!, {
   },
 });
 
-function buildModel(): SceneModel {
-  const view = { ...publicView(game.map, state), activePlayerId: frame.activePlayerId };
-  return buildSceneModel(game.map, layout, revealAll ? revealAllView(game.map, view) : presentedView(game.map, view, frame.explored));
-}
-
 /** Unica via per modificare lo stato: azione del motore, poi regia degli eventi. */
 function perform(action: GameAction): void {
-  if (director.busy || state.phase === "ended") return;
+  if (view.busy || state.phase === "ended") return;
   const result = applyAction(game.map, state, action);
   state = result.state;
   persist();
   for (const event of result.events) if (event.type === "diceRolled") die = { value: event.value, hideAt: null };
-  director.enqueue(result.events, state);
+  view.enqueue(result.events, state);
   // Le clip istantanee (movimento ridotto) si completano subito; quelle animate partono soltanto.
-  frame = director.update(0);
+  view.update(0);
   // Aggiornamento immediato di scena, interfaccia e dati di debug, salvo azioni nate durante il disegno (scadenza del timer).
   if (!drawing) draw(0);
 }
@@ -199,7 +210,7 @@ function activeQuestion(): PresentedQuestion {
  * rispondere di nuovo) e si mostra l'esito; il motore la riceve con «Continua».
  */
 function answer(given: GivenAnswer): void {
-  if (!question || state.phase !== "question" || director.busy) return;
+  if (!question || state.phase !== "question" || view.busy) return;
   questionLog = recordAnswer(questionLog, question.key, given);
   storeLog();
   question = null;
@@ -207,7 +218,7 @@ function answer(given: GivenAnswer): void {
 }
 
 function proceed(): void {
-  if (state.phase !== "question" || director.busy) return;
+  if (state.phase !== "question" || view.busy) return;
   const current = activeQuestion();
   if (current.answer === null) return;
   perform({ type: "answer", outcome: outcomeOf(current) });
@@ -215,7 +226,7 @@ function proceed(): void {
 
 /** Pannello da mostrare: solo a regia ferma, quando la presentazione coincide con lo stato. */
 function currentPanel(): Panel | null {
-  if (revealAll || director.busy) return null;
+  if (view.suppressPanels || view.busy) return null;
   const active = state.players[state.activeIndex]!;
   switch (state.phase) {
     case "question": {
@@ -237,7 +248,7 @@ function currentPanel(): Panel | null {
         to: option.to,
         relative: option.relative,
         difficulty: option.difficulty,
-        anchor: mode === "player" ? renderer.project(layout.positions[option.to]!) : null,
+        anchor: view.forkAnchor(active.cellId, option.to),
       }));
       return { kind: "fork", key: `f:${state.turn}:${active.cellId}:${state.stepsLeft}`, choices };
     }
@@ -248,33 +259,11 @@ function currentPanel(): Panel | null {
 
 const ORDER = { "piu-breve": 0, intermedio: 1, "piu-lungo": 2 } as const;
 
-/**
- * Fuochi del caricamento per settori: il punto inquadrato, con il raggio che
- * la sua inquadratura può mostrare o ombreggiare, e ogni pedina, destinazione
- * possibile di un cambio di turno, con il raggio della più ampia delle
- * inquadrature ordinarie. In panoramica e con la città rivelata si carica tutto.
- */
-function sectorFoci(aspect: number): Focus[] | null {
-  if (!sectorsEnabled || revealAll || mode === "overview") return null;
-  const target = frame.camera.target;
-  const foci: Focus[] = [{ x: target.x, z: target.z, radius: forcedSectorRadius ?? visibleRadius(frame.camera, aspect, slab) }];
-  for (const pawn of Object.values(frame.pawns)) {
-    const radius = forcedSectorRadius ?? Math.max(...Object.values(SHOTS).map((shot) => visibleRadius({ target: pawn, ...shot }, aspect, slab)));
-    foci.push({ x: pawn.x, z: pawn.z, radius });
-  }
-  return foci;
-}
-
 let lastPanel: Panel | null = null;
+/** Secondi trascorsi con la domanda corrente visibile (verifica del timer). */
+let questionVisibleFor = 0;
 let inset = 0;
-let occluders: Occluders = NO_OCCLUDERS;
 
-/** Altezza, dal fondo dello schermo, occupata dal pannello visibile. */
-function panelInset(): number {
-  const panel = document.querySelector<HTMLElement>(".hud-panel");
-  if (!panel || panel.hidden) return 0;
-  return Math.max(0, window.innerHeight - panel.getBoundingClientRect().top);
-}
 let radar: RadarShapes | null = null;
 
 let drawing = false;
@@ -289,52 +278,31 @@ function draw(seconds: number): void {
 
 function drawFrame(seconds: number): void {
   clock += seconds;
-  const width = canvas.clientWidth,
-    height = canvas.clientHeight;
-  const size = `${width}x${height}`;
-  if (size !== builtSize) {
-    renderer.resize(width, height);
-    builtSize = size;
-  }
-  const key = `${frame.explored.join()}|${frame.activePlayerId}|${revealAll}`;
-  if (key !== builtKey) {
-    model = buildModel();
-    renderer.setModel(model, seed);
-    builtKey = key;
-  }
-  renderer.setPawnPositions(frame.pawns);
-  if (mode === "overview") renderer.frameOverview(model);
-  else renderer.setCameraPose(frame.camera);
-  // Settori caricati: si aggiornano prima del disegno, quindi un fotogramma non mostra mai un settore mancante.
-  renderer.updateSectors(sectorFoci(width / Math.max(1, height)));
   // Il pannello in basso non copre il giocatore: l'inquadratura si centra nell'area libera.
-  const target = mode === "player" ? panelInset() : 0;
+  const target = panelInset();
   inset = reducedMotion ? target : inset + (target - inset) * Math.min(1, seconds * 8);
   if (Math.abs(inset - target) < 0.5) inset = target;
-  renderer.setBottomInset(inset);
-  // Gli ostacoli fra camera e giocatore attivo diventano trasparenti.
-  // Sulla sede di Bafometto la pedina non è inquadrata: niente ostacoli da rendere trasparenti.
-  if (occlusionEnabled) occluders = frame.bafometto?.kind === "seat" ? renderer.clearOcclusion() : renderer.updateOcclusion(frame.pawns[frame.activePlayerId]!);
-  renderer.setBafometto(
-    frame.bafometto?.kind === "terminal" ? { kind: "terminal", position: layout.positions[frame.bafometto.cellId]! } : frame.bafometto,
-  );
-  for (const line of director.takeAnnouncements()) {
+  for (const line of view.takeAnnouncements()) {
     speech = { text: line.text, until: clock + 3.5 };
     spoken.push(line.moment);
   }
   if (speech && clock >= speech.until) speech = null;
-  fade.style.opacity = String(frame.fade);
-  renderer.render();
+  fade.style.opacity = String(view.fade);
+  view.setQuestionOpen(lastPanel?.kind === "question");
+  view.draw(seconds, state, inset);
 
   const panel = currentPanel();
-  // Il timer scorre solo con la domanda visibile, a regia ferma e pagina in primo piano.
-  if (question && panel?.kind === "question" && question.timer.tick(seconds, !document.hidden)) answer("timeout");
+  // Il timer scorre solo con la domanda visibile, a regia ferma e pagina in primo piano, e solo dal fotogramma
+  // successivo alla sua comparsa: il tempo di questo fotogramma è trascorso prima che la domanda si vedesse.
+  const shownBefore = lastPanel?.kind === "question" && panel?.kind === "question" && lastPanel.key === panel.key;
+  questionVisibleFor = panel?.kind === "question" ? (shownBefore ? questionVisibleFor + seconds : 0) : 0;
+  if (question && panel?.kind === "question" && shownBefore && question.timer.tick(seconds, !document.hidden)) answer("timeout");
   if (question && clock - lastClockSave >= 0.5) {
     saveQuestionClock(storage, question.key, question.timer.remaining);
     lastClockSave = clock;
   }
   if (die) {
-    if (!director.busy) die.hideAt ??= clock + 1.2;
+    if (!view.busy) die.hideAt ??= clock + 1.2;
     if (die.hideAt !== null && clock >= die.hideAt) die = null;
   }
   if (toast && clock >= toast.until) toast = null;
@@ -342,17 +310,17 @@ function drawFrame(seconds: number): void {
 
   const hudState: HudState = {
     turn: state.turn,
-    players: state.players.map((p, index) => ({ id: p.id, name: p.name, index, active: p.id === frame.activePlayerId, escaped: p.escaped })),
+    players: state.players.map((p, index) => ({ id: p.id, name: p.name, index, active: p.id === view.activePlayerId, escaped: p.escaped })),
     panel: lastPanel,
     die: die?.value ?? null,
     toast: toast?.text ?? null,
     speech: speech?.text ?? null,
-    dev: `Prova non pubblicata · seme ${seed} · ${bank.title}${revealAll ? " · CITTÀ RIVELATA" : ""}${reducedMotion ? " · movimento ridotto" : ""}${forcedSectorRadius ? ` · SETTORI r=${forcedSectorRadius}` : ""} · velocità ×${speed} · A automatico · V vista`,
+    dev: `Prova non pubblicata · seme ${seed} · ${bank.title} · ${view.label}${reducedMotion ? " · movimento ridotto" : ""} · velocità ×${speed} · A automatico`,
   };
   hud.update(hudState);
   radar = hud.drawRadar(
     radarShapes(
-      { pawns: frame.pawns, players: state.players.map((p, index) => ({ id: p.id, index })), activePlayerId: frame.activePlayerId, exit: layout.positions[game.map.exitId]! },
+      { pawns: view.pawns, players: state.players.map((p, index) => ({ id: p.id, index })), activePlayerId: view.activePlayerId, exit: layout.positions[game.map.exitId]! },
       hudRadarSize(),
     ),
   );
@@ -363,10 +331,8 @@ function drawFrame(seconds: number): void {
       seed,
       turn: state.turn,
       phase: state.phase,
-      mode,
-      revealAll,
       reducedMotion,
-      busy: director.busy,
+      busy: view.busy,
       panel: lastPanel?.kind ?? null,
       timer: question ? { remaining: question.timer.remaining, total: question.timer.duration } : null,
       correctIndex: testHooks && lastPanel?.kind === "question" ? lastPanel.question.correctIndex : undefined,
@@ -376,38 +342,27 @@ function drawFrame(seconds: number): void {
       outcome: lastPanel?.kind === "feedback" ? outcomeOf(lastPanel.question) : null,
       askedCount: questionLog.asked.length,
       forkChoices: lastPanel?.kind === "fork" ? lastPanel.choices.map((c) => ({ number: c.number, to: c.to, anchored: c.anchor !== null })) : [],
-      activePlayerId: frame.activePlayerId,
+      activePlayerId: view.activePlayerId,
       stateActivePlayerId: state.players[state.activeIndex]!.id,
       explored: [...state.explored],
-      shown: [...frame.explored],
-      rendered: model.tiles.map((t) => t.id),
-      loadedTiles: renderer.loadedTiles(),
-      loadedSectors: renderer.loadedSectors(),
-      sectors: sectorsEnabled ? (forcedSectorRadius ?? "calcolato") : "off",
       radar: radar && {
         players: radar.players.map((p) => ({ id: p.id, active: p.active, onEdge: p.onEdge, x: p.x, y: p.y })),
         exit: radar.exit !== null,
         center: radar.center,
       },
-      occluders: { tiles: occluders.tiles.length, pillars: occluders.pillars.length, walkways: occluders.walkways.length, masses: occluders.masses.length },
-      occluderIds: [...occluders.tiles, ...occluders.pillars],
-      bafometto: frame.bafometto,
       resumed,
       timerRemaining: question?.timer.remaining ?? null,
+      questionVisibleFor,
       spoken: [...spoken],
       speech: speech?.text ?? null,
-      seat: director.seatPosition,
-      cameraTarget: frame.camera.target,
       inset,
-      activeScreen: renderer.project(frame.pawns[frame.activePlayerId]!),
       panelTop: panelInset() > 0 ? window.innerHeight - panelInset() : null,
-      pawns: frame.pawns,
       cellPositions: Object.fromEntries(state.players.map((p) => [p.id, layout.positions[p.cellId]])),
       playerCells: Object.fromEntries(state.players.map((p) => [p.id, p.cellId])),
       stepsLeft: state.stepsLeft,
-      fade: frame.fade,
+      fade: view.fade,
       totalCells: Object.keys(game.map.cells).length,
-      stats: renderer.getStats(),
+      ...view.debug(),
     },
   });
 }
@@ -437,14 +392,14 @@ window.addEventListener("keydown", (event) => {
     perform({ type: "roll" });
     event.preventDefault();
   } else if (event.code === "Space" || event.code === "KeyS") {
-    if (director.busy) {
-      frame = director.skip();
+    if (view.busy) {
+      view.skip();
       draw(0);
     }
     if (event.code === "Space") event.preventDefault();
   } else if (event.code === "KeyF") speed = speed === 1 ? 3 : 1;
-  else if (event.code === "KeyV") mode = mode === "player" ? "overview" : "player";
-  else if (event.code === "KeyA" && !director.busy && state.phase !== "ended") {
+  else if (event.code === "KeyV") view.toggleMode();
+  else if (event.code === "KeyA" && !view.busy && state.phase !== "ended") {
     // Sviluppo: risposta simulata secondo il profilo, registrata come le altre, senza fermarsi sull'esito.
     if (lastPanel?.kind === "question") {
       const action = autoAction(state);
@@ -467,7 +422,7 @@ let last = performance.now();
 function loop(now: number): void {
   const elapsed = Math.max(0, (now - last) / 1000);
   last = now;
-  frame = director.update(Math.min(0.25, elapsed) * speed);
+  view.update(Math.min(0.25, elapsed) * speed);
   draw(Math.min(1, elapsed));
   requestAnimationFrame(loop);
 }
