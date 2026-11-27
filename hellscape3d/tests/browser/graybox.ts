@@ -14,7 +14,7 @@ import { fileURLToPath } from "node:url";
 import { createCanvas, loadImage } from "@napi-rs/canvas";
 import { chromium, type Page } from "playwright";
 import { build, preview } from "vite";
-import { RUN } from "../../src/run/runScene.ts";
+import { RUN_SPEED } from "../../src/run/runDirector.ts";
 import { STRIP } from "../../src/run/strip.ts";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
@@ -62,6 +62,7 @@ interface DebugInfo {
   loadedTiles: string[];
   playerCells: Record<string, string>;
   stepsLeft: number;
+  fade: number;
   loadedSectors: string[];
   stats: {
     primitives: number;
@@ -537,39 +538,75 @@ try {
       failures++;
       console.log(`FAIL ${device.name} · ripresa: ${(error as Error).message}`);
     }
-    // Scena di corsa (pagina corsa.html): quattro inquadrature, scenario ciclico senza giunture, movimento ridotto.
+    // Scena di corsa (corsa.html): stanze senza giunture per tipo, partita con la regia della corsa, movimento ridotto.
     try {
+      type RunDebug = DebugInfo & {
+        view: string;
+        room: { key: string; kind: string; slope: string; cellId: string };
+        runners: string[];
+        running: boolean;
+        approach: number;
+      };
+      const runInfo = (): Promise<RunDebug> => page.evaluate(() => (window as unknown as { __hellscape3d: RunDebug }).__hellscape3d);
       const canvasPng = async (): Promise<Buffer> =>
         Buffer.from((await page.evaluate(() => document.querySelector<HTMLCanvasElement>("#scene")!.toDataURL("image/png"))).split(",")[1]!, "base64");
-      const at = async (query: string): Promise<Buffer> => {
+      const open = async (query: string): Promise<RunDebug> => {
         await page.goto(`${url}corsa.html?${query}`);
-        await page.waitForFunction(() => (window as unknown as { __corsa?: { ready: boolean } }).__corsa?.ready === true, null, { timeout: 30_000 });
-        await page.waitForTimeout(200);
-        return canvasPng();
+        await page.waitForFunction(() => (window as unknown as { __hellscape3d?: { ready: boolean } }).__hellscape3d?.ready === true, null, { timeout: 30_000 });
+        await page.waitForTimeout(250);
+        return runInfo();
       };
-      const period = STRIP.period,
-        speed = RUN.speed;
-      for (const camera of ["laterale", "angolata", "trequarti", "spalle"]) {
-        const first = await at(`camera=${camera}&t=1.3&players=2`);
-        const spread = await luminanceSpread(first);
-        assert.ok(spread > 8, `${camera}: scena apparentemente vuota (${spread.toFixed(1)})`);
-        assert.ok(await page.locator(".hud-panel .hud-option").first().isVisible(), `${camera}: domanda non visibile`);
-        // Un periodo dopo l'immagine è identica pixel per pixel: il ciclo non ha giunture.
-        const later = await at(`camera=${camera}&t=${1.3 + period / speed}&players=2`);
-        assert.ok(first.equals(later), `${camera}: l'immagine non si ripete dopo un periodo`);
-        // A metà periodo invece la scena è cambiata: lo scenario scorre davvero.
-        assert.ok(!first.equals(await at(`camera=${camera}&t=${1.3 + period / speed / 2}&players=2`)), `${camera}: lo scenario non scorre`);
-        await page.goto(`${url}corsa.html?camera=${camera}&t=1.3&players=2`);
-        await page.waitForFunction(() => (window as unknown as { __corsa?: { ready: boolean } }).__corsa?.ready === true);
-        await page.screenshot({ path: join(artifacts, `corsa-${camera}-${device.name}.png`) });
+      // Una stanza per tipo (anteprime), ciclo senza giunture: dopo un periodo l'immagine è identica, a metà è diversa.
+      const period = STRIP.period / RUN_SPEED.normal;
+      const kinds = new Map<string, string>();
+      for (const n of [1, 2, 3, 4, 5, 9]) {
+        await open(`seed=graybox-${n}&intro=off&t=0`);
+        for (const id of await page.evaluate(() => (window as unknown as { __hellscape3d: { explored: string[] } }).__hellscape3d.explored)) {
+          const d = await open(`seed=graybox-${n}&intro=off&t=0&anteprima=${id}`);
+          if (!kinds.has(`${d.room.kind}/${d.room.slope}`)) kinds.set(`${d.room.kind}/${d.room.slope}`, `seed=graybox-${n}&anteprima=${id}`);
+        }
       }
-      // Movimento ridotto: lo scenario resta fermo.
-      await page.goto(`${url}corsa.html?motion=reduced`);
-      await page.waitForFunction(() => (window as unknown as { __corsa?: { ready: boolean } }).__corsa?.ready === true);
+      for (const [kind, query] of kinds) {
+        await open(`${query}&intro=off&t=1.3`);
+        const a = await canvasPng();
+        assert.ok((await luminanceSpread(a)) > 8, `${kind}: scena apparentemente vuota`);
+        await open(`${query}&intro=off&t=${1.3 + period}`);
+        if (!kind.startsWith("uscita")) assert.ok(a.equals(await canvasPng()), `${kind}: l'immagine non si ripete dopo un periodo`);
+        await open(`${query}&intro=off&t=${1.3 + period / 2}`);
+        if (!kind.startsWith("uscita")) assert.ok(!a.equals(await canvasPng()), `${kind}: la stanza non scorre`);
+        await page.screenshot({ path: join(artifacts, `stanza-${kind.replace("/", "-")}-${device.name}.png`) });
+      }
+      assert.ok(kinds.size >= 5, `tipi di stanza esercitati: ${[...kinds.keys()].join(", ")}`);
+      // Partita con la regia della corsa: a regia ferma la scena è nella stanza del giocatore di turno.
+      let d = await open("seed=graybox-1&intro=off&test=1");
+      assert.equal(d.view, "corsa");
+      let forks = 0;
+      for (let action = 0; action < 40 && d.phase !== "ended"; action++) {
+        await page.keyboard.press("KeyA");
+        await page.waitForFunction(() => (window as unknown as { __hellscape3d: { busy: boolean } }).__hellscape3d.busy === false, null, { timeout: 20_000 });
+        d = await runInfo();
+        if (d.phase === "ended") break;
+        const active = d.playerCells[d.stateActivePlayerId]!;
+        if (d.phase === "fork") {
+          forks++;
+          assert.equal(d.room.key, `bivio:${active}`);
+          assert.ok(!d.running && d.approach === 0, "non fermo davanti alle porte");
+          assert.ok(d.forkChoices.length >= 2 && d.forkChoices.every((c) => c.anchored), "porte non segnalate");
+          if (forks === 1) await page.screenshot({ path: join(artifacts, `corsa-bivio-${device.name}.png`) });
+        } else {
+          assert.equal(d.room.key, active, "scena fuori dalla stanza del giocatore di turno");
+          assert.equal(d.runners[0], d.stateActivePlayerId);
+        }
+        assert.equal(d.fade, 0);
+        assertRadar(d);
+      }
+      assert.ok(forks > 0, "nessun bivio nella partita di prova");
+      // Movimento ridotto: la stanza resta ferma.
+      await open("seed=graybox-1&intro=off&motion=reduced");
       const still = await canvasPng();
       await page.waitForTimeout(700);
-      assert.ok(still.equals(await canvasPng()), "con il movimento ridotto lo scenario si muove");
-      console.log(`ok   ${device.name} · scena di corsa: quattro inquadrature, ciclo senza giunture, movimento ridotto`);
+      assert.ok(still.equals(await canvasPng()), "con il movimento ridotto la stanza si muove");
+      console.log(`ok   ${device.name} · scena di corsa: ${kinds.size} tipi di stanza senza giunture, partita con ${forks} bivi, movimento ridotto`);
     } catch (error) {
       failures++;
       console.log(`FAIL ${device.name} · scena di corsa: ${(error as Error).message}`);

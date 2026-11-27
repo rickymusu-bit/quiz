@@ -5,7 +5,8 @@
  *
  * Uso: node hellscape3d/tests/browser/record.ts --seed graybox-9 --steps 12 --actions 14 \
  *        [--width 960 --height 540] [--name regia] [--query motion=reduced]
- * Scena di corsa: --page corsa.html --duration 10 [--query camera=angolata] (nessuna azione, solo tempo).
+ * Scena di corsa: --page corsa.html (stessa partita, vista di gioco); con --actions 0 si registra per
+ * --duration secondi senza azioni (per esempio un'anteprima: --query anteprima=ID).
  * Richiede ffmpeg nel PATH. Output in artifacts/hellscape3d/.
  */
 import { execFileSync } from "node:child_process";
@@ -55,12 +56,12 @@ const browser = await chromium.launch({
 const context = await browser.newContext({ viewport: { width, height }, deviceScaleFactor: 1, recordVideo: { dir: work, size: { width, height } } });
 const page = await context.newPage();
 const started = Date.now();
-if (values.page) {
-  await page.goto(`${url}${values.page}?seed=${values.seed}${values.query ? `&${values.query}` : ""}`);
-  await page.waitForFunction(() => (window as unknown as { __corsa?: { ready: boolean } }).__corsa?.ready === true);
+if (Number(values.actions) === 0) {
+  await page.goto(`${url}${values.page}?seed=${values.seed}&steps=${values.steps}${values.query ? `&${values.query}` : ""}`);
+  await page.waitForFunction(() => (window as unknown as { __hellscape3d?: { ready: boolean } }).__hellscape3d?.ready === true);
   await page.waitForTimeout(Number(values.duration) * 1000);
 } else {
-  await page.goto(`${url}?seed=${values.seed}&steps=${values.steps}&test=1${values.query ? `&${values.query}` : ""}`);
+  await page.goto(`${url}${values.page}?seed=${values.seed}&steps=${values.steps}&test=1${values.query ? `&${values.query}` : ""}`);
   await page.waitForFunction(() => (window as unknown as { __hellscape3d?: { ready: boolean } }).__hellscape3d?.ready === true);
   await page.waitForTimeout(800);
   // Si gioca dall'interfaccia, con pause leggibili; una risposta su quattro è volutamente errata.
@@ -72,7 +73,7 @@ if (values.page) {
     if (i === reloadAfter) {
       await page.waitForTimeout(700);
       // Senza seme né mosse: la pagina riprende la partita salvata (test=1 serve solo a conoscere la risposta corretta).
-      await page.goto(`${url}?test=1`);
+      await page.goto(`${url}${values.page}?test=1`);
       await page.waitForFunction(() => (window as unknown as { __hellscape3d?: { ready: boolean } }).__hellscape3d?.ready === true);
       await page.waitForTimeout(1500);
     }

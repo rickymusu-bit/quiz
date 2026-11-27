@@ -172,10 +172,10 @@ Aperte dalla revisione del 26 novembre:
 
 ### Stato del prototipo rispetto alla revisione del 26 novembre
 
-Il prototipo in `hellscape3d/` implementa la regola dei bivi di questa revisione: bivio come punto di passaggio nel generatore e nel motore, salvataggi del formato precedente conservati a parte, bilanciamento rifatto; inoltre il radar al posto della minimappa. Per il resto implementa ancora la versione precedente: mostra la città a tre quarti con tutti i giocatori e le alternative del bivio con lunghezza relativa e difficoltà esplicite. Le modifiche vanno fatte per passi giudicabili:
+Il prototipo in `hellscape3d/` implementa la regola dei bivi di questa revisione: bivio come punto di passaggio nel generatore e nel motore, salvataggi del formato precedente conservati a parte, bilanciamento rifatto; inoltre il radar al posto della minimappa. La pagina `corsa.html` implementa in graybox la scena di corsa con le stanze: stanze generate con inquadratura secondo la stanza, uscita dalla stanza, stanze dei bivi, eventi all'arrivo, etichette generiche al bivio. La pagina `index.html` mostra la stessa partita nella vista della città, come strumento di sviluppo. Le modifiche vanno fatte per passi giudicabili:
 1. bivio come punto di passaggio nel generatore e nel motore (fatto);
 2. radar al posto della minimappa (fatto);
-3. scena di corsa in graybox: stanze cicliche generate per casella con inquadratura secondo la stanza, giocatori nella stessa stanza, uscita dalla stanza, stanze dei bivi con imbocchi ed etichette, eventi all'arrivo, movimento ridotto (in corso: la pagina di prova `corsa.html` ha servito a confrontare le inquadrature fisse);
+3. scena di corsa in graybox: stanze cicliche generate per casella con inquadratura secondo la stanza, giocatori nella stessa stanza, uscita dalla stanza, stanze dei bivi con imbocchi ed etichette, eventi all'arrivo, movimento ridotto (fatto in graybox nella pagina `corsa.html`, con stanze di partenza e d'uscita provvisorie);
 4. indizi dell'uscita provvisori.
 
 Restano utili generatore, motore, salvataggi, domande, kit modulare e radar. La vista della città a tre quarti resta come strumento di sviluppo per giudicare le mappe. Transizioni di camera nella città, ostacoli trasparenti e caricamento per settori perdono il loro scopo nel gioco: si rimuovono, dopo aver verificato le dipendenze, quando la scena di corsa li avrà sostituiti.
