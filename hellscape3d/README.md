@@ -12,7 +12,7 @@ Il codice è TypeScript con sola sintassi cancellabile. Il modello logico e il l
 ```sh
 npm run test:hellscape3d           # controllo dei tipi e test Node (logica, layout, scena)
 npm run test:hellscape3d:browser   # build Vite e verifica in Chromium, desktop e mobile orizzontale
-npm run dev:hellscape3d            # http://127.0.0.1:5173/corsa.html (scena di corsa) e / (vista città, sviluppo)
+npm run dev:hellscape3d            # http://127.0.0.1:5173/ (il gioco, scena di corsa) e /citta.html (vista della città, sviluppo)
 npm run record:hellscape3d -- --seed graybox-1 --steps 3 --actions 14   # GIF reale in artifacts/hellscape3d/ (richiede ffmpeg)
 npm test                           # suite core completa, che comprende i test Node
 ```
@@ -41,7 +41,7 @@ La verifica nel browser ripete in entrambe le viewport (1440×900 e 844×390) so
 | `layout/layout.ts` | CityBuilder spaziale: posizioni 3D delle caselle, verifica degli ingombri, masse edilizie |
 | `scene/model.ts` | modello puro della scena visibile, ricavato dalla vista pubblica |
 | `render/graybox.ts` | renderer Three.js: istanze per caselle, passerelle, piloni e masse; camera a tre quarti |
-| `main.ts`, `index.html` | pagina di prova non pubblicata |
+| `main.ts`, `index.html`, `citta.html` | pagine non pubblicate: il gioco e la vista della città (sviluppo) |
 
 **Layout.** La rete viene scomposta in corridoi e bivi. Il percorso avanza sempre lungo X, con svolte di 90° verso ±Z e rampe di 1,5 unità; le caselle distano 4 unità. Dalla casella prima di un bivio partono i rami: il più breve procede diritto e diventa una passerella sopraelevata; gli altri escono di lato, procedono paralleli e rientrano, eventualmente a una quota più bassa. I rami sono percorsi su griglia: se lo scarto rispetto al ramo breve è dispari, l'ultimo passo è diagonale. Così nessuna casella cade a metà di un angolo, dove disterebbe dalla precedente solo 2,83 unità e le piastrelle si sovrapporrebbero.
 
@@ -49,7 +49,7 @@ Ogni disposizione viene verificata: distanza minima fra caselle, passerelle che 
 
 **Nebbia di guerra nella scena.** Il renderer disegna solo il modello della scena, costruito dalla vista pubblica: caselle esplorate, passerelle fra caselle esplorate, masse entro 16 unità da esse e, per ogni tratto che prosegue nella nebbia, un moncone pari al 40% della passerella. La direzione del moncone è l'unico dato non pubblico usato, ed è visibile solo per quel 40%. Un test verifica che nessun identificativo di cella nascosta compaia nel modello in alcun momento della partita.
 
-**Pagina di prova.** Senza parametri riprende la partita salvata; se non c'è, apre la schermata di avvio, che `?new=1` apre comunque. Parametri **solo per sviluppo e test**, che saltano la schermata: `?seed=…` e `?steps=N` (azioni automatiche iniziali), che avviano una partita nuova, `?view=overview` (panoramica delle zone esplorate) e `?reveal=all`, che mostra l'intera città **solo per lo sviluppo**, per giudicare il layout. Tasti: 1–4 risposte e alternative, Invio chiude l'esito della risposta e lancia il dado, Spazio o S saltano la regia, F accelera ×3, V cambia inquadratura, A esegue un'azione automatica (sviluppo). `?motion=reduced` attiva il movimento ridotto, `?timer=S` impone la durata della domanda al posto di quella della partita, `?bank=ID` sceglie la banca di domande di una partita avviata con `?seed=`, `?test=1` espone ai test la risposta corretta. Le azioni automatiche simulano le risposte con il profilo provvisorio.
+**Pagine.** `index.html` è il gioco, `citta.html` la vista della città (solo sviluppo); condividono partita e salvataggio. Senza parametri la pagina riprende la partita salvata; se non c'è, apre la schermata di avvio, che `?new=1` apre comunque. Parametri **solo per sviluppo e test**, che saltano la schermata: `?seed=…` e `?steps=N` (azioni automatiche iniziali), che avviano una partita nuova, nella vista della città `?view=overview` (panoramica delle zone esplorate) e `?reveal=all`, che mostra l'intera città, per giudicare il layout. Tasti: 1–4 risposte e alternative, Invio chiude l'esito della risposta e lancia il dado, Spazio o S saltano la regia, F accelera ×3, V cambia inquadratura, A esegue un'azione automatica (sviluppo). `?motion=reduced` attiva il movimento ridotto, `?timer=S` impone la durata della domanda al posto di quella della partita, `?bank=ID` sceglie la banca di domande di una partita avviata con `?seed=`, `?test=1` espone ai test la risposta corretta. Le azioni automatiche simulano le risposte con il profilo provvisorio.
 
 ## Pedine animate e regia (fase 2, secondo passo)
 
@@ -135,7 +135,7 @@ Lo script di registrazione accetta `--reload-after N` per ricaricare la pagina d
 
 ## Scena di corsa e stanze (specifica §6, passo 3)
 
-`corsa.html` è la partita con la scena di corsa, cioè la schermata di gioco prevista dalla specifica. `index.html` mostra la stessa partita nella vista della città a tre quarti, che resta uno strumento di sviluppo. Le due pagine condividono motore, domande, timer, salvataggio e interfaccia (`main.ts`) e differiscono solo per la vista (`views/runView.ts`, `views/cityView.ts`): nessuna delle due modifica lo stato.
+`index.html` è il gioco: la partita con la scena di corsa, cioè la schermata di gioco prevista dalla specifica. `citta.html` mostra la stessa partita nella vista della città a tre quarti, che resta uno strumento di sviluppo per giudicare le mappe. Le due pagine condividono motore, domande, timer, salvataggio e interfaccia (`main.ts`) e differiscono solo per la vista (`views/runView.ts`, `views/cityView.ts`): nessuna delle due modifica lo stato.
 
 - **Stanze** (`run/rooms.ts`). Ogni casella è una stanza con un tipo (corridoio, sala, ponte sul vuoto, pozzo), una grandezza e una pendenza (salita, piano, discesa). Il tipo è estratto con pesi provvisori per distretto, da un flusso decorativo del seme. La pendenza viene dalla quota della casella successiva nella città generata. Partenza e uscita hanno stanze proprie, provvisorie in attesa di quelle disegnate. La stanza del bivio è una stanza di passaggio, non una casella, con una porta per ramo.
 - **Geometria** (`run/strip.ts`). Usa i pezzi e le tinte neutre del kit, in scala da megastruttura: pareti, pilastri colossali, torri e pozzi che scendono fino a −160 e si perdono nella nebbia. Le stanze ripetute sono strisce periodiche di 48 unità; in pendenza restano periodiche, con le strutture verticali sempre verticali. Bivio e uscita hanno una parete di fondo con le porte: stipiti chiari al bivio, varco luminoso all'uscita.
@@ -156,7 +156,7 @@ Lo script di registrazione accetta `--reload-after N` per ricaricare la pagina d
 
   La pendenza non decide l'inquadratura. Il personaggio non scende sotto il 5% dell'altezza dell'immagine, valore provvisorio. Con la domanda aperta la camera si avvicina e la corsa rallenta. La camera resta dal lato +Z del percorso e i cambi sono morbidi (0,5 s).
 - **Etichette del bivio** (tutte le viste): «Scorciatoia pericolosa», «Via incerta» (provvisoria), «Strada sicura», senza lunghezze né difficoltà esplicite.
-- **Parametri solo di sviluppo** in `corsa.html`:
+- **Parametri solo di sviluppo** nella scena di corsa (`index.html`):
   - `?camera=laterale|angolata|trequarti|spalle` fissa l'inquadratura, per confronto;
   - `?anteprima=ID` o `bivio:ID` mostra una stanza;
   - `?t=S` fissa l'istante, per i test.

@@ -170,10 +170,10 @@ Aperte dalla revisione del 26 novembre:
 
 ### Stato del prototipo rispetto alla revisione del 26 novembre
 
-Il prototipo in `hellscape3d/` implementa la regola dei bivi di questa revisione: bivio come punto di passaggio nel generatore e nel motore, salvataggi del formato precedente conservati a parte, bilanciamento rifatto; inoltre il radar al posto della minimappa. La pagina `corsa.html` implementa in graybox la scena di corsa con le stanze: stanze generate con l'inquadratura scelta insieme alla stanza, uscita dalla stanza, stanze dei bivi, eventi all'arrivo, etichette generiche al bivio. La pagina `index.html` mostra la stessa partita nella vista della città, come strumento di sviluppo. Le modifiche vanno fatte per passi giudicabili:
+Il prototipo in `hellscape3d/` implementa la regola dei bivi di questa revisione: bivio come punto di passaggio nel generatore e nel motore, salvataggi del formato precedente conservati a parte, bilanciamento rifatto; inoltre il radar al posto della minimappa. La pagina principale del prototipo, `index.html`, implementa in graybox la scena di corsa con le stanze: stanze generate con l'inquadratura scelta insieme alla stanza, uscita dalla stanza, stanze dei bivi, eventi all'arrivo, etichette generiche al bivio. La pagina `citta.html` mostra la stessa partita nella vista della città, come strumento di sviluppo. Le modifiche vanno fatte per passi giudicabili:
 1. bivio come punto di passaggio nel generatore e nel motore (fatto);
 2. radar al posto della minimappa (fatto);
-3. scena di corsa in graybox: stanze cicliche generate per casella con inquadratura secondo la stanza, giocatori nella stessa stanza, uscita dalla stanza, stanze dei bivi con imbocchi ed etichette, eventi all'arrivo, movimento ridotto (fatto in graybox nella pagina `corsa.html`, con stanze di partenza e d'uscita provvisorie).
+3. scena di corsa in graybox: stanze cicliche generate per casella con inquadratura secondo la stanza, giocatori nella stessa stanza, uscita dalla stanza, stanze dei bivi con imbocchi ed etichette, eventi all'arrivo, movimento ridotto (fatto in graybox, oggi nella pagina principale `index.html`, con stanze di partenza e d'uscita provvisorie).
 
 Gli indizi ambientali dell'uscita, previsti come quarto passo, sono stati abbandonati il 27 novembre: il radar basta.
 

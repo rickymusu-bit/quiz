@@ -218,3 +218,28 @@ test("regia della corsa: movimento ridotto senza animazioni né dissolvenze, sal
   }
   assert.ok(RUN_TIMING.cut > 0);
 });
+
+test("regia della corsa: una partita aperta (o ripresa) in attesa del bivio parte dalla stanza del bivio", () => {
+  const { game, layout } = city("regia-corsa-5");
+  let checked = 0;
+  // Ogni scelta al bivio in attesa, raggiunta senza regia: la scena iniziale deve coincidere con quella a regia conclusa.
+  const played = new RunDirector(game.map, layout, game.state, { reducedMotion: true });
+  let state = game.state;
+  for (let i = 0; i < 200 && state.phase !== "ended"; i++) {
+    const result = applyAction(game.map, state, autoAction(game, state, i % 2 ? "piu-breve" : "piu-lungo"));
+    played.enqueue(result.events, result.state);
+    played.skip();
+    state = result.state;
+    if (state.phase !== "fork") continue;
+    checked++;
+    const active = state.players[state.activeIndex]!;
+    const opened = new RunDirector(game.map, layout, state).getFrame();
+    assert.equal(opened.room.key, `bivio:${active.cellId}`, "partita al bivio aperta fuori dalla stanza del bivio");
+    assert.deepEqual(opened.runners, [active.id]);
+    assert.equal(opened.running, false, "il corridore non è fermo davanti alle porte");
+    assert.equal(opened.approach, 0);
+    const reference = played.getFrame();
+    assert.deepEqual([opened.room.key, opened.runners, opened.activePlayerId, opened.running], [reference.room.key, reference.runners, reference.activePlayerId, reference.running]);
+  }
+  assert.ok(checked >= 2, `bivi esercitati: ${checked}`);
+});

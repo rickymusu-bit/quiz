@@ -1,8 +1,8 @@
 /**
  * Pagine di prova, non pubblicate: partita con le domande delle banche della
  * versione precedente, interfaccia provvisoria e una vista intercambiabile.
- * `corsa.html` mostra la scena di corsa (la schermata di gioco, specifica §6);
- * `index.html` la città a tre quarti, strumento di sviluppo.
+ * `index.html` è il gioco, con la scena di corsa (specifica §6);
+ * `citta.html` mostra la stessa partita nella città a tre quarti, strumento di sviluppo.
  *
  * Senza parametri riprende la partita salvata nel browser; se non c'è, apre la
  * schermata di avvio (banca, argomenti, giocatori, durata). ?new=1 apre la
@@ -66,8 +66,8 @@ const sectorsEnabled = sectorsParam !== "off";
 const reducedMotion = params.get("motion") === "reduced" || matchMedia("(prefers-reduced-motion: reduce)").matches;
 /** SOLO SVILUPPO E TEST: durata della domanda imposta dall'indirizzo, al posto di quella della partita. */
 const timerParam = Number(params.get("timer")) > 0 ? Math.max(1, Number(params.get("timer"))) : null;
-/** Vista della pagina: scena di corsa (corsa.html) o città (index.html). */
-const sceneKind = document.body.dataset.scena === "corsa" ? "corsa" : "citta";
+/** Vista della pagina: scena di corsa (index.html, il gioco) o città (citta.html, solo sviluppo). */
+const sceneKind = document.body.dataset.scena === "citta" ? "citta" : "corsa";
 let speed = 1;
 
 /** Schermata di avvio: impostazioni della partita nuova, ricordate per la volta successiva. */

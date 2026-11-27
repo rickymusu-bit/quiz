@@ -96,16 +96,19 @@ export class RunDirector {
     this.reducedMotion = options.reducedMotion ?? false;
     this.shot = options.shot;
     const active = state.players[state.activeIndex]!;
-    const room = this.cellRoom(active.cellId);
+    // Partita aperta (o ripresa) in attesa della scelta al bivio: la scena è quella a regia conclusa,
+    // nella stanza del bivio con il corridore fermo davanti alle porte.
+    const atFork = state.phase === "fork";
+    const room = atFork ? this.junctionRoom(active.cellId) : this.cellRoom(active.cellId);
     this.frame = {
       room,
-      runners: this.runnersIn(state, active.cellId, active.id),
+      runners: atFork ? [active.id] : this.runnersIn(state, active.cellId, active.id),
       activePlayerId: active.id,
       distance: 0,
       approach: 0,
       advance: 0,
       door: null,
-      running: true,
+      running: !atFork,
       camera: this.pose(room),
       fade: 0,
       cells: Object.fromEntries(state.players.map((p) => [p.id, p.cellId])),

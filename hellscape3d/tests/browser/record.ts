@@ -5,7 +5,7 @@
  *
  * Uso: node hellscape3d/tests/browser/record.ts --seed graybox-9 --steps 12 --actions 14 \
  *        [--width 960 --height 540] [--name regia] [--query motion=reduced]
- * Scena di corsa: --page corsa.html (stessa partita, vista di gioco); con --actions 0 si registra per
+ * Pagina predefinita: il gioco (scena di corsa); --page citta.html per la vista della città. Con --actions 0 si registra per
  * --duration secondi senza azioni (per esempio un'anteprima: --query anteprima=ID).
  * Con --setup si parte dalla schermata di avvio (senza seme: città casuale), compilata
  * dall'interfaccia con giocatori, nomi, argomenti e durata, poi si gioca per --actions azioni.
@@ -31,7 +31,7 @@ const { values } = parseArgs({
     fps: { type: "string", default: "10" },
     /** Dopo N azioni ricarica la pagina senza parametri, per registrare la ripresa della partita. */
     "reload-after": { type: "string", default: "" },
-    /** Pagina diversa dalla città: si registra per `duration` secondi senza azioni. */
+    /** Pagina: vuota per il gioco, citta.html per la vista della città. */
     page: { type: "string", default: "" },
     duration: { type: "string", default: "10" },
     setup: { type: "boolean", default: false },

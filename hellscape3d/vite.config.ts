@@ -8,8 +8,8 @@ export default defineConfig({
     emptyOutDir: true,
     target: "es2022",
     chunkSizeWarningLimit: 1024,
-    // Due pagine di prova: la città (index) e la scena di corsa.
-    rollupOptions: { input: { index: "index.html", corsa: "corsa.html" } },
+    // Due pagine: il gioco con la scena di corsa (index) e la vista della città, solo sviluppo (citta).
+    rollupOptions: { input: { index: "index.html", citta: "citta.html" } },
   },
   // Le banche di domande della versione precedente stanno fuori dalla cartella del prototipo: si espongono solo quelle.
   server: { host: "127.0.0.1", fs: { allow: [".", "../datasets.json", "../dataset"] } },
