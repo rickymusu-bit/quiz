@@ -1,7 +1,10 @@
 /**
- * Verifica nel browser della pagina graybox: build Vite reale, Chromium,
+ * Verifica nel browser delle pagine del prototipo: build Vite reale, Chromium,
  * viewport desktop e mobile orizzontale. Controlla che la scena disegni solo le
  * celle esplorate, che il canvas non sia vuoto e che non ci siano errori.
+ * Il gioco (index.html, scena di corsa) porta le verifiche del flusso di
+ * partita; la vista della città (citta.html, solo sviluppo) quelle sue proprie:
+ * celle mostrate, regia nella città, ostacoli trasparenti, settori.
  * Le verifiche il cui esito dipende dalle dimensioni dello schermo
  * (impaginazione, inquadrature, proporzioni) girano in entrambe le viewport;
  * quelle di sola logica (timer, salvataggi, regia, battute) solo nella prima.
@@ -177,10 +180,23 @@ function assertRadar(debug: DebugInfo): void {
 }
 
 /** A regia ferma: celle mostrate = esplorate = disegnate, pedine sulle caselle dello stato. */
+/**
+ * Regia ferma: presentazione allineata allo stato. Nella scena di corsa la
+ * stanza è quella del giocatore di turno (o del bivio da scegliere) e lui corre
+ * in testa; nella città le celle mostrate e disegnate sono quelle esplorate.
+ */
 function assertSettled(debug: DebugInfo): void {
   assert.equal(debug.busy, false);
-  assert.deepEqual(debug.shown, debug.explored);
-  assert.deepEqual(debug.rendered, debug.explored);
+  const run = debug as DebugInfo & { view?: string; room?: { key: string }; runners?: string[] };
+  if (run.view === "corsa") {
+    const active = debug.playerCells[debug.stateActivePlayerId]!;
+    assert.equal(run.room!.key, debug.phase === "fork" ? `bivio:${active}` : active, "scena fuori dalla stanza del giocatore di turno");
+    if (debug.phase !== "fork") assert.equal(run.runners![0], debug.stateActivePlayerId);
+    assert.equal(debug.fade, 0);
+  } else {
+    assert.deepEqual(debug.shown, debug.explored);
+    assert.deepEqual(debug.rendered, debug.explored);
+  }
   assertRadar(debug);
   assert.equal(debug.activePlayerId, debug.stateActivePlayerId);
   for (const [id, p] of Object.entries(debug.pawns)) {
@@ -216,6 +232,8 @@ await build({ root, logLevel: "warn" });
 const server = await preview({ root, logLevel: "warn", preview: { port: 0, host: "127.0.0.1" } });
 const url = server.resolvedUrls?.local[0];
 assert.ok(url, "server di anteprima non avviato");
+/** Vista della città, solo sviluppo. Il gioco è la pagina principale (`url`). */
+const city = `${url}citta.html`;
 const executablePath = [process.env.CHROMIUM_PATH, "/usr/bin/chromium", "/opt/pw-browsers/chromium"].find((p) => p && existsSync(p));
 const browser = await chromium.launch({
   ...(executablePath ? { executablePath } : {}),
@@ -239,7 +257,7 @@ try {
     for (const testCase of CASES) {
       const label = `${device.name} · ${testCase.name}`;
       try {
-        await page.goto(`${url}?${testCase.query}`);
+        await page.goto(`${city}?${testCase.query}`);
         await waitReady(page);
         const debug = await info(page);
         if (debug.revealAll) assert.equal(debug.rendered.length, debug.totalCells, "città rivelata incompleta");
@@ -258,9 +276,9 @@ try {
         console.log(`FAIL ${label}: ${(error as Error).message}`);
       }
     }
-    // Regia: animazione reale, salto e coerenza finale con lo stato (sola logica).
+    // Regia nella città: animazione reale, salto e coerenza finale con lo stato (sola logica).
     if (logic) try {
-      await page.goto(`${url}?seed=graybox-1`);
+      await page.goto(`${city}?seed=graybox-1`);
       await waitReady(page);
       const first = await info(page);
       let animated = 0;
@@ -417,7 +435,7 @@ try {
     // Ostacoli: la passerella sopraelevata davanti alla pedina diventa trasparente; il pannello non la copre.
     try {
       for (const occlusion of ["on", "off"] as const) {
-        await page.goto(`${url}?seed=graybox-38&steps=9${occlusion === "off" ? "&occlusion=off" : ""}`);
+        await page.goto(`${city}?seed=graybox-38&steps=9${occlusion === "off" ? "&occlusion=off" : ""}`);
         await waitReady(page);
         await page.waitForFunction(() => {
           const d = (window as unknown as { __hellscape3d: DebugInfo }).__hellscape3d;
@@ -438,7 +456,7 @@ try {
     // molto più corto si scarica davvero, ma stato, radar e caselle delle pedine restano intatti.
     try {
       const canvasPixels = async (query: string): Promise<{ png: Buffer; debug: DebugInfo }> => {
-        await page.goto(`${url}?${query}`);
+        await page.goto(`${city}?${query}`);
         await waitReady(page);
         // Inquadratura ferma: il margine riservato al pannello ha raggiunto il valore finale.
         await page.waitForFunction(() => {
@@ -465,7 +483,7 @@ try {
       assert.ok(detected > 0, "il confronto delle immagini non rileva i settori mancanti");
 
       const play = async (query: string) => {
-        await page.goto(`${url}?seed=graybox-9&intro=off${query}`);
+        await page.goto(`${city}?seed=graybox-9&intro=off${query}`);
         await waitReady(page);
         let unloaded = 0,
           samples = 0,
@@ -513,20 +531,20 @@ try {
       failures++;
       console.log(`FAIL ${device.name} · settori: ${(error as Error).message}`);
     }
-    // Bafometto: apertura dalla sede, terminale locale, intervento finale, movimento ridotto.
+    // Bafometto nel gioco: battuta d'apertura, terminale, intervento finale, movimento ridotto.
     try {
-      const seatState = (): Promise<unknown> =>
-        page.waitForFunction(() => (window as unknown as { __hellscape3d: DebugInfo }).__hellscape3d.bafometto?.kind === "seat", null, { timeout: 8_000 });
+      const spokenNow = (moment: string): Promise<unknown> =>
+        page.waitForFunction((m) => (window as unknown as { __hellscape3d: DebugInfo }).__hellscape3d.spoken.includes(m), moment, { timeout: 10_000 });
       await page.goto(`${url}?seed=graybox-1`);
       await waitReady(page, false);
-      await seatState();
+      await spokenNow("intro");
       let debug = await info(page);
       assert.deepEqual(debug.spoken, ["intro"]);
       assert.ok(await page.locator(".hud-speech").isVisible(), "battuta non visibile");
-      assert.deepEqual(debug.rendered, debug.shown, "la sede mostra celle non esplorate");
+      assert.equal(debug.busy, true, "l'apertura non è una regia");
       assert.equal(debug.panel, null, "pannelli visibili durante l'intervento");
       assert.equal(await page.locator(".hud-panel").isVisible(), false, "contenitore del pannello visibile");
-      await page.screenshot({ path: join(artifacts, `bafometto-sede-${device.name}.png`) });
+      await page.screenshot({ path: join(artifacts, `bafometto-apertura-${device.name}.png`) });
       await page.keyboard.press("KeyS");
       debug = await info(page);
       assertSettled(debug);
@@ -537,7 +555,7 @@ try {
       await page.goto(`${url}?seed=graybox-3&steps=7`);
       await waitReady(page);
       await page.keyboard.press("KeyA");
-      await page.waitForFunction(() => (window as unknown as { __hellscape3d: DebugInfo }).__hellscape3d.bafometto?.kind === "terminal", null, { timeout: 10_000 });
+      await spokenNow("terminal");
       debug = await info(page);
       assert.ok(debug.spoken.includes("terminal") && !debug.spoken.includes("intro"));
       assert.ok(await page.locator(".hud-speech").isVisible());
@@ -548,7 +566,7 @@ try {
       await page.goto(`${url}?seed=graybox-1&steps=40`);
       await waitReady(page);
       await page.keyboard.press("KeyA");
-      await seatState();
+      await spokenNow("end");
       await page.waitForFunction(() => (window as unknown as { __hellscape3d: DebugInfo }).__hellscape3d.busy === false, null, { timeout: 10_000 });
       debug = await info(page);
       assert.equal(debug.phase, "ended");
@@ -567,7 +585,7 @@ try {
       assert.deepEqual(debug.spoken, ["intro"]);
       assert.ok(await page.locator(".hud-speech").isVisible(), "battuta assente con il movimento ridotto");
       }
-      console.log(`ok   ${device.name} · Bafometto: sede${logic ? ", terminale, fine partita, movimento ridotto" : ""}`);
+      console.log(`ok   ${device.name} · Bafometto: apertura${logic ? ", terminale, fine partita, movimento ridotto" : ""}`);
     } catch (error) {
       failures++;
       console.log(`FAIL ${device.name} · Bafometto: ${(error as Error).message}`);
@@ -706,7 +724,7 @@ try {
       failures++;
       console.log(`FAIL ${device.name} · schermata di avvio: ${(error as Error).message}`);
     }
-    // Scena di corsa (corsa.html): stanze senza giunture per tipo, partita con la regia della corsa, movimento ridotto.
+    // Scena di corsa (index.html): stanze senza giunture per tipo, partita con la regia della corsa, movimento ridotto.
     try {
       type RunDebug = DebugInfo & {
         view: string;
@@ -719,7 +737,7 @@ try {
       const canvasPng = async (): Promise<Buffer> =>
         Buffer.from((await page.evaluate(() => document.querySelector<HTMLCanvasElement>("#scene")!.toDataURL("image/png"))).split(",")[1]!, "base64");
       const open = async (query: string): Promise<RunDebug> => {
-        await page.goto(`${url}corsa.html?${query}`);
+        await page.goto(`${url}?${query}`);
         await page.waitForFunction(() => (window as unknown as { __hellscape3d?: { ready: boolean } }).__hellscape3d?.ready === true, null, { timeout: 30_000 });
         await page.waitForTimeout(250);
         return runInfo();
