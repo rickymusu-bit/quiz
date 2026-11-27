@@ -9,6 +9,8 @@ import { buildKit, massKey, tileKey, walkwayKey, type KitResult, type Primitive 
 import { ABYSS_Y, CAMERA_OPTICS, cameraPosition, fogRange, shadowExtent, SUN, WALKWAY } from "../scene/dimensions.ts";
 import type { SceneModel, SceneSegment } from "../scene/model.ts";
 import { elementKey, indexSectors, isLoaded, updateLoadedSectors, type Focus, type SectorIndex } from "../scene/sectors.ts";
+import { instancedMesh } from "./instancing.ts";
+import { applyBottomInset } from "./viewOffset.ts";
 import { findOccluders, NO_OCCLUDERS, occludersKey, type Occluders } from "../scene/occlusion.ts";
 import { playerColor } from "../ui/palette.ts";
 
@@ -244,21 +246,10 @@ export class GrayboxRenderer {
       const key = `${primitive.shape}|${primitive.material}|${isFaded}`;
       (groups.get(key) ?? groups.set(key, []).get(key)!).push(primitive);
     }
-    const matrix = new THREE.Matrix4();
-    const position = new THREE.Vector3(),
-      scale = new THREE.Vector3(),
-      quaternion = new THREE.Quaternion(),
-      euler = new THREE.Euler(),
-      color = new THREE.Color();
     for (const [key, primitives] of groups) {
       const [shape, materialName, isFaded] = key.split("|") as [Primitive["shape"], Primitive["material"], string];
       const material = this.kitMaterials[materialName];
-      const mesh = new THREE.InstancedMesh(shape === "box" ? this.unitBox : this.unitCylinder, isFaded === "true" ? this.fadedMaterial(material) : material, primitives.length);
-      primitives.forEach((p, i) => {
-        quaternion.setFromEuler(euler.set(p.rotation.x, p.rotation.y, p.rotation.z));
-        mesh.setMatrixAt(i, matrix.compose(position.set(p.position.x, p.position.y, p.position.z), quaternion, scale.set(p.scale.x, p.scale.y, p.scale.z)));
-        if (materialName === "concrete") mesh.setColorAt(i, color.setHex(p.color));
-      });
+      const mesh = instancedMesh(primitives, shape === "box" ? this.unitBox : this.unitCylinder, isFaded === "true" ? this.fadedMaterial(material) : material, materialName === "concrete");
       mesh.castShadow = true;
       mesh.receiveShadow = isFaded !== "true";
       mesh.userData.faded = isFaded === "true";
@@ -358,17 +349,7 @@ export class GrayboxRenderer {
    * la camera né deformare l'immagine.
    */
   setBottomInset(pixels: number): void {
-    const width = this.renderer.domElement.clientWidth,
-      height = this.renderer.domElement.clientHeight;
-    const inset = Math.max(0, Math.min(height * 0.6, pixels));
-    if (inset < 0.5) {
-      this.camera.clearViewOffset();
-      this.camera.aspect = width / height;
-    } else {
-      this.camera.aspect = width / (height + inset);
-      this.camera.setViewOffset(width, height + inset, 0, inset, width, height);
-    }
-    this.camera.updateProjectionMatrix();
+    applyBottomInset(this.camera, this.renderer.domElement.clientWidth, this.renderer.domElement.clientHeight, pixels);
   }
 
   /** Coordinate in pixel CSS di un punto della scena; null se dietro la camera o fuori dall'inquadratura. */

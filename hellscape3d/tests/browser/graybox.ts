@@ -14,6 +14,8 @@ import { fileURLToPath } from "node:url";
 import { createCanvas, loadImage } from "@napi-rs/canvas";
 import { chromium, type Page } from "playwright";
 import { build, preview } from "vite";
+import { RUN } from "../../src/run/runScene.ts";
+import { STRIP } from "../../src/run/strip.ts";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const artifacts = resolve(root, "../artifacts/hellscape3d");
@@ -534,6 +536,43 @@ try {
     } catch (error) {
       failures++;
       console.log(`FAIL ${device.name} · ripresa: ${(error as Error).message}`);
+    }
+    // Scena di corsa (pagina corsa.html): quattro inquadrature, scenario ciclico senza giunture, movimento ridotto.
+    try {
+      const canvasPng = async (): Promise<Buffer> =>
+        Buffer.from((await page.evaluate(() => document.querySelector<HTMLCanvasElement>("#scene")!.toDataURL("image/png"))).split(",")[1]!, "base64");
+      const at = async (query: string): Promise<Buffer> => {
+        await page.goto(`${url}corsa.html?${query}`);
+        await page.waitForFunction(() => (window as unknown as { __corsa?: { ready: boolean } }).__corsa?.ready === true, null, { timeout: 30_000 });
+        await page.waitForTimeout(200);
+        return canvasPng();
+      };
+      const period = STRIP.period,
+        speed = RUN.speed;
+      for (const camera of ["laterale", "angolata", "trequarti", "spalle"]) {
+        const first = await at(`camera=${camera}&t=1.3&players=2`);
+        const spread = await luminanceSpread(first);
+        assert.ok(spread > 8, `${camera}: scena apparentemente vuota (${spread.toFixed(1)})`);
+        assert.ok(await page.locator(".hud-panel .hud-option").first().isVisible(), `${camera}: domanda non visibile`);
+        // Un periodo dopo l'immagine è identica pixel per pixel: il ciclo non ha giunture.
+        const later = await at(`camera=${camera}&t=${1.3 + period / speed}&players=2`);
+        assert.ok(first.equals(later), `${camera}: l'immagine non si ripete dopo un periodo`);
+        // A metà periodo invece la scena è cambiata: lo scenario scorre davvero.
+        assert.ok(!first.equals(await at(`camera=${camera}&t=${1.3 + period / speed / 2}&players=2`)), `${camera}: lo scenario non scorre`);
+        await page.goto(`${url}corsa.html?camera=${camera}&t=1.3&players=2`);
+        await page.waitForFunction(() => (window as unknown as { __corsa?: { ready: boolean } }).__corsa?.ready === true);
+        await page.screenshot({ path: join(artifacts, `corsa-${camera}-${device.name}.png`) });
+      }
+      // Movimento ridotto: lo scenario resta fermo.
+      await page.goto(`${url}corsa.html?motion=reduced`);
+      await page.waitForFunction(() => (window as unknown as { __corsa?: { ready: boolean } }).__corsa?.ready === true);
+      const still = await canvasPng();
+      await page.waitForTimeout(700);
+      assert.ok(still.equals(await canvasPng()), "con il movimento ridotto lo scenario si muove");
+      console.log(`ok   ${device.name} · scena di corsa: quattro inquadrature, ciclo senza giunture, movimento ridotto`);
+    } catch (error) {
+      failures++;
+      console.log(`FAIL ${device.name} · scena di corsa: ${(error as Error).message}`);
     }
     // Movimento ridotto: nessuna animazione, presentazione sempre allineata allo stato.
     try {

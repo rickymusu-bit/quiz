@@ -16,10 +16,12 @@
  * saltano la regia, F accelera ×3, V cambia inquadratura, A esegue
  * un'azione automatica (sviluppo).
  */
+import "./ui/hud.css";
 import { CameraDirector, SHOTS, type Frame } from "./director/director.ts";
 import { applyAction, createGame, publicView, rngFromSeed, saveToStorage, type Game, type GameAction, type GameState, type KeyValueStorage } from "./logic/index.ts";
 import { buildCityLayout } from "./layout/layout.ts";
 import { GrayboxRenderer, type CameraMode } from "./render/graybox.ts";
+import { panelInset } from "./render/viewOffset.ts";
 import { buildSceneModel, presentedView, revealAllView, type SceneModel } from "./scene/model.ts";
 import { NO_OCCLUDERS, type Occluders } from "./scene/occlusion.ts";
 import { citySlab, visibleRadius, type Focus } from "./scene/sectors.ts";
@@ -269,12 +271,6 @@ let lastPanel: Panel | null = null;
 let inset = 0;
 let occluders: Occluders = NO_OCCLUDERS;
 
-/** Altezza, dal fondo dello schermo, occupata dal pannello visibile. */
-function panelInset(): number {
-  const panel = document.querySelector<HTMLElement>(".hud-panel");
-  if (!panel || panel.hidden) return 0;
-  return Math.max(0, window.innerHeight - panel.getBoundingClientRect().top);
-}
 let radar: RadarShapes | null = null;
 
 let drawing = false;

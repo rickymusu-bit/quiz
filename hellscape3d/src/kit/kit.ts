@@ -62,8 +62,8 @@ export const KIT = Object.freeze({
   braceSpacing: 7,
 });
 
-const CONCRETE = { light: 0x8c8f94, walkway: 0x8a8d93, mass: 0x4d5056, pillar: 0x5c5f65 };
-const DISTRICT_TINT: Readonly<Record<string, number>> = {
+export const CONCRETE = { light: 0x8c8f94, walkway: 0x8a8d93, mass: 0x4d5056, pillar: 0x5c5f65 };
+export const DISTRICT_TINT: Readonly<Record<string, number>> = {
   fondazioni: 0x8b8682,
   ponti: 0x858c96,
   abitativo: 0x8e8e89,
@@ -75,7 +75,7 @@ export const tileKey = (id: string): string => id;
 export const walkwayKey = (segment: SceneSegment): string => `${segment.from}>${segment.to ?? "?"}`;
 export const massKey = (mass: Mass): string => `${mass.x.toFixed(2)},${mass.z.toFixed(2)}`;
 
-function shade(hex: number, factor: number): number {
+export function shade(hex: number, factor: number): number {
   const r = Math.min(255, Math.round(((hex >> 16) & 255) * factor)),
     g = Math.min(255, Math.round(((hex >> 8) & 255) * factor)),
     b = Math.min(255, Math.round((hex & 255) * factor));
@@ -93,7 +93,8 @@ export function exitPoint(centre: Vec3, half: number, dx: number, dz: number): V
 
 const halfSize = (kind: CellKind): number => (TILE.size * tileScale(kind)) / 2;
 
-class Builder {
+/** Raccoglie primitive per un elemento; usato anche dallo scenario della corsa. */
+export class Builder {
   readonly primitives: Primitive[] = [];
   ref: ElementRef = { kind: "tile", key: "" };
 

@@ -12,7 +12,7 @@ Il codice è TypeScript con sola sintassi cancellabile. Il modello logico e il l
 ```sh
 npm run test:hellscape3d           # controllo dei tipi e test Node (logica, layout, scena)
 npm run test:hellscape3d:browser   # build Vite e verifica in Chromium, desktop e mobile orizzontale
-npm run dev:hellscape3d            # pagina di prova su http://127.0.0.1:5173
+npm run dev:hellscape3d            # pagina di prova su http://127.0.0.1:5173 (scena di corsa: /corsa.html)
 npm run record:hellscape3d -- --seed graybox-1 --steps 3 --actions 14   # GIF reale in artifacts/hellscape3d/ (richiede ffmpeg)
 npm test                           # suite core completa, che comprende i test Node
 ```
@@ -129,6 +129,22 @@ Lo script di registrazione accetta `--reload-after N` per ricaricare la pagina d
 **Stabilità.** Le varianti dipendono dal seme e dall'identità di ogni elemento, non da quante celle sono visibili, quindi un elemento non cambia aspetto esplorando. I monconi verso la nebbia aprono la ringhiera come farebbe la passerella completa. L'unica eccezione è voluta: dove arriva un ramo ancora nascosto la ringhiera resta chiusa, altrimenti l'apertura rivelerebbe il ramo, e si apre quando il ramo viene esplorato. La città intera di `graybox-1` conta circa 1 700 primitive, assemblate in pochi millisecondi.
 
 **Non ancora:** sagome lontane (con la nebbia attuale non sarebbero visibili), palette, materiali e texture, illuminazione, macchinari animati. Sono decisioni di direzione artistica.
+
+## Scena di corsa: confronto delle inquadrature (specifica §6, passo 3)
+
+Pagina di prova `corsa.html`, non pubblicata e non ancora collegata al motore. Mostra il giocatore di turno che corre sul posto mentre lo scenario della sua casella scorre e si ripete. Ci sono il pannello di una domanda vera e il radar, come durante una domanda. Serve a scegliere l'angolo della camera, ancora aperto nella specifica.
+
+- **Scenario** (`run/strip.ts`): striscia periodica lungo X di 48 unità, cioè 12 moduli da 4. Contiene la passerella con cordoli, montanti e corrimano, i piloni fino all'abisso, le masse sullo sfondo a profondità diverse (la prospettiva dà la parallasse) e le tubazioni. Usa i pezzi e le tinte neutre del kit della città. Dipende solo da seme, casella e distretto, quindi non anticipa il percorso. Il renderer affianca sei copie della striscia: la ripetizione non ha giunture.
+- **Corridore provvisorio** (`run/runScene.ts`): volumi semplici con un ciclo di corsa schematico, cioè gambe e braccia in opposizione, rimbalzo e inclinazione. Il passo divide il periodo, così l'intera immagine si ripete identica dopo 8 s. Con `players=2` il secondo giocatore corre affiancato, un po' indietro.
+- **Inquadrature** (`?camera=`): `laterale`, `angolata` (profilo ruotato di circa 20°, predefinita), `trequarti`, `spalle`. Come nella città, l'immagine si centra nell'area lasciata libera dal pannello in basso.
+- **Altri parametri:** `?seed=`, `?cell=`, `?panel=off`, `?motion=reduced` (scenario fermo), `?t=S` (istante fisso, per i test). Registrazione: `npm run record:hellscape3d -- --page corsa.html --duration 10 --query camera=angolata`.
+
+Verifiche nel browser, desktop e mobile:
+- per ogni inquadratura l'immagine dopo un periodo è identica pixel per pixel e a metà periodo è diversa;
+- domanda visibile;
+- con il movimento ridotto lo scenario resta fermo.
+
+**Non ancora:** collegamento al motore e alla regia, cambio di scenario a ogni casella attraversata, bivio con imbocchi ed etichette, rallentamento durante la domanda, personaggi definitivi.
 
 ## Domande (banche della versione precedente)
 

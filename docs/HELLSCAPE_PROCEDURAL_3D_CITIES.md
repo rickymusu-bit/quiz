@@ -166,7 +166,7 @@ Aperte dalla revisione del 26 novembre:
 Il prototipo in `hellscape3d/` implementa la regola dei bivi di questa revisione: bivio come punto di passaggio nel generatore e nel motore, salvataggi del formato precedente conservati a parte, bilanciamento rifatto; inoltre il radar al posto della minimappa. Per il resto implementa ancora la versione precedente: mostra la città a tre quarti con tutti i giocatori e le alternative del bivio con lunghezza relativa e difficoltà esplicite. Le modifiche vanno fatte per passi giudicabili:
 1. bivio come punto di passaggio nel generatore e nel motore (fatto);
 2. radar al posto della minimappa (fatto);
-3. scena di corsa in graybox: scenario ciclico per casella, giocatori nella stessa casella, bivio con imbocchi ed etichette, movimento ridotto;
+3. scena di corsa in graybox: scenario ciclico per casella, giocatori nella stessa casella, bivio con imbocchi ed etichette, movimento ridotto (in corso: pagina di prova `corsa.html` per confrontare le inquadrature);
 4. indizi dell'uscita provvisori.
 
 Restano utili generatore, motore, salvataggi, domande, kit modulare e radar. La vista della città a tre quarti resta come strumento di sviluppo per giudicare le mappe. Transizioni di camera nella città, ostacoli trasparenti e caricamento per settori perdono il loro scopo nel gioco: si rimuovono, dopo aver verificato le dipendenze, quando la scena di corsa li avrà sostituiti.
