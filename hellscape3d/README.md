@@ -66,7 +66,8 @@ Fino al 27 novembre la vista aveva una regia (camminata delle pedine, transizion
 - **Timer** (`ui/timer.ts`): 45 secondi, il valore predefinito della versione precedente, ancora provvisorio. Scorre solo con la domanda visibile, a regia ferma e con la pagina in primo piano; alla scadenza la risposta vale come tempo scaduto. La domanda viene creata solo quando diventa visibile, quindi la regia non può consumarne il tempo.
 - **Dado:** pulsante (o Invio) dopo la risposta corretta; il risultato resta visibile durante l'avanzamento.
 - **Bivio:** alternative ordinate dalla più breve alla più lunga, con lunghezza relativa e difficoltà (tasti 1–3). Gli stessi numeri compaiono nella scena sugli imbocchi dei rami, con il colore della difficoltà.
-- **Fine partita:** nome di chi è uscito e pulsante per una nuova città.
+- **Fine partita:** nome di chi è uscito, «Riepilogo della partita» e «Nuova città».
+- **Riepilogo** (`questions/summary.ts`, `ui/summary.ts`, provvisorio): risposte corrette, errate e scadute per giocatore; corrette sul totale per argomento; poi le domande in ordine di turno con giocatore, argomento, difficoltà, risposta data, risposta corretta (se diversa) e spiegazione. Si ricava solo dal registro delle domande, quindi vale anche per una partita ripresa; le domande rimaste senza risposta non compaiono. Si chiude con «Chiudi» o Esc.
 - **Radar** (`ui/radar.ts`, specifica §3): sostituisce la minimappa e non disegna caselle né percorsi. Al centro c'è il giocatore di turno, contornato di chiaro; gli altri giocatori sono punti nella loro posizione relativa. Le distanze sono in linea d'aria sul piano orizzontale e l'orientamento è fisso, come la camera della vista a tre quarti. La portata è di 24 unità, cioè 6 caselle in linea d'aria, valore provvisorio. Chi è più lontano compare come tacca sul bordo nella propria direzione, chi è nella stessa casella si affianca al centro. L'uscita, un portale verde, compare solo quando entra nella portata. Su 200 città compare quando mancano in mediana 7 caselle di percorso, nel 90% dei casi al massimo 9, al massimo 16 dove un ramo passa vicino all'uscita. Il radar riceve solo le posizioni delle pedine e dell'uscita.
 
 Quando un pannello occupa la parte bassa dello schermo, l'inquadratura si decentra (`render/viewOffset.ts`) in modo che il punto inquadrato resti al centro dell'area libera, senza spostare la camera né deformare l'immagine. Su schermi bassi (mobile orizzontale) pannelli e radar si riducono. Il tasto A esegue un'azione automatica, solo per lo sviluppo.
@@ -153,7 +154,7 @@ Le domande vengono dalle banche del sito, le stesse della versione precedente: i
 - **Registro** (`hellscape3d-domande`): per ogni momento di domanda (turno e giocatore) registra la domanda assegnata, l'ordine delle alternative e la risposta, con banca, argomenti, durata della domanda e seme della partita. Si salva a ogni cambiamento. Un ricaricamento ripropone la stessa domanda, o il suo esito se si era già risposto, e non permette una seconda risposta. Una partita nuova apre un registro nuovo; una ripresa usa la banca con cui la partita era cominciata. Un registro del formato precedente, senza argomenti né durata, non viene riletto: la partita ripresa prosegue con un registro nuovo, tutti gli argomenti e la durata predefinita.
 - **Banca:** scelta nella schermata di avvio; con `?seed=` (sviluppo) `?bank=ID`, altrimenti la prima del catalogo.
 
-**Non ancora:** rendering delle formule (KaTeX nella versione precedente); riepilogo delle domande a fine partita. La durata del timer resta da fissare nel regolamento.
+**Non ancora:** rendering delle formule (KaTeX nella versione precedente). La durata del timer resta da fissare nel regolamento.
 
 ## Rete generata
 

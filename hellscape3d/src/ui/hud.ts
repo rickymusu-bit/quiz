@@ -51,6 +51,8 @@ export interface HudActions {
   roll(): void;
   choose(to: string): void;
   restart(): void;
+  /** Riepilogo delle domande a fine partita. */
+  summary(): void;
 }
 
 /**
@@ -279,11 +281,16 @@ export class Hud {
       options.querySelector("button")?.focus({ preventScroll: true });
     } else {
       this.panel.setAttribute("aria-label", "Fine partita");
-      const button = element("button", "hud-primary", "Nuova città");
+      const summary = element("button", "hud-primary hud-summary", "Riepilogo della partita");
+      summary.type = "button";
+      summary.addEventListener("click", () => this.actions.summary());
+      const button = element("button", "hud-option hud-restart", "Nuova città");
       button.type = "button";
       button.addEventListener("click", () => this.actions.restart());
-      this.panel.append(element("p", "hud-question-text", `${panel.winnerName} ha raggiunto la porta: è uscito dalla città.`), button);
-      button.focus({ preventScroll: true });
+      const buttons = element("div", "hud-options");
+      buttons.append(summary, button);
+      this.panel.append(element("p", "hud-question-text", `${panel.winnerName} ha raggiunto la porta: è uscito dalla città.`), buttons);
+      summary.focus({ preventScroll: true });
     }
   }
 

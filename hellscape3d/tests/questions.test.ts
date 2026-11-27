@@ -8,6 +8,7 @@ import { applyAction, rngFromSeed } from "../src/logic/index.ts";
 import { BankError, DIFFICULTIES, parseBank, parseCatalog, type QuestionBank } from "../src/questions/bank.ts";
 import { ask, inPlay, loadLog, newLog, outcomeOf, present, QUESTION_LOG_KEY, recordAnswer, saveLog, type QuestionLog } from "../src/questions/deck.ts";
 import { memoryStorage, questionKey } from "../src/session.ts";
+import { parseQuestionKey, summarize } from "../src/questions/summary.ts";
 import { autoAction, newGame } from "./helpers.ts";
 
 const site = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
@@ -168,4 +169,49 @@ test("partita intera: una domanda per ogni momento, mai ripetuta finché ce ne s
     assert.equal(new Set(ids).size, ids.length, `${seed}: domande ripetute in ${ids.length} turni`);
     assert.equal(new Set(log.asked.map((a) => a.key)).size, log.asked.length);
   }
+});
+
+test("riepilogo a fine partita: conteggi per giocatore e argomento coerenti con il registro, domande in ordine di turno", () => {
+  const seed = "riepilogo-1";
+  const { game } = newGame(seed);
+  const bank = banks[0]!;
+  let log = newLog(seed, bank.id);
+  let state = game.state;
+  const rng = rngFromSeed(seed, "risposte-test");
+  for (let i = 0; i < 400 && state.phase !== "ended"; i++) {
+    if (state.phase === "question") {
+      const key = questionKey(seed, state.turn, state.players[state.activeIndex]!.id);
+      const r = ask(log, bank, key, state.questionDifficulty!);
+      const q = present(bank, r.asked);
+      const roll = rng.next();
+      log = recordAnswer(r.log, key, roll < 0.6 ? q.correctIndex : roll < 0.85 ? (q.correctIndex + 1) % 4 : "timeout");
+      state = applyAction(game.map, state, { type: "answer", outcome: outcomeOf(present(bank, log.asked.at(-1)!)) }).state;
+    } else state = applyAction(game.map, state, autoAction(game, state)).state;
+  }
+  // Una domanda rimasta senza risposta non compare.
+  log = ask(log, bank, questionKey(seed, state.turn + 1, state.players[0]!.id), "facile").log;
+  const summary = summarize(log, bank, state.players);
+  const answered = log.asked.filter((a) => a.answer !== null);
+  assert.equal(summary.items.length, answered.length);
+  const sum = (rows: readonly { correct: number; wrong: number; timeout: number; total: number }[]) =>
+    rows.reduce((t, r) => ({ correct: t.correct + r.correct, wrong: t.wrong + r.wrong, timeout: t.timeout + r.timeout, total: t.total + r.total }), { correct: 0, wrong: 0, timeout: 0, total: 0 });
+  const expected = {
+    correct: summary.items.filter((i) => i.outcome === "correct").length,
+    wrong: summary.items.filter((i) => i.outcome === "wrong").length,
+    timeout: summary.items.filter((i) => i.outcome === "timeout").length,
+    total: answered.length,
+  };
+  assert.ok(expected.correct > 0 && expected.wrong > 0 && expected.timeout > 0, "esiti non tutti esercitati");
+  assert.deepEqual(sum(summary.players), expected);
+  assert.deepEqual(sum(summary.topics), expected);
+  assert.deepEqual(summary.players.map((p) => p.name), state.players.map((p) => p.name));
+  for (const p of summary.players) assert.equal(p.total, summary.items.filter((i) => i.playerId === p.id).length);
+  // Ordine di turno; risposta data e corretta come le ha viste il giocatore.
+  for (let i = 1; i < summary.items.length; i++) assert.ok(summary.items[i]!.turn >= summary.items[i - 1]!.turn);
+  for (const item of summary.items) {
+    if (item.outcome === "timeout") assert.equal(item.given, null);
+    else assert.equal(item.given === item.correctAnswer, item.outcome === "correct");
+  }
+  assert.deepEqual(parseQuestionKey(questionKey("seme:con:due-punti", 12, "p3")), { turn: 12, playerId: "p3" });
+  assert.equal(parseQuestionKey("chiave-estranea"), null);
 });
