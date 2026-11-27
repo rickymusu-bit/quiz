@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import * as THREE from "three";
 import { test } from "node:test";
 import { applyAction, type Game, type GameEvent, type GameState } from "../src/logic/index.ts";
 import { buildCityLayout } from "../src/layout/layout.ts";
@@ -85,6 +86,27 @@ test("inquadratura scelta con la stanza: deterministica, per tipo, dal lato del 
       assert.ok(d <= maxDistance(r.shot.fov) + 1e-9);
       // Lato fisso: la camera resta dal lato +Z del percorso.
       assert.ok(pose.position[2] >= 0, `${r.kind}: camera dall'altra parte del percorso`);
+      // Il personaggio, dai piedi alla testa, sta dentro l'inquadratura e lontano dalla camera, anche con la domanda aperta.
+      // Nella stanza del bivio non ci sono domande: ci si passa solo durante l'avanzamento.
+      for (const question of r.kind === "bivio" ? [false] : [false, true]) {
+        const p = poseFor(r.shot, { question });
+        const camera = new THREE.PerspectiveCamera(p.fov, 16 / 9, 0.3, 400);
+        camera.position.set(...p.position);
+        camera.lookAt(...p.target);
+        camera.updateMatrixWorld();
+        for (const y of [0, 1.0, 1.9]) {
+          const v = new THREE.Vector3(0, y, 0).project(camera);
+          assert.ok(Math.abs(v.x) < 0.95 && Math.abs(v.y) < 0.95 && v.z < 1, `${r.kind}: personaggio fuori dall'inquadratura (${v.x.toFixed(2)}, ${v.y.toFixed(2)})`);
+        }
+        assert.ok(Math.hypot(...p.position.map((c, i) => c - [0, 1, 0][i]!)) > 5, `${r.kind}: camera addosso al personaggio`);
+        // Bivio: le porte, con i loro numeri, restano nell'inquadratura.
+        if (r.kind === "bivio") {
+          for (const door of buildRoom("inquadrature", r).doors) {
+            const v = new THREE.Vector3(door.x, 3.8, door.z).project(camera);
+            assert.ok(Math.abs(v.x) < 0.95 && Math.abs(v.y) < 0.95 && v.z < 1, `bivio: porta fuori dall'inquadratura (${v.x.toFixed(2)}, ${v.y.toFixed(2)})`);
+          }
+        }
+      }
       // Con la domanda aperta si avvicina.
       const near = poseFor(r.shot, { question: true });
       assert.ok(Math.hypot(near.position[0] - near.target[0], near.position[1] - near.target[1], near.position[2] - near.target[2]) < d);

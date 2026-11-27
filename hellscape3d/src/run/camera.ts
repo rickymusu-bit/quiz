@@ -62,7 +62,7 @@ const RULES: Readonly<Record<string, ShotRule>> = {
   pozzo: { yaw: [15, 30], pitch: [[-18, -8], [42, 58]], distance: [14, 20], fov: 56, lookAhead: 1 },
   partenza: { yaw: [15, 25], pitch: [8, 12], distance: [12, 14], fov: 46, lookAhead: 1.5 },
   uscita: { yaw: [25, 35], pitch: [6, 10], distance: [13, 15], fov: 46, lookAhead: 4 },
-  bivio: { yaw: [-80, -76], pitch: [14, 18], distance: [7, 8], fov: 55, lookAhead: 7 },
+  bivio: { yaw: [-86, -82], pitch: [6, 9], distance: [12, 13], fov: 55, lookAhead: 6 },
 };
 
 const pickIn = (rng: Rng, [a, b]: Range): number => a + rng.next() * (b - a);
