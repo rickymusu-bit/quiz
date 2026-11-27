@@ -2,6 +2,9 @@
  * Verifica nel browser della pagina graybox: build Vite reale, Chromium,
  * viewport desktop e mobile orizzontale. Controlla che la scena disegni solo le
  * celle esplorate, che il canvas non sia vuoto e che non ci siano errori.
+ * Le verifiche il cui esito dipende dalle dimensioni dello schermo
+ * (impaginazione, inquadrature, proporzioni) girano in entrambe le viewport;
+ * quelle di sola logica (timer, salvataggi, regia, battute) solo nella prima.
  * Screenshot in artifacts/hellscape3d/ (cartella ignorata da git).
  *
  * Uso: npm run test:hellscape3d:browser
@@ -14,8 +17,11 @@ import { fileURLToPath } from "node:url";
 import { createCanvas, loadImage } from "@napi-rs/canvas";
 import { chromium, type Page } from "playwright";
 import { build, preview } from "vite";
+import { buildCityLayout } from "../../src/layout/layout.ts";
+import { roomOf } from "../../src/run/rooms.ts";
 import { RUN_SPEED } from "../../src/run/runDirector.ts";
 import { STRIP } from "../../src/run/strip.ts";
+import { newGame } from "../helpers.ts";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const artifacts = resolve(root, "../artifacts/hellscape3d");
@@ -82,6 +88,47 @@ interface DebugInfo {
     builds: number;
     lastBuildMs: number;
   };
+}
+
+/**
+ * Stanze di esempio per la scena di corsa, scelte in Node (la generazione non
+ * dipende dal browser): ogni tipo di stanza ciclica almeno una volta, con le
+ * pendenze salita, piano e discesa coperte fra tutte, più partenza e uscita.
+ * Restituisce `tipo/pendenza` → parametri dell'anteprima.
+ */
+function sampleRooms(): Map<string, string> {
+  const periodic = ["corridoio", "sala", "ponte", "pozzo"];
+  const found = new Map<string, string>();
+  const slopes = new Set<string>();
+  const candidates: { kind: string; slope: string; query: string }[] = [];
+  for (let n = 1; n <= 20; n++) {
+    const { game } = newGame(`graybox-${n}`);
+    const layout = buildCityLayout(game.map);
+    for (const id of Object.keys(game.map.cells).sort()) {
+      const room = roomOf(game.map, layout, id);
+      candidates.push({ kind: room.kind, slope: room.slope, query: `seed=graybox-${n}&anteprima=${id}` });
+    }
+  }
+  for (const kind of ["partenza", "uscita"]) {
+    const c = candidates.find((x) => x.kind === kind)!;
+    found.set(`${c.kind}/${c.slope}`, c.query);
+  }
+  for (const kind of periodic) {
+    const own = candidates.filter((x) => x.kind === kind);
+    const c = own.find((x) => !slopes.has(x.slope)) ?? own[0];
+    if (!c) throw new Error(`nessuna stanza ${kind} nei semi di prova`);
+    slopes.add(c.slope);
+    found.set(`${c.kind}/${c.slope}`, c.query);
+  }
+  // Pendenze non ancora coperte: un'altra stanza ciclica con quella pendenza.
+  for (const slope of ["salita", "piano", "discesa"]) {
+    if (slopes.has(slope)) continue;
+    const c = candidates.find((x) => periodic.includes(x.kind) && x.slope === slope);
+    if (!c) throw new Error(`nessuna stanza in ${slope} nei semi di prova`);
+    slopes.add(slope);
+    found.set(`${c.kind}/${c.slope}`, c.query);
+  }
+  return found;
 }
 
 const VIEWPORTS = [
@@ -175,8 +222,11 @@ const browser = await chromium.launch({
   args: ["--no-sandbox", "--disable-dev-shm-usage", "--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader"],
 });
 let failures = 0;
+const kinds = sampleRooms();
 try {
   for (const device of VIEWPORTS) {
+    /** Verifiche di sola logica: una volta, nella prima viewport. */
+    const logic = device === VIEWPORTS[0];
     const context = await browser.newContext({ viewport: device.viewport, deviceScaleFactor: 1, isMobile: device.isMobile, hasTouch: device.isMobile });
     const page = await context.newPage();
     // HELLSCAPE3D_CPU_THROTTLE=N rallenta JavaScript di N volte. È solo un'approssimazione dei runner lenti:
@@ -208,8 +258,8 @@ try {
         console.log(`FAIL ${label}: ${(error as Error).message}`);
       }
     }
-    // Regia: animazione reale, salto e coerenza finale con lo stato.
-    try {
+    // Regia: animazione reale, salto e coerenza finale con lo stato (sola logica).
+    if (logic) try {
       await page.goto(`${url}?seed=graybox-1`);
       await waitReady(page);
       const first = await info(page);
@@ -295,7 +345,8 @@ try {
       }
       console.log(`ok   ${device.name} · domanda della banca, esito con spiegazione anche dopo il ricaricamento, dado e timer fermo durante la regia`);
 
-      // Risposta errata con il mouse: il turno passa all'altro giocatore.
+      // Risposta errata con il mouse e scadenza del timer (sola logica).
+      if (logic) {
       await page.goto(`${url}?seed=graybox-1&steps=15&test=1`);
       await waitReady(page);
       debug = await info(page);
@@ -336,6 +387,7 @@ try {
       );
       assertSettled(await info(page));
       console.log(`ok   ${device.name} · risposta errata e scadenza del timer`);
+      }
 
       // Bivio: si incontra solo avanzando, numeri sugli imbocchi, scelta da tastiera, poi i passi residui.
       await page.goto(`${url}?seed=graybox-1&steps=7`);
@@ -441,6 +493,8 @@ try {
         assertSettled(end);
         return { end, unloaded, samples, slowestBuild };
       };
+      // Partite con raggio forzato o senza settori: stato e radar invariati (sola logica; il raggio è fisso).
+      if (logic) {
       const forced = await play("&steps=20&sectors=4");
       const whole = await play("&steps=20&sectors=off");
       assert.ok(forced.unloaded > 0, "il raggio forzato non scarica nulla");
@@ -454,6 +508,7 @@ try {
         `ok   ${device.name} · settori: immagine identica alla città intera (raggio corto rilevato in ${detected}/3); raggio forzato ${forced.unloaded}/${forced.samples} campioni con scaricamento, ` +
           `ricostruzioni ${forced.end.stats.builds} (la più lenta ${forced.slowestBuild.toFixed(1)} ms), stato e radar invariati`,
       );
+      } else console.log(`ok   ${device.name} · settori: immagine identica alla città intera (raggio corto rilevato in ${detected}/3)`);
     } catch (error) {
       failures++;
       console.log(`FAIL ${device.name} · settori: ${(error as Error).message}`);
@@ -477,6 +532,8 @@ try {
       assertSettled(debug);
       assert.equal(debug.panel, "question");
 
+      // Terminale, fine partita e movimento ridotto: sola logica.
+      if (logic) {
       await page.goto(`${url}?seed=graybox-3&steps=7`);
       await waitReady(page);
       await page.keyboard.press("KeyA");
@@ -509,13 +566,14 @@ try {
       assert.equal(debug.busy, false);
       assert.deepEqual(debug.spoken, ["intro"]);
       assert.ok(await page.locator(".hud-speech").isVisible(), "battuta assente con il movimento ridotto");
-      console.log(`ok   ${device.name} · Bafometto: sede, terminale, fine partita, movimento ridotto`);
+      }
+      console.log(`ok   ${device.name} · Bafometto: sede${logic ? ", terminale, fine partita, movimento ridotto" : ""}`);
     } catch (error) {
       failures++;
       console.log(`FAIL ${device.name} · Bafometto: ${(error as Error).message}`);
     }
-    // Ripresa della partita salvata: stesso stato, nessuna apertura ripetuta, timer non restituito.
-    try {
+    // Ripresa della partita salvata: stesso stato, nessuna apertura ripetuta, timer non restituito (sola logica).
+    if (logic) try {
       await page.goto(`${url}?seed=graybox-1&intro=off`);
       await waitReady(page);
       await page.evaluate(() => localStorage.setItem("fool-v1", "runner-intatto"));
@@ -666,30 +724,27 @@ try {
         await page.waitForTimeout(250);
         return runInfo();
       };
-      // Una stanza per tipo (anteprime), ciclo senza giunture: dopo un periodo l'immagine è identica, a metà è diversa.
+      // Stanze di esempio (anteprime), ciclo senza giunture: dopo un periodo l'immagine è identica, a metà è diversa.
+      // Dipende dalle proporzioni dello schermo (quanta striscia è in vista): entrambe le viewport.
       const period = STRIP.period / RUN_SPEED.normal;
-      const kinds = new Map<string, string>();
-      for (const n of [1, 2, 3, 4, 5, 9]) {
-        await open(`seed=graybox-${n}&intro=off&t=0`);
-        for (const id of await page.evaluate(() => (window as unknown as { __hellscape3d: { explored: string[] } }).__hellscape3d.explored)) {
-          const d = await open(`seed=graybox-${n}&intro=off&t=0&anteprima=${id}`);
-          if (!kinds.has(`${d.room.kind}/${d.room.slope}`)) kinds.set(`${d.room.kind}/${d.room.slope}`, `seed=graybox-${n}&anteprima=${id}`);
-        }
-      }
       for (const [kind, query] of kinds) {
-        await open(`${query}&intro=off&t=1.3`);
+        const d = await open(`${query}&intro=off&t=1.3`);
+        assert.equal(`${d.room.kind}/${d.room.slope}`, kind, "stanza dell'anteprima diversa da quella generata in Node");
         const a = await canvasPng();
         assert.ok((await luminanceSpread(a)) > 8, `${kind}: scena apparentemente vuota`);
-        await open(`${query}&intro=off&t=${1.3 + period}`);
-        if (!kind.startsWith("uscita")) assert.ok(a.equals(await canvasPng()), `${kind}: l'immagine non si ripete dopo un periodo`);
-        await open(`${query}&intro=off&t=${1.3 + period / 2}`);
-        if (!kind.startsWith("uscita")) assert.ok(!a.equals(await canvasPng()), `${kind}: la stanza non scorre`);
         await page.screenshot({ path: join(artifacts, `stanza-${kind.replace("/", "-")}-${device.name}.png`) });
+        // L'uscita non è ciclica: basta che non sia vuota.
+        if (kind.startsWith("uscita")) continue;
+        await open(`${query}&intro=off&t=${1.3 + period}`);
+        assert.ok(a.equals(await canvasPng()), `${kind}: l'immagine non si ripete dopo un periodo`);
+        await open(`${query}&intro=off&t=${1.3 + period / 2}`);
+        assert.ok(!a.equals(await canvasPng()), `${kind}: la stanza non scorre`);
       }
-      assert.ok(kinds.size >= 5, `tipi di stanza esercitati: ${[...kinds.keys()].join(", ")}`);
       // Partita con la regia della corsa: a regia ferma la scena è nella stanza del giocatore di turno.
+      // Regia a velocità ×3 (tasto F): si controllano gli stati a regia ferma, non i tempi.
       let d = await open("seed=graybox-1&intro=off&test=1");
       assert.equal(d.view, "corsa");
+      await page.keyboard.press("KeyF");
       let forks = 0;
       for (let action = 0; action < 40 && d.phase !== "ended"; action++) {
         await page.keyboard.press("KeyA");
@@ -722,8 +777,8 @@ try {
       failures++;
       console.log(`FAIL ${device.name} · scena di corsa: ${(error as Error).message}`);
     }
-    // Movimento ridotto: nessuna animazione, presentazione sempre allineata allo stato.
-    try {
+    // Movimento ridotto: nessuna animazione, presentazione sempre allineata allo stato (sola logica).
+    if (logic) try {
       await page.goto(`${url}?seed=graybox-1&motion=reduced`);
       await waitReady(page);
       for (let action = 0; action < 15; action++) {

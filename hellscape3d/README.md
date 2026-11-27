@@ -17,6 +17,8 @@ npm run record:hellscape3d -- --seed graybox-1 --steps 3 --actions 14   # GIF re
 npm test                           # suite core completa, che comprende i test Node
 ```
 
+La verifica nel browser ripete in entrambe le viewport (1440×900 e 844×390) solo i controlli il cui esito dipende dallo schermo: impaginazione, inquadrature, immagini. Quelli di sola logica (timer, salvataggi, regia della città, battute di Bafometto) girano una volta, a 1440×900. Le stanze di esempio della scena di corsa sono scelte in Node, una per tipo ciclico con tutte le pendenze, più partenza e uscita.
+
 ## Moduli (`src/logic/`)
 
 | Modulo | Responsabilità |
