@@ -437,7 +437,7 @@ try {
       assert.equal(debug.radar.exit, true, "all'uscita il radar non la mostra");
       assert.ok(debug.spoken.includes("end"));
       // «Nuova città» riapre la schermata di avvio, con la partita salvata da riprendere.
-      await page.locator(".hud-panel .hud-primary").click();
+      await page.getByRole("button", { name: "Nuova città" }).click();
       await page.locator("#setup").waitFor({ timeout: 15_000 });
       assert.ok(new URL(page.url()).searchParams.get("new") === "1", "«Nuova città» non apre la schermata di avvio");
 
