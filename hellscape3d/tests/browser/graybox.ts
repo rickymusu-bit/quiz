@@ -4,10 +4,10 @@
  * celle esplorate, che il canvas non sia vuoto e che non ci siano errori.
  * Il gioco (index.html, scena di corsa) porta le verifiche del flusso di
  * partita; la vista della città (citta.html, solo sviluppo) quelle sue proprie:
- * celle mostrate, regia nella città, ostacoli trasparenti, settori.
+ * celle mostrate, kit disegnato, panoramica e città rivelata.
  * Le verifiche il cui esito dipende dalle dimensioni dello schermo
  * (impaginazione, inquadrature, proporzioni) girano in entrambe le viewport;
- * quelle di sola logica (timer, salvataggi, regia, battute) solo nella prima.
+ * quelle di sola logica (timer, salvataggi, battute) solo nella prima.
  * Screenshot in artifacts/hellscape3d/ (cartella ignorata da git).
  *
  * Uso: npm run test:hellscape3d:browser
@@ -63,34 +63,20 @@ interface DebugInfo {
   radar: { players: { id: string; active: boolean; onEdge: boolean; x: number; y: number }[]; exit: boolean; center: { x: number; y: number } };
   activePlayerId: string;
   stateActivePlayerId: string;
-  occluders: { tiles: number; pillars: number; walkways: number; masses: number };
   activeScreen: { x: number; y: number } | null;
   panelTop: number | null;
-  bafometto: { kind: "seat" } | { kind: "terminal"; cellId: string } | null;
   spoken: string[];
   speech: string | null;
   resumed: boolean;
   timerRemaining: number | null;
   questionVisibleFor: number;
   totalCells: number;
-  loadedTiles: string[];
   playerCells: Record<string, string>;
   stepsLeft: number;
   fade: number;
-  loadedSectors: string[];
-  stats: {
-    primitives: number;
-    totalPrimitives: number;
-    tiles: number;
-    walkways: number;
-    stubs: number;
-    masses: number;
-    players: number;
-    loadedSectors: number;
-    occupiedSectors: number;
-    builds: number;
-    lastBuildMs: number;
-  };
+  /** Solo vista della città. */
+  mode: "player" | "overview";
+  stats: { primitives: number; tiles: number; walkways: number; stubs: number; masses: number; players: number };
 }
 
 /**
@@ -263,10 +249,18 @@ try {
         if (debug.revealAll) assert.equal(debug.rendered.length, debug.totalCells, "città rivelata incompleta");
         else assertSettled(debug);
         if (testCase.name === "inizio") assert.equal(debug.radar.exit, false, "uscita sul radar già alla partenza");
-        assert.equal(debug.stats.tiles, debug.loadedTiles.length);
-        assert.ok(debug.loadedTiles.every((id) => debug.rendered.includes(id)), "casella caricata fuori dalla vista presentata");
+        assert.equal(debug.stats.tiles, debug.rendered.length);
         assert.ok(debug.stats.primitives > debug.stats.tiles * 8, `kit modulare non disegnato (${debug.stats.primitives} primitive)`);
         assert.equal(debug.stats.players, 2);
+        // Con un pannello aperto, la pedina di turno resta nell'area libera sopra il pannello.
+        if (debug.mode === "player" && debug.panelTop !== null) {
+          await page.waitForFunction(() => {
+            const d = (window as unknown as { __hellscape3d: DebugInfo & { inset: number } }).__hellscape3d;
+            return d.panelTop !== null && d.activeScreen !== null && Math.abs(window.innerHeight - d.panelTop - d.inset) < 1;
+          }, null, { timeout: 10_000 });
+          const settled = await info(page);
+          assert.ok(settled.activeScreen!.y < settled.panelTop!, `pedina sotto il pannello (${settled.activeScreen!.y} ≥ ${settled.panelTop})`);
+        }
         const png = await page.screenshot({ path: join(artifacts, `${testCase.name}-${device.name}.png`) });
         const spread = await luminanceSpread(png);
         assert.ok(spread > 8, `canvas apparentemente vuoto (deviazione ${spread.toFixed(1)})`);
@@ -275,39 +269,6 @@ try {
         failures++;
         console.log(`FAIL ${label}: ${(error as Error).message}`);
       }
-    }
-    // Regia nella città: animazione reale, salto e coerenza finale con lo stato (sola logica).
-    if (logic) try {
-      await page.goto(`${city}?seed=graybox-1`);
-      await waitReady(page);
-      const first = await info(page);
-      let animated = 0;
-      for (let action = 0; action < 30 && animated < 2; action++) {
-        await page.keyboard.press("KeyA");
-        await page.waitForTimeout(120);
-        const during = await info(page);
-        if (!during.busy) continue;
-        animated++;
-        assert.ok(during.shown.every((id) => during.explored.includes(id)), "celle mostrate prima di essere esplorate");
-        assert.deepEqual(during.rendered, during.shown, "celle disegnate diverse da quelle mostrate dalla regia");
-        assertRadar(during);
-        assert.equal(during.panel, null, "pannello visibile durante la regia");
-        if (animated === 2) {
-          await page.keyboard.press("KeyS");
-          await page.waitForTimeout(50);
-          assert.equal((await info(page)).busy, false, "il salto non interrompe la regia");
-        } else {
-          await page.waitForFunction(() => (window as unknown as { __hellscape3d: DebugInfo }).__hellscape3d.busy === false, null, { timeout: 15_000 });
-        }
-        assertSettled(await info(page));
-      }
-      assert.equal(animated, 2, "nessuna regia animata osservata");
-      const after = await info(page);
-      assert.ok(after.turn > first.turn, "la partita non è avanzata");
-      console.log(`ok   ${device.name} · regia animata, salto e stato finale (turno ${first.turn} → ${after.turn})`);
-    } catch (error) {
-      failures++;
-      console.log(`FAIL ${device.name} · regia: ${(error as Error).message}`);
     }
     // Interfaccia: domanda, timer, dado e scelta al bivio dall'interfaccia, con tastiera e clic.
     try {
@@ -431,105 +392,6 @@ try {
     } catch (error) {
       failures++;
       console.log(`FAIL ${device.name} · interfaccia: ${(error as Error).message}`);
-    }
-    // Ostacoli: la passerella sopraelevata davanti alla pedina diventa trasparente; il pannello non la copre.
-    try {
-      for (const occlusion of ["on", "off"] as const) {
-        await page.goto(`${city}?seed=graybox-38&steps=9${occlusion === "off" ? "&occlusion=off" : ""}`);
-        await waitReady(page);
-        await page.waitForFunction(() => {
-          const d = (window as unknown as { __hellscape3d: DebugInfo }).__hellscape3d;
-          return d.panelTop !== null && d.activeScreen !== null && Math.abs(window.innerHeight - d.panelTop - (d as unknown as { inset: number }).inset) < 1;
-        }, null, { timeout: 10_000 });
-        const debug = await info(page);
-        if (occlusion === "on") assert.equal(debug.occluders.walkways, 1, "passerella occludente non rilevata");
-        else assert.equal(debug.occluders.walkways + debug.occluders.tiles + debug.occluders.masses, 0);
-        assert.ok(debug.activeScreen!.y < debug.panelTop!, `pedina sotto il pannello (${debug.activeScreen!.y} ≥ ${debug.panelTop})`);
-        await page.screenshot({ path: join(artifacts, `ostacolo-${occlusion}-${device.name}.png`) });
-      }
-      console.log(`ok   ${device.name} · ostacolo trasparente e pedina sopra il pannello`);
-    } catch (error) {
-      failures++;
-      console.log(`FAIL ${device.name} · ostacoli: ${(error as Error).message}`);
-    }
-    // Settori: con il raggio calcolato l'immagine coincide con la città intera; con un raggio forzato
-    // molto più corto si scarica davvero, ma stato, radar e caselle delle pedine restano intatti.
-    try {
-      const canvasPixels = async (query: string): Promise<{ png: Buffer; debug: DebugInfo }> => {
-        await page.goto(`${city}?${query}`);
-        await waitReady(page);
-        // Inquadratura ferma: il margine riservato al pannello ha raggiunto il valore finale.
-        await page.waitForFunction(() => {
-          const d = (window as unknown as { __hellscape3d: DebugInfo & { inset: number } }).__hellscape3d;
-          return d.panelTop === null ? d.inset === 0 : Math.abs(window.innerHeight - d.panelTop - d.inset) < 0.5;
-        }, null, { timeout: 10_000 });
-        await page.waitForTimeout(300);
-        // Pixel del solo canvas WebGL: lo screenshot dell'elemento includerebbe l'interfaccia sovrapposta (timer).
-        const data = await page.evaluate(() => document.querySelector<HTMLCanvasElement>("#scene")!.toDataURL("image/png"));
-        return { png: Buffer.from(data.split(",")[1]!, "base64"), debug: await info(page) };
-      };
-      let detected = 0;
-      for (const query of ["seed=graybox-9&steps=20", "seed=graybox-1&steps=30", "seed=graybox-1&steps=36"]) {
-        const sectored = await canvasPixels(query);
-        const whole = await canvasPixels(`${query}&sectors=off`);
-        assert.ok(sectored.png.equals(whole.png), `${query}: immagine diversa dalla città intera`);
-        assert.equal(sectored.debug.stats.primitives, whole.debug.stats.primitives);
-        // Controllo di sensibilità: con un raggio troppo corto almeno un'inquadratura perde pezzi visibili.
-        // (Gli elementi scaricati fuori dall'inquadratura non cambiano l'immagine.)
-        const short = await canvasPixels(`${query}&sectors=4`);
-        assert.ok(short.debug.stats.primitives < whole.debug.stats.primitives, `${query}: il raggio forzato non scarica (${short.debug.stats.primitives})`);
-        if (!short.png.equals(whole.png)) detected++;
-      }
-      assert.ok(detected > 0, "il confronto delle immagini non rileva i settori mancanti");
-
-      const play = async (query: string) => {
-        await page.goto(`${city}?seed=graybox-9&intro=off${query}`);
-        await waitReady(page);
-        let unloaded = 0,
-          samples = 0,
-          slowestBuild = 0;
-        for (let action = 0; action < 24; action++) {
-          await page.keyboard.press("KeyA");
-          for (let k = 0; k < 6; k++) {
-            await page.waitForTimeout(90);
-            const d = await info(page);
-            samples++;
-            if (d.stats.primitives < d.stats.totalPrimitives) unloaded++;
-            slowestBuild = Math.max(slowestBuild, d.stats.lastBuildMs);
-            assert.deepEqual(d.rendered, d.shown, "vista presentata alterata dai settori");
-            assertRadar(d);
-            // Le caselle su cui si trovano le pedine nello stato restano disegnate, anche durante la regia.
-            // (una casella non ancora mostrata dalla regia non fa parte della vista presentata).
-            for (const cell of Object.values(d.playerCells)) {
-              if (d.shown.includes(cell)) assert.ok(d.loadedTiles.includes(cell), `casella ${cell} di una pedina scaricata`);
-            }
-            if (!d.busy) break;
-          }
-          await page.waitForFunction(() => (window as unknown as { __hellscape3d: DebugInfo }).__hellscape3d.busy === false, null, { timeout: 15_000 });
-        }
-        const end = await info(page);
-        assertSettled(end);
-        return { end, unloaded, samples, slowestBuild };
-      };
-      // Partite con raggio forzato o senza settori: stato e radar invariati (sola logica; il raggio è fisso).
-      if (logic) {
-      const forced = await play("&steps=20&sectors=4");
-      const whole = await play("&steps=20&sectors=off");
-      assert.ok(forced.unloaded > 0, "il raggio forzato non scarica nulla");
-      assert.equal(whole.unloaded, 0);
-      assert.equal(forced.end.turn, whole.end.turn);
-      assert.deepEqual(forced.end.explored, whole.end.explored, "esplorazione diversa con i settori");
-      assert.deepEqual(forced.end.cellPositions, whole.end.cellPositions, "posizioni dei giocatori diverse con i settori");
-      assert.deepEqual(forced.end.radar, whole.end.radar);
-      await page.screenshot({ path: join(artifacts, `settori-forzati-${device.name}.png`) });
-      console.log(
-        `ok   ${device.name} · settori: immagine identica alla città intera (raggio corto rilevato in ${detected}/3); raggio forzato ${forced.unloaded}/${forced.samples} campioni con scaricamento, ` +
-          `ricostruzioni ${forced.end.stats.builds} (la più lenta ${forced.slowestBuild.toFixed(1)} ms), stato e radar invariati`,
-      );
-      } else console.log(`ok   ${device.name} · settori: immagine identica alla città intera (raggio corto rilevato in ${detected}/3)`);
-    } catch (error) {
-      failures++;
-      console.log(`FAIL ${device.name} · settori: ${(error as Error).message}`);
     }
     // Bafometto nel gioco: battuta d'apertura, terminale, intervento finale, movimento ridotto.
     try {

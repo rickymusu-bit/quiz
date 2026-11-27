@@ -8,13 +8,9 @@
  * schermata di avvio (banca, argomenti, giocatori, durata). ?new=1 apre la
  * schermata di avvio anche se esiste un salvataggio.
  * Parametri di sviluppo e test, che saltano la schermata: ?seed=… (città),
- * ?bank=ID, ?steps=N (azioni automatiche iniziali, senza regia), ?timer=S (secondi per domanda), ?view=overview, ?motion=reduced,
- * ?intro=off (senza l'apertura di Bafometto),
- * ?reveal=all (SOLO SVILUPPO: città intera), ?occlusion=off (SOLO SVILUPPO:
- * ostacoli opachi, per confronto), ?sectors=off (SOLO SVILUPPO: città presentata
- * sempre intera), ?sectors=R (SOLO SVILUPPO: raggio di caricamento forzato a R,
- * più corto di quello sicuro: si vedono comparire i settori), ?test=1 (espone ai
- * test la risposta corretta).
+ * ?bank=ID, ?steps=N (azioni automatiche iniziali, senza regia), ?timer=S (secondi per domanda), ?motion=reduced,
+ * ?intro=off (senza l'apertura di Bafometto), ?test=1 (espone ai test la risposta corretta).
+ * Solo nella vista della città: ?view=overview (panoramica), ?reveal=all (città intera).
  * Solo nella scena di corsa: ?camera=laterale|angolata|trequarti|spalle
  * (SOLO SVILUPPO: inquadratura fissa), ?anteprima=ID o bivio:ID (SOLO
  * SVILUPPO: mostra quella stanza), ?t=S (SOLO TEST: istante fisso).
@@ -57,12 +53,6 @@ const start = decideStart(params, storage, "graybox-1");
 const resumed = start.kind === "resume";
 const revealAll = params.get("reveal") === "all";
 const testHooks = params.get("test") === "1";
-/** SOLO SVILUPPO: ?occlusion=off disattiva la trasparenza degli ostacoli, per confronto. */
-const occlusionEnabled = params.get("occlusion") !== "off";
-/** Caricamento per settori: raggio calcolato (predefinito), disattivato o forzato (sviluppo). */
-const sectorsParam = params.get("sectors");
-const forcedSectorRadius = sectorsParam && sectorsParam !== "off" && Number(sectorsParam) > 0 ? Number(sectorsParam) : null;
-const sectorsEnabled = sectorsParam !== "off";
 const reducedMotion = params.get("motion") === "reduced" || matchMedia("(prefers-reduced-motion: reduce)").matches;
 /** SOLO SVILUPPO E TEST: durata della domanda imposta dall'indirizzo, al posto di quella della partita. */
 const timerParam = Number(params.get("timer")) > 0 ? Math.max(1, Number(params.get("timer"))) : null;
@@ -164,13 +154,7 @@ const view: GameView =
         ...(params.get("anteprima") ? { preview: params.get("anteprima")! } : {}),
         ...(fixedTime !== undefined && Number.isFinite(fixedTime) ? { fixedTime } : {}),
       })
-    : new CityView(canvas, game.map, layout, state, {
-        reducedMotion,
-        revealAll,
-        occlusion: occlusionEnabled,
-        sectors: sectorsEnabled ? (forcedSectorRadius ?? "calcolato") : "off",
-        overview: params.get("view") === "overview",
-      });
+    : new CityView(canvas, game.map, layout, state, { revealAll, overview: params.get("view") === "overview" });
 // Intervento d'apertura di Bafometto, solo per una partita nuova.
 if (!resumed && steps === 0 && !revealAll && params.get("intro") !== "off") view.intro();
 

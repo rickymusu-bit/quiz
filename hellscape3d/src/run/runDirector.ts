@@ -14,8 +14,7 @@
  * - Inquadratura scelta con la stanza, più vicina con la domanda aperta; cambi
  *   morbidi, e per stacco con il movimento ridotto.
  */
-import { BAFOMETTO_LINES, type BafomettoMoment } from "../director/bafometto.ts";
-import type { Announcement } from "../director/director.ts";
+import { BAFOMETTO_LINES, type Announcement, type BafomettoMoment } from "../bafometto.ts";
 import type { CityLayout } from "../layout/types.ts";
 import type { GameEvent, GameState } from "../logic/state.ts";
 import type { CityMap } from "../logic/types.ts";

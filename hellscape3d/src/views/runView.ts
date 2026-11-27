@@ -3,7 +3,7 @@
  * giocatore alla volta corre nella stanza della sua casella; la regia della
  * corsa decide uscite, stanze dei bivi, eventi e cambi di stanza.
  */
-import type { Announcement } from "../director/director.ts";
+import type { Announcement } from "../bafometto.ts";
 import type { CityLayout, Vec3 } from "../layout/types.ts";
 import type { GameEvent, GameState } from "../logic/state.ts";
 import type { CityMap } from "../logic/types.ts";
