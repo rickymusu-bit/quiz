@@ -163,7 +163,7 @@ Verifiche: test Node su stanze, geometria, inquadrature (per tipo, dal lato del 
 - in una partita giocata, a regia ferma la scena è sempre nella stanza del giocatore di turno, oppure nella stanza del bivio con le porte segnalate;
 - con il movimento ridotto la stanza resta ferma.
 
-**Non ancora:** stanze di partenza e d'uscita disegnate, varietà e regole di generazione definitive delle stanze, distanze e altezza minima tarate su dispositivi reali, modelli e animazioni dei personaggi, indizi dell'uscita, direzione artistica.
+**Non ancora:** stanze di partenza e d'uscita disegnate, varietà e regole di generazione definitive delle stanze, distanze e altezza minima tarate su dispositivi reali, modelli e animazioni dei personaggi, direzione artistica.
 
 ## Domande (banche della versione precedente)
 
