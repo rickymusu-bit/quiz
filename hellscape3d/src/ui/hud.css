@@ -517,6 +517,10 @@ body {
   color: #b9b9c0;
   font-weight: 400;
 }
+/* Intestazioni delle colonne numeriche allineate come i numeri. */
+.summary-table thead th:not(:first-child) {
+  text-align: right;
+}
 .summary-items {
   margin: 0;
   padding-left: 1.6em;
