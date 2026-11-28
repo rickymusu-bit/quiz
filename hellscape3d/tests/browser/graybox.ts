@@ -635,7 +635,23 @@ try {
       const open = async (query: string): Promise<RunDebug> => {
         await page.goto(`${url}?${query}`);
         await page.waitForFunction(() => (window as unknown as { __hellscape3d?: { ready: boolean } }).__hellscape3d?.ready === true, null, { timeout: 30_000 });
-        await page.waitForTimeout(250);
+        if (/(^|&)t=/.test(query)) {
+          // Istante fisso: si confronta la scena ferma. Dopo il primo fotogramma la presentazione cambia ancora
+          // (margine del pannello della domanda, avvicinamento della camera), e su un runner lento un'attesa
+          // fissa può catturare un'immagine di passaggio: si attende il margine finale e due immagini uguali.
+          await page.waitForFunction(() => {
+            const d = (window as unknown as { __hellscape3d: { inset: number; panelTop: number | null } }).__hellscape3d;
+            return Math.abs((d.panelTop === null ? 0 : window.innerHeight - d.panelTop) - d.inset) < 0.5;
+          }, null, { timeout: 10_000 });
+          let previous = await canvasPng();
+          for (let i = 0; i < 40; i++) {
+            await page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
+            const next = await canvasPng();
+            if (next.equals(previous)) break;
+            assert.ok(i < 39, `${query}: la scena con l'istante fisso non si ferma`);
+            previous = next;
+          }
+        } else await page.waitForTimeout(250);
         return runInfo();
       };
       // Stanze di esempio (anteprime), ciclo senza giunture: dopo un periodo l'immagine è identica, a metà è diversa.
