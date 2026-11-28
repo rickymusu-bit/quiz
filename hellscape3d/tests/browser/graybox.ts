@@ -606,6 +606,16 @@ try {
       assert.equal(rows, debug.playerNames.length);
       const totals = await dialog.locator("table").first().locator("tbody tr td:last-child").allTextContents();
       assert.equal(totals.reduce((t, v) => t + Number(v), 0), debug.askedCount);
+      // Formule della banca rese con KaTeX (la partita di prova ne contiene), con il MathML per gli screen reader.
+      const formulas = await dialog.locator(".katex").count();
+      assert.ok(formulas > 0, "nessuna formula resa nel riepilogo");
+      assert.equal(await dialog.locator(".katex-mathml").count(), formulas);
+      assert.equal(await page.locator(".katex-error").count(), 0);
+      assert.ok(!/Qrecipiente/.test((await dialog.locator(".summary-items").evaluate((e) => {
+        const copy = e.cloneNode(true) as HTMLElement;
+        copy.querySelectorAll(".katex").forEach((k) => k.remove());
+        return copy.textContent ?? "";
+      }))), "formula rimasta come testo semplice");
       const box = (await dialog.boundingBox())!;
       const viewport = page.viewportSize()!;
       assert.ok(box.y >= 0 && box.y + box.height <= viewport.height + 1, "riepilogo fuori dallo schermo");
@@ -615,7 +625,7 @@ try {
       debug = await info(page);
       assert.equal(debug.summaryOpen, false);
       assert.equal(await page.evaluate(() => document.activeElement?.textContent), "Riepilogo della partita", "fuoco non restituito");
-      console.log(`ok   ${device.name} · riepilogo a fine partita: ${debug.askedCount} domande, ${rows} giocatori`);
+      console.log(`ok   ${device.name} · riepilogo a fine partita: ${debug.askedCount} domande, ${rows} giocatori, ${formulas} formule`);
     } catch (error) {
       failures++;
       console.log(`FAIL ${device.name} · riepilogo: ${(error as Error).message}`);

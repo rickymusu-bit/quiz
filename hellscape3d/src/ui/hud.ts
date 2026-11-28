@@ -7,6 +7,7 @@ import type { Difficulty, RelativeLength } from "../logic/types.ts";
 import type { RadarShapes } from "./radar.ts";
 import { cssColor, playerColor } from "./palette.ts";
 import { outcomeOf, type PresentedQuestion } from "../questions/deck.ts";
+import { mathElement } from "./math.ts";
 
 export interface HudPlayer {
   id: string;
@@ -238,12 +239,12 @@ export class Hud {
       this.timerBar = track.appendChild(element("div", "hud-timer-bar"));
       const options = element("div", "hud-options");
       panel.question.options.forEach((option, index) => {
-        const button = element("button", "hud-option", `${index + 1}. ${option}`);
+        const button = mathElement("button", "hud-option", option, `${index + 1}. `);
         button.type = "button";
         button.addEventListener("click", () => this.actions.answer(index));
         options.append(button);
       });
-      this.panel.append(head, track, element("p", "hud-question-text", panel.question.text), options);
+      this.panel.append(head, track, mathElement("p", "hud-question-text", panel.question.text), options);
       options.querySelector("button")?.focus({ preventScroll: true });
     } else if (panel.kind === "feedback") {
       const q = panel.question;
@@ -253,9 +254,9 @@ export class Hud {
       const heading = element("p", `hud-outcome is-${outcome}`, title);
       heading.setAttribute("role", "status");
       const details = element("div", "hud-solution");
-      if (outcome === "wrong") details.append(element("p", "hud-answer is-chosen", `Hai risposto: ${q.options[q.answer as number]}`));
-      if (outcome !== "correct") details.append(element("p", "hud-answer is-correct", `Risposta corretta: ${q.options[q.correctIndex]}`));
-      if (q.explanation) details.append(element("p", "hud-explanation", q.explanation));
+      if (outcome === "wrong") details.append(mathElement("p", "hud-answer is-chosen", q.options[q.answer as number]!, "Hai risposto: "));
+      if (outcome !== "correct") details.append(mathElement("p", "hud-answer is-correct", q.options[q.correctIndex]!, "Risposta corretta: "));
+      if (q.explanation) details.append(mathElement("p", "hud-explanation", q.explanation));
       const button = element("button", "hud-primary", "Continua (Invio)");
       button.type = "button";
       button.addEventListener("click", () => this.actions.proceed());

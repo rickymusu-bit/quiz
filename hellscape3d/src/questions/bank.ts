@@ -3,13 +3,12 @@
  * `dataset/*.json` alla radice del sito). Le regole di validazione sono quelle
  * di `assets/js/datasets.js` con la copertura obbligatoria delle tre
  * difficoltà, come per una partita nuova; un test confronta i due lettori sulle
- * banche disponibili. Puro, senza browser.
- *
- * Unica differenza voluta: le formule LaTeX (`\( … \)`, `\[ … \]`) non sono
- * ancora rese dal prototipo 3D, quindi una banca che le contiene viene
- * rifiutata con un messaggio esplicito invece di mostrare il codice sorgente.
+ * banche disponibili. Puro, senza browser. Le formule LaTeX si validano con
+ * KaTeX come nella versione precedente (`validateMath`).
  */
+import katex from "katex";
 import type { Difficulty } from "../logic/types.ts";
+import { mathParts } from "./math.ts";
 
 export const DIFFICULTIES: readonly Difficulty[] = ["facile", "media", "difficile"];
 /** Limite di dimensione della versione precedente. */
@@ -51,7 +50,19 @@ function need(condition: unknown, message: string): asserts condition {
   if (!condition) throw new BankError(message);
 }
 
-const LATEX = /\\[()[\]]/;
+/** Validazione delle formule della versione precedente: delimitatori completi, formule che KaTeX sa rendere. */
+function validateMath(value: string): void {
+  for (const part of mathParts(value)) {
+    if (part.text !== undefined) need(!/\\[()[\]]/.test(part.text), "Delimitatori LaTeX incompleti");
+    else {
+      try {
+        katex.renderToString(part.math!, { throwOnError: true, trust: false, strict: "ignore", maxExpand: 1000 });
+      } catch (error) {
+        throw new BankError(`formula non valida: ${(error as Error).message}`);
+      }
+    }
+  }
+}
 
 function text(value: unknown, label: string): string {
   need(typeof value === "string" && value.trim() !== "", `${label}: testo vuoto o non valido`);
@@ -95,7 +106,13 @@ export function parseBank(id: string, source: string): QuestionBank {
       need(/^[ABCD]$/.test(letter), `${qid}: corretta deve essere A–D`);
       need(q.spiegazione === undefined || typeof q.spiegazione === "string", `${qid}: spiegazione non valida`);
       const explanation = (q.spiegazione as string | undefined) || "";
-      for (const value of [body, ...options, explanation]) need(!LATEX.test(value), `${qid}: formule LaTeX non ancora supportate dal prototipo 3D`);
+      for (const value of [body, ...options, explanation]) {
+        try {
+          validateMath(value);
+        } catch (error) {
+          throw new BankError(`${qid}: ${(error as Error).message}`);
+        }
+      }
       questions.push({
         id: qid,
         topic,
