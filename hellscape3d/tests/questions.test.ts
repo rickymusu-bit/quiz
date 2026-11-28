@@ -6,6 +6,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { applyAction, rngFromSeed } from "../src/logic/index.ts";
 import { BankError, DIFFICULTIES, parseBank, parseCatalog, type QuestionBank } from "../src/questions/bank.ts";
+import { mathParts, scienceParts } from "../src/questions/math.ts";
 import { ask, inPlay, loadLog, newLog, outcomeOf, present, QUESTION_LOG_KEY, recordAnswer, saveLog, type QuestionLog } from "../src/questions/deck.ts";
 import { memoryStorage, questionKey } from "../src/session.ts";
 import { parseQuestionKey, summarize } from "../src/questions/summary.ts";
@@ -50,7 +51,8 @@ test("banche non valide rifiutate con un messaggio", () => {
     ["difficoltà", broken((d) => (d.argomenti[0]!.domande[0]!.difficolta = "impossibile")), /difficoltà non valida/],
     ["ID ripetuto", broken((d) => (d.argomenti[0]!.domande[1]!.id = d.argomenti[0]!.domande[0]!.id)), /ripetuto/],
     ["livello mancante", broken((d) => d.argomenti.forEach((t) => t.domande.forEach((q) => q.difficolta === "difficile" && (q.difficolta = "media")))), /facili, medie e difficili/],
-    ["formula LaTeX", broken((d) => (d.argomenti[0]!.domande[0]!.testo = "Quanto vale \\(x^2\\)?")), /LaTeX/],
+    ["formula non valida", broken((d) => (d.argomenti[0]!.domande[0]!.testo = "Quanto vale \\(\\frac{1}{\\)?")), /formula non valida/],
+    ["delimitatore incompleto", broken((d) => (d.argomenti[0]!.domande[0]!.testo = "Quanto vale \\(x^2?")), /Delimitatori LaTeX incompleti/],
   ];
   for (const [label, text, message] of cases) assert.throws(() => parseBank("prova", text), (e: unknown) => e instanceof BankError && message.test(e.message), label);
   assert.throws(() => parseCatalog(JSON.stringify({ versione: 1, banche: [{ id: "x", nome: "X", url: "../segreti.json" }] })), BankError);
@@ -214,4 +216,30 @@ test("riepilogo a fine partita: conteggi per giocatore e argomento coerenti con 
   }
   assert.deepEqual(parseQuestionKey(questionKey("seme:con:due-punti", 12, "p3")), { turn: 12, playerId: "p3" });
   assert.equal(parseQuestionKey("chiave-estranea"), null);
+});
+
+test("formule: stesse parti della versione precedente su tutte le banche e sui delimitatori LaTeX; formule valide accettate", () => {
+  const legacy = createRequire(import.meta.url)("../../assets/js/datasets.js") as {
+    mathParts(text: string): unknown[];
+    scienceParts(text: string): unknown[];
+  };
+  const samples = [
+    ...banks.flatMap((b) => b.questions.flatMap((q) => [q.text, ...q.options, q.explanation])),
+    String.raw`Quanto vale \(x^2\) se \[y = \frac{1}{2}\]?`,
+    String.raw`Storica: \\(Q = m c \\Delta T\\) e \\[E = mc^2\\]`,
+    "Q = mcΔT e poi ΔT = Q/(mc), con Qrecipiente",
+    "",
+  ];
+  let formulas = 0;
+  for (const text of samples) {
+    assert.deepEqual(mathParts(text), legacy.mathParts(text), text);
+    const parts = scienceParts(text);
+    assert.deepEqual(parts, legacy.scienceParts(text), text);
+    formulas += parts.filter((p) => p.math !== undefined).length;
+  }
+  assert.ok(formulas > 10, `poche formule riconosciute nelle banche (${formulas})`);
+  // Una banca con formule LaTeX valide si legge (prima il prototipo la rifiutava).
+  const base = JSON.parse(source(catalog[0]!.url)) as { argomenti: { domande: Record<string, unknown>[] }[] };
+  base.argomenti[0]!.domande[0]!.testo = String.raw`Quanto vale \(\frac{Q}{m\,c}\)?`;
+  assert.match(parseBank("formule", JSON.stringify(base)).questions[0]!.text, /frac/);
 });

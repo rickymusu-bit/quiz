@@ -35,6 +35,7 @@
     "@napi-rs/canvas": "0.1.100",
     "@types/node": "22.20.7",
     "@types/three": "0.187.0",
+    "katex": "0.16.22",
     "playwright": "1.62.1",
     "typescript": "7.0.2",
     "vite": "8.4.0"

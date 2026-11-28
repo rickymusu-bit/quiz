@@ -18,6 +18,7 @@
  * saltano la regia, F accelera ×3, V cambia inquadratura, A esegue
  * un'azione automatica (sviluppo).
  */
+import "katex/dist/katex.min.css";
 import "./ui/hud.css";
 import { applyAction, createGame, rngFromSeed, saveToStorage, type Game, type GameAction, type GameState, type KeyValueStorage } from "./logic/index.ts";
 import { buildCityLayout } from "./layout/layout.ts";

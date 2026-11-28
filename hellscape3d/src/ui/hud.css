@@ -572,3 +572,16 @@ body {
 .hud-restart {
   text-align: center;
 }
+
+/* Formule (KaTeX): quelle in display scorrono in orizzontale invece di uscire dal pannello. */
+.math-scroll {
+  max-width: 100%;
+}
+.math-block {
+  display: block;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.math-inline .katex {
+  font-size: 1.05em;
+}

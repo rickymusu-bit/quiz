@@ -4,6 +4,7 @@
  * data, risposta corretta e spiegazione. Si chiude con «Chiudi» o Esc.
  */
 import type { GameSummary, SummaryItem, Tally } from "../questions/summary.ts";
+import { mathElement } from "./math.ts";
 
 const OUTCOME_LABELS: Readonly<Record<SummaryItem["outcome"], string>> = { correct: "corretta", wrong: "errata", timeout: "tempo scaduto" };
 
@@ -62,11 +63,11 @@ export function showSummary(host: HTMLElement, summary: GameSummary, onClose: ()
       const li = el("li", `summary-item is-${item.outcome}`);
       li.append(
         el("p", "summary-meta", `Turno ${item.turn} · ${item.playerName} · ${item.topicName} · ${item.difficulty} · ${OUTCOME_LABELS[item.outcome]}`),
-        el("p", "summary-question", item.text),
-        el("p", "", item.given === null ? "Nessuna risposta: tempo scaduto." : `Risposta data: ${item.given}`),
+        mathElement("p", "summary-question", item.text),
+        item.given === null ? el("p", "", "Nessuna risposta: tempo scaduto.") : mathElement("p", "", item.given, "Risposta data: "),
       );
-      if (item.outcome !== "correct") li.append(el("p", "", `Risposta corretta: ${item.correctAnswer}`));
-      li.append(el("p", "summary-explanation", item.explanation));
+      if (item.outcome !== "correct") li.append(mathElement("p", "", item.correctAnswer, "Risposta corretta: "));
+      li.append(mathElement("p", "summary-explanation", item.explanation));
       list.append(li);
     }
     dialog.append(list);
